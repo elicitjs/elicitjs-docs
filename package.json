@@ -1,0 +1,36 @@
+{
+  "name": "elicitjs-docs",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Documentation site for elicit-js / ElicitJS.",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elicitjs/elicitjs-docs.git"
+  },
+  "homepage": "https://github.com/elicitjs/elicitjs-docs#readme",
+  "bugs": {
+    "url": "https://github.com/elicitjs/elicitjs-docs/issues"
+  },
+  "dependencies": {
+    "d3": "^7.9.0",
+    "next": "^15.5.20",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-live": "^4.1.8"
+  },
+  "devDependencies": {
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^15.5.20",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^22.20.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^6.0.3"
+  }
+}
