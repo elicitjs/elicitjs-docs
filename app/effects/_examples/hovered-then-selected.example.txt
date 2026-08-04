@@ -1,0 +1,27 @@
+mount(Elicit({
+  width: 380, height: 250,
+  margins: { top: 14, right: 14, bottom: 28, left: 34 },
+  data: [
+    { cat: "A", n: 62 }, { cat: "B", n: 38 },
+    { cat: "C", n: 81 }, { cat: "D", n: 24 },
+  ],
+  schema: {
+    cat: { type: "categorical", domain: ["A", "B", "C", "D"] },
+    n:   { type: "quantitative", domain: [0, 100] },
+  },
+  // Different weights: `hovered` says which bar a gesture would take, `selected`
+  // says which one you picked. `selected` outranks `hovered`.
+  effects: {
+    hovered:  { outline: { color: "#94a3b8", width: 2,   pad: 3, opacity: 0.9 } },
+    selected: { outline: { color: "#0f766e", width: 3,   pad: 3, opacity: 1 } },
+    grabbed:  { filter: "brightness(0.85)" },
+  },
+  marks: [
+    bar({
+      channels: { x: { field: "cat" }, y: { field: "n", edit: move() } },
+      // Selection is pipeline state, not a data column: nothing here writes a
+      // `selected` field. Alt-click selects, so a plain click still drags.
+      edits: [ select({ when: when.alt }) ],
+    }),
+  ],
+}))

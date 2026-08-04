@@ -1,0 +1,51 @@
+// Two ways to paint a state, both available on every state.
+//
+//   element props  filter / opacity / fill / stroke / strokeWidth / cursor —
+//                  restyle the mark itself, without writing its own paint.
+//   outline        an overlay traced around the mark, above every layer.
+//
+// Left uses element props, right an outline. The dots keep the fill their `group`
+// field gives them in both.
+const rows = [
+  { x: 22, y: 34, group: "a" },
+  { x: 50, y: 66, group: "b" },
+  { x: 78, y: 40, group: "a" },
+];
+const schema = {
+  x:     { type: "quantitative", domain: [0, 100] },
+  y:     { type: "quantitative", domain: [0, 100] },
+  group: { type: "categorical", domain: ["a", "b"] },
+};
+const dots = () => point({
+  size: 11, stroke: "#ffffff", strokeWidth: 2,
+  channels: {
+    x:    { field: "x", edit: move() },
+    y:    { field: "y", edit: move() },
+    fill: { field: "group" },
+  },
+});
+
+// Element props: the dot brightens and thickens. No overlay.
+mount(Elicit({
+  width: 300, height: 220,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  data: rows, schema,
+  effects: {
+    hovered:  { filter: "brightness(1.25)", strokeWidth: 4 },
+    grabbed:  { filter: "brightness(0.8)" },
+    selected: false,
+  },
+  marks: [ dots() ],
+}));
+
+// Outline: the dot is untouched, and a ring is drawn around it.
+mount(Elicit({
+  width: 300, height: 220,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  data: rows, schema,
+  effects: {
+    hovered:  { outline: { color: "#0f172a", width: 2, pad: 7, dash: "3 3", opacity: 0.9 } },
+    selected: false,
+  },
+  marks: [ dots() ],
+}));

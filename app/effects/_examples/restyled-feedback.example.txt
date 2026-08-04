@@ -1,13 +1,13 @@
 mount(Elicit({
   width: 340, height: 240,
   margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  // EFFECTS are interaction STATE. Each state takes the same vocabulary:
+  // element props (filter / opacity / fill / stroke / strokeWidth / cursor) that
+  // ride as CSS over the mark's own paint, plus an `outline` overlay.
   effects: {
-    grab: "brightness(1.08)",
-    select: {
-      color: "#4f46e5",
-      ring: { dash: "1 3", width: 1.5, opacity: 0.5 },
-      highlight: { width: 4, opacity: 1, pad: 8 },
-    },
+    hovered:  { outline: { color: "#818cf8", width: 2, pad: 8, opacity: 0.7 } },
+    selected: { outline: { color: "#4f46e5", width: 4, pad: 8, opacity: 1 } },
+    grabbed:  { filter: "brightness(1.08)" },
   },
   data: [{ x: 25, y: 35 }, { x: 55, y: 68 }, { x: 78, y: 30 }],
   schema: {
@@ -22,7 +22,12 @@ mount(Elicit({
         x: { field: "x" },
         y: { field: "y" },
       },
-      edits: [ move({ channels: ["x", "y"], pick: "nearest", threshold: 45, guide: true }) ],
+      // The snap ring is a GUIDE — it shows the pick's reach, a rule about what a
+      // gesture will grab — so it is styled on the edit, not in `effects`.
+      edits: [ move({
+        channels: ["x", "y"], pick: "nearest", threshold: 45,
+        guide: { catchment: { color: "#4f46e5", dash: "1 3", width: 1.5, opacity: 0.5 } },
+      }) ],
     }),
   ],
 }))

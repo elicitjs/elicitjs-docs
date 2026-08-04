@@ -1,0 +1,27 @@
+const belief = [{ intercept: 1, slope: 0.4, aSd: 1.5, bSd: 0.25 }];
+const spreads = { interceptSpread: { field: "aSd" }, slopeSpread: { field: "bSd" } };
+const lineParams = {
+  intercept: { field: "intercept", edit: edit.trend.intercept() },
+  slope:     { field: "slope",     edit: edit.trend.slope() },
+};
+
+for (const render of ["region", "gradient", "samples"]) {
+  mount(Elicit({
+    width: 200, height: 170,
+    margins: { top: 10, right: 10, bottom: 22, left: 26 },
+    schema: {
+      x: { type: "quantitative", domain: [-10, 10] },
+      y: { type: "quantitative", domain: [-10, 10] },
+      intercept: { type: "quantitative" },
+      slope:     { type: "quantitative" },
+      aSd:       { type: "quantitative" },
+      bSd:       { type: "quantitative" },
+    },
+    data: belief,
+    marks: [
+      trendBand({ render, levels: 6, samples: 80, fill: "#0f766e", stroke: "#0f766e", channels: spreads }),
+      // Three renderings of the SAME belief, so all three share one edit set.
+      trend({ stroke: "#0f766e", channels: lineParams }),
+    ],
+  }));
+}

@@ -7,26 +7,46 @@ import { api } from './api';
 
 import trendLine from './_examples/trend-line.example.txt';
 import bothHandlesAtOnce from './_examples/both-handles-at-once.example.txt';
+import aBandAroundTheLine from './_examples/a-band-around-the-line.example.txt';
+import editingTheBand from './_examples/editing-the-band.example.txt';
+import threeReadings from './_examples/three-readings-of-one-band.example.txt';
+import aCorrelation from './_examples/a-correlation-is-a-pinned-trend.example.txt';
+import inertWithoutAnEdit from './_examples/inert-without-an-edit.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Trend line
+# Trend + Band
 
-<Lead>An **intercept-then-slope** line. The single datum `{ intercept, slope }` is a linear belief; the mark draws `y = intercept + slope·x` across the plot (clipped to the plot rectangle) plus two handles — an **intercept** handle at `x = 0` that translates the line and a **slope** handle that rotates it about the anchor. By default the axes cross at the origin. Stage the two handles to elicit the level first, then the trend. Trend is the one mark whose `x`/`y` channels name the plot’s _axes_ rather than columns of its datum: declare them in the schema (typically spanning negatives so the intercept sits in the middle of the frame).</Lead>
+<Lead>A **parametric line** and its uncertainty. The datum `{ intercept, slope }` is a linear belief; `trend` draws `y = intercept + slope·x` across the plot (clipped to the plot rectangle) plus two handles — an **intercept** handle at `x = 0` that translates the line and a **slope** handle that rotates it about the anchor. `trendBand` draws the band: a range on the intercept, a range on the slope, and every line between them. Trend is the one mark whose `x`/`y` channels name the plot’s _axes_ rather than columns of its datum — declare them in the schema (typically spanning negatives, so the intercept sits in the middle of the frame) and the axes cross at the origin by default.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="not-creatable" title="Trend can't be created by a gesture">
 
-Unlike a `point` or `bar`, a trend line is **derived**: its position comes from `intercept`/`slope`, not from an `x`/`y` you could invert a click into. So a plane `create` has nothing to place — trend is one of the two exceptions (with guides) in the [can/can't-create matrix](/editing/existence#what-can-create). You author a trend by editing its two handles, not by adding rows.
+Unlike a `point` or `bar`, a trend line is **derived**: its position comes from `intercept`/`slope`, not from an `x`/`y` you could invert a click into. So a plane `create` has nothing to place — trend is one of the two exceptions (with guides) in the [can/can't-create matrix](/editing/existence#what-can-create). You author a trend by editing its parameters, not by adding rows.
+
+</Section>
+
+<Section id="inert" title="Inert until an edit names the column">
+
+`trend()` draws the line and both handles, and writes nothing. Like every other mark, it is a **view** until an `edit` says which column a gesture sets — `edit.trend.intercept()` on the intercept channel, `edit.trend.slope()` on the slope channel. Staging goes on the edit (`edit.trend.slope({ stage: 1 })`), the same way it does everywhere else.
+
+<Example
+  code={inertWithoutAnEdit}
+  title="No edit, no writes"
+  blurb="The handles are drawn but the data never moves."
+  try={"drag either dot — nothing changes."}
+/>
 
 </Section>
 
 <Section id="twostep" title="Intercept, then slope">
 
 Domains span both sides of zero so the intercept sits on the y-axis in the middle of the frame. Stage 0: drag the intercept handle to set the level. Stage 1: drag the slope handle to set the trend (rotating about the anchor).
+
+The parameters are channels like any other, so the columns are renameable — `channels: { slope: { field: "r" } }` — or pinnable to a constant with `{ datum }`. They are unscaled: parameters in their own units, projected through `x`/`y` rather than encoded themselves.
 
 <Example
   code={trendLine}
@@ -39,6 +59,60 @@ Domains span both sides of zero so the intercept sits on the y-axis in the middl
   code={bothHandlesAtOnce}
   title="Both handles at once"
   blurb="Omit the stages (default null) to leave both handles always active."
+/>
+
+</Section>
+
+<Section id="band" title="The band around the line">
+
+`trendBand` takes the same two parameters plus a **spread** on each: `interceptSpread` and `slopeSpread`, half-widths in the field’s own units. The band it draws is the whole family of lines those ranges allow, and its envelope is exact — piecewise linear, with a single kink where `x` crosses zero (the point where only the intercept range is left).
+
+The two marks are views of one dataset. `trendBand` declares **no edits of its own**: a whole-dataset gesture declared on two marks would run twice, so put the edit on the mark the reader grabs and let the other re-derive on the next render.
+
+<Example
+  code={aBandAroundTheLine}
+  title="A band around the line"
+  blurb="Every line whose intercept is within aSd and whose slope is within bSd."
+/>
+
+For an asymmetric band, name the ends instead: `intercept1`/`intercept2` and `slope1`/`slope2`, the same `1`/`2` span spelling [`area`](/marks/area#band) and `rect` use. The range form wins wherever both are declared; pair it with `ordering` to stop it turning inside out.
+
+<Example
+  code={editingTheBand}
+  title="Editing the band"
+  blurb="handles: true puts a grab on each spread — the intercept's at the anchor, the slope's at the probe."
+  try={"drag either band handle, then drag the line's own handles underneath."}
+/>
+
+</Section>
+
+<Section id="render" title="Three readings of one band">
+
+`render` picks how the same family is drawn. `region` (the default) is one polygon: the exact envelope. `gradient` stacks `levels` nested envelopes so the ink darkens toward the line. `samples` draws individual lines from the family — the ensemble reading, where you see the hypotheses rather than their hull. There `distribution` chooses `normal` (the bounds are a `sigma`-wide envelope, so ~95% of draws land inside them) or `uniform` (every line in the range equally plausible).
+
+Each render inks through its own ordinary style channel: `fillOpacity` (default `0.18`) for the filled forms, `strokeOpacity` (default `0.15`) for **one line** of the fan. So a fan gets denser as you raise `samples` — drop `strokeOpacity` to thin it back out, or raise it for a sparse one.
+
+<Example
+  code={threeReadings}
+  title="region, gradient, samples"
+  blurb="One belief, three renderings. The polygon and the fan are the same statement."
+/>
+
+</Section>
+
+<Section id="correlation" title="A correlation is a pinned trend">
+
+A correlation belief is this mark with two things said about it: the intercept is **pinned** at the origin, and the slope is a coefficient in `[-1, 1]`. Neither needs a mark of its own — pinning is a constant channel (`intercept: { datum: 0 }`, which names no column, so no edit can write one), and the range is a `clamp`.
+
+Stage 0 aims the line: under [`probe`](/editing/probe) there is no handle to grab, so the gesture takes the pointer’s own `x` and the line follows the cursor; a click sets it and advances. Stage 1 opens the band — `slopeSpread` is how far the line through the pointer tilts away from the committed one, so the edge of the fan sits under the cursor.
+
+Both axes span matched `[-1, 1]` domains over a square plot, which is what makes the line’s screen angle read as `r`. Shipped as [`widgets.lineCone`](/widgets#linecone).
+
+<Example
+  code={aCorrelation}
+  title="Line + Cone, from the general marks"
+  blurb="Two clicks: aim the line, then open the cone."
+  try={"move the mouse, click, move again, click."}
 />
 
 </Section>

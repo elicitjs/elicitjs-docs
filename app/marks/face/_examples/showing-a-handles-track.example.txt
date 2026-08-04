@@ -1,0 +1,19 @@
+mount(Elicit({
+  width: 320, height: 300,
+  margins: { top: 12, right: 12, bottom: 12, left: 12 },
+  data: [ { squint: 0.5, open: 0.5 } ],
+  schema: {
+    squint: { type: "quantitative", domain: [0, 1] },
+    open:   { type: "quantitative", domain: [0, 1] },
+  },
+  marks: [
+    face({
+      channels: {
+        // `guide: { track: true }` draws the range each handle can travel. Opt in
+        // where that range isn't obvious from the mark itself.
+        eyeSquint: { field: "squint", edit: edit.face.expression({ guide: { track: true } }) },
+        mouthOpen: { field: "open",   edit: edit.face.expression({ guide: { track: true } }) },
+      },
+    }),
+  ],
+}))

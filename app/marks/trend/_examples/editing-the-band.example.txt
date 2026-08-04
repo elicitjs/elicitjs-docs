@@ -6,12 +6,22 @@ mount(Elicit({
     y: { type: "quantitative", domain: [-10, 10] },
     intercept: { type: "quantitative" },
     slope:     { type: "quantitative" },
+    aSd:       { type: "quantitative" },
+    bSd:       { type: "quantitative" },
   },
-  data: [{ intercept: 2, slope: 0.5 }],
+  data: [{ intercept: 1, slope: 0.4, aSd: 2, bSd: 0.3 }],
   marks: [
-    // Unstaged: both handles live at once. Each edit claims its own handle, so
-    // dragging the intercept never moves the slope and vice versa.
+    // The band is a VIEW. It draws the spreads; the handles below write them.
+    trendBand({
+      fill: "#7c3aed",
+      handles: true,
+      channels: {
+        interceptSpread: { field: "aSd", edit: edit.trend.interceptSpread() },
+        slopeSpread:     { field: "bSd", edit: edit.trend.slopeSpread() },
+      },
+    }),
     trend({
+      stroke: "#7c3aed",
       channels: {
         intercept: { field: "intercept", edit: edit.trend.intercept() },
         slope:     { field: "slope",     edit: edit.trend.slope() },

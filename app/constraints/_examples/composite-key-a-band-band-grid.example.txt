@@ -7,8 +7,8 @@ mount(Elicit({
   ],
   constraints: [ unique({ field: ["x", "y"], max: 1 }) ],
   schema: {
-    x:     { domain: ["A", "B", "C"] },
-    y:     { domain: ["Low", "Mid", "High"] },
+    x:     { type: "categorical", domain: ["A", "B", "C"] },
+    y:     { type: "ordinal",     domain: ["Low", "Mid", "High"] },
     group: { type: "ordinal", domain: ["alpha", "beta", "gamma"] },
   },
   marks: [

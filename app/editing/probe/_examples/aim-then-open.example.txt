@@ -1,22 +1,36 @@
 const chart = Elicit({
-  width: 360, height: 320,
+  width: 320, height: 320,
   margins: { top: 20, right: 20, bottom: 20, left: 20 },
   axes: false,
   data: [{ r: 0, spread: 0 }],
   schema: {
+    x: { type: "quantitative", domain: [-1, 1] },
+    y: { type: "quantitative", domain: [-1, 1] },
     r:      { type: "quantitative", domain: [-1, 1] },
     spread: { type: "quantitative", domain: [0, 1] },
   },
   marks: [
-    cone({
-      id: "belief",
+    trendBand({
+      render: "samples", samples: 60,
       channels: {
-        angle: { field: "r", scale: { range: [-45, 45] },
-                 edit: rotate({ pick: "probe", stage: 0 }) },
-        spread: { field: "spread", scale: { range: [0, 45] },
-                  edit: rotate({ pick: "probe", stage: 1, relativeTo: "angle" }) },
+        intercept:   { datum: 0 },
+        slope:       { field: "r" },
+        slopeSpread: { field: "spread" },
       },
-      samples: 60, wedge: true,
+    }),
+    trend({
+      id: "belief",
+      handles: false,
+      stroke: "#d33", strokeWidth: 3,
+      channels: {
+        intercept: { datum: 0 },
+        // Stage 0: no handle to grab, so the gesture takes the pointer's own x
+        // and the line simply follows the cursor. A click sets it and advances.
+        slope: { field: "r", edit: edit.trend.slope({ pick: "probe", stage: 0 }) },
+        // Stage 1: how far the line through the pointer tilts away from the
+        // committed one is the envelope half-width.
+        slopeSpread: { field: "spread", edit: edit.trend.slopeSpread({ pick: "probe", stage: 1 }) },
+      },
     }),
   ],
 });

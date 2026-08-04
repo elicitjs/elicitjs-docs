@@ -1,5 +1,5 @@
 mount(Elicit({
-  width: 360, height: 300,
+  width: 360, height: 260,
   margins: { top: 16, right: 16, bottom: 28, left: 34 },
   schema: {
     x: { type: "quantitative", domain: [-10, 10] },
@@ -9,12 +9,13 @@ mount(Elicit({
   },
   data: [{ intercept: 2, slope: 0.5 }],
   marks: [
-    // Unstaged: both handles live at once. Each edit claims its own handle, so
-    // dragging the intercept never moves the slope and vice versa.
+    // No edit anywhere: the line and both handles draw, and nothing you do to
+    // them changes the data. A mark is a VIEW until an edit names the column a
+    // gesture writes — trend is no exception, and used to be.
     trend({
       channels: {
-        intercept: { field: "intercept", edit: edit.trend.intercept() },
-        slope:     { field: "slope",     edit: edit.trend.slope() },
+        intercept: { field: "intercept" },
+        slope:     { field: "slope" },
       },
     }),
   ],

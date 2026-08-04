@@ -1,0 +1,26 @@
+mount(Elicit({
+  width: 420, height: 240,
+  margins: { top: 16, right: 16, bottom: 30, left: 34 },
+  data: [
+    { cat: "A", n: 40, team: "north" },
+    { cat: "B", n: 65, team: "south" },
+    { cat: "C", n: 28, team: "north" },
+  ],
+  schema: {
+    cat:  { type: "categorical", domain: ["A", "B", "C"] },
+    n:    { type: "quantitative", domain: [0, 100] },
+    team: { type: "categorical", domain: ["north", "south"] },
+  },
+  // One legend per non-positional channel bound to a field. For per-channel
+  // config: `legends: { fill: { anchor: "top" }, size: false }`.
+  legends: true,
+  marks: [
+    bar({
+      channels: {
+        x:    { field: "cat" },
+        y:    { field: "n", edit: move() },
+        fill: { field: "team" },
+      },
+    }),
+  ],
+}))

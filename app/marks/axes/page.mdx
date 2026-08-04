@@ -16,9 +16,25 @@ export default function Layout({ children }) {
 
 # Axis, Grid & Rule
 
-<Lead>Axes and gridlines are composable marks. Configure them the easy way through the global `axes: {…}` convenience (ticks, formats, titles, hiding, free positioning), or add `axisX` / `axisY` / `gridY` / `ruleY` as explicit marks for full control.</Lead>
+<Lead>Axes and gridlines are **chart elements** — composable like marks, but they draw a *scale* rather than the data. Configure them the easy way through the global `axes: {…}` convenience (ticks, formats, titles, hiding, free positioning), or add `axisX` / `axisY` / `gridY` / `ruleY` as explicit marks for full control.</Lead>
 
 <ApiReference entries={api} />
+
+<Section id="chart-elements" title="Chart elements are not data marks">
+
+`axis`, `grid`, `legend` and `axisRadial` sit in `plot` beside the data marks, but they follow a different contract.
+
+A data mark views the dataset's columns through a `channels` map. A chart element views **one scale**, named by a singular `channel` (`'x'`, `'fill'`, `'angle'`), so it has no channel map and no fields of its own.
+
+Its `stroke`, `fill` and `fontSize` paint a spine and its labels rather than a datum, so they stay plain options instead of becoming channels.
+
+An edit on a data mark writes a **row**; an edit on a chart element writes the **domain** (`edit.axis.*`). `create` therefore doesn't apply to an element — there is no row to mint. Since an element has no channel map, an edit on one recovers its field from the scale, which is how a legend picker knows what to write.
+
+A legend also **reserves space**, shrinking the plot; nothing else does.
+
+Both halves have an implicit layer on the spec: `axes` for the positional scales, [`legends`](/marks/legend#legends-key) for the rest.
+
+</Section>
 
 <Section id="global" title={"The global axes:{} convenience"}>
 

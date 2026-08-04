@@ -1,0 +1,56 @@
+// `guide: true` is shorthand for the parts at their defaults. Pass an object to
+// switch and restyle each one.
+const rows = [{ x: 30, y: 45 }, { x: 60, y: 62 }, { x: 84, y: 28 }];
+const schema = {
+  x: { type: "quantitative", domain: [0, 100] },
+  y: { type: "quantitative", domain: [0, 100] },
+};
+const bounds = [
+  clamp({ field: "y", min: 15, max: 80 }),
+  snap({ field: "y", step: 10 }),
+];
+
+// One colour for every part.
+mount(Elicit({
+  width: 300, height: 220,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  data: rows, schema, constraints: bounds,
+  marks: [
+    point({
+      size: 9,
+      channels: {
+        x: { field: "x" },
+        y: { field: "y", edit: move({
+          pick: "nearest", threshold: 40,
+          guide: { bounds: true, catchment: true, color: "#0f766e" },
+        }) },
+      },
+    }),
+  ],
+}));
+
+// Or one per part. `snap` stops draw as short ticks at the plot edge, where the
+// axis sits — `tickLength` and `tickOpacity` pull them clear of it.
+mount(Elicit({
+  width: 300, height: 220,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  data: rows, schema, constraints: bounds,
+  marks: [
+    point({
+      size: 9,
+      channels: {
+        x: { field: "x" },
+        y: { field: "y", edit: move({
+          pick: "nearest", threshold: 40,
+          guide: {
+            bounds: {
+              color: "#b91c1c", dash: "6 2", width: 1.5, opacity: 1,
+              tickLength: 18, tickOpacity: 0.9,
+            },
+            catchment: { color: "#94a3b8", dash: "1 4", width: 1, opacity: 0.35 },
+          },
+        }) },
+      },
+    }),
+  ],
+}));

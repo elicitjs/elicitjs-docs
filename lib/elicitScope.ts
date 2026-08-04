@@ -9,13 +9,15 @@ import * as d3 from 'd3';
 import vancouver from '../data/vancouver.js';
 
 // The scoped namespaces are held back so they don't shadow the same-named MARKS
-// spread from elicit.plot (axis / arc / waffle / line).
+// spread from elicit.plot (axis / arc / waffle / line / trend / face).
 const {
   line: _editLine,
   axis: _editAxis,
   arc: _editArc,
   geo: _editGeo,
   waffle: _editWaffle,
+  trend: _editTrend,
+  face: _editFace,
   // The legend pickers stay under `edit.*` so the same-named `legend` MARK (from
   // elicit.plot) — and its `legendColor`/`legendSize`/`legendSymbol` siblings — win
   // the bare name, the way axis/arc/waffle marks win over their edit namespaces.

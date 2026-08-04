@@ -1,0 +1,49 @@
+const chart = Elicit({
+  width: 300, height: 300,
+  margins: { top: 14, right: 14, bottom: 14, left: 14 },
+  axes: false,
+  schema: {
+    // Standardized units, matched on both axes, so a slope of 1 is a 45° line.
+    x: { type: "quantitative", domain: [-1, 1] },
+    y: { type: "quantitative", domain: [-1, 1] },
+    r:      { type: "quantitative", domain: [-1, 1], default: 0 },
+    spread: { type: "quantitative", domain: [0, 1],  default: 0 },
+  },
+  data: [{ r: 0, spread: 0 }],
+  // What makes it a CORRELATION rather than a free trend — declared, not baked in.
+  constraints: [
+    clamp({ field: "r",      min: -1, max: 1 }),
+    clamp({ field: "spread", min: 0,  max: 1 }),
+  ],
+  marks: [
+    trendBand({
+      render: "samples",
+      samples: 80,
+      channels: {
+        intercept:   { datum: 0 },       // pinned at the origin
+        slope:       { field: "r" },
+        slopeSpread: { field: "spread" },
+      },
+    }),
+    trend({
+      handles: false,
+      stroke: "#f59e0b",
+      strokeWidth: 5,
+      channels: {
+        intercept: { datum: 0 },
+        slope:       { field: "r",      edit: edit.trend.slope({ pick: "probe", stage: 0 }) },
+        slopeSpread: { field: "spread", edit: edit.trend.slopeSpread({ pick: "probe", stage: 1 }) },
+      },
+    }),
+  ],
+});
+mount(chart);
+const out = document.createElement("div");
+out.style.cssText = "font:12px ui-monospace,monospace;margin-top:6px;color:#64748b";
+const show = () => {
+  const d = chart.getData()[0] || {};
+  out.textContent = "stage " + chart.getStage() +
+    "  ·  r=" + (d.r ?? 0).toFixed(2) + "  spread=" + (d.spread ?? 0).toFixed(2);
+};
+chart.on("change", show); chart.on("stage", show); show();
+mount(out);

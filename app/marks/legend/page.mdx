@@ -11,6 +11,7 @@ import legendOnTheBottom from './_examples/legend-on-the-bottom.example.txt';
 import categoryPicker from './_examples/category-picker.example.txt';
 import valuePicker from './_examples/value-picker.example.txt';
 import pickAndEdit from './_examples/pick-and-edit.example.txt';
+import theLegendsKey from './_examples/the-legends-key.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -21,6 +22,24 @@ export default function Layout({ children }) {
 <Lead>A legend for a non-positional channel — `fill`, `stroke`, `size`, `symbol`. Like an axis, it is a composable mark that reads the channel's scale; unlike an axis, it **reserves space** on its side, so the plot shrinks to make room and the legend never overlaps the marks. It can also be a **picker**: click a swatch to set a category, or drag a ramp handle to set a value, written straight back to the data.</Lead>
 
 <ApiReference entries={api} />
+
+<Section id="legends-key" title="The legends key">
+
+A legend is a **chart element**, not a data mark: it draws a *scale* rather than columns, so it has no channel map and no fields of its own (see [Chart elements](/marks/axes#chart-elements)). Like axes, it has an implicit layer — `legends` on the spec, the counterpart to `axes`:
+
+- `legends: true` — one legend per non-positional channel bound to a field
+- `legends: \{ fill: \{ anchor: "top" \}, size: false \}` — per-channel config; `false` suppresses one
+- omitted — none, which is the default
+
+It defaults to **off**, unlike `axes`, because a legend reserves layout space; injecting one the moment a `fill` field appears would silently shrink the plot. An explicit `legendColor()` in `marks` always wins for its channel.
+
+<Example
+  code={theLegendsKey}
+  title="legends: true"
+  blurb="One key per bound non-positional scale, with no legend mark composed by hand."
+/>
+
+</Section>
 
 <Section id="discrete" title="A discrete colour legend">
 

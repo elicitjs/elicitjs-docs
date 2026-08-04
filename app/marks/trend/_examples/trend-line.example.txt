@@ -9,9 +9,14 @@ const chart = Elicit({
   },
   data: [{ intercept: 0, slope: 0.6 }],
   marks: [
+    // A trend draws its line and two handles, but writes nothing until an edit
+    // names the column each handle sets. Staging goes on the edit, like any other:
+    // the intercept is live in stage 0, the slope in stage 1.
     trend({
-      interceptStage: 0,
-      slopeStage: 1,
+      channels: {
+        intercept: { field: "intercept", edit: edit.trend.intercept({ stage: 0 }) },
+        slope:     { field: "slope",     edit: edit.trend.slope({ stage: 1 }) },
+      },
     }),
   ],
 });

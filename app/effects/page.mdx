@@ -7,6 +7,10 @@ import { api } from './api';
 
 import proximitySelect from './_examples/proximity-select.example.txt';
 import restyledFeedback from './_examples/restyled-feedback.example.txt';
+import hoverAnyEditableMark from './_examples/hover-any-editable-mark.example.txt';
+import theTwoMechanisms from './_examples/the-two-mechanisms.example.txt';
+import hoveredThenSelected from './_examples/hovered-then-selected.example.txt';
+import switchingAStateOff from './_examples/switching-a-state-off.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -14,13 +18,114 @@ export default function Layout({ children }) {
 
 # Interaction effects
 
-<Lead>Feedback for interaction state (grabbing, proximity-selecting) lives in its own layer, never on a mark’s paint channels — so it can’t clobber your fill/stroke. Customize it through `effects`: a `grab` filter while dragging, and a `select` overlay (ring + highlight) for the proximity target.</Lead>
+<Lead>An **effect** is transient feedback for the state of an interaction: `hovered`, `selected`, `grabbed`. Set them in `effects: \{ ... \}` on the `Elicit` spec. Effects never write a mark's paint channels, so they can't clobber a data-driven `fill` or `stroke`. For the rules a gesture obeys — a clamp's bounds, a pick's reach — see [Guides](/guides).</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="default" title="The default select effect">
+<Section id="states" title="The three states">
 
-A pick: "nearest" drag. The select effect draws the snap-zone ring and a highlight outline around the targeted dot — without touching the stroke you set.
+`effects` is keyed by state, and every state takes the same options.
+
+**`hovered`** applies when the pointer is over the mark, or when a proximity pick has resolved it. Both routes draw the same thing, whether you point at a mark or a `pick: "nearest"` edit picks it as the closest.
+
+**`selected`** applies when the mark is in the chart's selection.
+
+**`grabbed`** applies while a drag on it is in flight. Pass a string as shorthand for `\{ filter \}`.
+
+Set a state to `false` to switch it off.
+
+</Section>
+
+<Section id="hover" title="Hover on an editable mark">
+
+`hovered` applies to every editable mark. You don't opt in, and it doesn't need a
+`pick` — point at a draggable bar and it responds before you press.
+
+<Example
+  code={hoverAnyEditableMark}
+  title="A plain draggable bar"
+  blurb="A single move() on y. Nothing in the spec asks for hover feedback."
+  try={(
+    <>
+      <b>Move</b> across the bars without pressing, then <b>drag</b> one.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="mechanisms" title="The two mechanisms">
+
+Each state paints in one of two ways, and can use both at once.
+
+**Element props** restyle the mark itself: `filter`, `opacity`, `fill`, `stroke`,
+`strokeWidth`, `cursor`. They apply as CSS properties, which override a mark's own
+paint while the state holds and are removed when it ends. Your data-driven `fill`
+and `stroke` are never written.
+
+**`outline`** draws an overlay around the mark, above every other layer. It takes
+`color`, `width`, `pad`, `dash` and `opacity`, and traces whatever shape the mark
+is: a ring on a circle, an inflated box on a rect or tick, the path itself on an
+arc slice or polygon, a ring at the anchor on a label.
+
+<Example
+  code={theTwoMechanisms}
+  title="Element props, and outline"
+  blurb="Left restyles the dot; right leaves it alone and rings it. Both keep the fill the data gives it."
+  try={(
+    <>
+      <b>Hover</b> both charts. The dots' own colours never change.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="precedence" title="Hovered and selected together">
+
+`selected` outranks `hovered`, so a selected mark is never also drawn as hovered.
+Give the two different weights: `hovered` says which mark a gesture would take,
+`selected` says which one you picked.
+
+Selection is pipeline state, not a data column — `edit.select` writes no `selected`
+field. See [Editing a selected item](/marks/legend#dynamic-target).
+
+<Example
+  code={hoveredThenSelected}
+  title="A light hover, a firm selection"
+  blurb="Alt-click selects, so a plain click still drags. Hover stays light; the selection holds."
+  try={(
+    <>
+      <b>Alt-click</b> a bar to select it, <b>hover</b> the others, <b>drag</b> any.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="off" title="Switching a state off">
+
+`false` disables a state. Turn one off where the mark already reads clearly enough
+on its own, such as a dense grid where an outline per cell adds noise.
+
+<Example
+  code={switchingAStateOff}
+  title="Feedback only on drag"
+  blurb="hovered: false and selected: false; only the drag reads back."
+  try={(
+    <>
+      <b>Hover</b> a bar, then <b>drag</b> it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="default" title="Hover and proximity, one signal">
+
+A `pick: "nearest"` drag draws two things. The ring is the pick's `catchment`, a
+[guide](/guides#parts) on the edit. The outline on the resolved dot is the `hovered`
+effect — the same one you get by pointing straight at a mark.
 
 <Example
   code={proximitySelect}
@@ -37,7 +142,9 @@ A pick: "nearest" drag. The select effect draws the snap-zone ring and a highlig
 
 <Section id="custom" title="Customized effects">
 
-The same edit, restyled through `effects: \{ grab, select: \{ color, ring, highlight \} \}`. The mark's own stroke stays intact throughout.
+The same edit, restyled. The states go in `effects`; the ring goes in the edit's
+`guide: \{ catchment \}`, since it describes the pick rather than the mark's state.
+The dots keep the `stroke` you set throughout.
 
 <Example
   code={restyledFeedback}

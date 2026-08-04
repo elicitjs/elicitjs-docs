@@ -92,7 +92,9 @@ Band y of questions × band x of options. `toggle()` on the (x, y) tuple names a
 
 <Section id="linecone" title="Line + Cone">
 
-The two-step correlation instrument: aim the line and click, open the cone and click. `getData()` returns `[\{ r, spread \}]`.
+The two-step correlation instrument: aim the line and click, open the cone and click. `getData()` returns `[\{ r, spread \}]`, and `on("stage")` says which question the reader is on (2 = both answered).
+
+It is a **preset, not a mark**: [`trendBand`](/marks/trend#band) + [`trend`](/marks/trend) over one dataset, with the correlation stated as a pinned `intercept: \{ datum: 0 \}` channel and two `clamp` constraints. Nothing about it is special-cased — [the same spec written out](/marks/trend#correlation) sits on the trend page. The chart is sized to a square inner plot, which is what makes the line’s screen angle read as `r`.
 
 <Example
   code={asAWidget4}

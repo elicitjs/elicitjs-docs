@@ -21,8 +21,9 @@ mount(Elicit({
         y: { field: "mood" },
         // Bind the smile to the SAME field as y: click higher → happier face,
         // and a created face's expression derives from the mood create mints —
-        // no extra field to seed.
-        mouthCurve: { field: "mood" },
+        // no extra field to seed. The edit makes pulling the mouth write `mood`
+        // too, so the smile and the y position stay two views of one column.
+        mouthCurve: { field: "mood", edit: edit.face.expression() },
       },
       // A click on an empty day's column inverts the pointer to (day, mood) and
       // mints one face there. A click that lands ON a face carries a node, so it

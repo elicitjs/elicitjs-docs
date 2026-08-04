@@ -7,7 +7,7 @@ mount(Elicit({
   schema: {
     x:   { type: "quantitative", domain: [0, 100] },
     y:   { type: "quantitative", domain: [0, 100] },
-    mag: { domain: [0, 14] },
+    mag: { type: "quantitative", domain: [0, 14] },
   },
   marks: [
     point({

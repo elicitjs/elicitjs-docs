@@ -10,6 +10,7 @@ import fullChernoffFace from './_examples/full-chernoff-face.example.txt';
 import aMoodPerPerson from './_examples/a-mood-per-person.example.txt';
 import moveAndResizeTheHead from './_examples/move-and-resize-the-head.example.txt';
 import oneFacePerDay from './_examples/one-face-per-day.example.txt';
+import showingATrack from './_examples/showing-a-handles-track.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -40,7 +41,7 @@ The emotion preset binds `mouthCurve` to `valence` and `eyeScale` to `arousal`. 
 
 <Section id="expressive" title="Turn on more expressions">
 
-Bind any subset of the seven params in `channels`, each as a plain `{ field }` — the binding both drives the geometry and makes that feature draggable. Unbound params stay neutral. Here every param is live: mouth (↕ curve, ↔ smirk), eyes (↕ aperture), the eyelid dot (↓ squint), the lip dot (↓ open), and the brows (↕ height, ↔ tilt).
+Bind any subset of the seven params in `channels`, each as a plain `{ field }` — the binding drives the geometry, and an `edit.face.expression()` on it makes that feature draggable. Unbound params stay neutral. Here every param is live: mouth (↕ curve, ↔ smirk), eyes (↕ aperture), the eyelid dot (↓ squint), the lip dot (↓ open), and the brows (↕ height, ↔ tilt).
 
 <Example
   code={fullChernoffFace}
@@ -49,6 +50,23 @@ Bind any subset of the seven params in `channels`, each as a plain `{ field }` �
   try={(
     <>
       <b>Drag</b> the mouth, eyes, brows, or the eyelid / lip dots.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="track" title="Showing a handle's track">
+
+A face's handles move along ranges that no scale describes — they are derived from the head's radius. The mark declares each one on its handle, and the edit inverts the pointer through it; `guide: \{ track: true \}` draws that same range, so what you see is the mapping rather than a redrawing of it. Opt-in, because on a chart where the range is obvious it is only extra ink.
+
+<Example
+  code={showingATrack}
+  title="A handle's travel range"
+  blurb="The dashed segment is exactly the range the edit maps the pointer onto."
+  try={(
+    <>
+      <b>Drag</b> the mouth or a brow along its dashed track.
     </>
   )}
 />

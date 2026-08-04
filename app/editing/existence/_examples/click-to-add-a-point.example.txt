@@ -3,7 +3,9 @@ mount(Elicit({
   margins: { top: 14, right: 14, bottom: 26, left: 30 },
   data: [{ x: 30, y: 30, group: "a" }],
   schema: {
-    s: { type: "categorical" },  // the series key; declared so create() mints it
+    // Declared so create() mints it on a new row — an undeclared column would be
+    // missing from every point the click adds.
+    group: { type: "categorical" },
     x: { type: "quantitative", domain: [0, 100] },
     y: { type: "quantitative", domain: [0, 100] },
   },

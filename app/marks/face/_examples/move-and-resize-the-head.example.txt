@@ -5,21 +5,24 @@ mount(Elicit({
   schema: {
     px:      { type: "quantitative", domain: [-1, 1] },
     py:      { type: "quantitative", domain: [-1, 1] },
-    mag:     { domain: [30, 90] },
+    mag:     { type: "quantitative", domain: [30, 90] },
     valence: { type: "quantitative", domain: [-1, 1] },
     arousal: { type: "quantitative", domain: [-1, 1] },
   },
   marks: [
     face({
       channels: {
-        // Both x AND y bound -> the head is a MOVE target: grab an empty part of
-        // the face and drag it. size bound -> a resize handle on the right rim
-        // (an absolute-mode slide along x). Give size a radius range (the default
-        // is a small [3,18] dot range) so the head reads as a face. The emotion
-        // preset still binds the mouth/eyes to valence/arousal.
-        x: { field: "px" },
-        y: { field: "py" },
-        size: { field: "mag", scale: { range: [30, 92] } },
+        // Both x AND y bound -> the head can be a MOVE target; `edit.face.move()`
+        // is what actually makes grabbing an empty part of the face drag it.
+        // size bound -> a resize handle on the right rim (an absolute-mode slide
+        // along x). Give size a radius range (the default is a small [3,18] dot
+        // range) so the head reads as a face.
+        x: { field: "px", edit: edit.face.move() },
+        y: { field: "py", edit: edit.face.move() },
+        size: { field: "mag", scale: { range: [30, 92] }, edit: edit.face.expression() },
+        // The preset's two expression channels, declared so they are editable too.
+        mouthCurve: { field: "valence", edit: edit.face.expression() },
+        eyeScale:   { field: "arousal", edit: edit.face.expression() },
       },
     }),
   ],

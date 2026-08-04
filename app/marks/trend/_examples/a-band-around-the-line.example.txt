@@ -1,0 +1,33 @@
+mount(Elicit({
+  width: 360, height: 300,
+  margins: { top: 16, right: 16, bottom: 28, left: 34 },
+  schema: {
+    x: { type: "quantitative", domain: [-10, 10] },
+    y: { type: "quantitative", domain: [-10, 10] },
+    // The band's four elicited columns. Every column of the dataset belongs in
+    // the schema — that is the contract of what this chart elicits.
+    intercept: { type: "quantitative" },
+    slope:     { type: "quantitative" },
+    aSd:       { type: "quantitative" },
+    bSd:       { type: "quantitative" },
+  },
+  data: [{ intercept: 1, slope: 0.4, aSd: 1.5, bSd: 0.25 }],
+  marks: [
+    trendBand({
+      fill: "#2563eb",
+      channels: {
+        interceptSpread: { field: "aSd" },
+        slopeSpread:     { field: "bSd" },
+      },
+    }),
+    // Drag either handle to move the line; the band above re-derives from the same
+    // two parameters, so it follows without carrying an edit of its own.
+    trend({
+      stroke: "#2563eb",
+      channels: {
+        intercept: { field: "intercept", edit: edit.trend.intercept() },
+        slope:     { field: "slope",     edit: edit.trend.slope() },
+      },
+    }),
+  ],
+}));

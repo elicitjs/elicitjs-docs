@@ -13,7 +13,6 @@ import { api as waffleApi } from '../../app/marks/waffle/api';
 import { api as arcApi } from '../../app/marks/arc/api';
 import { api as needleApi } from '../../app/marks/needle/api';
 import { api as axisRadialApi } from '../../app/marks/axis-radial/api';
-import { api as coneApi } from '../../app/marks/cone/api';
 import { api as trendApi } from '../../app/marks/trend/api';
 import { api as legendApi } from '../../app/marks/legend/api';
 import { api as axesApi } from '../../app/marks/axes/api';
@@ -105,14 +104,14 @@ export const MARKS: MarkManifestEntry[] = [
     family: 'axisRadial', label: 'Radial axis', category: 'Polar & gauges', docHref: '/marks/axis-radial',
     api: axisRadialApi, factoryNames: { auto: 'axisRadial' }, buildable: false, channels: [],
   },
-  {
-    family: 'cone', label: 'Line + Cone', category: 'Polar & gauges', docHref: '/marks/cone',
-    api: coneApi, factoryNames: { auto: 'cone' }, buildable: false, channels: [],
-  },
   // Chrome / derived — read another channel's scale rather than encoding fresh data.
   {
-    family: 'trend', label: 'Trend line', category: 'Chrome', docHref: '/marks/trend',
+    family: 'trend', label: 'Trend + Band', category: 'Chrome', docHref: '/marks/trend',
     api: trendApi, factoryNames: { auto: 'trend' }, buildable: false, channels: [],
+  },
+  {
+    family: 'trendBand', label: 'Trend band', category: 'Chrome', docHref: '/marks/trend',
+    api: trendApi, factoryNames: { auto: 'trendBand' }, buildable: false, channels: [],
   },
   {
     family: 'legend', label: 'Legend', category: 'Chrome', docHref: '/marks/legend',

@@ -13,6 +13,16 @@ mount(Elicit({
     arousal: { type: "quantitative", domain: [-1, 1] },
   },
   marks: [
-    face({ size: 46, channels: { x: { field: "who" } } }),
+    face({
+      size: 46,
+      channels: {
+        x: { field: "who" },
+        // Declared, not implied: these are the two columns a drag on this face
+        // writes. (The mark's emotion preset would DRAW the same binding, but a
+        // mark is inert until an edit names the column it touches.)
+        mouthCurve: { field: "valence", edit: edit.face.expression() },
+        eyeScale:   { field: "arousal", edit: edit.face.expression() },
+      },
+    }),
   ],
 }))

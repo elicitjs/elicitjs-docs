@@ -7,6 +7,8 @@ import { api } from './api';
 
 import aTargetBandWithARule from './_examples/a-target-band-with-a-rule.example.txt';
 import aMeanLineThatChasesTheBars from './_examples/a-mean-line-that-chases-the-bars.example.txt';
+import anEditDrawsItsBounds from './_examples/an-edit-draws-its-bounds.example.txt';
+import restylingTheParts from './_examples/restyling-the-parts.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -14,18 +16,76 @@ export default function Layout({ children }) {
 
 # Guides
 
-<Lead>A guide is a graphical mark that isn’t bound to a row the way a plot mark is: it draws an annotation. But it is still allowed to **depend on the data** — every guide option may be a literal _or_ a function of the guide context (`{ data, scales, features, ui, width, height, stage }`), so a mean line is one line of spec. Guides rebuild every render and never capture a gesture. `guides.rule` draws a reference line at a data value, `guides.region` shades a band between two values, and `guides.proximity` visualizes what a nearest-pick edit has selected. (An edit’s own constraint bounds draw automatically via `guide: true`.)</Lead>
+<Lead>A guide draws a **rule** — something true about the chart that isn't one of its rows. Two kinds: an edit draws its own rules with `guide:` (its constraint bounds, its pick's reach, its handle's track), and you declare annotations in `guides: [...]` on the spec (`guides.rule`, `guides.region`, `guides.proximity`). Guides rebuild every render and never capture a gesture. For feedback on interaction state — hovered, selected, grabbed — see [Effects](/effects).</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="annotations" title="Rule & region">
+<Section id="two-kinds" title="Which kind you want">
 
-A shaded target band (region) and a reference line (rule) annotate a chart. They sit under the marks and follow the same scales, so they stay put as points move.
+The two differ in who declares them.
+
+**`guide:` on an edit** draws the edit's own rules. It already knows the channel, the scale and the constraints that gate it, so you repeat none of them. Use it to show what a gesture is allowed to do.
+
+**`guides: [...]` on the spec** draws an annotation you choose — a target line, a shaded range — from whatever you compute out of the guide context.
+
+Reach for the edit-owned form when the thing you want to draw is already known to the edit. A `guides.rule` at a `clamp` limit restates that limit in two places, and the two drift apart.
+
+</Section>
+
+<Section id="edit-bounds" title="An edit draws its own rules">
+
+`guide: true` on an edit turns on `bounds` and `catchment`. You repeat nothing from the constraints: the edit draws every dataset constraint whose `field` matches its own channel.
+
+Bounds follow the edit's axis. The same `clamp` draws horizontal lines on a y-edit and vertical ones on an x-edit.
+
+<Example
+  code={anEditDrawsItsBounds}
+  title="clamp and snap, drawn by the edit"
+  blurb="guide: true draws the allowed band and a labelled line at each clamp limit."
+  try={(
+    <>
+      <b>Drag</b> a bar past a limit, or between the snap stops.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="parts" title="Restyling the parts">
+
+`guide: true` is shorthand for the parts at their defaults. Pass an object to switch and restyle each one.
+
+A `snap`'s stops draw as short ticks at the plot edge, where the axis also sits. Raise `bounds.tickLength` and `bounds.tickOpacity` to pull them clear of it.
+
+**`bounds`** draws the constraint boundaries: a `clamp`'s band and limits, a `snap`'s stops, a `maintainSum` cap. On with `guide: true`.
+
+**`catchment`** draws the radius in which a proximity pick resolves a free pointer to a mark. On with `guide: true`.
+
+**`track`** draws where a handle can travel, for handles whose range isn't a scale. Off by default — turn it on where that range isn't obvious from the mark, as on [a face's parameters](/marks/face#track).
+
+Each part takes `color`, `dash`, `width` and `opacity`; `bounds` adds `bandOpacity`, `fontSize`, `tickLength` and `tickOpacity`. A `color` on the guide itself sets all three parts at once.
+
+<Example
+  code={restylingTheParts}
+  title="One colour, or one per part"
+  blurb="Left sets one colour for every part. Right styles each separately and lengthens the snap ticks."
+  try={(
+    <>
+      <b>Move</b> near a dot to see the catchment ring, then <b>drag</b> it into the band.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="annotations" title="Rule and region">
+
+Annotations you declare in `guides: [...]`. `guides.region` shades a band, `guides.rule` draws a reference line. Both position in data space through the same scales a mark uses, so they stay put as points move.
 
 <Example
   code={aTargetBandWithARule}
   title="A target band with a rule"
-  blurb="guides.region shades 40–60; guides.rule marks the midpoint. Drag the dots across them."
+  blurb="guides.region shades 40–60; guides.rule marks the midpoint."
   try={(
     <>
       <b>Drag</b> a dot in and out of the target band.
@@ -37,15 +97,15 @@ A shaded target band (region) and a reference line (rule) annotate a chart. They
 
 <Section id="live" title="Guides derived from the data">
 
-A guide option can be a function of the guide context, so an annotation can be computed from the rows it annotates. Here one rule is a fixed target and the other is the running **mean** — recomputed on every commit, because guides rebuild each render. The band tracks the spread the same way.
+Every option takes a literal or a function of the guide context (`{ data, scales, features, ui, width, height, stage }`), so an annotation can read the rows it annotates. Here one rule is a fixed target and the other is the running **mean**. Guides rebuild each render, so it recomputes on every commit. The band tracks the spread the same way.
 
 <Example
   code={aMeanLineThatChasesTheBars}
   title="A mean line that chases the bars"
-  blurb={"guides.rule({ y: ({ data }) => d3.mean(data, (d) => d.y) }) — the annotation reads the dataset."}
+  blurb={"guides.rule({ y: ({ data }) => d3.mean(data, (d) => d.y) }) reads the dataset."}
   try={(
     <>
-      <b>Drag</b> a bar — the fixed target holds, the mean line and the band follow.
+      <b>Drag</b> a bar. The fixed target holds; the mean line and the band follow.
     </>
   )}
 />

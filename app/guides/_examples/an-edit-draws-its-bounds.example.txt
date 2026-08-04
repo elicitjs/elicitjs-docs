@@ -1,0 +1,23 @@
+mount(Elicit({
+  width: 400, height: 260,
+  margins: { top: 16, right: 16, bottom: 28, left: 36 },
+  data: [{ cat: "A", n: 55 }, { cat: "B", n: 30 }, { cat: "C", n: 70 }],
+  schema: {
+    cat: { type: "categorical", domain: ["A", "B", "C"] },
+    n:   { type: "quantitative", domain: [0, 100] },
+  },
+  // The rules this chart enforces. An edit governed by them can draw them.
+  constraints: [ clamp({ field: "n", min: 20, max: 85 }) ],
+  marks: [
+    bar({
+      channels: {
+        x: { field: "cat" },
+        // `guide: true` turns on bounds and catchment. This edit has no proximity
+        // pick, so only the bounds draw: the allowed band and a labelled line at
+        // each `clamp` limit. You repeat none of it — the edit draws every
+        // constraint whose `field` matches its channel.
+        y: { field: "n", edit: move({ guide: true }) },
+      },
+    }),
+  ],
+}))

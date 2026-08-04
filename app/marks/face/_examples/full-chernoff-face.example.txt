@@ -21,6 +21,11 @@ mount(Elicit({
         eyeScale: { field: "aperture" }, eyeSquint: { field: "squint" },
         browHeight: { field: "browH" }, browTilt: { field: "browT" },
       },
+      // Mark-level: every handle above is draggable, each writing its own channel's
+      // field. With seven params that reads better than repeating the edit on each.
+      // Put it on ONE channel instead — mouthCurve: { field: "curve",
+      // edit: edit.face.expression() } — and only that handle moves.
+      edits: [ edit.face.expression() ],
     }),
   ],
 }))

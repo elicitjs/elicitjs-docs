@@ -6,5 +6,15 @@ mount(Elicit({
     valence: { type: "quantitative", domain: [-1, 1] },
     arousal: { type: "quantitative", domain: [-1, 1] },
   },
-  marks: [ face() ],
+  marks: [
+    // A face draws its handles but writes nothing until an edit says so. The
+    // emotion preset binds mouthCurve ← valence and eyeScale ← arousal; declaring
+    // them here is what makes those two columns editable — and says which they are.
+    face({
+      channels: {
+        mouthCurve: { field: "valence", edit: edit.face.expression() },
+        eyeScale:   { field: "arousal", edit: edit.face.expression() },
+      },
+    }),
+  ],
 }))

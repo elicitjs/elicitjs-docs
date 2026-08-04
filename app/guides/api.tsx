@@ -67,4 +67,47 @@ export const api: ApiEntry[] = [
       </>
     ),
   },
+  {
+    name: "guide (on an edit)",
+    summary: (
+      <>
+        What an edit draws about its own <b>rules</b>. <code className="inline">guide: true</code> turns on <code className="inline">bounds</code> and <code className="inline">catchment</code> at their defaults; an object turns parts on individually and restyles them.
+      </>
+    ),
+    signatures: [
+      "guide: true | false | { bounds, catchment, track, color }",
+    ],
+    options: [
+      {
+        name: "bounds",
+        type: "boolean | object",
+        default: "on with guide: true",
+        desc: "Constraint boundaries on the edit's own value channel — a clamp's band and limit lines, a snap's stops, a maintainSum cap.",
+      },
+      {
+        name: "catchment",
+        type: "boolean | object",
+        default: "on with guide: true",
+        desc: "The reach of a proximity pick: the radius within which a free pointer resolves to a mark. Only drawn by picks that select one.",
+      },
+      {
+        name: "track",
+        type: "boolean | object",
+        default: "off",
+        desc: "Where a handle can travel. Opt-in: extra ink on a chart that already shows the handle, and worth it when the range isn't obvious.",
+      },
+      {
+        name: "color",
+        type: "string",
+        default: "theme.constraint.color",
+        desc: "One colour for every part; a part's own colour still wins.",
+      },
+      {
+        name: "<part>.dash · width · opacity",
+        type: "any",
+        default: "—",
+        desc: "Per-part stroke appearance. Every one of these used to be a hard-coded literal.",
+      },
+    ],
+  },
 ];

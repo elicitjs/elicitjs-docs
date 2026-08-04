@@ -5,7 +5,7 @@ import { Example } from '../../../components/Example';
 import { Lead } from '../../../components/Lead';
 import { api } from './api';
 
-import lineThenCone from './_examples/line-then-cone.example.txt';
+import aimThenOpen from './_examples/aim-then-open.example.txt';
 import probeASingleValue from './_examples/probe-a-single-value.example.txt';
 import aTentativeToken from './_examples/a-tentative-token.example.txt';
 
@@ -21,10 +21,10 @@ export default function Layout({ children }) {
 
 <Section id="twostep" title="Two questions, two clicks">
 
-Stage 0 owns the angle, stage 1 owns the spread. The driver advances on each commit; no app code, no buttons.
+Stage 0 owns the slope, stage 1 owns the spread. The driver advances on each commit; no app code, no buttons.
 
 <Example
-  code={lineThenCone}
+  code={aimThenOpen}
   title="Line, then cone"
   blurb="Move to aim the line, click. Move to open the cone, click. Both are then frozen."
   try={"move the mouse, click, move again, click."}
@@ -35,6 +35,8 @@ Stage 0 owns the angle, stage 1 owns the spread. The driver advances on each com
 <Section id="preview" title="The ghost is the commit">
 
 A probe proposes; `getData()` still reports the last committed belief. The knob below shows a translucent **ghost** at the pointer — commit it either way: move and click, or grab the knob and drag. The readout only moves on commit, and the ghost is exactly what a commit writes.
+
+A proposal is about the **dataset**, not about the mark that made it, so **every** mark viewing those rows ghosts it — not only the one carrying the edit. That is what keeps a glyph split across marks whole while the pointer moves: the cone above is a `trendBand` reading a spread the gesture writes on the `trend` line, and it opens under the cursor rather than snapping into place on the click.
 
 <Example
   code={probeASingleValue}
