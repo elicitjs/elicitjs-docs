@@ -59,11 +59,11 @@ A `snap`'s stops draw as short ticks at the plot edge, where the axis also sits.
 
 **`bounds`** draws the constraint boundaries: a `clamp`'s band and limits, a `snap`'s stops, a `maintainSum` cap. On with `guide: true`.
 
-**`catchment`** draws the radius in which a proximity pick resolves a free pointer to a mark. On with `guide: true`.
+**`catchment`** draws the radius in which a proximity pick resolves a free pointer to a mark. On with `guide: true`. Proximity picks that select a target (`nearest`, `sweep`, brush*) also turn catchment on when you **omit** `guide` — set `guide: false` to silence it.
 
 **`track`** draws where a handle can travel, for handles whose range isn't a scale. Off by default — turn it on where that range isn't obvious from the mark, as on [a face's parameters](/marks/face#track).
 
-Each part takes `color`, `dash`, `width` and `opacity`; `bounds` adds `bandOpacity`, `fontSize`, `tickLength` and `tickOpacity`. A `color` on the guide itself sets all three parts at once.
+Each part takes `color`, `dash`, `width` and `opacity`; `bounds` adds `bandOpacity`, `fontSize`, `tickLength` and `tickOpacity`. A `color` on the guide itself sets all three parts at once. Theme tokens live at `theme.guide.bounds|catchment|track` (and `theme.constraint.color`).
 
 <Example
   code={restylingTheParts}

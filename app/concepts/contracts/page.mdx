@@ -1,0 +1,68 @@
+import { DocShell } from "../../../components/DocShell";
+import { Section } from "../../../components/Section";
+import { Lead } from "../../../components/Lead";
+import {
+  KindsTable,
+  DataMarksTable,
+  ParametricTable,
+  GeoTable,
+  ElementsTable,
+} from "./tables";
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Mark & element contracts
+
+<Lead>
+  What every factory is for: kind, channels, whether create/remove apply, and
+  what you grab. Prefer <code className="inline">{"elicit.elements.*"}</code> for
+  scale chrome. The same factories stay aliased on <code className="inline">{"plot.*"}</code>.
+</Lead>
+
+<Section id="kinds" title="Four kinds">
+
+<KindsTable />
+
+Marks are **inert** until an edit names the column it writes. Edits write **fields** — a constant <code className="inline">{"{ value }"}</code> channel cannot carry an edit.
+
+</Section>
+
+<Section id="data" title="Data marks">
+
+<DataMarksTable />
+
+<code className="inline">handles</code> is <code className="inline">true</code> (drawn + grabbable), <code className="inline">false</code> (neither), or <code className="inline">&apos;hit&apos;</code> (invisible but grabbable) on every mark that draws a grip.
+
+</Section>
+
+<Section id="parametric" title="Parametric glyphs">
+
+<ParametricTable />
+
+Stage via the edit (<code className="inline">{"edit.trend.slope({ stage: 1 })"}</code>), not mark options.
+
+</Section>
+
+<Section id="geo" title="Geographic">
+
+<GeoTable />
+
+</Section>
+
+<Section id="elements" title="Chart elements">
+
+Public as <code className="inline">{"elicit.elements.*"}</code>, or pass them in <code className="inline">ElicitSpec.elements</code> (concatenated with <code className="inline">marks</code>). Also still work inside <code className="inline">marks</code> and on <code className="inline">{"plot.*"}</code>.
+
+<ElementsTable />
+
+See [Axis, Grid & Rule](/marks/axes#chart-elements) and [Legend](/marks/legend).
+
+</Section>
+
+<Section id="feedback" title="Guides and effects">
+
+A **guide** shows a rule (<code className="inline">edit.guide</code> — <code className="inline">bounds</code> / <code className="inline">catchment</code> / <code className="inline">track</code>). An **effect** shows state (<code className="inline">hovered</code> / <code className="inline">selected</code> / <code className="inline">grabbed</code>). Proximity picks (<code className="inline">nearest</code>, <code className="inline">sweep</code>, brush*) auto-enable catchment when you omit <code className="inline">guide</code>; set <code className="inline">guide: false</code> to silence. See [Guides](/guides) and [Effects](/effects).
+
+</Section>

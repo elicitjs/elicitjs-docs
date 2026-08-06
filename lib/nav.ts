@@ -7,6 +7,7 @@ export const SITE: NavGroup[] = [
       { href: "/", title: "Intro" },
       { href: "/overview", title: "Overview" },
       { href: "/concepts", title: "Core concepts" },
+      { href: "/concepts/contracts", title: "Mark & element contracts" },
       { href: "/sizing", title: "Responsive sizing" },
       { href: "/renderers", title: "Renderers (SVG · Canvas)" },
       { href: "/authoring", title: "Authoring SDK" },
@@ -15,6 +16,7 @@ export const SITE: NavGroup[] = [
   {
     group: "Marks",
     pages: [
+      { href: "/concepts/contracts", title: "Contracts (all factories)" },
       { href: "/marks/bar", title: "Bar" },
       { href: "/marks/rect", title: "Rect" },
       { href: "/marks/area", title: "Area" },

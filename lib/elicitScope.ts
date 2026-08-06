@@ -36,6 +36,9 @@ export function createElicitScope() {
     Elicit: elicit.Elicit,
     when: elicit.when,
     edit: elicit.edit,
+    // Chart elements (axis / grid / legend / axisRadial). Also aliased on
+    // plot.* so bare `axisX` still works; prefer `elements.axisX` in new specs.
+    elements: elicit.elements,
     guides: elicit.guides,
     widgets: elicit.widgets,
     format: elicit.format,

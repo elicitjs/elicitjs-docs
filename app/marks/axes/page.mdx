@@ -9,6 +9,7 @@ import gridlinesTicksFormatTitle from './_examples/gridlines-ticks-format-title.
 import originCrossingAxes from './_examples/origin-crossing-axes.example.txt';
 import ex1dCenteredSliderAxis from './_examples/1d-centered-slider-axis.example.txt';
 import explicitGridyAxisxAxisyRuley from './_examples/explicit-gridy-axisx-axisy-ruley.example.txt';
+import elementsNamespace from './_examples/elements-namespace.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -16,15 +17,15 @@ export default function Layout({ children }) {
 
 # Axis, Grid & Rule
 
-<Lead>Axes and gridlines are **chart elements** — composable like marks, but they draw a *scale* rather than the data. Configure them the easy way through the global `axes: {…}` convenience (ticks, formats, titles, hiding, free positioning), or add `axisX` / `axisY` / `gridY` / `ruleY` as explicit marks for full control.</Lead>
+<Lead>Axes and gridlines are **chart elements** — they draw a scale rather than the data. Prefer <code className="inline">{"elicit.elements.*"}</code> (or <code className="inline">ElicitSpec.elements</code>); the same factories stay aliased on <code className="inline">{"plot.*"}</code>. Configure them via the global <code className="inline">{"axes: {…}"}</code> convenience, or compose <code className="inline">elements.axisX</code> / <code className="inline">gridY</code> explicitly. <code className="inline">ruleY</code> is still a data mark.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="chart-elements" title="Chart elements are not data marks">
 
-`axis`, `grid`, `legend` and `axisRadial` sit in `plot` beside the data marks, but they follow a different contract.
+`axis`, `grid`, `legend` and `axisRadial` are public as `elicit.elements.*`. They still work inside `marks` and on `plot.*`, and you can separate them with `elements: […]` on the spec (concatenated into the feature list). See [Mark & element contracts](/concepts/contracts).
 
-A data mark views the dataset's columns through a `channels` map. A chart element views **one scale**, named by a singular `channel` (`'x'`, `'fill'`, `'angle'`), so it has no channel map and no fields of its own.
+A data mark views the dataset's columns through a `channels` map. A chart element views **one scale**, named by a singular `channel` (`'x'`, `'fill'`, `'angle'`), so it has no data-mark channel map and no fields of its own. (`axisRadial` may carry optional x/y **placement** channels for per-row rings — placement chrome, not elicitation encoding.)
 
 Its `stroke`, `fill` and `fontSize` paint a spine and its labels rather than a datum, so they stay plain options instead of becoming channels.
 
@@ -33,6 +34,23 @@ An edit on a data mark writes a **row**; an edit on a chart element writes the *
 A legend also **reserves space**, shrinking the plot; nothing else does.
 
 Both halves have an implicit layer on the spec: `axes` for the positional scales, [`legends`](/marks/legend#legends-key) for the rest.
+
+</Section>
+
+<Section id="elements-ns" title="elicit.elements and ElicitSpec.elements">
+
+Prefer `elements.axisX` over treating axes as data marks. Pass chrome through `elements: […]` on the spec (or keep them in `marks` — same factories).
+
+<Example
+  code={elementsNamespace}
+  title="elements: […] with barY"
+  blurb="axes: false, then explicit elements.axisX / axisY / gridY. The bar is the only data mark."
+  try={(
+    <>
+      <b>Drag</b> a bar — the elements stay scale chrome.
+    </>
+  )}
+/>
 
 </Section>
 

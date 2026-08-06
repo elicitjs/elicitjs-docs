@@ -1,0 +1,27 @@
+// Chart elements via elicit.elements + ElicitSpec.elements (also still work in marks).
+mount(Elicit({
+  width: 420, height: 220,
+  schema: {
+    cat: { type: 'categorical', domain: ['A', 'B', 'C'] },
+    n: { type: 'quantitative', domain: [0, 100] },
+  },
+  data: [
+    { cat: 'A', n: 40 },
+    { cat: 'B', n: 70 },
+    { cat: 'C', n: 55 },
+  ],
+  axes: false,
+  elements: [
+    elements.axisX({ ticks: 3, title: 'category' }),
+    elements.axisY({ ticks: 4, title: 'n' }),
+    elements.gridY(),
+  ],
+  marks: [
+    barY({
+      channels: {
+        x: { field: 'cat' },
+        y: { field: 'n', edit: move() },
+      },
+    }),
+  ],
+}));

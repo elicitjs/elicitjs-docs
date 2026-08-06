@@ -7,6 +7,7 @@ import { api } from './api';
 
 import editableArea from './_examples/editable-area.example.txt';
 import anEditableConfidenceBand from './_examples/an-editable-confidence-band.example.txt';
+import hitHandles from './_examples/hit-handles.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -29,6 +30,23 @@ Drag handles to reshape the belief curve.
   try={(
     <>
       <b>Drag</b> a handle to reshape the area.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="hit" title="Invisible handles">
+
+`handles: 'hit'` keeps the grab targets without drawing the circles — the shared contract with `line` and `arc` (`false` is neither drawn nor grabbable).
+
+<Example
+  code={hitHandles}
+  title="handles: 'hit'"
+  blurb="Same area as Basics; the grips are invisible but still dragable."
+  try={(
+    <>
+      <b>Drag</b> along the upper edge where a handle would sit.
     </>
   )}
 />
