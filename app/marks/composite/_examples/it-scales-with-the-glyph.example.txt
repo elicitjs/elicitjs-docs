@@ -1,0 +1,43 @@
+mount(Elicit({
+  width: 480, height: 300,
+  margins: { top: 20, right: 24, bottom: 40, left: 44 },
+  axes: { x: {}, y: false },
+  data: [
+    { town: "Ayr",  weight: 26, share: 0.7 },
+    { town: "Bede", weight: 58, share: 0.3 },
+    { town: "Cara", weight: 40, share: 0.5 },
+  ],
+  schema: {
+    town:   { type: "categorical", domain: ["Ayr", "Bede", "Cara"] },
+    weight: { type: "quantitative", domain: [10, 70] },
+    share:  { type: "quantitative", domain: [0, 1] },
+  },
+  marks: [
+    composite({
+      id: "pip",
+      channels: {
+        x: { field: "town" },
+        // `size` is the box's HALF-SIZE, so resizing the glyph resizes everything
+        // placed in it. The edit lives here, on the glyph itself: the box is a
+        // real grab target covering the whole pip, so this picks it up bodily.
+        size: { field: "weight", scale: { range: [18, 54] }, edit: resize() },
+      },
+      parts: [
+        // The outer disc IS the box — full half-size, at the origin. It carries
+        // no edit of its own, so it is pointer-transparent and a drag on it
+        // reaches the box underneath.
+        point({ channels: {
+          size: { frame: 1 },
+          fill: { value: "#f2f5f9" }, stroke: { value: "#9aa7b4" },
+        } }),
+        // The inner disc is 0..0.8 of the half-size — a FRACTION, so it grows with
+        // the glyph and its edit still writes `share` on the same [0, 1] domain.
+        point({ channels: {
+          size: { field: "share", frame: [0, 0.8],
+                  edit: slide({ axis: "y", increase: "up" }) },
+          fill: { value: "#4e79a7" },
+        } }),
+      ],
+    }),
+  ],
+}))

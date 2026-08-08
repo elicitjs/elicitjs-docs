@@ -61,12 +61,19 @@ Each state paints in one of two ways, and can use both at once.
 **Element props** restyle the mark itself: `filter`, `opacity`, `fill`, `stroke`,
 `strokeWidth`, `cursor`. They apply as CSS properties, which override a mark's own
 paint while the state holds and are removed when it ends. Your data-driven `fill`
-and `stroke` are never written.
+and `stroke` are never written. (`filter` and `cursor` are SVG-only — a canvas has no
+element to hover and no per-shape filter. Everything else paints in both renderers.)
 
 **`outline`** draws an overlay around the mark, above every other layer. It takes
 `color`, `width`, `pad`, `dash` and `opacity`, and traces whatever shape the mark
-is: a ring on a circle, an inflated box on a rect or tick, the path itself on an
-arc slice or polygon, a ring at the anchor on a label.
+is: a ring on a circle, a padded ellipse on an ellipse, an inflated box on a rect or
+tick, the path itself on an arc slice or polygon, a ring at the anchor on a label.
+
+Restyling is the mark's own node, so it follows the mark wherever the mark goes. An
+outline is a separate node, and it copies the mark's rotation to keep up: spin a mark
+with an [`angle` channel](/marks/point#angle) and its outline turns with it rather
+than staying square to the axes. Proximity picking measures that same rotated
+geometry, so what lights up and what a drag actually grabs are always the same mark.
 
 <Example
   code={theTwoMechanisms}

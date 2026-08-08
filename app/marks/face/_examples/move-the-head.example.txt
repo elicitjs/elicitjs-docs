@@ -1,28 +1,24 @@
 mount(Elicit({
   width: 340, height: 320,
   margins: { top: 12, right: 12, bottom: 12, left: 12 },
-  data: [ { px: 0.1, py: 0.1, mag: 55, valence: 0.4, arousal: 0.2 } ],
+  data: [ { px: 0.1, py: 0.1, valence: 0.4, arousal: 0.2 } ],
   schema: {
     px:      { type: "quantitative", domain: [-1, 1] },
     py:      { type: "quantitative", domain: [-1, 1] },
-    mag:     { type: "quantitative", domain: [30, 90] },
     valence: { type: "quantitative", domain: [-1, 1] },
     arousal: { type: "quantitative", domain: [-1, 1] },
   },
   marks: [
     face({
+      size: 62,
       channels: {
-        // Both x AND y bound -> the head can be a MOVE target; `edit.face.move()`
-        // is what actually makes grabbing an empty part of the face drag it.
-        // size bound -> a resize handle on the right rim (an absolute-mode slide
-        // along x). Give size a radius range (the default is a small [3,18] dot
-        // range) so the head reads as a face.
-        x: { field: "px", edit: edit.face.move() },
-        y: { field: "py", edit: edit.face.move() },
-        size: { field: "mag", scale: { range: [30, 92] }, edit: edit.face.expression() },
-        // The preset's two expression channels, declared so they are editable too.
-        mouthCurve: { field: "valence", edit: edit.face.expression() },
-        eyeScale:   { field: "arousal", edit: edit.face.expression() },
+        // The head is an ordinary `point`, so it takes an ordinary `move()`. The
+        // eyes, brows and mouth are separate features drawn on top of it, so
+        // grabbing one of them edits the expression instead — no arbitration.
+        x: { field: "px", edit: move({ channels: ["x", "y"] }) },
+        y: { field: "py" },
+        mouthCurve: { field: "valence", edit: slide({ axis: "y", increase: "up" }) },
+        eyeScale:   { field: "arousal", edit: slide({ axis: "x", increase: "right" }) },
       },
     }),
   ],

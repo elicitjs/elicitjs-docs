@@ -8,9 +8,11 @@ import { api } from './api';
 import valenceArousal from './_examples/valence-arousal.example.txt';
 import fullChernoffFace from './_examples/full-chernoff-face.example.txt';
 import aMoodPerPerson from './_examples/a-mood-per-person.example.txt';
-import moveAndResizeTheHead from './_examples/move-and-resize-the-head.example.txt';
-import oneFacePerDay from './_examples/one-face-per-day.example.txt';
+import moveTheHead from './_examples/move-the-head.example.txt';
+import resizeTheHead from './_examples/resize-the-head.example.txt';
 import showingATrack from './_examples/showing-a-handles-track.example.txt';
+import oneFacePerDay from './_examples/one-face-per-day.example.txt';
+import buildYourOwn from './_examples/build-your-own.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -18,7 +20,7 @@ export default function Layout({ children }) {
 
 # Face (emotion)
 
-<Lead>`face` encodes emotion — a datum's fields — into a face, and lets you **directly manipulate the features** to write them back: grab the mouth and pull it into a smile, drag an eye wider, tilt a brow. A face has seven parameters; each is only editable when you **bind it to a field**, so you turn on exactly the expressions you want to elicit.</Lead>
+<Lead>`face` encodes emotion — a datum's fields — into a face, and lets you **directly manipulate the features** to write them back: pull the mouth into a smile, widen an eye, tilt a brow. It is a **preset, not a mark**: it returns a [composite in box mode](/marks/composite#box) — a `point` head, two `ellipse` eyes, two `tickY` brows and a `curveY` mouth — each placed in the glyph's own local units. Each parameter is a channel on one of those parts, so it takes the ordinary edits and is only editable when you **bind it to a field**.</Lead>
 
 <ApiReference entries={api} />
 
@@ -26,13 +28,15 @@ export default function Layout({ children }) {
 
 The emotion preset binds `mouthCurve` to `valence` and `eyeScale` to `arousal`. Grab the mouth and pull it up to smile, or drag an eye to widen it — each gesture inverts through the field's scale, and the whole face re-derives.
 
+Because every feature is its own mark, the edits are the ones you already know: a `slide` on the mouth's curvature, a `slide` on an eye's radius. There is no `edit.face.*` namespace.
+
 <Example
   code={valenceArousal}
   title="Valence × arousal"
   blurb="The two-field emotion preset. The mouth and eyes are the drag targets themselves."
   try={(
     <>
-      <b>Drag the mouth</b> up/down (valence) or <b>drag an eye</b> up/down (arousal).
+      <b>Drag the mouth</b> up/down (valence) or <b>drag an eye</b> sideways (arousal).
     </>
   )}
 />
@@ -41,32 +45,17 @@ The emotion preset binds `mouthCurve` to `valence` and `eyeScale` to `arousal`. 
 
 <Section id="expressive" title="Turn on more expressions">
 
-Bind any subset of the seven params in `channels`, each as a plain `{ field }` — the binding drives the geometry, and an `edit.face.expression()` on it makes that feature draggable. Unbound params stay neutral. Here every param is live: mouth (↕ curve, ↔ smirk), eyes (↕ aperture), the eyelid dot (↓ squint), the lip dot (↓ open), and the brows (↕ height, ↔ tilt).
+Bind any subset of the six params in `channels`, each a plain `{ field }` with the edit you want. Unbound params stay neutral. Here every param is live: the mouth (↕ curve, ↔ smirk), the eyes (↔ aperture, ↕ squint), and the brows (↕ height, ↔ tilt).
+
+Two params on one part means one gesture drives both — dragging an eye sideways opens it and dragging it down squints it, because `rx` and `ry` are two channels on one `ellipse`. The rule for sharing a part is that the two edits must read **different components** of the drag: one on `axis: "x"`, one on `axis: "y"`. That is also why a brow's tilt slides rather than rotating, even though it drives an `angle`. You grab a brow at its own pivot, so an angular edit would swing through most of a half-turn in a few pixels and pin the value to an extreme — the sensitivity of `rotate` comes from the pointer's distance to the pivot, and inside a glyph that distance is nearly zero.
 
 <Example
   code={fullChernoffFace}
   title="Full Chernoff face"
-  blurb="All seven parameters bound to fields; grab any feature to sculpt the expression."
+  blurb="All six parameters bound to fields; grab any feature to sculpt the expression."
   try={(
     <>
-      <b>Drag</b> the mouth, eyes, brows, or the eyelid / lip dots.
-    </>
-  )}
-/>
-
-</Section>
-
-<Section id="track" title="Showing a handle's track">
-
-A face's handles move along ranges that no scale describes — they are derived from the head's radius. The mark declares each one on its handle, and the edit inverts the pointer through it; `guide: \{ track: true \}` draws that same range, so what you see is the mapping rather than a redrawing of it. Opt-in, because on a chart where the range is obvious it is only extra ink.
-
-<Example
-  code={showingATrack}
-  title="A handle's travel range"
-  blurb="The dashed segment is exactly the range the edit maps the pointer onto."
-  try={(
-    <>
-      <b>Drag</b> the mouth or a brow along its dashed track.
+      <b>Drag</b> the mouth, an eye, or a brow — each is a separate mark.
     </>
   )}
 />
@@ -75,7 +64,7 @@ A face's handles move along ranges that no scale describes — they are derived 
 
 <Section id="multiples" title="Many faces in a plot">
 
-Give the face an `x` (or `y`) channel and it is placed like a `point` — one editable face per row. Set `x: { field: 'valence' }, y: { field: 'arousal' }` instead and the faces become an emotion-space scatter that moves as you edit them.
+Give the face an `x` (or `y`) channel and it is placed like a `point` — one editable face per row, each with its own frame. Set `x: { field: 'valence' }, y: { field: 'arousal' }` instead and the faces become an emotion-space scatter that moves as you edit them.
 
 <Example
   code={aMoodPerPerson}
@@ -92,15 +81,45 @@ Give the face an `x` (or `y`) channel and it is placed like a `point` — one ed
 
 <Section id="head" title="Move and resize the head">
 
-Bind **both** `x` and `y` to fields and the head itself becomes a **move** target — grab an empty part of the face (away from the feature handles) and drag it through the plane. Bind `size` to a field and a **resize** handle appears on the right rim: drag it out to grow the head, in to shrink it. The resize is a `slide` — the same linear interaction the eyes use — so growing the face reads as a steady drag, not the “outside grows, inside shrinks” of a radius edit.
+The head is an ordinary `point`, so it takes an ordinary `move()`: bind `x` and `y` to fields, attach the edit, and grabbing the head drags the glyph through the plane. The eyes, brows and mouth are separate features drawn on top of it, so grabbing one of *them* still edits the expression — direct-pick dispatch routes a gesture to the touched node's feature, and nothing has to arbitrate.
 
 <Example
-  code={moveAndResizeTheHead}
-  title="Drag to move · rim handle to resize"
-  blurb={"x + y bound makes the outline a drag-to-move target; size bound adds the slide resize handle on the rim. The mouth/eyes still edit the emotion preset."}
+  code={moveTheHead}
+  title="Drag the head to move it"
+  blurb={"x + y bound with move() on the head part. The mouth and eyes still edit the emotion preset."}
   try={(
     <>
-      <b>Drag</b> the head to move it · <b>drag the rim handle</b> to resize · the mouth/eyes still work.
+      <b>Drag</b> the head to move it · the mouth/eyes still work.
+    </>
+  )}
+/>
+
+`size` is both the head's radius and the frame's half-size, so a `resize()` on it scales every feature with it. Keep it off a face that is also movable, though: both would be direct edits on the same head, and one drag would fire both.
+
+<Example
+  code={resizeTheHead}
+  title="Resize the whole glyph"
+  blurb={"size bound with resize(): the head grows and the eyes, brows and mouth grow with it, because they are placed in fractions of the frame."}
+  try={(
+    <>
+      <b>Drag</b> the head outward to grow it, inward to shrink it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="track" title="Showing a handle's track">
+
+A positional channel in the frame is a real scale, so an edit that inverts the pointer through it — `move()` — travels exactly the range the scale spans, and no further. `guide: \{ track: true \}` draws that range: the dashed segment is the mapping itself, not a redrawing of it. Opt-in, because where the range is obvious it is only extra ink.
+
+<Example
+  code={showingATrack}
+  title="A handle's travel range"
+  blurb="The dashed segment is exactly the range the edit maps the pointer onto — drag past either end and the value stops."
+  try={(
+    <>
+      <b>Drag</b> a brow up and down along its dashed track.
     </>
   )}
 />
@@ -109,7 +128,9 @@ Bind **both** `x` and `y` to fields and the head itself becomes a **move** targe
 
 <Section id="creating" title="One face per day — click to add">
 
-A face is a data mark, so it's [creatable](/editing/existence#what-can-create) like a `point`: a plane click inverts the pointer through the x and y scales to mint a datum, and the face draws itself from it. Here the week starts with three days filled; click an empty day to add its face — the click's height sets the `mood`, which also drives the smile. `unique({ field: "day" })` makes the day the identity, so each day holds **at most one** face: a click in a day that's already taken is rejected, and clicking directly on a face never creates one — only a click on empty space does.
+A face is a data glyph, so it's [creatable](/editing/existence#what-can-create) like a `point`: a plane click inverts the pointer through the x and y scales to mint a datum, and every part draws itself from it. Mark-level `edits` ride on the head part, so the create fires **once** per click rather than once per facial feature.
+
+Here the week starts with three days filled; click an empty day to add its face — the click's height sets the `mood`, which also drives the smile. `unique({ field: "day" })` makes the day the identity, so each day holds **at most one** face.
 
 <Example
   code={oneFacePerDay}
@@ -118,6 +139,27 @@ A face is a data mark, so it's [creatable](/editing/existence#what-can-create) l
   try={(
     <>
       <b>Click</b> an empty day to add its face · <b>drag</b> a mouth to adjust the mood.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="build" title="It's just a composite">
+
+`face()` builds nothing you couldn't assemble yourself. Below is a smaller version written out in full — a `point` head, two `ellipse` eyes, two `tickY` brows and a `curveY` mouth, each placed in the [composite's box](/marks/composite#box).
+
+Read `frame:` as "this number is in the glyph's own coordinates": `x` and `y` in `[-1, 1]` from the centre with y **up**, radii as a fraction of the half-size. A part that states no position sits at the centre, which is where the head goes. A field-bound channel maps the field's declared domain onto a slice of the box (`frame: [0.05, 0.19]`), and the edit inverts back through it.
+
+Each brow is a `tickY` spanning a chord, with `worry` driving its height and its tilt. The two tilt ranges are mirrored — `[45, -45]` on the left, `[-45, 45]` on the right — so a rising `worry` tilts both brows into the same expression rather than the same direction. A `frame:` scale belongs to its own part, so the two ranges don't collide.
+
+<Example
+  code={buildYourOwn}
+  title="A face, written out"
+  blurb="The same construction face() performs, spelled out with composite + point + ellipse + tick + curve."
+  try={(
+    <>
+      <b>Drag</b> an eye sideways · <b>drag a brow</b> down to worry it · <b>drag</b> the mouth up and down.
     </>
   )}
 />

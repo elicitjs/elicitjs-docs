@@ -11,6 +11,9 @@ import coupledMoveCenterWithinEnds from './_examples/coupled-move-center-within-
 import compositeChannelsTrickleDown from './_examples/composite-channels-trickle-down.example.txt';
 import hubPointOwnFillSize from './_examples/hub-point-own-fill-size.example.txt';
 import createAWholeGlyph from './_examples/create-a-whole-glyph.example.txt';
+import aLocalFrame from './_examples/a-local-frame.example.txt';
+import itScales from './_examples/it-scales-with-the-glyph.example.txt';
+import unibrow from './_examples/a-face-with-a-unibrow.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -18,7 +21,7 @@ export default function Layout({ children }) {
 
 # Composite
 
-<Lead>A **composite** mark is a glyph: a named group of ordinary marks over the chart's one dataset. Group-level `channels` (and style / `angle` shorthands) trickle into every part at desugar time — declare a shared orientation or position once; a part's own channel for the same name wins; inherited `edit`s attach to the **last** part only (visuals first, handles last). Each part still has its own channels and shorthands: arm geometry, per-part stroke, a hub's fill. Composite is a desugaring, not a new kind of mark — it returns its parts as plain marks, and `Elicit` flattens them. Because each handle is its own mark, dragging one cannot move another: a gesture routes only to the mark you touched.</Lead>
+<Lead>A composite is a glyph: a group of ordinary marks over the chart's one dataset. Each part encodes some fields of the same rows, and a part whose channel carries an `edit` is a handle. Give a part a `frame:` channel and the composite becomes a box its parts sit inside; `group` is an alias of `composite`.</Lead>
 
 <ApiReference entries={api} />
 
@@ -57,7 +60,7 @@ Three editable fields on one row: `mean` (the dot), `lo` and `hi` (the caps). Ea
 <Example
   code={coupledMoveCenterWithinEnds}
   title="Coupled move + center-within-ends"
-  blurb={"Two behaviours, two layers. The dot uses a joint edit (edit.custom): its new value comes from the pointer, and it shifts lo/hi by the same delta, so moving the centre carries the whole bar. \"Centre stays within the ends\" is a constraint — a pure data rule on the dataset. Declared once on the group, it runs on every commit from every part, so a cap can never cross the centre, no matter which handle you grabbed."}
+  blurb={"Two behaviours, two layers. The dot uses a joint edit (edit.custom): its new value comes from the pointer, and it shifts lo/hi by the same delta, so moving the centre carries the whole bar. \"Centre stays within the ends\" is a constraint — a pure data rule on the dataset. Declared once on the composite, it runs on every commit from every part, so a cap can never cross the centre, no matter which handle you grabbed."}
   try={(
     <>
       <b>Drag the dot</b> — the whole bar travels. <b>Drag a cap</b> past the dot — it stops at the centre.
@@ -67,14 +70,14 @@ Three editable fields on one row: `mean` (the dot), `lo` and `hi` (the caps). Ea
 
 </Section>
 
-<Section id="plus" title="Group channels + per-part channels">
+<Section id="plus" title="Composite channels + per-part channels">
 
-Two layers of binding. **Group** `channels` (here `x`, `y`, `angle`) trickle into every part so the glyph shares one position and one orientation. **Each part** still declares its own channels and shorthands — arm length, stroke colour, a hub’s `fill` / `size`. A part key wins on conflict. Inherited `edit`s attach to the last part only, so one `rotate()` spins the whole glyph without double-applying.
+Two layers of binding. **Composite** `channels` (here `x`, `y`, `angle`) trickle into every part so the glyph shares one position and one orientation. **Each part** still declares its own channels and shorthands — arm length, stroke colour, a hub’s `fill` / `size`. A part key wins on conflict. Inherited `edit`s attach to the last part only, so one `rotate()` spins the whole glyph without double-applying.
 
 <Example
   code={compositeChannelsTrickleDown}
   title="Shared x/y/angle; per-part stroke on crossing ticks"
-  blurb="A + from tickY (horizontal) + tickX (vertical). Group channels bind position and angle once; each tick keeps its own stroke / length. The last part holds the inherited rotate() edit."
+  blurb="A + from tickY (horizontal) + tickX (vertical). Composite channels bind position and angle once; each tick keeps its own stroke / length. The last part holds the inherited rotate() edit."
   try={(
     <>
       <b>Drag</b> the darker (vertical) arm of a + to spin it.
@@ -84,8 +87,8 @@ Two layers of binding. **Group** `channels` (here `x`, `y`, `angle`) trickle int
 
 <Example
   code={hubPointOwnFillSize}
-  title="Same group angle; hub point with its own fill/size"
-  blurb="Add a square hub as a third part. It inherits x/y/angle from the group but sets its own shape, fill, and size — part channels win for those names. rotate() still lives on the last part."
+  title="Same composite angle; hub point with its own fill/size"
+  blurb="Add a square hub as a third part. It inherits x/y/angle from the composite but sets its own shape, fill, and size — part channels win for those names. rotate() still lives on the last part."
   try={(
     <>
       <b>Drag</b> the hub (last part) to spin the whole glyph.
@@ -109,5 +112,92 @@ Creation is [mark-agnostic](/editing/existence#what-can-create): a plane gesture
     </>
   )}
 />
+
+</Section>
+
+<Section id="box" title="A glyph with its own units">
+
+The parts above sit on the chart's axes. Some glyphs need the opposite: a face's eye is 16% of the way up *the face*, not at `y = 0.16` of the data.
+
+Give a part a `frame:` channel and the composite becomes a **box**. Its own `x` / `y` / `size` set that box's centre and half-size for each row, and `frame:` values are read inside it:
+
+- `x` / `y` — `[-1, 1]` from the centre, y up. `{ frame: -0.4 }` is 40% of the way to the left edge.
+- `size` / `rx` / `ry` / `strokeWidth` — `[0, 1]`, a fraction of the half-size.
+- `angle` / `curvature` — the channel's own units. The scale belongs to its own part, so two parts can take opposite ranges.
+- `{ field: "f", frame: [lo, hi] }` maps the field's schema domain onto that slice of the box. The domain stays on the schema.
+
+`x` / `y` / `size` describe the box, so they don't trickle into the parts. A part that states no position sits at the centre. `{ value }` still means pixels, so use `frame:` for anything that should scale with the glyph.
+
+<Example
+  code={aLocalFrame}
+  title="A dial per row"
+  blurb="The composite's x and size place a box. The dial states no position, so it sits at the centre at the box's full half-size; the needle spans it in local units and rotates through its own angle scale."
+  try={(
+    <>
+      <b>Drag</b> a needle around its own centre.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="why-scales" title="Why they're real scales">
+
+A `frame:` channel is a real scale, built once per row. So the ordinary edits work inside a box unchanged: `move`, `slide`, `rotate` and `resize` invert a gesture back through the same mapping that placed the part, and `.accepts()` reports the field's real range to an [external control](/editing/external-controls).
+
+A `frame:` channel is also invisible to the chart's axes. An eye at `{ frame: -0.4 }` never widens the x domain or adds an axis for coordinates that aren't in the data's units.
+
+</Section>
+
+<Section id="scaling" title="Everything scales together">
+
+A part's geometry is a fraction of the box, so resizing the glyph resizes its contents. An edit on an inner part still writes its own field on its own domain.
+
+An edit on the composite's own `x` / `y` / `size` moves or resizes the whole glyph. The box covers the glyph, so you can grab it anywhere, including between the parts. A part carrying its own edit takes the drag first.
+
+<Example
+  code={itScales}
+  title="Resize the glyph, the contents follow"
+  blurb="The outer disc is the box's half-size; the inner one is 0..0.8 of it. resize() is on the composite, so dragging the outer ring grows the whole glyph and the share stays put."
+  try={(
+    <>
+      <b>Drag the inner disc</b> up to raise its share · <b>drag the outer ring</b> outward to grow the glyph.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="parts" title="What box mode returns">
+
+The box first, then the parts, all as plain marks. The box carries the composite's `x` / `y` / `size`, so those fields still build the chart's axes; a composite with no edit on them draws nothing you can grab.
+
+Two limits apply to a part placed in the box:
+
+- A `{ fn }` channel is called once per row, as `(d, 0, [d])`, so it can't look across rows. Read the field instead.
+- A line-family mark can't span rows inside a box. Position it on the global scales, or move it out of the composite.
+
+A part with no `frame:` channel keeps the global scales, so one part of a glyph can still span to a data value.
+
+</Section>
+
+<Section id="face" title="Build a face with one brow">
+
+[`face()`](/marks/face) is a composite in box mode: a `point` head, two [`ellipse`](/marks/ellipse) eyes, two `tickY` brows and a [`curveY`](/marks/curve) mouth. It's a preset, so you can assemble a different anatomy from the same parts — here, one brow instead of two.
+
+The brow and the mouth are both [`curve`](/marks/curve) marks. `curvature` is the apex's offset from the chord, as a fraction of the half-chord, so it scales with the glyph. Positive curvature bows to the left of travel, which arches a rightward chord upward. A descending `frame:` range reverses that, so a rising `grump` dips the brow and a rising `mood` deepens the smile.
+
+<Example
+  code={unibrow}
+  title="One brow, two curves"
+  blurb="Head, eyes, brow and mouth, all placed in the glyph's local units. The brow and the mouth are the same mark with opposite frame ranges."
+  try={(
+    <>
+      <b>Drag the unibrow down</b> to make a face grumpier · <b>drag a mouth up</b> to cheer it up.
+    </>
+  )}
+/>
+
+The [face page](/marks/face) writes the preset's own anatomy out the same way.
 
 </Section>

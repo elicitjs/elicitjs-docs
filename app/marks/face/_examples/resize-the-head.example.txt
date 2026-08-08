@@ -1,0 +1,20 @@
+mount(Elicit({
+  width: 340, height: 320,
+  margins: { top: 12, right: 12, bottom: 12, left: 12 },
+  data: [ { mag: 55, valence: 0.4 } ],
+  schema: {
+    mag:     { type: "quantitative", domain: [30, 90] },
+    valence: { type: "quantitative", domain: [-1, 1] },
+  },
+  marks: [
+    face({
+      channels: {
+        // `size` is the head's radius AND the frame's half-size, so resizing it
+        // scales every feature with it. Give it a radius range — the default size
+        // range is the small [3, 18] a dot uses.
+        size: { field: "mag", scale: { range: [30, 92] }, edit: resize() },
+        mouthCurve: { field: "valence", edit: slide({ axis: "y", increase: "up" }) },
+      },
+    }),
+  ],
+}))

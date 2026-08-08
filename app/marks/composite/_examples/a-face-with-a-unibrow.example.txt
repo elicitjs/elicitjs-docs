@@ -1,0 +1,62 @@
+mount(Elicit({
+  width: 520, height: 300,
+  margins: { top: 20, right: 24, bottom: 40, left: 24 },
+  axes: { x: {}, y: false },
+  data: [
+    { who: "Ada",  grump: 0.15, mood: 0.85 },
+    { who: "Brun", grump: 0.55, mood: 0.50 },
+    { who: "Cyd",  grump: 0.95, mood: 0.10 },
+  ],
+  schema: {
+    who:   { type: "categorical",  domain: ["Ada", "Brun", "Cyd"] },
+    grump: { type: "quantitative", domain: [0, 1] },
+    mood:  { type: "quantitative", domain: [0, 1] },
+  },
+  marks: [
+    // A face is nothing but a composite in box mode — so if you want a face with
+    // ONE brow, you just use one part. Two `curveY`s do all the expression here:
+    // a unibrow across both eyes and a mouth under them.
+    composite({
+      id: "unibrow",
+      // Where the glyph goes and how big it is. Nothing inside restates this.
+      channels: { x: { field: "who" }, size: { value: 56 } },
+      parts: [
+        // Head: the box itself, at the origin.
+        point({ channels: {
+          size: { frame: 1 },
+          fill: { value: "#FFD666" }, stroke: { value: "#B7791F" },
+        } }),
+        // Eyes: pinned local positions, radius a fraction of the half-size.
+        point({ channels: {
+          x: { frame: -0.34 }, y: { frame: 0.12 }, size: { frame: 0.11 },
+          fill: { value: "#1f2937" },
+        } }),
+        point({ channels: {
+          x: { frame: 0.34 }, y: { frame: 0.12 }, size: { frame: 0.11 },
+          fill: { value: "#1f2937" },
+        } }),
+        // THE UNIBROW. `curvature` is the apex's offset from the chord as a
+        // fraction of the half-chord, and positive bows to the LEFT of travel —
+        // so on this rightward chord positive arches UP. The descending range
+        // turns a rising `grump` into a brow that dips toward the nose.
+        curveY({ channels: {
+          x1: { frame: -0.60 }, x2: { frame: 0.60 },
+          y:  { frame: 0.46 },
+          curvature: { field: "grump", frame: [0.45, -0.35],
+                       edit: slide({ axis: "y", increase: "down" }) },
+          stroke: { value: "#1f2937" },
+          strokeWidth: { frame: 0.10 },
+        } }),
+        // The mouth, same mark and the same trick with the sign reversed.
+        curveY({ channels: {
+          x1: { frame: -0.34 }, x2: { frame: 0.34 },
+          y:  { frame: -0.36 },
+          curvature: { field: "mood", frame: [0.6, -0.6],
+                       edit: slide({ axis: "y", increase: "up" }) },
+          stroke: { value: "#1f2937" },
+          strokeWidth: { frame: 0.06 },
+        } }),
+      ],
+    }),
+  ],
+}))

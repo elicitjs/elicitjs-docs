@@ -1,0 +1,35 @@
+mount(Elicit({
+  width: 480, height: 300,
+  margins: { top: 20, right: 24, bottom: 40, left: 44 },
+  axes: { x: {}, y: false },
+  data: [
+    { option: "A", convexity: 0.6 },
+    { option: "B", convexity: -0.3 },
+    { option: "C", convexity: 0.0 },
+  ],
+  schema: {
+    option:    { type: "categorical", domain: ["A", "B", "C"] },
+    convexity: { type: "quantitative", domain: [-1, 1] },
+  },
+  marks: [
+    // "How does value grow between the two ends?" — a straight line means steadily,
+    // a bow means front- or back-loaded. The chord is fixed (both ends are agreed);
+    // only the SHAPE between them is elicited, which is exactly one number.
+    curveY({
+      length: 110,
+      channels: {
+        x: { field: "option" },
+        // No y scale here, so the height is a visual constant: `{ value }` is in
+        // pixels, and skips the scale by definition.
+        y: { value: 150 },
+        // Positive curvature bows to the LEFT of travel — up, for a chord that runs
+        // left to right. So an ascending range plus increase:"up" makes dragging up
+        // arch it and dragging down cup it.
+        curvature: { field: "convexity", scale: { range: [-0.8, 0.8] },
+                     edit: slide({ axis: "y", increase: "up" }) },
+        stroke: { value: "#4e79a7" },
+        strokeWidth: { value: 3 },
+      },
+    }),
+  ],
+}))

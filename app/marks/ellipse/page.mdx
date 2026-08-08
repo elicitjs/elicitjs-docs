@@ -1,0 +1,61 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import twoUncertainties from './_examples/two-uncertainties.example.txt';
+import aMovableBlob from './_examples/a-movable-blob.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Ellipse
+
+<Lead>`ellipse` is a dot with **two independent radii**. A `point` has one `size` channel because a circle has one radius; splitting it into `rx` and `ry` means each is its own magnitude channel — each can carry its own field, and each can carry its own edit. A shape that widens on one drag and flattens on another is **two elicited numbers in one mark**.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="uncertainty" title="Two uncertainties, one blob">
+
+The classic use is an estimate with per-axis uncertainty: the centre is what someone believes, and the two radii are how sure they are along each axis separately. A circle can only say "unsure overall"; this can say "confident about cost, vague about benefit".
+
+Both radius edits live on the same mark, so a single diagonal drag reshapes the blob. That's fine here — `slide({ axis: 'x' })` and `slide({ axis: 'y' })` read different components of the gesture, so neither fights the other.
+
+<Example
+  code={twoUncertainties}
+  title="Cost × benefit, with per-axis spread"
+  blurb="rx and ry are separate fields; drag a blob sideways to widen it, up or down to flatten it."
+  try={(
+    <>
+      <b>Drag</b> a blob sideways (cost spread) or vertically (benefit spread).
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="movable" title="Moving it as well">
+
+Two edits that read the *same* component of a drag can't share one mark — one gesture would fire both, and a `move()` on the centre would fight a radius `slide`. Give them a mark each with a [composite](/marks/composite): an `ellipse` that resizes, and a `point` at its centre that moves. Direct-pick routes a gesture to the mark you touched, so nothing has to arbitrate.
+
+<Example
+  code={aMovableBlob}
+  title="A blob you can move and resize"
+  blurb="The ellipse carries the radius edit; a small centre dot carries the move. Two marks, two gestures, one row."
+  try={(
+    <>
+      <b>Drag the dot</b> to move the blob · <b>drag the blob</b> to resize it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="glyphs" title="Inside a glyph">
+
+`ellipse` is what a [face](/marks/face)'s eyes are: an `rx` that opens and an `ry` that squints, both stated as fractions of the glyph's frame so they scale with the head. See [composite](/marks/composite#box) for how a mark places itself in a glyph's local coordinates.
+
+</Section>

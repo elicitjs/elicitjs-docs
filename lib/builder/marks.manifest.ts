@@ -18,6 +18,8 @@ import { api as legendApi } from '../../app/marks/legend/api';
 import { api as axesApi } from '../../app/marks/axes/api';
 import { api as compositeApi } from '../../app/marks/composite/api';
 import { api as faceApi } from '../../app/marks/face/api';
+import { api as ellipseApi } from '../../app/marks/ellipse/api';
+import { api as curveApi } from '../../app/marks/curve/api';
 import { api as symbolApi } from '../../app/marks/symbol/api';
 import { api as geoApi } from '../../app/marks/geo/api';
 
@@ -123,12 +125,20 @@ export const MARKS: MarkManifestEntry[] = [
   },
   // Glyphs / nested — need composed sub-marks or fixed emotion/symbol channels.
   {
-    family: 'composite', label: 'Composite', category: 'Composite & glyphs', docHref: '/marks/composite',
+    family: 'composite', label: 'Composite & glyph boxes', category: 'Composite & glyphs', docHref: '/marks/composite',
     api: compositeApi, factoryNames: { auto: 'composite' }, buildable: false, channels: [],
   },
   {
     family: 'face', label: 'Face (emotion)', category: 'Composite & glyphs', docHref: '/marks/face',
     api: faceApi, factoryNames: { auto: 'face' }, buildable: false, channels: [],
+  },
+  {
+    family: 'ellipse', label: 'Ellipse', category: 'Composite & glyphs', docHref: '/marks/ellipse',
+    api: ellipseApi, factoryNames: { auto: 'ellipse' }, buildable: false, channels: [],
+  },
+  {
+    family: 'curve', label: 'Curve', category: 'Composite & glyphs', docHref: '/marks/curve',
+    api: curveApi, factoryNames: { auto: 'curveY' }, buildable: false, channels: [],
   },
   {
     family: 'symbol', label: 'Symbol & Emoji', category: 'Composite & glyphs', docHref: '/marks/symbol',

@@ -11,6 +11,7 @@ import ex2dMoveScatter from './_examples/2d-move-scatter.example.txt';
 import clickToAddPoints from './_examples/click-to-add-points.example.txt';
 import scatterOfRotatableSquares from './_examples/scatter-of-rotatable-squares.example.txt';
 import scatterOfRotatableTicks from './_examples/scatter-of-rotatable-ticks.example.txt';
+import grabbingASpunTickFromNearby from './_examples/grabbing-a-spun-tick-from-nearby.example.txt';
 import heatmapOfCircles from './_examples/heatmap-of-circles.example.txt';
 
 export default function Layout({ children }) {
@@ -96,6 +97,8 @@ When both x and y carry a drag, a gesture inverts the pointer through both posit
 
 An `angle` channel orients a mark about its centre. Degrees are math convention (0° = +x, counterclockwise); `rotate()` inverts the pointer through the same scale. Squares use `point({ shape: 'square' })`; short `tickX` / `tickY` segments (with `length`) rotate the same way — useful for directional markers on a scatter.
 
+Rotation is a transform, not a change of geometry: the mark keeps its upright coordinates and the renderer spins it about its centre. Everything that answers the pointer follows that transform — proximity picking measures the tick where it is **drawn**, and an interaction effect (a hover or selection outline) turns with the mark it belongs to.
+
 <Example
   code={scatterOfRotatableSquares}
   title="Scatter of rotatable squares"
@@ -114,6 +117,18 @@ An `angle` channel orients a mark about its centre. Degrees are math convention 
   try={(
     <>
       <b>Drag</b> a tick to spin it.
+    </>
+  )}
+/>
+
+<Example
+  code={grabbingASpunTickFromNearby}
+  title="Grabbing a spun tick from nearby"
+  blurb="pick: 'nearest' with a 12px threshold. The catchment tracks each tick's drawn arm, so the flat one is grabbable along the horizontal."
+  try={(
+    <>
+      <b>Drag</b> from just off either tick — including off the END of the flat
+      one, well away from the vertical it would sit on at 0°.
     </>
   )}
 />

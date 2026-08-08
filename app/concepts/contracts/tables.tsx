@@ -16,7 +16,7 @@ export function KindsTable() {
           </tr>
           <tr>
             <td><b>parametric</b></td>
-            <td>Belief parameters (trend, face); not free create targets</td>
+            <td>Belief parameters (trend); not free create targets</td>
           </tr>
           <tr>
             <td><b>map chrome</b></td>
@@ -79,6 +79,22 @@ export function DataMarksTable() {
             <td>the tick</td>
           </tr>
           <tr>
+            <td><code className="inline">ellipse</code></td>
+            <td>natural</td>
+            <td>
+              the mark; <code className="inline">rx</code> and <code className="inline">ry</code> are
+              separate magnitudes
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <code className="inline">curve</code> / <code className="inline">curveX</code> /{' '}
+              <code className="inline">curveY</code>
+            </td>
+            <td>less natural</td>
+            <td>a fat transparent hit path over the stroke</td>
+          </tr>
+          <tr>
             <td>
               <code className="inline">text</code> / <code className="inline">textX</code> /{' '}
               <code className="inline">textY</code>
@@ -139,6 +155,13 @@ export function DataMarksTable() {
             <td>depends on parts</td>
             <td>each part is its own feature</td>
           </tr>
+          <tr>
+            <td><code className="inline">group</code></td>
+            <td>depends on parts</td>
+            <td>
+              each part is its own feature, placed in a per-datum <b>local frame</b>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -175,10 +198,13 @@ export function ParametricTable() {
           </tr>
           <tr>
             <td><code className="inline">face</code></td>
-            <td>emotion preset binds valence/arousal if unbound</td>
             <td>
-              <b>shape is the control</b>; <code className="inline">handles</code> gates
-              eyelid/lip/size dots only
+              a <b>preset</b>, not a mark: it returns a <code className="inline">group</code> of
+              ordinary marks. Emotion preset binds valence/arousal if unbound
+            </td>
+            <td>
+              <b>shape is the control</b> — each feature is its own mark, so the universal edits
+              apply and there is no <code className="inline">edit.face.*</code>
             </td>
           </tr>
         </tbody>

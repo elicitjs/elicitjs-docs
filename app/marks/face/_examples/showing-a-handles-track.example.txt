@@ -1,0 +1,22 @@
+mount(Elicit({
+  width: 320, height: 300,
+  margins: { top: 12, right: 12, bottom: 12, left: 12 },
+  data: [ { brow: 0.5 } ],
+  schema: {
+    brow: { type: "quantitative", domain: [0, 1] },
+  },
+  marks: [
+    face({
+      channels: {
+        // A brow's height is a POSITIONAL channel in the face's local frame, so
+        // `move()` inverts the pointer straight back through the very scale that
+        // placed it — and the frame scale's pixel range IS the travel range.
+        // `guide: { track: true }` draws that range, so what you see is the mapping.
+        browHeight: {
+          field: "brow",
+          edit: move({ channels: ["y"], guide: { track: true } }),
+        },
+      },
+    }),
+  ],
+}))

@@ -1,0 +1,33 @@
+mount(Elicit({
+  width: 420, height: 300,
+  margins: { top: 20, right: 30, bottom: 40, left: 44 },
+  axes: { x: {}, y: {} },
+  data: [ { from: 15, to: 85, at: 55, bow: 0.5, lean: 12 } ],
+  schema: {
+    from: { type: "quantitative", domain: [0, 100] },
+    to:   { type: "quantitative", domain: [0, 100] },
+    at:   { type: "quantitative", domain: [0, 100] },
+    bow:  { type: "quantitative", domain: [-1, 1] },
+    lean: { type: "quantitative", domain: [-45, 45] },
+  },
+  marks: [
+    // An explicit endpoint PAIR states the chord: x1 → x2 at height y. Both edits
+    // sit on one mark, so ONE drag drives both: its vertical component bends the
+    // curve, its horizontal one tilts it. Reading two components of a gesture is
+    // what lets two params share a mark without fighting — an angular edit here
+    // would fire off both, since you are standing on the pivot.
+    curveY({
+      channels: {
+        x1: { field: "from" },
+        x2: { field: "to" },
+        y:  { field: "at" },
+        curvature: { field: "bow", scale: { range: [-0.8, 0.8] },
+                     edit: slide({ axis: "y", increase: "up" }) },
+        angle: { field: "lean", scale: { range: [-45, 45] },
+                 edit: slide({ axis: "x", increase: "right" }) },
+        stroke: { value: "#e15759" },
+        strokeWidth: { value: 3 },
+      },
+    }),
+  ],
+}))

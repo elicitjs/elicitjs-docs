@@ -1,0 +1,80 @@
+mount(Elicit({
+  width: 320, height: 300,
+  margins: { top: 12, right: 12, bottom: 12, left: 12 },
+  data: [ { openness: 0.7, mood: 0.8, worry: 0.35 } ],
+  schema: {
+    openness: { type: "quantitative", domain: [0, 1] },
+    mood:     { type: "quantitative", domain: [0, 1] },
+    worry:    { type: "quantitative", domain: [0, 1] },
+  },
+  marks: [
+    // This is what `face()` returns. A part stating a `frame:` channel turns the
+    // composite into a BOX: its x / y / size say where the box is and how big,
+    // and a `frame:` channel is placed inside it — x and y in [-1, 1] from the
+    // centre with y UP, radii as a fraction of the half-size.
+    composite({
+      id: "myface",
+      channels: { size: { value: 92 } },
+      parts: [
+        // The head IS the box: radius 1 in local units, and no position at all —
+        // inside a box, saying nothing means "here, at the glyph".
+        point({ channels: {
+          size:   { frame: 1 },
+          fill:   { value: "#FFD666" },
+          stroke: { value: "#B7791F" },
+        } }),
+        // Two eyes. `rx` maps the field's domain onto a slice of the box, so the
+        // same drag means the same thing however big the head is.
+        ellipse({ channels: {
+          x:  { frame: -0.4 },
+          y:  { frame: 0.16 },
+          rx: { field: "openness", frame: [0.05, 0.19],
+                edit: slide({ axis: "x", increase: "right" }) },
+          ry: { frame: 0.12 },
+          fill: { value: "#1f2937" },
+        } }),
+        ellipse({ channels: {
+          x:  { frame: 0.4 },
+          y:  { frame: 0.16 },
+          rx: { field: "openness", frame: [0.05, 0.19],
+                edit: slide({ axis: "x", increase: "right" }) },
+          ry: { frame: 0.12 },
+          fill: { value: "#1f2937" },
+        } }),
+        // Two brows, each a tickY spanning a chord in the box. `worry` drives
+        // BOTH the height (a slide on y) and the tilt — and the two tilt ranges
+        // are MIRRORED, so one rising field tilts them into the same expression
+        // rather than the same direction. That only works because each part's
+        // frame scale is PRIVATE: a single global angle scale could not hold
+        // [45, -45] and [-45, 45] at once.
+        tickY({ channels: {
+          x1: { frame: -0.14 }, x2: { frame: -0.50 },
+          y:  { field: "worry", frame: [0.57, 0.23],
+                edit: slide({ axis: "y", increase: "down" }) },
+          angle: { field: "worry", frame: [45, -45] },
+          stroke: { value: "#1f2937" },
+          strokeWidth: { frame: 0.055 },
+        } }),
+        tickY({ channels: {
+          x1: { frame: 0.14 }, x2: { frame: 0.50 },
+          y:  { field: "worry", frame: [0.57, 0.23],
+                edit: slide({ axis: "y", increase: "down" }) },
+          angle: { field: "worry", frame: [-45, 45] },
+          stroke: { value: "#1f2937" },
+          strokeWidth: { frame: 0.055 },
+        } }),
+        // The mouth is a `curve`: a chord in the box plus a curvature. Positive
+        // bows up, so a descending range turns a rising mood into a deeper smile.
+        curveY({ channels: {
+          x1: { frame: -0.36 },
+          x2: { frame: 0.36 },
+          y:  { frame: -0.34 },
+          curvature: { field: "mood", frame: [0.6, -0.6],
+                       edit: slide({ axis: "y", increase: "up" }) },
+          stroke: { value: "#1f2937" },
+          strokeWidth: { frame: 0.055 },
+        } }),
+      ],
+    }),
+  ],
+}))

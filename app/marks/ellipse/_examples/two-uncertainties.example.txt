@@ -1,0 +1,36 @@
+mount(Elicit({
+  width: 480, height: 320,
+  margins: { top: 20, right: 24, bottom: 40, left: 44 },
+  axes: { x: {}, y: {} },
+  data: [
+    { region: "North", cost: 30, benefit: 62, costSd: 8,  benefitSd: 16 },
+    { region: "South", cost: 66, benefit: 34, costSd: 17, benefitSd: 6 },
+  ],
+  schema: {
+    cost:      { type: "quantitative", domain: [0, 100] },
+    benefit:   { type: "quantitative", domain: [0, 100] },
+    costSd:    { type: "quantitative", domain: [2, 30] },
+    benefitSd: { type: "quantitative", domain: [2, 30] },
+    region:    { type: "categorical", domain: ["North", "South"] },
+  },
+  marks: [
+    // One blob per region: the CENTRE is the estimate, the two RADII are two
+    // separate uncertainties. A circle could only say "how unsure overall"; two
+    // radii let a reader say they are confident about cost and vague about benefit.
+    // Both edits sit on one mark, so a single diagonal drag reshapes the blob —
+    // that is the point of rx and ry being independent channels.
+    ellipse({
+      channels: {
+        x: { field: "cost" },
+        y: { field: "benefit" },
+        rx: { field: "costSd",    scale: { range: [6, 64] },
+              edit: slide({ axis: "x", increase: "right" }) },
+        ry: { field: "benefitSd", scale: { range: [6, 64] },
+              edit: slide({ axis: "y", increase: "down" }) },
+        fill: { field: "region" },
+        fillOpacity: { value: 0.35 },
+        stroke: { field: "region" },
+      },
+    }),
+  ],
+}))

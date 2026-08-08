@@ -2,12 +2,11 @@ mount(Elicit({
   width: 340, height: 340,
   margins: { top: 12, right: 12, bottom: 12, left: 12 },
   data: [ {
-    curve: 0.7, open: 0.2, smirk: 0.5,
+    curve: 0.7, smirk: 0.5,
     aperture: 0.6, squint: 0.2, browH: 0.5, browT: 0.4,
   } ],
   schema: {
     curve:    { type: "quantitative", domain: [0, 1] },
-    open:     { type: "quantitative", domain: [0, 1] },
     smirk:    { type: "quantitative", domain: [0, 1] },
     aperture: { type: "quantitative", domain: [0, 1] },
     squint:   { type: "quantitative", domain: [0, 1] },
@@ -17,15 +16,20 @@ mount(Elicit({
   marks: [
     face({
       channels: {
-        mouthCurve: { field: "curve" }, mouthOpen: { field: "open" }, mouthAsym: { field: "smirk" },
-        eyeScale: { field: "aperture" }, eyeSquint: { field: "squint" },
-        browHeight: { field: "browH" }, browTilt: { field: "browT" },
+        // The mouth is one part, so one drag drives both of its params: the
+        // vertical component bends it, the horizontal one tilts it into a smirk.
+        mouthCurve: { field: "curve", edit: slide({ axis: "y", increase: "up" }) },
+        mouthAsym:  { field: "smirk", edit: slide({ axis: "x", increase: "right" }) },
+        // Each eye is one ellipse: rx opens it, ry squints it. Horizontal and
+        // vertical drag, so one gesture on an eye reads as reshaping it.
+        eyeScale:  { field: "aperture", edit: slide({ axis: "x", increase: "right" }) },
+        eyeSquint: { field: "squint",   edit: slide({ axis: "y", increase: "down" }) },
+        // Each brow is one tick: height is where it SITS — a positional channel in
+        // the face's frame, so `move()` inverts straight back through it — and tilt
+        // is a magnitude, so it slides.
+        browHeight: { field: "browH", edit: move({ channels: ["y"] }) },
+        browTilt:   { field: "browT", edit: slide({ axis: "x", increase: "right" }) },
       },
-      // Mark-level: every handle above is draggable, each writing its own channel's
-      // field. With seven params that reads better than repeating the edit on each.
-      // Put it on ONE channel instead — mouthCurve: { field: "curve",
-      // edit: edit.face.expression() } — and only that handle moves.
-      edits: [ edit.face.expression() ],
     }),
   ],
 }))

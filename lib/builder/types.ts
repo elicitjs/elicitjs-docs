@@ -20,7 +20,8 @@ export type ChannelBinding = { field: string };
 export type MarkFamilyId =
   | 'bar' | 'rect' | 'area' | 'tick' | 'point' | 'line' | 'text' | 'dotStack' | 'waffle'
   | 'arc' | 'needle' | 'axisRadial' | 'trend' | 'trendBand' | 'legend'
-  | 'axis' | 'grid' | 'rule' | 'composite' | 'face' | 'symbol' | 'geo';
+  | 'axis' | 'grid' | 'rule' | 'composite' | 'group' | 'face' | 'ellipse' | 'curve'
+  | 'symbol' | 'geo';
 
 export type MarkState = {
   family: MarkFamilyId;

@@ -1,0 +1,65 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import howMuchDoesItBend from './_examples/how-much-does-it-bend.example.txt';
+import bendAndTilt from './_examples/bend-and-tilt.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Curve
+
+<Lead>`curve` is a segment that **bends**. A `tick` draws a straight line between two points; a curve draws the same span bowed off its chord by an amount that is itself a channel — so *how much does this bend, and which way* becomes an elicited number. A mouth's smile, an annotation's arc, a utility curve's convexity, a flow's deflection.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="bend" title="One number: how much it bends">
+
+`curvature` is dimensionless — the apex's offset from the chord as a fraction of the **half-chord**. So 0 is a straight segment, ±1 bows out by half the span's length, and the shape stays proportional when the span changes. That last part is what makes it usable inside a glyph: a face's mouth keeps its expression when the head is resized.
+
+The sign convention is one rule: **positive bows to the left of travel**, from the first endpoint to the second. A rightward chord bows up. Which way *more* should bend is the author's decision, and it belongs on the scale — a descending `range` turns a rising field into a deepening cup.
+
+<Example
+  code={howMuchDoesItBend}
+  title="How does value grow between the ends?"
+  blurb="The chord is fixed — both ends are agreed — and only the shape between them is elicited. That's exactly one number."
+  try={(
+    <>
+      <b>Drag</b> a curve up to arch it, down to cup it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="tilt" title="Bend and tilt">
+
+`angle` tilts the whole curve about its chord midpoint. It is baked into the **geometry** rather than left on the node, because neither renderer rotates a `path` — a curve that couldn't tilt would lose the one gesture that distinguishes it from a bent tick.
+
+Both edits can live on the same mark, because they read different **components** of one drag: `slide({ axis: "y" })` on `curvature` and `slide({ axis: "x" })` on `angle`. That is the rule for sharing a mark — two edits reading the same component would fight. An angular edit (`rotate`) is the wrong tool here even though the channel is an angle: you grab the curve at its own pivot, so a few pixels of travel swing the pointer through most of a half-turn and the value pins to an extreme.
+
+<Example
+  code={bendAndTilt}
+  title="An explicit chord, bent and leaning"
+  blurb="x1 → x2 states the chord outright; curvature bends it and angle leans it."
+  try={(
+    <>
+      <b>Drag</b> the curve up and down to bend it · around to tilt it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="grabbing" title="Why there are two paths">
+
+A stroked curve is a few pixels wide and would be nearly impossible to grab, so the mark lays a fat **transparent hit path** over the same geometry. It also carries a sampled polyline, because the proximity layer measures distance along points and cannot hit a bare path string at all — without it, a canvas-rendered curve would be undraggable.
+
+Both nodes stamp `cx`/`cy` at the chord midpoint, which is what gives an edit a centre to work from on a path mark — `markCenter` reads no geometry out of a bare `d` string. And the hit path deliberately leaves `pointerEvents` unset: the engine silences a mark with no direct-pick edit, so an inert curve can't swallow a neighbouring handle's drag, while an editable one gets the pointer back automatically.
+
+</Section>

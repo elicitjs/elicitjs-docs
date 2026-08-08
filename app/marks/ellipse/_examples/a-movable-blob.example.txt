@@ -1,0 +1,37 @@
+mount(Elicit({
+  width: 420, height: 320,
+  margins: { top: 20, right: 24, bottom: 40, left: 44 },
+  axes: { x: {}, y: {} },
+  data: [ { cost: 40, benefit: 55, sd: 14 } ],
+  schema: {
+    cost:    { type: "quantitative", domain: [0, 100] },
+    benefit: { type: "quantitative", domain: [0, 100] },
+    sd:      { type: "quantitative", domain: [2, 30] },
+  },
+  marks: [
+    // Two edits that both read a raw drag can't share one mark — one gesture would
+    // fire both. Give them one mark each: the blob resizes, the dot at its centre
+    // moves. Direct-pick routes a gesture to the mark you touched, so there is
+    // nothing to arbitrate.
+    composite({
+      id: "blob",
+      parts: [
+        ellipse({ channels: {
+          x: { field: "cost" },
+          y: { field: "benefit" },
+          rx: { field: "sd", scale: { range: [6, 64] },
+                edit: slide({ axis: "x", increase: "right" }) },
+          ry: { field: "sd", scale: { range: [6, 64] } },
+          fill: { value: "#4e79a7" }, fillOpacity: { value: 0.28 },
+          stroke: { value: "#4e79a7" },
+        } }),
+        point({ channels: {
+          x: { field: "cost", edit: move({ channels: ["x", "y"] }) },
+          y: { field: "benefit" },
+          size: { value: 5 },
+          fill: { value: "#1f2937" },
+        } }),
+      ],
+    }),
+  ],
+}))

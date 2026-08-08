@@ -60,7 +60,7 @@ export default function Layout({ children }) {
 
 `slide()` is the linear counterpart to `resize`: instead of the pointer's *radius* from the centre, it reads how far the pointer has moved along one **axis** and maps that onto the value's domain — the same interaction a face's eye uses to grow. `axis` picks the axis (`'x'`/`'y'`), and `increase` names the direction that raises the value (`'left'`/`'right'`/`'up'`/`'down'`, default `'left'`/`'up'`).
 
-The default `mode: "absolute"` is a direct-pick edit — it shares a mark with other direct edits (which is why a glyph handle uses it). `mode: "relative"` moves by the drag *delta* (no jump on grab) but rides a plane driver, so it can't coexist with direct-pick edits; use it on a standalone magnitude chart.
+The default `mode: "relative"` moves the value by the drag *delta* from where you grabbed, so pressing the mark never teleports it. `mode: "absolute"` instead reads the value off the pointer's *position* on a fixed track centred on the mark — stateless, but only right when the handle already sits at its value's place on that track (a dot on a rail); grab a mark centre and the value snaps to the middle of the domain. Both are direct-pick, so either shares a mark with its other direct edits — which is what lets a glyph put one param on `axis: "x"` and another on `axis: "y"` and drive both with one gesture. `extent` is the drag distance that sweeps the whole domain; inside a [glyph's box](/marks/composite#box) it defaults to the glyph's radius, so the gesture scales with the glyph.
 
 <Example
   code={slideAlongAnAxis}

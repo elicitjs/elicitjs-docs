@@ -1,0 +1,47 @@
+mount(Elicit({
+  width: 480, height: 300,
+  margins: { top: 20, right: 24, bottom: 40, left: 44 },
+  axes: { x: {}, y: {} },
+  data: [
+    { site: "North", capacity: 30, load: 0.7 },
+    { site: "South", capacity: 72, load: 0.3 },
+  ],
+  schema: {
+    site:     { type: "categorical", domain: ["North", "South"] },
+    capacity: { type: "quantitative", domain: [0, 100] },
+    load:     { type: "quantitative", domain: [0, 1] },
+  },
+  marks: [
+    // One part states a channel in LOCAL units (`frame:`), so the composite
+    // becomes a BOX: its x / y / size place and size one per row. Inside it,
+    // x and y run [-1, 1] from the centre with y UP, and magnitudes are a
+    // fraction of the half-size.
+    composite({
+      id: "gauge",
+      channels: {
+        x: { field: "capacity" },
+        y: { value: 150 },
+        size: { value: 46 },
+      },
+      parts: [
+        // The dial: exactly the box's half-size. It states no position at all —
+        // inside a box, saying nothing means "here, at the glyph".
+        point({ channels: {
+          size: { frame: 1 },
+          fill: { value: "#eef2f7" }, stroke: { value: "#9aa7b4" },
+        } }),
+        // The needle: a tick spanning the box's full width, rotated by `load`.
+        // The angle is a PRIVATE frame scale, so this glyph's degrees can't
+        // collide with another mark's — and the rotate inverts back through it.
+        tickY({ channels: {
+          x1: { frame: -0.85 },
+          x2: { frame: 0.85 },
+          angle: { field: "load", frame: [-80, 80],
+                   edit: rotate({ pivot: "mark", pick: "direct" }) },
+          stroke: { value: "#e15759" },
+          strokeWidth: { frame: 0.09 },
+        } }),
+      ],
+    }),
+  ],
+}))

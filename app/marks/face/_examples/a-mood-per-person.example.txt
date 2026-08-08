@@ -18,10 +18,11 @@ mount(Elicit({
       channels: {
         x: { field: "who" },
         // Declared, not implied: these are the two columns a drag on this face
-        // writes. (The mark's emotion preset would DRAW the same binding, but a
-        // mark is inert until an edit names the column it touches.)
-        mouthCurve: { field: "valence", edit: edit.face.expression() },
-        eyeScale:   { field: "arousal", edit: edit.face.expression() },
+        // writes. (The emotion preset would DRAW the same binding, but a mark is
+        // inert until an edit names the column it touches.) Every face's parts are
+        // separate features, so a drag on Ana's mouth cannot reach Ben's.
+        mouthCurve: { field: "valence", edit: slide({ axis: "y", increase: "up" }) },
+        eyeScale:   { field: "arousal", edit: slide({ axis: "x", increase: "right" }) },
       },
     }),
   ],

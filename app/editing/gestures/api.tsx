@@ -99,16 +99,16 @@ export const api: ApiEntry[] = [
       {
         name: "extent",
         type: "number",
-        default: "120",
-        desc: "Pixel span that traverses the full domain.",
+        default: "glyph radius, else 120",
+        desc: "Drag distance that sweeps the full domain. Inside a composite's local box it defaults to the glyph's radius, so the gesture scales with the glyph.",
       },
       {
         name: "mode",
         type: "'absolute' | 'relative'",
-        default: "'absolute'",
+        default: "'relative'",
         desc: (
           <>
-            <code className="inline">absolute</code> — a fixed track at the mark centre; direct-pick, coexists with a mark's other direct edits (a glyph handle), may jump to the pointer on grab. <code className="inline">relative</code> — moves by the drag delta (no jump) via the <code className="inline">slide</code> driver, so it can't share a chart with direct-pick edits.
+            <code className="inline">relative</code> — the value moves by the drag delta from the grab, so there is no jump. <code className="inline">absolute</code> — the value is read off the pointer's position on a fixed track centred on the mark; stateless, but it teleports unless the handle already sits at its value's place on that track. Both are direct-pick and coexist with a mark's other direct edits.
           </>
         ),
       },

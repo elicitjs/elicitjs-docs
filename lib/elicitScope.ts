@@ -17,7 +17,6 @@ const {
   geo: _editGeo,
   waffle: _editWaffle,
   trend: _editTrend,
-  face: _editFace,
   // The legend pickers stay under `edit.*` so the same-named `legend` MARK (from
   // elicit.plot) — and its `legendColor`/`legendSize`/`legendSymbol` siblings — win
   // the bare name, the way axis/arc/waffle marks win over their edit namespaces.

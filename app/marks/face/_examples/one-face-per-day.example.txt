@@ -23,12 +23,13 @@ mount(Elicit({
         // and a created face's expression derives from the mood create mints —
         // no extra field to seed. The edit makes pulling the mouth write `mood`
         // too, so the smile and the y position stay two views of one column.
-        mouthCurve: { field: "mood", edit: edit.face.expression() },
+        mouthCurve: { field: "mood", edit: slide({ axis: "y", increase: "up" }) },
       },
       // A click on an empty day's column inverts the pointer to (day, mood) and
-      // mints one face there. A click that lands ON a face carries a node, so it
-      // never fires the plane create — and a click in a day that's already taken
-      // is rejected by `unique`, so a day can hold at most one face.
+      // mints one face there. Mark-level edits ride on the HEAD part, so the
+      // create fires once per click, not once per facial feature. A click that
+      // lands ON a face carries a node, so it never fires the plane create — and
+      // a click in a day that's already taken is rejected by `unique`.
       edits: [ create({ channels: ["x", "y"] }) ],
       constraints: [ unique({ field: "day" }) ],
     }),
