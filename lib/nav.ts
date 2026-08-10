@@ -35,6 +35,7 @@ export const SITE: NavGroup[] = [
       { href: "/marks/axis-radial", title: "Radial axis" },
       { href: "/marks/arc", title: "Arc · Pie · Donut" },
       { href: "/marks/geo", title: "Geo" },
+      { href: "/marks/network", title: "Network (nodes & links)" },
       { href: "/marks/trend", title: "Trend + Band" },
       { href: "/marks/axes", title: "Axis, Grid & Rule" },
       { href: "/marks/legend", title: "Legend" },

@@ -146,7 +146,8 @@ export function DataMarksTable() {
               <code className="inline">donut</code>
             </td>
             <td>
-              N/A → <code className="inline">edit.arc.edge</code>
+              <code className="inline">edit.stack.cut</code> /{' '}
+              <code className="inline">edit.stack.merge</code>
             </td>
             <td>rim boundary dots</td>
           </tr>

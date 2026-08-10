@@ -1,0 +1,25 @@
+mount(Elicit({
+  width: 380, height: 240,
+  margins: { top: 20, right: 16, bottom: 34, left: 44 },
+  data: [
+    { id: "r1", effort: 30, value: 70 },
+    { id: "r2", effort: 65, value: 40 },
+  ],
+  schema: {
+    id: { type: "categorical", key: true, open: true },
+    effort: { type: "quantitative", domain: [0, 100] },
+    value: { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    node({
+      size: 9,
+      fill: "#4e79a7",
+      edits: [create(), remove({ when: when.alt })],
+      channels: {
+        x: { field: "effort", edit: move({ channels: ["effort", "value"] }) },
+        y: { field: "value" },
+        text: { field: "id" },
+      },
+    }),
+  ],
+}));

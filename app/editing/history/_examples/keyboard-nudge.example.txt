@@ -1,6 +1,8 @@
 mount(Elicit({
   width: 420, height: 260,
   margins: { top: 16, right: 16, bottom: 32, left: 40 },
+  // Native focus ring — off by default; on here so Tab is visible while learning.
+  focusOutline: true,
   schema: {
     effort: { type: "quantitative", domain: [0, 100] },
     value:  { type: "quantitative", domain: [0, 100] },

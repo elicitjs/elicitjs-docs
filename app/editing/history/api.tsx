@@ -84,7 +84,7 @@ export const api: ApiEntry[] = [
     name: "Keyboard editing",
     summary: (
       <>
-        There is no option for this. Any node carrying a direct edit is focusable (<code className="inline">tabindex=0</code>, <code className="inline">role="button"</code>), and an arrow key on it dispatches a <b>nudge</b> that goes through the edit’s own <code className="inline">apply()</code> — so the keyboard cannot drift from the pointer, because it isn’t a second path.
+        Keyboard nudge is always on — there is no option to disable it. Any node carrying a direct edit is focusable (<code className="inline">tabindex=0</code>, <code className="inline">role="button"</code>), and an arrow key on it dispatches a <b>nudge</b> that goes through the edit’s own <code className="inline">apply()</code> — so the keyboard cannot drift from the pointer, because it isn’t a second path. The only chrome option is the browser focus ring below.
       </>
     ),
     options: [
@@ -103,6 +103,16 @@ export const api: ApiEntry[] = [
         type: "—",
         default: "—",
         desc: "A coarse step — 10% of the domain. (No effect on a categorical axis, where one category is already the smallest move.)",
+      },
+      {
+        name: "focusOutline",
+        type: "boolean",
+        default: "false",
+        desc: (
+          <>
+            The browser’s native focus ring (the blue box after a click or Tab). Off by default — Tab and arrow keys still work; only the outline is suppressed. Set <code className="inline">true</code> when you want the ring visible (e.g. teaching keyboard editing). SVG/D3 renderer only.
+          </>
+        ),
       },
       {
         name: "Constraints & locks apply",

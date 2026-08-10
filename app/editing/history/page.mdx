@@ -37,15 +37,15 @@ Drag a bar and undo it. The whole drag is one step, because the history’s unit
 
 <Section id="keyboard" title="Arrow keys">
 
-Nothing below asks for keyboard support — the point takes a drag on x and y, so it takes arrow keys on x and y. That is the whole feature: a fallback for anyone who can’t drag precisely (or at all), and a precision tool for anyone who can.
+Nothing below asks for keyboard support — the point takes a drag on x and y, so it takes arrow keys on x and y. That is the whole feature: a fallback for anyone who can’t drag precisely (or at all), and a precision tool for anyone who can. The browser’s focus ring is off by default (`focusOutline: false`); this example turns it on so Tab is visible.
 
 <Example
   code={keyboardNudge}
   title="Arrow keys move a point"
-  blurb="No option to set: a mark that takes a drag takes the keyboard too."
+  blurb="A mark that takes a drag takes the keyboard too. focusOutline: true shows the native ring while you Tab."
   try={(
     <>
-      <b>Tab</b> until a dot is focused, then use the <b>arrow keys</b> — 1% of the domain a press, <b>Shift+arrow</b> for 10%. Hold an arrow at the edge: the clamp stops it exactly where a drag would.
+      <b>Tab</b> until a dot is focused (blue ring), then use the <b>arrow keys</b> — 1% of the domain a press, <b>Shift+arrow</b> for 10%. Hold an arrow at the edge: the clamp stops it exactly where a drag would.
     </>
   )}
 />

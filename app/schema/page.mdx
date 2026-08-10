@@ -7,6 +7,8 @@ import { api } from './api';
 
 import elicitFromNothing from './_examples/elicit-from-nothing.example.txt';
 import beliefsOverTime from './_examples/beliefs-over-time.example.txt';
+import aKeyedTable from './_examples/a-keyed-table.example.txt';
+import barOfLinkWeights from './_examples/a-bar-of-link-weights.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -14,7 +16,7 @@ export default function Layout({ children }) {
 
 # Data schema
 
-<Lead>A `schema` declares the output dataset: each field’s measurement type (quantitative / categorical / ordinal / temporal), range, and creation default. It is the source of truth for a field’s scale, so a chart resolves scales, draws axes, and mints data with **zero starter data**.</Lead>
+<Lead>A `schema` declares the output dataset: each field’s measurement type (quantitative / categorical / ordinal / temporal), range, and creation default. It is the source of truth for a field’s scale, so a chart resolves scales, draws axes, and mints data with **zero starter data**. `structure` declares how many tables that dataset has — one by default, or a network of nodes and links.</Lead>
 
 <ApiReference entries={api} />
 
@@ -29,6 +31,97 @@ No data — the axes come straight from the schema. Every created point carries 
   try={(
     <>
       <b>Double-click</b> to create · <b>drag</b> to move · <b>click</b> to cycle the class colour.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="structure" title="How many tables">
+
+`structure` says which tables the dataset has. Leave it out and you get one, whose columns are the schema itself — that is every example on this page, and the form stays valid.
+
+```js
+schema: {
+  age: { type: "quantitative", domain: [18, 80] },
+  belief: { type: "quantitative", domain: [0, 1] },
+}
+```
+
+`structure: "network"` gives you two, under `tables`: one filling the `nodes` role and one filling `links`. Each has its own columns, so a node and a link both carry their own attributes.
+
+```js
+schema: {
+  structure: "network",
+  tables: {
+    nodes: {
+      id: { type: "categorical", key: true, open: true },
+      x: { type: "quantitative", domain: [0, 100] },
+      y: { type: "quantitative", domain: [0, 100] },
+    },
+    links: {
+      source: { type: "ref" },
+      target: { type: "ref" },
+    },
+  },
+}
+```
+
+`data` is then keyed by table name, and so are `getData()`, `onChange` and `setData`. A table you leave out of `data` starts empty.
+
+Give a table a `role` and you can name it whatever your data is — `claims` and `supports` rather than `nodes` and `links`. Marks and edits find their table by role, so nothing else in the spec changes. See [Network](/marks/network) for the marks and gestures that draw one.
+
+</Section>
+
+<Section id="ref" title="Keys and references">
+
+Two field declarations join one table to another. `key: true` marks the column that identifies a row. `type: "ref"` marks a column that names one.
+
+A `ref` has no `domain` of its own — it reads the key column’s, so the two can never disagree and you never write out a list of identities twice. A value that names no row is reported when you seed it, and dropped when it becomes dangling: delete a node and its links go with it.
+
+Pair `key` with `open: true`. A row minted by `create` — or any other creating edit — takes a fresh identity from that column automatically, so it can be referenced straight away. `open` is what lets it take one instead of asking you to type. Naming is a separate act: put `editText()` on a `text` mark and write the label in place.
+
+A closed `domain` on a key is a fixed roster. `create` hands out the declared values one at a time and refuses once they run out, which is how you cap how many rows may exist.
+
+None of this needs a network. A single table can declare a `key` too, and every row you create gets an identity:
+
+<Example
+  code={aKeyedTable}
+  title="A keyed table"
+  blurb="One table, a `key` column, and `create`. New rows arrive already identified."
+  try={(
+    <>
+      <b>Click</b> empty space to add a row and watch its <code>id</code>.{" "}
+      <b>Drag</b> a dot to move it, <b>Alt-click</b> to remove it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="table" title="Which table a mark draws">
+
+Every mark draws exactly one table, and takes a `table` option naming which. It is universal — every mark has it, and on a single-table chart there is nothing to say, so you never write it.
+
+With no `table`, a mark draws the **primary** table: the only one on a `structure: "table"` chart, and the nodes on a network. `link()` is the exception — it draws the links. That is the whole rule.
+
+Reach for `table` when you want an ordinary mark over another table:
+
+```js
+barY({ table: "links", channels: { x: { field: "source" }, y: { field: "strength" } } })
+```
+
+An edit on that mark writes rows of that table, and `getData()` shows the change there. A name the schema does not declare is reported, and the mark falls back to the primary table.
+
+Positional scales are shared across the whole chart. Two tables encoding different kinds of field on the same axis will disagree about its type, which is reported — give the second mark its own chart instead.
+
+<Example
+  code={barOfLinkWeights}
+  title="A bar of link weights"
+  blurb="An ordinary barY over the links table. Same channels, same edits — only `table` differs."
+  try={(
+    <>
+      <b>Drag</b> a bar. The change lands in the <code>links</code> table.
     </>
   )}
 />

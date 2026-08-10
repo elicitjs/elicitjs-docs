@@ -19,7 +19,7 @@ mount(Elicit({
   },
   marks: [
     donut({
-      edits: [edit.arc.edge()],
+      edits: [edit.stack.edge()],
       handleSize: 6,
       channels: {
         x: { field: "state" },          // band axis → one donut per state

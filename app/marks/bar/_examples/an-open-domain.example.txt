@@ -1,0 +1,26 @@
+mount(Elicit({
+  width: 380, height: 260,
+  margins: { top: 16, right: 16, bottom: 28, left: 40 },
+  data: [{ year: "2024", holding: "VTI", pct: 100 }],
+  schema: {
+    year:    { type: "categorical", domain: ["2024"] },
+    holding: { type: "categorical", domain: ["VTI"], open: true },
+    pct:     { type: "quantitative", domain: [0, 100] },
+  },
+  legends: true,
+  marks: [
+    bar({
+      stack: true,
+      channels: {
+        x:    { field: "year" },
+        y:    { field: "pct" },
+        fill: { field: "holding" },
+      },
+      edits: [
+        edit.stack.cut({ label: "Holding" }),
+        edit.stack.edge(),
+        edit.stack.merge(),
+      ],
+    }),
+  ],
+}))

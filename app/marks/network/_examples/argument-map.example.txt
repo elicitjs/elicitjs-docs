@@ -1,0 +1,54 @@
+mount(Elicit({
+  width: 460, height: 300,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      claims: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          text: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      supports: {
+        role: "links",
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+        },
+      },
+    },
+  },
+  data: {
+    claims: [
+      { id: "c1", text: "Ban cars downtown", x: 50, y: 78 },
+      { id: "c2", text: "Cuts emissions", x: 20, y: 28 },
+      { id: "c3", text: "Hurts shops", x: 80, y: 28 },
+    ],
+    supports: [
+      { source: "c2", target: "c1" },
+      { source: "c3", target: "c1" },
+    ],
+  },
+  marks: [
+    link({ arrow: true, inset: 16, stroke: "#94a3b8" }),
+    node({
+      size: 11,
+      fill: "#4e79a7",
+      edits: [
+        edit.network.connect({ when: when.shift }),
+        create({ defaults: { text: "New claim" } }),
+        remove({ when: when.alt }),
+      ],
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], when: when.noShift }) },
+        y: { field: "y" },
+        text: { field: "text", edit: editText() },
+      },
+    }),
+  ],
+}));

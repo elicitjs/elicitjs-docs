@@ -1,0 +1,54 @@
+mount(Elicit({
+  width: 440, height: 280,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        name: { type: "categorical", open: true },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+      },
+      links: {
+        source: { type: "ref" },
+        target: { type: "ref" },
+        strength: { type: "quantitative", domain: [0, 1], default: 0.5 },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "a", name: "Ana", x: 20, y: 70 },
+      { id: "b", name: "Ben", x: 70, y: 82 },
+      { id: "c", name: "Cleo", x: 78, y: 26 },
+      { id: "d", name: "Dev", x: 26, y: 20 },
+    ],
+    links: [
+      { source: "a", target: "b", strength: 0.9 },
+      { source: "b", target: "c", strength: 0.3 },
+      { source: "c", target: "d", strength: 0.6 },
+      { source: "d", target: "a", strength: 0.2 },
+    ],
+  },
+  marks: [
+    link({
+      inset: 12,
+      channels: {
+        strokeWidth: { field: "strength", scale: { range: [1, 7] } },
+        stroke: { field: "strength", scale: { scheme: "blues" } },
+        source: { field: "source", edit: edit.network.rewire() },
+      },
+    }),
+    node({
+      size: 10,
+      fill: "#1f2937",
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"] }) },
+        y: { field: "y" },
+        text: { field: "name" },
+      },
+    }),
+  ],
+}));

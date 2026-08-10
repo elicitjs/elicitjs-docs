@@ -12,6 +12,9 @@ import yearsActivePerPerson from './_examples/years-active-per-person.example.tx
 import brushEdgesBodyTogether from './_examples/brush-edges-body-together.example.txt';
 import dragAValue from './_examples/drag-a-value.example.txt';
 import nearestPickSelfDrawnGuide from './_examples/nearest-pick-self-drawn-guide.example.txt';
+import aStackedBarChart from './_examples/a-stacked-bar-chart.example.txt';
+import cutAStackIntoParts from './_examples/cut-a-stack-into-parts.example.txt';
+import anOpenDomain from './_examples/an-open-domain.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -49,6 +52,50 @@ Put the band on y and the value on x, and the bars run horizontally. `barX` forc
   code={barxValueOnX}
   title="barX — value on x"
   blurb="y is the category band, x the linear value drawn rightward from the baseline."
+/>
+
+</Section>
+
+<Section id="stack" title="Stacked bars">
+
+`stack: true` stacks the bars that share a band: each segment sits on the cumulative total of the ones before it. The stack's grouping is its band — rows with the same `x` (or `y`, for `barX`) stack together — so there's no grouping option to set. Declare a schema domain covering the stacked **total**, not the individual values.
+
+Segments are ordered by the mark's series field, so the same category sits at the same height in every band. `stack: true` infers that field from `fill` (then `stroke`); `stack: "asset"` names it outright. Span mode wins over `stack`: give the value axis `x1`/`x2` or `y1`/`y2` and the bars draw as spans instead.
+
+<Example
+  code={aStackedBarChart}
+  title="A stacked bar chart"
+  blurb={'stack: true with fill: { field: "asset" }. The pct domain covers the total, [0, 100].'}
+/>
+
+</Section>
+
+<Section id="slice" title="Slicing a stack">
+
+A stacked bar divides one total among its rows, so three gestures reshape it — the same three that work on a `pie` or `donut`, which divide a total the same way:
+
+- `edit.stack.cut()` — **click** inside a segment to divide it in two at that point.
+- `edit.stack.edge()` — **drag** a boundary to move value across it. Only the two segments it separates change.
+- `edit.stack.merge()` — **double-click** a boundary to fuse those two back into one.
+
+All three preserve the band's total: cutting divides a magnitude, dragging moves value from one row to its neighbour, merging adds two into one. Boundary handles appear once one of these edits is wired, and follow the shared `handles` / `handleSize` / `handleColor` contract.
+
+A cut mints a row, and its category comes from the schema's domain — so building a stack takes no typing. A **closed** domain (the default) hands out the values that band doesn't yet use, and refuses the cut once they run out. Each band has its own copy of the vocabulary, so using `bonds` in 2023 doesn't stop 2024 from using it.
+
+<Example
+  code={cutAStackIntoParts}
+  title="Cut a stack into parts"
+  blurb="Each year starts as one 100% block. The asset domain declares four categories, so each band takes four cuts."
+  try={<><b>Click</b> inside a segment to cut it, <b>drag</b> a boundary to shift value, <b>double-click</b> one to merge.</>}
+/>
+
+Set `open: true` on the field's schema entry and the domain becomes a starting set instead: a cut appends a new category to it, named from `label` (`"Category"` by default) for you to rename later with `edit.axis.categories()`. An open field also skips the out-of-domain check on seed data.
+
+<Example
+  code={anOpenDomain}
+  title="An open domain"
+  blurb={'holding is declared open, so each cut adds a category rather than running out. label: "Holding" names them.'}
+  try={<><b>Click</b> inside a segment to add a holding.</>}
 />
 
 </Section>

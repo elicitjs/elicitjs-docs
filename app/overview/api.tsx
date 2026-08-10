@@ -91,6 +91,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "focusOutline",
+        type: "boolean",
+        default: "false",
+        desc: (
+          <>
+            Browser focus ring on editable marks. Off by default — Tab / arrow keys still work. See <a href="/editing/history#keyboard">History &amp; keyboard</a>.
+          </>
+        ),
+      },
+      {
         name: "lock",
         type: "LockSpec",
         default: "—",

@@ -48,13 +48,28 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: 'handles / handleSize / handleColor',
+        type: "boolean | 'hit' / number / string",
+        default: 'true / 5 / theme',
+        desc: (
+          <>
+            Boundary dots on a stacked bar, drawn once a{' '}
+            <code className="inline">edit.stack.*</code> edit is wired.{' '}
+            <code className="inline">'hit'</code> keeps them grabbable but invisible.
+          </>
+        ),
+      },
+      {
         name: 'edits',
         type: 'Edit[]',
         default: '—',
         desc: (
           <>
             Mark-level edits; per-channel edits live in{' '}
-            <code className="inline">channels[ch].edit</code>.
+            <code className="inline">channels[ch].edit</code>. A stacked bar also takes{' '}
+            <code className="inline">edit.stack.cut()</code>,{' '}
+            <code className="inline">edit.stack.edge()</code> and{' '}
+            <code className="inline">edit.stack.merge()</code>.
           </>
         ),
       },

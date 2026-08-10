@@ -188,6 +188,9 @@ a { color: var(--accent); }
 .data-body .key { color: var(--muted); }
 .data-body .num { color: #b45309; }
 .data-body .str { color: #0d7a5f; }
+/* Table name, for a multi-table dataset (see marks/network). A single-table
+   chart renders no heading at all, so its panel is unchanged. */
+.data-body .tbl { color: var(--muted); font-weight: 600; }
 @media (max-width: 940px) {
   .body { flex-direction: column; }
   .code { flex-basis: auto; width: 100%; }

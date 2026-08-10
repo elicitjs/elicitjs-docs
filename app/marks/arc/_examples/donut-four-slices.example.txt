@@ -15,7 +15,7 @@ mount(Elicit({
   marks: [
     donut({
       outerRadius: 100, innerRadius: 50,
-      edits: [edit.arc.edge()],
+      edits: [edit.stack.edge()],
       handleSize: 6,
       channels: {
         value: { field: "v" },

@@ -1,0 +1,135 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import argumentMap from './_examples/argument-map.example.txt';
+import weightedLinks from './_examples/weighted-links.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Network
+
+<Lead>A **network** is a dataset of two tables: nodes, and links between them. Declare it with `structure: "network"` on the schema and both tables get their own columns, so a node and a link each carry their own attributes and content. `node()` draws a dot with a label; `link()` draws one line per link row. `edit.network.connect` and `rewire` build the topology by gesture; `create`, `move`, `editText` and `remove` work here exactly as they do on any other mark.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="schema" title="Declaring the structure">
+
+`structure` says which tables the dataset has. `"table"` is the default and means one — that is every other chart on this site, and its schema stays a bare field map. `"network"` means two, filling the roles `nodes` and `links`.
+
+```js
+schema: {
+  structure: "network",
+  tables: {
+    nodes: {
+      id: { type: "categorical", key: true, open: true },
+      label: { type: "categorical", open: true },
+      x: { type: "quantitative", domain: [0, 100] },
+      y: { type: "quantitative", domain: [0, 100] },
+    },
+    links: {
+      source: { type: "ref" },
+      target: { type: "ref" },
+      weight: { type: "quantitative", domain: [0, 1] },
+    },
+  },
+}
+```
+
+Two field declarations do the joining. `key: true` marks the column that identifies a node. `type: "ref"` marks a column that names one — its domain is read from the key column, so the two can never disagree, and you never declare a list of node ids twice.
+
+Pair `key` with `open: true`. A gesture that mints a node has to get an identity from somewhere, and `open` is what lets it take a fresh one instead of asking you to type.
+
+`data` is keyed by table name. A table you leave out starts empty, so a diagram you build entirely by gesture needs no `data` at all.
+
+```js
+data: {
+  nodes: [{ id: "a", label: "Ana", x: 20, y: 70 }],
+  links: [],
+}
+```
+
+`getData()`, `onChange` and `setData` use the same shape.
+
+</Section>
+
+<Section id="naming" title="Naming the tables">
+
+Call the tables what your data is. Give each one a `role` and the name is yours:
+
+```js
+tables: {
+  claims:   { role: "nodes", fields: { … } },
+  supports: { role: "links", fields: { … } },
+}
+```
+
+`data` and `getData()` are then keyed `claims` and `supports`. Marks and edits find their table by role, so nothing else in the spec changes — `link()` still draws `supports` with no `table` option written anywhere.
+
+</Section>
+
+<Section id="draw" title="Drawing a network">
+
+A node is an ordinary mark. Use `point`, `rect`, `text` or a `composite` over the node table — every channel, scale and edit works as usual, because a mark with no `table` draws the primary table, which for a network is the nodes. See [which table a mark draws](/schema#table) for pointing one at the links instead.
+
+`node()` is the shorthand for the usual pair: a dot with a label above it. It states `x` and `y` once and shares them, and it draws a label only when you give it a `text` channel. It is a preset over `composite`, not a network mark — point it at any table you like.
+
+`link()` draws the link table. It reads its endpoints from the node rows, so it needs no configuration: the schema already says which table holds nodes, which column identifies one, and which columns reference it.
+
+`inset` pulls both ends in so the line stops short of the node marks rather than running under them.
+
+<Example
+  code={argumentMap}
+  title="Argument map"
+  blurb="Nodes carry a claim; links point from a reason to what it supports."
+  try={(
+    <>
+      <b>Drag</b> a node to move it. <b>Shift-drag</b> from one node to another to
+      connect them. <b>Click</b> empty space to add a claim, <b>double-click</b> its
+      label to write it, and <b>Alt-click</b> a node to delete it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="gestures" title="Building the topology">
+
+Only two gestures are network-specific. The rest is the ordinary editing vocabulary.
+
+`edit.network.connect()` goes on the **node** mark: drag from one node and release on another to create a link. While you drag, the link you would make is drawn as a ghost, and only when you are over a node it can reach — releasing anywhere else creates nothing.
+
+Pair it with `when` whenever the node mark also carries a plain drag. Both fire on the same gesture otherwise, and `move` pulls the source node along under the pointer, so the release lands back on the node you started from and nothing connects. `connect({ when: when.shift })` beside `move({ when: when.noShift })` is the usual split.
+
+`edit.network.rewire()` goes on a `link` mark's `source` or `target` channel and turns that end into a handle. Drag the handle onto another node to re-point the link. Both ends can carry one at once.
+
+`create()` mints a node where you click — the plain creation edit, with no network variant. Because the node table declares a `key`, the new row arrives with an identity already set, so you can link it straight away. Naming it is a separate act: `editText()` on the `text` channel writes the label in place.
+
+`remove()` deletes a node, and takes its links with it. A `ref` must name a node that exists, so links to a removed node are dropped from the dataset — not just hidden.
+
+<Example
+  code={weightedLinks}
+  title="Weighted links"
+  blurb="A link's own columns drive its width and colour. Drag a link's source handle onto another node."
+  try={(
+    <>
+      <b>Drag</b> a name to move it. <b>Drag</b> the small handle at a link's source
+      end onto a different person to re-point it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="attributes" title="Link attributes">
+
+A link row is a row like any other. Give the link table columns and encode them on `link()`'s style channels, or edit them: `set`, `cycle` and `editText` all act on the link under the pointer.
+
+`channels.text` draws a label at the link's midpoint, and takes `editText()` the same way a `text` mark does.
+
+</Section>

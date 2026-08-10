@@ -1,0 +1,41 @@
+mount(Elicit({
+  width: 380, height: 220,
+  margins: { top: 20, right: 16, bottom: 34, left: 44 },
+  schema: {
+    structure: "network",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+      },
+      links: {
+        source: { type: "ref" },
+        target: { type: "ref" },
+        strength: { type: "quantitative", domain: [0, 1] },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "a", x: 20, y: 70 },
+      { id: "b", x: 70, y: 82 },
+      { id: "c", x: 78, y: 26 },
+    ],
+    links: [
+      { source: "a", target: "b", strength: 0.9 },
+      { source: "b", target: "c", strength: 0.3 },
+      { source: "c", target: "a", strength: 0.6 },
+    ],
+  },
+  marks: [
+    barY({
+      table: "links",
+      fill: "#4e79a7",
+      channels: {
+        x: { field: "source" },
+        y: { field: "strength", edit: move({ channels: ["y"] }) },
+      },
+    }),
+  ],
+}));

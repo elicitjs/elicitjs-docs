@@ -47,11 +47,38 @@ function fmtRow(d: Record<string, unknown>, i: number, pad: number) {
   );
 }
 
+type Rows = Record<string, unknown>[];
+type ElicitData = Rows | Record<string, Rows>;
+
 type ElicitEl = HTMLElement & {
-  getData: () => Record<string, unknown>[];
+  getData: () => ElicitData;
   on: (ev: string, cb: () => void) => () => void;
   destroy?: () => void;
 };
+
+/**
+ * `getData()` is shaped like the spec's `data`: a bare array for a single-table
+ * chart, one array per table name for a multi-table structure (see marks/network).
+ * Normalise both to named groups; a single-table chart's group has no name, so it
+ * renders exactly as it always has.
+ */
+function dataGroups(data: ElicitData): { name: string | null; rows: Rows }[] {
+  if (Array.isArray(data)) return [{ name: null, rows: data }];
+  return Object.entries(data ?? {}).map(([name, rows]) => ({
+    name,
+    rows: Array.isArray(rows) ? rows : [],
+  }));
+}
+
+function fmtGroup(group: { name: string | null; rows: Rows }) {
+  const pad = String(Math.max(group.rows.length - 1, 0)).length;
+  const body = group.rows.length
+    ? group.rows.map((d, i) => fmtRow(d, i, pad)).join('\n')
+    : '<span class="empty">no rows</span>';
+  return group.name === null
+    ? body
+    : `<span class="tbl">${esc(group.name)}</span>\n${body}`;
+}
 
 function DataPanel({ chart }: { chart: ElicitEl | null }) {
   const [html, setHtml] = useState('<span class="empty">no rows</span>');
@@ -61,14 +88,15 @@ function DataPanel({ chart }: { chart: ElicitEl | null }) {
     if (!chart) return;
     const render = () => {
       try {
-        const rows = chart.getData();
-        setCount(rows.length === 1 ? '1 row' : `${rows.length} rows`);
-        const pad = String(Math.max(rows.length - 1, 0)).length;
-        setHtml(
-          rows.length
-            ? rows.map((d, i) => fmtRow(d, i, pad)).join('\n')
-            : '<span class="empty">no rows</span>'
+        const groups = dataGroups(chart.getData());
+        setCount(
+          groups.length === 1 && groups[0].name === null
+            ? groups[0].rows.length === 1
+              ? '1 row'
+              : `${groups[0].rows.length} rows`
+            : groups.map((g) => `${g.name} ${g.rows.length}`).join(' · ')
         );
+        setHtml(groups.map(fmtGroup).join('\n\n'));
       } catch {
         setHtml('<span class="empty">unavailable</span>');
       }

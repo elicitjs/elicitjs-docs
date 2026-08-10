@@ -14,7 +14,7 @@ mount(Elicit({
   marks: [
     pie({
       outerRadius: 100,
-      edits: [edit.arc.edge()],
+      edits: [edit.stack.edge()],
       channels: {
         value: { field: "share" },
         fill: { field: "party" },

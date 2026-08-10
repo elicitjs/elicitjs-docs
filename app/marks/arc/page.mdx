@@ -10,6 +10,7 @@ import donutWithCenterText from './_examples/donut-with-center-text.example.txt'
 import dragAnyBoundary from './_examples/drag-any-boundary.example.txt';
 import donutFourSlices from './_examples/donut-four-slices.example.txt';
 import donutGrid from './_examples/donut-grid.example.txt';
+import cutASlice from './_examples/cut-a-slice.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -17,7 +18,7 @@ export default function Layout({ children }) {
 
 # Arc · Pie · Donut
 
-<Lead>Data-driven **pie** and **donut** slices. Each row’s magnitude (the `value` field) is stacked and normalized to a circle (or partial arc). Shares path math with `axisRadial`. Wire `edits: [edit.arc.edge()]` to **drag a slice boundary** and redistribute the two adjacent shares (the total stays fixed).</Lead>
+<Lead>Data-driven **pie** and **donut** slices. Each row’s magnitude (the `value` field) is stacked and normalized to a circle (or partial arc). Shares path math with `axisRadial`. Wire `edits: [edit.stack.edge()]` to **drag a slice boundary** and redistribute the two adjacent shares (the total stays fixed).</Lead>
 
 <ApiReference entries={api} />
 
@@ -47,15 +48,17 @@ Same layout with an inner hole — room for a center label.
 
 <Section id="edit" title="Editable slice boundaries">
 
-Wire `edit.arc.edge()` and **every** boundary gets a draggable handle — including the seam where the last slice meets the first on a full circle, so _n_ slices give _n_ handles. Dragging a boundary moves value between exactly the two slices it separates: one grows by what the other loses, so the total is preserved.
+Wire `edit.stack.edge()` and every **interior** boundary gets a draggable handle, so _n_ slices give _n_ − 1 handles. The seam where the last slice meets the first is the layout's fixed anchor: with the orientation and the total both fixed, those _n_ − 1 boundaries are all that can move independently.
+
+Dragging one moves value between exactly the two slices it separates. One grows by what the other loses, so the total is preserved.
 
 <Example
   code={dragAnyBoundary}
   title="Drag any boundary"
-  blurb="Each handle pair-shifts its two neighbours; the seam handle links the last and first slice."
+  blurb="Each handle pair-shifts the two slices it sits between; the rest of the pie holds still."
   try={(
     <>
-      <b>Drag</b> a dot on any slice edge (including the seam at 9 o’clock).
+      <b>Drag</b> a dot on any slice edge.
     </>
   )}
 />
@@ -63,12 +66,31 @@ Wire `edit.arc.edge()` and **every** boundary gets a draggable handle — includ
 <Example
   code={donutFourSlices}
   title="Donut, four slices"
-  blurb="Four slices → four handles; drag the seam to trade the last and first slice."
+  blurb="Four slices → three handles."
   try={(
     <>
       <b>Drag</b> any edge — the two adjacent slices rebalance.
     </>
   )}
+/>
+
+</Section>
+
+<Section id="slice" title="Cutting and merging slices">
+
+A pie divides one total among its rows, which is what a stacked `bar` does along an axis — so the same three gestures work on both:
+
+- `edit.stack.cut()` — **click** inside a slice to divide it in two at the pointer angle.
+- `edit.stack.edge()` — **drag** a boundary to move value across it.
+- `edit.stack.merge()` — **double-click** a boundary to fuse those two slices back into one.
+
+Each preserves the pie's total. A cut takes its category from the schema's domain, so it needs no typing: a closed domain hands out the values this pie doesn't yet use and refuses the cut once they run out, while `open: true` lets each cut append a new one. See [Slicing a stack](/marks/bar#slice) for the bar form.
+
+<Example
+  code={cutASlice}
+  title="Cut a slice"
+  blurb="One full circle to start. The category domain declares five values, so the pie takes four cuts."
+  try={<><b>Click</b> inside a slice to cut it, <b>drag</b> a boundary to shift share, <b>double-click</b> one to merge.</>}
 />
 
 </Section>

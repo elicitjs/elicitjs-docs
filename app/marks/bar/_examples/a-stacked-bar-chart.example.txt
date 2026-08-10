@@ -1,0 +1,28 @@
+mount(Elicit({
+  width: 380, height: 240,
+  margins: { top: 16, right: 16, bottom: 28, left: 40 },
+  data: [
+    { year: "2023", asset: "stocks", pct: 50 },
+    { year: "2023", asset: "bonds",  pct: 30 },
+    { year: "2023", asset: "cash",   pct: 20 },
+    { year: "2024", asset: "stocks", pct: 65 },
+    { year: "2024", asset: "bonds",  pct: 20 },
+    { year: "2024", asset: "cash",   pct: 15 },
+  ],
+  schema: {
+    year:  { type: "categorical", domain: ["2023", "2024"] },
+    asset: { type: "categorical", domain: ["stocks", "bonds", "cash"] },
+    pct:   { type: "quantitative", domain: [0, 100] },
+  },
+  legends: true,
+  marks: [
+    bar({
+      stack: true,
+      channels: {
+        x:    { field: "year" },
+        y:    { field: "pct" },
+        fill: { field: "asset" },
+      },
+    }),
+  ],
+}))

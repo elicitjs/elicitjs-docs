@@ -48,7 +48,11 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Boundary editing — usually <code className="inline">edit.arc.edge()</code>. Draws a grab handle on every boundary (a full circle also gets a seam handle).
+            Slice editing — <code className="inline">edit.stack.cut()</code>,{" "}
+            <code className="inline">edit.stack.edge()</code>,{" "}
+            <code className="inline">edit.stack.merge()</code>. Draws a grab handle on each
+            interior boundary (<em>n</em> slices → <em>n</em> − 1 handles; the seam is the
+            layout's fixed anchor).
           </>
         ),
       },

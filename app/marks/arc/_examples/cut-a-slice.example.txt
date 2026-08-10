@@ -1,0 +1,28 @@
+mount(Elicit({
+  width: 300, height: 300,
+  margins: { top: 20, right: 20, bottom: 20, left: 20 },
+  axes: false,
+  data: [{ category: "housing", share: 100 }],
+  schema: {
+    category: {
+      type: "categorical",
+      domain: ["housing", "food", "transport", "savings", "other"],
+    },
+    share: { type: "quantitative", domain: [0, 100] },
+  },
+  legends: true,
+  marks: [
+    pie({
+      outerRadius: 100,
+      channels: {
+        value: { field: "share" },
+        fill: { field: "category" },
+      },
+      edits: [
+        edit.stack.cut(),
+        edit.stack.edge(),
+        edit.stack.merge(),
+      ],
+    }),
+  ],
+}));
