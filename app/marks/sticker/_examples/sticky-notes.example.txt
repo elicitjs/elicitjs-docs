@@ -1,0 +1,33 @@
+mount(Elicit({
+  width: 460, height: 300,
+  margins: { top: 20, right: 20, bottom: 20, left: 20 },
+  axes: false,
+  schema: {
+    note: { type: "categorical", open: true },
+    tone: { type: "categorical", domain: ["#fde68a", "#bbf7d0", "#bfdbfe"] },
+    x: { type: "quantitative", domain: [0, 100] },
+    y: { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { note: "Drag me", tone: "#fde68a", x: 25, y: 75 },
+    { note: "Double-click to rewrite. Long notes wrap and the box grows.", tone: "#bbf7d0", x: 70, y: 45 },
+    { note: "Click empty space for a new one", tone: "#bfdbfe", x: 25, y: 22 },
+  ],
+  marks: [
+    sticker({
+      stroke: "#00000022",
+      maxWidth: 140,
+      edits: [
+        editText({ multiline: true }),
+        create({ defaults: { note: "New note", tone: "#fde68a" } }),
+        remove({ when: when.alt }),
+      ],
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        text: { field: "note" },
+        fill: { field: "tone", scale: null, edit: cycle() },
+      },
+    }),
+  ],
+}));

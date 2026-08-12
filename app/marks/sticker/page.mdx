@@ -1,0 +1,162 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import stickyNotes from './_examples/sticky-notes.example.txt';
+import resizeNotes from './_examples/resize-notes.example.txt';
+import lanes from './_examples/lanes.example.txt';
+import flowchart from './_examples/flowchart.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Sticker
+
+<Lead>`sticker()` draws a rounded box with text inside, and **sizes the box to the text**: a long note wraps at `maxWidth` and grows taller instead of wider. Pair it with `editText({ multiline: true })` to double-click and type into it. It is a preset over `composite` — an ordinary `rect` and `text` — so every channel, scale, edit and constraint works as elsewhere.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="sizing" title="Sizing">
+
+The box is measured from the `text` channel string, at the `fontSize` and `fontFamily` it will be drawn in, plus `padding` on every side. Size does not live in your data.
+
+`maxWidth` is both the ceiling and the wrap width. A longer note breaks onto more lines and the box gets taller. `minWidth` keeps a one-word note from collapsing.
+
+State a `width` or `height` channel to pin that dimension instead:
+
+```js
+sticker({ channels: { width: { value: 120 }, text: { field: "note" } } })
+```
+
+Auto-sizing stops for that axis only, so a pinned width still lets height follow the wrapped text. Size from the row with `{ fn }`, or read a column of pixel widths with `{ field: "w", scale: null }`.
+
+A pinned `width` is also the wrap width, in place of `maxWidth`. Narrow a note and the text re-flows; with height still auto-sized, the box grows taller to fit.
+
+</Section>
+
+<Section id="resizing" title="Resizing">
+
+A `width` channel with a field behind it is a resize handle. The channel is in pixels, so give it an identity scale — a `range` matching the field's domain — and the column holds the box's width directly:
+
+```js
+width: {
+  field: "w",
+  scale: { range: [70, 260] },
+  edit: slide({ axis: "x", increase: "right", extent: 95, when: when.shift }),
+}
+```
+
+`slide` moves the value by how far you drag, so the box does not jump when you press it. `extent` is the drag distance that sweeps the whole domain. The box grows about its centre, so half the domain's span (`95` for a 190-wide domain) makes the edge you are dragging track the pointer.
+
+Gate the two drags with `when`. A `move` on `x` and a `slide` on `width` both read horizontal travel, so without `when.shift` / `when.noShift` they fight over the same gesture.
+
+Pin `height` the same way for a fixed-size card. Leave it off and height keeps following the text.
+
+<Example
+  code={resizeNotes}
+  title="Resizable notes"
+  blurb="Drag the width, and the text re-wraps to fit."
+  try={(
+    <>
+      <b>Shift-drag</b> a note sideways to resize it — the text re-wraps and the box
+      gets taller as it narrows. <b>Drag</b> without Shift to move it, and{' '}
+      <b>double-click</b> to retype.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="typing" title="Typing">
+
+`editText()` writes what you type back into the `text` channel's field. Put it in `edits`:
+
+```js
+sticker({
+  edits: [editText({ multiline: true })],
+  channels: { x: { field: "x" }, y: { field: "y" }, text: { field: "note" } },
+})
+```
+
+Double-click a note to open an editor filling the box. `multiline: true` makes it a textarea: Enter inserts a newline, and Cmd/Ctrl+Enter or clicking away commits. Escape cancels either way. Without it you get a single-line field where Enter commits.
+
+Both the drag and the double-click land on the **box**, not the letters, so you can pick up a note by any part of it — including the gaps between words.
+
+Typing is only wired in the SVG renderer. Under `CanvasRenderer` a sticker draws and drags, but double-click does nothing.
+
+</Section>
+
+<Section id="editing" title="Editing a board">
+
+Nothing here is sticker-specific. The universal edits do the rest:
+
+- `move({ channels: ["x", "y"], mode: "relative" })` on `x` drags a note. Use `mode: "relative"` on anything with area: it moves by how far you drag, keeping the grab point under the pointer. The default `"absolute"` puts the note's centre at the pointer, which snaps a big box the moment you press it.
+- `create()` in `edits` mints one where you click. Give it `defaults` so a new note arrives with a colour and a placeholder.
+- `remove({ when: when.alt })` deletes the note under the pointer.
+- `cycle()` on `fill` steps through the colours in that field's domain.
+
+<Example
+  code={stickyNotes}
+  title="Sticky notes"
+  blurb="Boxes sized by what you type."
+  try={(
+    <>
+      <b>Drag</b> a note. <b>Double-click</b> one and type — Enter makes a new line,
+      Cmd/Ctrl+Enter commits, and the box resizes. <b>Click</b> a note to recolour it,
+      <b>click</b> empty space to add one, and <b>Alt-click</b> to delete.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="diagram" title="Diagram board">
+
+A board you draw on is a `network` schema with a `sticker` over the nodes and a `link` over the links — there is no diagram mark. Draw `link()` first so connectors sit behind the boxes.
+
+Give the connectors `curve: "orthogonal"` and tell them how big a note is, and each one leaves a box square out of one of its edges rather than crossing a corner. A sticker measures its box from its own text, so measure it the same way with `noteBox` and pass the options you gave the sticker. `inset` is then the gap between the edge and the line, and `cornerRadius` rounds the turns.
+
+`connect` and `move` both fire on a drag from a box, so split them with `when.shift` / `when.noShift`. Deleting a box drops its connectors: `source` and `target` are `ref` columns, so a link naming a missing node is removed from the dataset. See [Network](/marks/network) for the topology edits and connector styles.
+
+<Example
+  code={flowchart}
+  title="Flowchart"
+  blurb="Boxes you type into, connectors you drag, flip and restyle."
+  try={(
+    <>
+      <b>Double-click</b> a box and type — Enter makes a new line, Cmd/Ctrl+Enter
+      commits, and the box grows to fit. <b>Shift-drag</b> from one box to another to
+      connect them. <b>Drag</b> a box past another and the connectors re-route to the
+      edges now facing. <b>Click</b> a connector to switch it between an elbow and a curve,
+      and <b>Alt-click</b> one to reverse it. <b>Click</b> empty space for a new box,
+      and <b>Alt-click</b> a box to delete it — its connectors go too.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="lanes" title="Notes on a scale">
+
+A sticker places itself through the same scales as any other mark, so point `x` at a categorical field and the notes sit in columns. `move` inverts the drag back through that band scale, so dropping a note in another column writes the new category into the row.
+
+Which lane a note ends in is the belief — `getData()` returns it as `lane`. Sort within a lane by pointing `y` at a quantitative field, as here with `rank`.
+
+<Example
+  code={lanes}
+  title="Lanes"
+  blurb="A band scale on x, so a drag re-files a card."
+  try={(
+    <>
+      <b>Drag</b> a card into another lane — it snaps to the column and the row&rsquo;s{' '}
+      <code>lane</code> changes. <b>Double-click</b> to retype, <b>click</b> empty space
+      to add a card, and <b>Alt-click</b> to delete.
+    </>
+  )}
+/>
+
+</Section>

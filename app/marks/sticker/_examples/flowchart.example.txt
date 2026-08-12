@@ -1,0 +1,76 @@
+mount(Elicit({
+  width: 520, height: 360,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      steps: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          label: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      flows: {
+        role: "links",
+        directed: true,
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+          kind: { type: "categorical", domain: ["orthogonal", "bezier"] },
+        },
+      },
+    },
+  },
+  data: {
+    steps: [
+      { id: "s1", label: "Draft the question", x: 22, y: 82 },
+      { id: "s2", label: "Pilot it with five readers", x: 74, y: 60 },
+      { id: "s3", label: "Ship", x: 30, y: 18 },
+    ],
+    flows: [
+      { source: "s1", target: "s2", kind: "orthogonal" },
+      { source: "s2", target: "s1", kind: "orthogonal" },
+      { source: "s2", target: "s3", kind: "bezier" },
+    ],
+  },
+  marks: [
+    link({
+      cornerRadius: 8,
+      inset: 6,
+      stroke: "#94a3b8",
+      strokeWidth: 1.5,
+      channels: {
+        curve: { field: "kind" },
+        // The box each connector docks to. A sticker sizes itself from its text,
+        // so `noteBox` measures the same note the same way.
+        nodeWidth: { fn: (d) => noteBox(d.label, { maxWidth: 130 }).width },
+        nodeHeight: { fn: (d) => noteBox(d.label, { maxWidth: 130 }).height },
+      },
+      edits: [
+        edit.network.reverse({ when: when.alt }),
+        cycle({ channels: ["curve"], when: when.noAlt }),
+      ],
+    }),
+    sticker({
+      fill: "#fef3c7",
+      stroke: "#f59e0b",
+      maxWidth: 130,
+      radius: 8,
+      edits: [
+        editText({ multiline: true }),
+        edit.network.connect({ when: when.shift, defaults: { kind: "orthogonal" } }),
+        create({ defaults: { label: "New step" } }),
+        remove({ when: when.alt }),
+      ],
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative", when: when.noShift }) },
+        y: { field: "y" },
+        text: { field: "label" },
+      },
+    }),
+  ],
+}));

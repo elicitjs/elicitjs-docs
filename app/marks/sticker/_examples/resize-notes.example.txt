@@ -1,0 +1,36 @@
+mount(Elicit({
+  width: 460, height: 300,
+  margins: { top: 20, right: 20, bottom: 20, left: 20 },
+  axes: false,
+  schema: {
+    note: { type: "categorical", open: true },
+    w: { type: "quantitative", domain: [70, 260] },
+    x: { type: "quantitative", domain: [0, 100] },
+    y: { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { note: "Shift-drag my edge sideways. The text re-wraps to whatever width I end up.", w: 170, x: 32, y: 62 },
+    { note: "Narrow notes get taller.", w: 100, x: 72, y: 28 },
+  ],
+  marks: [
+    sticker({
+      fill: "#fde68a",
+      stroke: "#00000022",
+      maxWidth: 260,
+      edits: [editText({ multiline: true })],
+      channels: {
+        x: {
+          field: "x",
+          edit: move({ channels: ["x", "y"], mode: "relative", when: when.noShift }),
+        },
+        y: { field: "y" },
+        width: {
+          field: "w",
+          scale: { range: [70, 260] },
+          edit: slide({ axis: "x", increase: "right", extent: 95, when: when.shift }),
+        },
+        text: { field: "note" },
+      },
+    }),
+  ],
+}));

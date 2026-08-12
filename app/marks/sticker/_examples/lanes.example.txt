@@ -1,0 +1,34 @@
+mount(Elicit({
+  width: 480, height: 320,
+  margins: { top: 24, right: 16, bottom: 30, left: 16 },
+  axes: { x: {}, y: false },
+  schema: {
+    note: { type: "categorical", open: true },
+    lane: { type: "categorical", domain: ["Now", "Next", "Later"] },
+    rank: { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { note: "Measure the text", lane: "Now", rank: 80 },
+    { note: "Wrap long notes", lane: "Now", rank: 40 },
+    { note: "Resize a note by its edge", lane: "Next", rank: 65 },
+    { note: "Wire notes together", lane: "Later", rank: 55 },
+  ],
+  marks: [
+    grid({ channel: "x" }),
+    sticker({
+      fill: "#e0f2fe",
+      stroke: "#0284c7",
+      maxWidth: 120,
+      edits: [
+        editText({ multiline: true }),
+        create({ defaults: { note: "New card" } }),
+        remove({ when: when.alt }),
+      ],
+      channels: {
+        x: { field: "lane", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "rank" },
+        text: { field: "note" },
+      },
+    }),
+  ],
+}));

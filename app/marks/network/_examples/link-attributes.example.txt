@@ -1,0 +1,61 @@
+mount(Elicit({
+  width: 460, height: 290,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      people: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          name: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      ties: {
+        role: "links",
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+          note: { type: "categorical", open: true },
+          trust: { type: "quantitative", domain: [0, 1] },
+        },
+      },
+    },
+  },
+  data: {
+    people: [
+      { id: "a", name: "Ana", x: 18, y: 70 },
+      { id: "b", name: "Ben", x: 80, y: 72 },
+      { id: "c", name: "Cleo", x: 50, y: 20 },
+    ],
+    ties: [
+      { source: "a", target: "b", note: "worked together", trust: 0.9 },
+      { source: "b", target: "c", note: "met once", trust: 0.25 },
+    ],
+  },
+  marks: [
+    link({
+      inset: 16,
+      fontSize: 11,
+      labelBackground: true,
+      channels: {
+        strokeWidth: { field: "trust", scale: { range: [1, 6] } },
+        stroke: { field: "trust", scale: { scheme: "blues" } },
+        text: { field: "note" },
+      },
+      edits: [editText()],
+    }),
+    node({
+      size: 10,
+      fill: "#1f2937",
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"] }) },
+        y: { field: "y" },
+        text: { field: "name" },
+      },
+    }),
+  ],
+}));

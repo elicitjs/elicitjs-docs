@@ -26,6 +26,8 @@ export default function Layout({ children }) {
 
 `move()` inverts the pointer coordinate on each positional channel it governs. On `x` and `y` together it's a 2D translate; on `y` alone it's a bar drag. It is driven by a `drag` gesture — the transform name and the gesture are deliberately different.
 
+By default the mark's centre goes to the pointer. On a mark with area — a `rect`, a [sticker](/marks/sticker) — that snaps the mark as soon as you press it, so pass `mode: "relative"`: the mark moves by the drag distance and the point you grabbed stays under the pointer. Relative mode is direct-pick, since it measures from the mark you pressed.
+
 <Example
   code={moveAPoint}
   title="Move a point"

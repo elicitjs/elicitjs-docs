@@ -1,0 +1,57 @@
+mount(Elicit({
+  width: 460, height: 330,
+  margins: { top: 18, right: 34, bottom: 18, left: 34 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+      },
+      links: {
+        source: { type: "ref" },
+        target: { type: "ref" },
+        kind: {
+          type: "categorical",
+          domain: ["line", "step", "stepBefore", "stepAfter", "orthogonal", "arc", "bezier"],
+        },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "l1", x: 6, y: 92 }, { id: "r1", x: 94, y: 82 },
+      { id: "l2", x: 6, y: 73 }, { id: "r2", x: 94, y: 63 },
+      { id: "l3", x: 6, y: 54 }, { id: "r3", x: 94, y: 44 },
+      { id: "l4", x: 6, y: 35 }, { id: "r4", x: 94, y: 25 },
+      { id: "l5", x: 6, y: 16 }, { id: "r5", x: 94, y: 6 },
+    ],
+    links: [
+      { source: "l1", target: "r1", kind: "step" },
+      { source: "l2", target: "r2", kind: "stepBefore" },
+      { source: "l3", target: "r3", kind: "stepAfter" },
+      { source: "l4", target: "r4", kind: "arc" },
+      { source: "l5", target: "r5", kind: "bezier" },
+    ],
+  },
+  marks: [
+    link({
+      inset: 9,
+      stroke: "#4e79a7",
+      strokeWidth: 2,
+      // A fixed bow. These links share no pair of nodes, so "auto" would leave
+      // every one of them flat — including the arc, whose only parameter this is.
+      curvature: 0.1,
+      fontSize: 11,
+      labelBackground: true,
+      channels: {
+        curve: { field: "kind" },
+        text: { field: "kind" },
+      },
+      edits: [cycle({ channels: ["curve"] })],
+    }),
+    point({ size: 4, fill: "#94a3b8", channels: { x: { field: "x" }, y: { field: "y" } } }),
+  ],
+}));

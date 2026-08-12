@@ -1,0 +1,54 @@
+mount(Elicit({
+  width: 460, height: 280,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        name: { type: "categorical", open: true },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+      },
+      links: {
+        role: "links",
+        directed: true,
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+        },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "a", name: "Ana", x: 20, y: 68 },
+      { id: "b", name: "Ben", x: 76, y: 68 },
+      { id: "c", name: "Cleo", x: 48, y: 20 },
+    ],
+    links: [
+      { source: "a", target: "b" },
+      { source: "b", target: "a" },
+      { source: "b", target: "c" },
+    ],
+  },
+  marks: [
+    link({
+      inset: 14,
+      stroke: "#94a3b8",
+      strokeWidth: 1.5,
+      edits: [edit.network.reverse({ when: when.alt })],
+    }),
+    node({
+      size: 10,
+      fill: "#4e79a7",
+      edits: [edit.network.connect({ when: when.shift })],
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], when: when.noShift }) },
+        y: { field: "y" },
+        text: { field: "name" },
+      },
+    }),
+  ],
+}));

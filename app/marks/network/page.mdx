@@ -7,6 +7,11 @@ import { api } from './api';
 
 import argumentMap from './_examples/argument-map.example.txt';
 import weightedLinks from './_examples/weighted-links.example.txt';
+import fromEmpty from './_examples/from-empty.example.txt';
+import directed from './_examples/directed.example.txt';
+import curves from './_examples/curves.example.txt';
+import sides from './_examples/sides.example.txt';
+import linkAttributes from './_examples/link-attributes.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -14,13 +19,13 @@ export default function Layout({ children }) {
 
 # Network
 
-<Lead>A **network** is a dataset of two tables: nodes, and links between them. Declare it with `structure: "network"` on the schema and both tables get their own columns, so a node and a link each carry their own attributes and content. `node()` draws a dot with a label; `link()` draws one line per link row. `edit.network.connect` and `rewire` build the topology by gesture; `create`, `move`, `editText` and `remove` work here exactly as they do on any other mark.</Lead>
+<Lead>A **network** is two tables — nodes and the links between them — declared with `structure: "network"`. `node()` draws a labelled dot; `link()` draws one connector per link row, straight or curved, with arrowheads when directed. `edit.network.connect`, `rewire` and `reverse` build the topology; `create`, `move`, `editText` and `remove` work as on any other mark.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="schema" title="Declaring the structure">
 
-`structure` says which tables the dataset has. `"table"` is the default and means one — that is every other chart on this site, and its schema stays a bare field map. `"network"` means two, filling the roles `nodes` and `links`.
+`structure: "network"` gives the dataset two tables in the roles `nodes` and `links`. The default `"table"` is one table — a bare field map, as on every other chart here.
 
 ```js
 schema: {
@@ -41,11 +46,11 @@ schema: {
 }
 ```
 
-Two field declarations do the joining. `key: true` marks the column that identifies a node. `type: "ref"` marks a column that names one — its domain is read from the key column, so the two can never disagree, and you never declare a list of node ids twice.
+`key: true` marks the column that identifies a node. `type: "ref"` marks a column that names one; its domain comes from the key, so you never list node ids twice.
 
-Pair `key` with `open: true`. A gesture that mints a node has to get an identity from somewhere, and `open` is what lets it take a fresh one instead of asking you to type.
+Pair `key` with `open: true` so a gesture that mints a node can take a fresh identity.
 
-`data` is keyed by table name. A table you leave out starts empty, so a diagram you build entirely by gesture needs no `data` at all.
+`data` is keyed by table name. Omit a table and it starts empty — a diagram built entirely by gesture needs no `data` at all.
 
 ```js
 data: {
@@ -56,11 +61,59 @@ data: {
 
 `getData()`, `onChange` and `setData` use the same shape.
 
+<Example
+  code={fromEmpty}
+  title="Nodes, no links"
+  blurb="links: [] — the topology is drawn by gesture."
+  try={(
+    <>
+      <b>Shift-drag</b> from one node to another to connect them. <b>Drag</b> a node to
+      move it, <b>double-click</b> its label to rename it, <b>click</b> empty space to
+      add one, and <b>Alt-click</b> to delete.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="directed" title="Directed or undirected">
+
+`directed` on the links table says whether `source` → `target` is ordered. Declare it on the long form:
+
+```js
+tables: {
+  nodes: { fields: { … } },
+  links: {
+    directed: true,
+    fields: { source: { type: "ref" }, target: { type: "ref" } },
+  },
+}
+```
+
+`directed: true` draws an arrowhead at the target, bows reciprocal links apart so `a → b` and `b → a` stay readable, and enables `edit.network.reverse`.
+
+`directed: false` treats the pair as unordered: `edit.network.connect` refuses `b → a` once `a → b` exists.
+
+Leave it out for no arrowheads, and `connect` rejects only the exact pair you already have.
+
+<Example
+  code={directed}
+  title="Directed links"
+  blurb="directed: true — arrowheads, and a reciprocal pair that bows apart."
+  try={(
+    <>
+      <b>Alt-click</b> a connector to reverse it. <b>Shift-drag</b> between two nodes to
+      add another — connect them the other way round too, and the pair separates instead
+      of drawing over itself. <b>Drag</b> a node to move it.
+    </>
+  )}
+/>
+
 </Section>
 
 <Section id="naming" title="Naming the tables">
 
-Call the tables what your data is. Give each one a `role` and the name is yours:
+Name the tables for your data. Give each a `role`:
 
 ```js
 tables: {
@@ -69,19 +122,19 @@ tables: {
 }
 ```
 
-`data` and `getData()` are then keyed `claims` and `supports`. Marks and edits find their table by role, so nothing else in the spec changes — `link()` still draws `supports` with no `table` option written anywhere.
+`data` and `getData()` are then keyed `claims` and `supports`. Marks and edits find their table by role, so `link()` still draws `supports` with no `table` option. The [argument map](#draw) below is written that way.
 
 </Section>
 
 <Section id="draw" title="Drawing a network">
 
-A node is an ordinary mark. Use `point`, `rect`, `text` or a `composite` over the node table — every channel, scale and edit works as usual, because a mark with no `table` draws the primary table, which for a network is the nodes. See [which table a mark draws](/schema#table) for pointing one at the links instead.
+A node is an ordinary mark — `point`, `rect`, `text`, or a `composite` over the node table. Every channel, scale and edit works as usual: a mark with no `table` draws the primary table, which for a network is the nodes. See [which table a mark draws](/schema#table) to point one at the links instead.
 
-`node()` is the shorthand for the usual pair: a dot with a label above it. It states `x` and `y` once and shares them, and it draws a label only when you give it a `text` channel. It is a preset over `composite`, not a network mark — point it at any table you like.
+`node()` is the shorthand: a dot with a label above it. It states `x` and `y` once and shares them, and draws a label only when you give it a `text` channel. It is a preset over `composite`, not a network mark — point it at any table.
 
-`link()` draws the link table. It reads its endpoints from the node rows, so it needs no configuration: the schema already says which table holds nodes, which column identifies one, and which columns reference it.
+`link()` draws the link table. It reads endpoints from the node rows via the schema's `key` and `ref` columns, so it needs no endpoint configuration.
 
-`inset` pulls both ends in so the line stops short of the node marks rather than running under them.
+`inset` pulls both ends in so the line stops short of the node marks.
 
 <Example
   code={argumentMap}
@@ -98,19 +151,112 @@ A node is an ordinary mark. Use `point`, `rect`, `text` or a `composite` over th
 
 </Section>
 
+<Section id="curves" title="Connector styles">
+
+`curve` sets a link's shape:
+
+<div className="api-table-wrap">
+  <table className="api-table">
+    <thead>
+      <tr><th><code>curve</code></th><th>shape</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>"line"</code></td><td>straight segment (the default)</td></tr>
+      <tr><td><code>"step"</code></td><td>right-angled elbow, turning midway</td></tr>
+      <tr><td><code>"stepBefore"</code> / <code>"stepAfter"</code></td><td>elbow turning at one end instead</td></tr>
+      <tr><td><code>"orthogonal"</code></td><td>elbow that leaves each node square out of one of its edges</td></tr>
+      <tr><td><code>"arc"</code></td><td>quadratic bow to one side</td></tr>
+      <tr><td><code>"bezier"</code></td><td>cubic with square tangents; <code>"smooth"</code> is an alias</td></tr>
+    </tbody>
+  </table>
+</div>
+
+The `"step"` kinds turn on the straight line between two node positions, so a connector meets a box wherever that line happens to cross it. `"orthogonal"` docks to the box instead. It leaves and arrives perpendicular to an edge, and picks which edges from where the two nodes sit — left and right when they are side by side, top and bottom when they are stacked. `cornerRadius` rounds the turns.
+
+`nodeWidth` and `nodeHeight` tell it how big a node is, in px. They read the node rows, so a constant sizes every node, a column sizes each one, and `{ fn: d => … }` derives it. A [sticker](/marks/sticker) measures its box from its own text, and `noteBox` measures it the same way:
+
+```js
+link({
+  curve: "orthogonal",
+  cornerRadius: 8,
+  channels: {
+    nodeWidth: { fn: (d) => noteBox(d.label, { maxWidth: 130 }).width },
+    nodeHeight: { fn: (d) => noteBox(d.label, { maxWidth: 130 }).height },
+  },
+})
+```
+
+Pass `noteBox` the same sizing options you gave the sticker — it measures text, it does not read the mark. With neither channel set the connector docks to a small square around the node's position, so it still leaves square-on.
+
+Give `curve` a column to mix them in one mark:
+
+```js
+link({ channels: { curve: { field: "kind" } } })
+```
+
+Any column works, or `{ fn: d => … }` to map one. `arrow` reads a column the same way, so one field can drive both shape and arrowheads.
+
+`curvature` sets how far a link bows; default `"auto"` fans links that share a pair of nodes and keeps a lone link straight. On a directed network every link bows to the same side of its travel, so `a → b` and `b → a` separate. Pass a number to bow every link equally, and `spread` to change the gap `"auto"` leaves between siblings.
+
+An `"arc"` at curvature `0` is a straight chord, so under `"auto"` a lone arc draws flat. A `"line"` with a bow is drawn as an arc — a straight segment cannot bend, so curvature wins over the named shape. That is why `"auto"` is visible on a plain `link()` that names no curve.
+
+A link whose source and target are the same node draws a loop, whatever `curve` says. `loopRadius` sets how far it reaches; `edit.network.connect({ selfLoops: true })` lets you draw one.
+
+`link()` is pickable along its whole length, so a `click` edit like `reverse` or `remove` lands anywhere on the line.
+
+<Example
+  code={curves}
+  title="Connector shapes"
+  blurb="One link() mark, a kind column driving curve, at a fixed curvature: 0.1."
+  try={(
+    <>
+      <b>Click</b> a connector to step it to the next shape in the{" "}
+      <code>kind</code> domain. The label is the column, so it changes with it — and
+      stepping one to <code>line</code> draws an arc, since this mark sets a curvature.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="sides" title="Pinned sides">
+
+`sourceSide` and `targetSide` pin an end to `"top"`, `"right"`, `"bottom"` or `"left"` instead of choosing one, so a diagram reads the same way however the boxes are arranged. Both default to `"auto"`.
+
+They are drawing options rather than data. Give one a `{ fn: d => … }` to derive a side from a column you already have — the flow's own `kind`, say — and nothing new is written to the dataset.
+
+<Example
+  code={sides}
+  title="Pinned sides"
+  blurb="curve: orthogonal with sourceSide and targetSide fixed, so flow reads left to right."
+  try={(
+    <>
+      <b>Drag</b> a stage anywhere. Every connector still leaves the right edge and
+      enters the left one, and <code>getData()</code> gains nothing but the new{" "}
+      <code>x</code> and <code>y</code>.
+    </>
+  )}
+/>
+
+</Section>
+
 <Section id="gestures" title="Building the topology">
 
-Only two gestures are network-specific. The rest is the ordinary editing vocabulary.
+Only three gestures are network-specific; the rest is ordinary editing.
 
-`edit.network.connect()` goes on the **node** mark: drag from one node and release on another to create a link. While you drag, the link you would make is drawn as a ghost, and only when you are over a node it can reach — releasing anywhere else creates nothing.
+`edit.network.connect()` goes on the **node** mark: drag from one node and release on another to create a link. A ghost connector follows the pointer; release off a reachable node creates nothing.
 
-Pair it with `when` whenever the node mark also carries a plain drag. Both fire on the same gesture otherwise, and `move` pulls the source node along under the pointer, so the release lands back on the node you started from and nothing connects. `connect({ when: when.shift })` beside `move({ when: when.noShift })` is the usual split.
+Pair it with `when` if the node mark also carries a plain drag — otherwise both fire, `move` pulls the source under the pointer, and the release lands back where it started. `connect({ when: when.shift })` beside `move({ when: when.noShift })` is the usual split.
 
-`edit.network.rewire()` goes on a `link` mark's `source` or `target` channel and turns that end into a handle. Drag the handle onto another node to re-point the link. Both ends can carry one at once.
+Release on the node you started from creates nothing, unless `selfLoops: true` — then you get a loop.
 
-`create()` mints a node where you click — the plain creation edit, with no network variant. Because the node table declares a `key`, the new row arrives with an identity already set, so you can link it straight away. Naming it is a separate act: `editText()` on the `text` channel writes the label in place.
+`edit.network.rewire()` on a `link` mark's `source` or `target` channel turns that end into a handle. Drag it onto another node to re-point the link. Both ends can carry one at once.
 
-`remove()` deletes a node, and takes its links with it. A `ref` must name a node that exists, so links to a removed node are dropped from the dataset — not just hidden.
+`edit.network.reverse()` on the `link` mark swaps the two ends on a click, keeping every other column. Give it a `when` if the mark carries another click edit. On `directed: false` it does nothing and logs a warning.
+
+`create()` mints a node where you click — the plain creation edit. The node table's `key` gives the new row an identity, so you can link it straight away. Name it separately with `editText()` on the `text` channel.
+
+`remove()` deletes a node and takes its links with it. A `ref` must name a node that exists, so links to a removed node are dropped from the dataset, not just hidden.
 
 <Example
   code={weightedLinks}
@@ -128,8 +274,30 @@ Pair it with `when` whenever the node mark also carries a plain drag. Both fire 
 
 <Section id="attributes" title="Link attributes">
 
-A link row is a row like any other. Give the link table columns and encode them on `link()`'s style channels, or edit them: `set`, `cycle` and `editText` all act on the link under the pointer.
+A link row is a row like any other. Give the link table columns and encode them on `link()`'s style channels, or edit them with `set`, `cycle` and `editText`.
 
-`channels.text` draws a label at the link's midpoint, and takes `editText()` the same way a `text` mark does.
+`channels.text` draws a label at the midpoint and takes `editText()` the same way a `text` mark does. Double-click anywhere along the connector to open the editor.
+
+`stroke` and `strokeWidth` paint the connector and its arrowhead. `fill` paints the label (default: the theme's ink). Stroke never reaches the label, so a thick line does not outline the text.
+
+A label sits on its connector, so the line runs through it. `labelBackground` puts a plate underneath:
+
+```js
+link({ labelBackground: true, channels: { text: { field: "note" } } })
+```
+
+`true` uses the theme's backdrop, which reads as a gap in the line; pass a colour string for anything else. `labelOpacity` (default `0.9`) sets how much of the connector shows through; `labelPadding` and `labelRadius` size the plate.
+
+<Example
+  code={linkAttributes}
+  title="Link attributes"
+  blurb="A link's own columns drive its width, its colour and its label."
+  try={(
+    <>
+      <b>Double-click</b> a connector to retype its label. <b>Drag</b> a name to move it —
+      the connectors and their labels follow.
+    </>
+  )}
+/>
 
 </Section>

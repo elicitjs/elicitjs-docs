@@ -1,0 +1,66 @@
+mount(Elicit({
+  width: 460, height: 320,
+  margins: { top: 20, right: 20, bottom: 20, left: 20 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      stages: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          label: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+          w: { type: "quantitative", domain: [40, 200] },
+          h: { type: "quantitative", domain: [24, 120] },
+        },
+      },
+      flows: {
+        role: "links",
+        directed: true,
+        fields: { source: { type: "ref" }, target: { type: "ref" } },
+      },
+    },
+  },
+  data: {
+    stages: [
+      { id: "a", label: "Collect", x: 22, y: 76, w: 92, h: 40 },
+      { id: "b", label: "Score", x: 70, y: 76, w: 92, h: 40 },
+      { id: "c", label: "Publish", x: 46, y: 22, w: 92, h: 40 },
+    ],
+    flows: [
+      { source: "a", target: "b" },
+      { source: "b", target: "c" },
+    ],
+  },
+  marks: [
+    link({
+      curve: "orthogonal",
+      cornerRadius: 10,
+      inset: 4,
+      stroke: "#4e79a7",
+      strokeWidth: 2,
+      // Every flow leaves the right of its stage and enters the left of the next,
+      // wherever the two boxes end up. Drop the two sides to let position choose.
+      sourceSide: "right",
+      targetSide: "left",
+      channels: {
+        nodeWidth: { field: "w" },
+        nodeHeight: { field: "h" },
+      },
+    }),
+    sticker({
+      fill: "#eef2ff",
+      stroke: "#4e79a7",
+      radius: 6,
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        width: { field: "w", scale: null },
+        height: { field: "h", scale: null },
+        text: { field: "label" },
+      },
+    }),
+  ],
+}));

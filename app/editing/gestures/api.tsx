@@ -5,7 +5,7 @@ export const api: ApiEntry[] = [
     name: "move(options)",
     summary: "Position edit — inverts the pointer on each positional channel. On x+y a 2D move; on y alone a bar drag.",
     signatures: [
-      "move({ channel, channels, pick, threshold, when, guide, constrain }) → Edit",
+      "move({ channel, channels, mode, pick, threshold, when, guide, constrain }) → Edit",
     ],
     options: [
       {
@@ -21,6 +21,20 @@ export const api: ApiEntry[] = [
         desc: (
           <>
             Multiple channels for a joint move (e.g. <code className="inline">["x","y"]</code>).
+          </>
+        ),
+      },
+      {
+        name: "mode",
+        type: "'absolute'|'relative'",
+        default: "'absolute'",
+        desc: (
+          <>
+            <code className="inline">absolute</code> puts the mark&rsquo;s centre at the pointer.{" "}
+            <code className="inline">relative</code> moves it by the drag distance instead, so the
+            point you grabbed stays under the pointer — use it on anything with area, such as a{" "}
+            <code className="inline">rect</code> or a <a href="/marks/sticker">sticker</a>, where an
+            absolute move snaps the mark as soon as you press it. Relative mode is direct-pick.
           </>
         ),
       },
