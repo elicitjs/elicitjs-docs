@@ -12,6 +12,7 @@ import editingTheBand from './_examples/editing-the-band.example.txt';
 import threeReadings from './_examples/three-readings-of-one-band.example.txt';
 import aCorrelation from './_examples/a-correlation-is-a-pinned-trend.example.txt';
 import inertWithoutAnEdit from './_examples/inert-without-an-edit.example.txt';
+import swingTheLine from './_examples/swing-the-line.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -19,7 +20,7 @@ export default function Layout({ children }) {
 
 # Trend + Band
 
-<Lead>A **parametric line** and its uncertainty. The datum `{ intercept, slope }` is a linear belief; `trend` draws `y = intercept + slope·x` across the plot (clipped to the plot rectangle) plus two handles — an **intercept** handle at `x = 0` that translates the line and a **slope** handle that rotates it about the anchor. `trendBand` draws the band: a range on the intercept, a range on the slope, and every line between them. Trend is the one mark whose `x`/`y` channels name the plot’s _axes_ rather than columns of its datum — declare them in the schema (typically spanning negatives, so the intercept sits in the middle of the frame) and the axes cross at the origin by default.</Lead>
+<Lead>A **parametric line** and its uncertainty. The datum `{ intercept, slope }` is a linear belief; `trend` draws `y = intercept + slope·x` across the plot (clipped to the plot rectangle) plus its handles — an **intercept** handle at `x = 0` that translates the line, and a **slope** grip at each end of the line that rotates it about the anchor. `trendBand` draws the band: a range on the intercept, a range on the slope, and every line between them. Trend is the one mark whose `x`/`y` channels name the plot’s _axes_ rather than columns of its datum — declare them in the schema (typically spanning negatives, so the intercept sits in the middle of the frame) and the axes cross at the origin by default.</Lead>
 
 <ApiReference entries={api} />
 
@@ -44,7 +45,7 @@ Unlike a `point` or `bar`, a trend line is **derived**: its position comes from 
 
 <Section id="twostep" title="Intercept, then slope">
 
-Domains span both sides of zero so the intercept sits on the y-axis in the middle of the frame. Stage 0: drag the intercept handle to set the level. Stage 1: drag the slope handle to set the trend (rotating about the anchor).
+Domains span both sides of zero so the intercept sits on the y-axis in the middle of the frame. Stage 0: drag the intercept handle to set the level. Stage 1: drag either end grip to set the trend, rotating about the anchor.
 
 The parameters are channels like any other, so the columns are renameable — `channels: { slope: { field: "r" } }` — or pinnable to a constant with `{ datum }`. They are unscaled: parameters in their own units, projected through `x`/`y` rather than encoded themselves.
 
@@ -52,13 +53,30 @@ The parameters are channels like any other, so the columns are renameable — `c
   code={trendLine}
   title="Trend line"
   blurb="Axes cross at the origin automatically; the line runs edge-to-edge through the plot."
-  try={"drag the centre (intercept) dot; press Next; drag the right (slope) dot."}
+  try={"drag the centre (intercept) dot; press Next; drag an end dot."}
 />
 
 <Example
   code={bothHandlesAtOnce}
   title="Both handles at once"
   blurb="Omit the stages (default null) to leave both handles always active."
+/>
+
+</Section>
+
+<Section id="grip" title="Rotating the line">
+
+The slope grips sit on the line’s own ends, and dragging one passes the line through the pointer. So the line rotates a full turn: drag an end up and over the anchor and the line swings past vertical and comes down the other side. Both ends carry the same edit, and each stays inside the plot at every angle.
+
+A vertical line has no slope. The gesture **holds** while the pointer is in the anchor’s own column, and `slope` grows without bound as you approach it — bound it with a `clamp` on the column, the same way you would bound any other field.
+
+`grip: "probe"` pins a single grip at `x = probe` instead, sliding vertically at that column. Reachable slope is then capped at `ySpan / (probe − anchor)`.
+
+<Example
+  code={swingTheLine}
+  title="Swing it round"
+  blurb="Both parameters live, with slope clamped to ±20."
+  try={"drag an end dot up and across the middle of the plot — the line keeps turning."}
 />
 
 </Section>
@@ -80,7 +98,7 @@ For an asymmetric band, name the ends instead: `intercept1`/`intercept2` and `sl
 <Example
   code={editingTheBand}
   title="Editing the band"
-  blurb="handles: true puts a grab on each spread — the intercept's at the anchor, the slope's at the probe."
+  blurb="handles: true puts a grab on each spread — the intercept's at the anchor, the slope's on the ends of the band's upper edge."
   try={"drag either band handle, then drag the line's own handles underneath."}
 />
 

@@ -1,0 +1,32 @@
+const chart = Elicit({
+  width: 340, height: 300,
+  margins: { top: 16, right: 16, bottom: 28, left: 40 },
+  schema: {
+    x: { type: "quantitative", domain: [-10, 10] },
+    y: { type: "quantitative", domain: [-10, 10] },
+    intercept: { type: "quantitative" },
+    slope:     { type: "quantitative" },
+  },
+  data: [{ intercept: 0, slope: 0.6 }],
+  // The slope grows without bound as the line approaches vertical. Bound it the
+  // same way you bound any other column.
+  constraints: [clamp({ field: "slope", min: -20, max: 20 })],
+  marks: [
+    trend({
+      channels: {
+        intercept: { field: "intercept", edit: edit.trend.intercept() },
+        slope:     { field: "slope",     edit: edit.trend.slope() },
+      },
+    }),
+  ],
+});
+mount(chart);
+const out = document.createElement("div");
+out.style.cssText = "font:12px ui-monospace,monospace;margin-top:6px;color:#64748b";
+const show = () => {
+  const d = chart.getData()[0] || {};
+  out.textContent = "intercept " + d.intercept.toFixed(2) +
+    "   slope " + d.slope.toFixed(2);
+};
+chart.on("change", show); show();
+mount(out);
