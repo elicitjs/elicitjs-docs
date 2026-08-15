@@ -31,7 +31,7 @@ export const api: ApiEntry[] = [
         default: "null",
         desc: (
           <>
-            Arbitration — whether this edit claims the gesture (e.g. only on Shift). See <code className="inline">elicit.when</code>.
+            Arbitration — whether this edit claims the gesture (e.g. only on Shift). See <code className="inline">edit.when</code>.
           </>
         ),
       },
@@ -170,7 +170,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            The raw DOM event (for modifiers like <code className="inline">shiftKey</code>). Prefer <code className="inline">elicit.when</code> for arbitration when you can.
+            The raw DOM event (for modifiers like <code className="inline">shiftKey</code>). Prefer <code className="inline">edit.when</code> for arbitration when you can.
           </>
         ),
       },

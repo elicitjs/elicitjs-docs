@@ -13,7 +13,7 @@ mount(Elicit({
       },
     }),
     // A glyph legend that doubles as a picker: legendSymbol draws the row of
-    // glyphs, edit.legend() makes each one click-to-set the category.
-    legendSymbol({ anchor: "bottom", swatchSize: 22, edit: edit.legend() }),
+    // glyphs, edit.legend.category() makes each one click-to-set the category.
+    legendSymbol({ anchor: "bottom", swatchSize: 22, edit: edit.legend.category() }),
   ],
 }))

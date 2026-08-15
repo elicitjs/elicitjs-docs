@@ -2,45 +2,58 @@
 
 /**
  * Live-example scope: what an example on the docs site can name without importing.
- * Universal edits are bare (`move()`); scoped namespaces stay under `edit.*`.
+ *
+ * The shape mirrors the library's own split. MARKS and ELEMENTS are spread bare,
+ * because an example reads better as `barY({…})` than `plot.barY({…})`. Universal
+ * EDITS are bare for the same reason (`move()`), while the scoped edit families
+ * stay under `edit.*` — which is also how they are spelled in a spec, and how they
+ * will be spelled in a JSON spec (`{ "type": "line.draw" }`).
  */
 import * as elicit from '@elicit';
 import * as d3 from 'd3';
 import vancouver from '../data/vancouver.js';
 
-// The scoped namespaces are held back so they don't shadow the same-named MARKS
-// spread from elicit.plot (axis / arc / waffle / line / trend / face).
+// The scoped edit namespaces are held back rather than spread: several share a
+// name with a MARK (`line`, `trend`, `waffle`) or an ELEMENT (`axis`, `legend`),
+// and the drawing vocabulary should win the bare name. They stay reachable as
+// `edit.line.draw()`, `edit.legend.category()`, and so on.
 const {
   line: _editLine,
   axis: _editAxis,
-  arc: _editArc,
+  legend: _editLegend,
+  stack: _editStack,
   geo: _editGeo,
   waffle: _editWaffle,
   trend: _editTrend,
-  // The legend pickers stay under `edit.*` so the same-named `legend` MARK (from
-  // elicit.plot) — and its `legendColor`/`legendSize`/`legendSymbol` siblings — win
-  // the bare name, the way axis/arc/waffle marks win over their edit namespaces.
-  legend: _editLegend,
-  legendValue: _editLegendValue,
-  nextSeriesKey: _nsk,
+  network: _editNetwork,
   when: _editWhen,
   ...universalEdits
 } = elicit.edit;
 
 export function createElicitScope() {
   return {
+    // Marks — view DATA.
     ...elicit.plot,
+    // Chart elements — view a SCALE. Spread bare so `axisX(…)` / `legendColor(…)`
+    // read the same as a mark; `elements.axisX` also works and is the spelling to
+    // prefer in a spec, since it says which of the three kinds it is.
+    ...elicit.elements,
+    // Constraints — pure data invariants.
     ...elicit.constraints,
+    // Universal edits (the scoped families stay under `edit.*`).
     ...universalEdits,
     Elicit: elicit.Elicit,
-    when: elicit.when,
+    // Arbitration predicates. Part of the edit vocabulary — a `when` only ever
+    // appears inside an edit's options.
+    when: elicit.edit.when,
     edit: elicit.edit,
-    // Chart elements (axis / grid / legend / axisRadial). Also aliased on
-    // plot.* so bare `axisX` still works; prefer `elements.axisX` in new specs.
     elements: elicit.elements,
+    // Guides — view chart STATE, and write nothing.
     guides: elicit.guides,
     widgets: elicit.widgets,
     format: elicit.format,
+    // The authoring kit, for the /authoring examples that write a custom mark.
+    authoring: elicit.authoring,
     D3Renderer: elicit.D3Renderer,
     CanvasRenderer: elicit.CanvasRenderer,
     // Theme layer: `themes` (built-ins), `setTheme` (app-wide), `resolveTheme`.

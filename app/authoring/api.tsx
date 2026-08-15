@@ -5,14 +5,14 @@ export const api: ApiEntry[] = [
     name: "Mark SDK — elicit.plot",
     summary: (
       <>
-        Shared foundation every mark factory uses. Import as <code className="inline">plot.encodeChannel</code> (or the bare name in these docs). A mark never owns <code className="inline">data</code> or a domain — <code className="inline">Elicit</code> owns both.
+        Shared foundation every mark factory uses. Import as <code className="inline">authoring.encodeChannel</code> (or the bare name in these docs). A mark never owns <code className="inline">data</code> or a domain — <code className="inline">Elicit</code> owns both.
       </>
     ),
     signatures: [
-      "normalizeMarkOptions(options) → options",
-      "encodeChannel(scales, channels, name, datum, fallback) → any",
-      "encodeAngle(scales, channels, datum, fallback?) → number",
-      "resolveStyle(scales, channels, datum, defaults?) → style",
+      "authoring.normalizeMarkOptions(options) → options",
+      "authoring.encodeChannel(scales, channels, name, datum, fallback) → any",
+      "authoring.encodeAngle(scales, channels, datum, fallback?) → number",
+      "authoring.resolveStyle(scales, channels, datum, defaults?) → style",
     ],
     options: [
       {
@@ -26,7 +26,7 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "normalizeMarkOptions",
+        name: "authoring.normalizeMarkOptions",
         type: "fn",
         default: "—",
         desc: (
@@ -158,7 +158,7 @@ export const api: ApiEntry[] = [
     ),
   },
   {
-    name: "Drivers — edit.registerDriver",
+    name: "Drivers — authoring.registerDriver",
     summary: (
       <>
         A driver owns a multi-event plane lifecycle (<code className="inline">hover</code> / <code className="inline">drag</code> / <code className="inline">click</code>, …). Built-ins cover <code className="inline">nearest</code>, <code className="inline">sweep</code>, <code className="inline">draw</code>, <code className="inline">brush</code>, <code className="inline">probe</code>, <code className="inline">plane</code>, …. Register a new one when stock <code className="inline">pick</code> values aren’t enough.

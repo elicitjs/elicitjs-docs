@@ -1,5 +1,5 @@
 // A tiny driver: hover highlights the nearest mark; click bumps its y.
-edit.registerDriver({
+authoring.registerDriver({
   name: "clickNearest",
   wants: (e) => e.pick === "clickNearest",
   selects: true,
@@ -8,7 +8,7 @@ edit.registerDriver({
     if (event.type === "hover") {
       session.set({
         px: event.x, py: event.y, threshold,
-        hoverIndex: edit.nearestMark(marks, event.x, event.y, threshold),
+        hoverIndex: authoring.nearestMark(marks, event.x, event.y, threshold),
       });
       return true;
     }
@@ -17,7 +17,7 @@ edit.registerDriver({
       return true;
     }
     if (event.type === "click") {
-      const index = edit.nearestMark(marks, event.x, event.y, threshold);
+      const index = authoring.nearestMark(marks, event.x, event.y, threshold);
       if (index == null) return false;
       let changed = false;
       for (const e of edits) {
@@ -29,7 +29,7 @@ edit.registerDriver({
   },
 });
 
-const bump = edit.makeEdit({
+const bump = authoring.makeEdit({
   type: "bump",
   pick: "clickNearest",
   gesture: "click",

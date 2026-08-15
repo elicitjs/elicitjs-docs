@@ -113,6 +113,24 @@ A derived channel is **read-only**. It is opaque to the edit layer, so it can't 
 
 </Section>
 
+<Section id="feature-kinds" title="Marks, elements, and guides">
+
+Three kinds of thing draw on a chart, and each **views** something different.
+
+| Kind | Namespace | Spec key | One node per | Writes |
+| --- | --- | --- | --- | --- |
+| **mark** | `plot.*` | `marks` | a row | rows |
+| **element** | `elements.*` | `elements` | a tick or swatch | the schema's domain |
+| **guide** | `guides.*` | `guides` | a derived statement | nothing |
+
+A mark draws the data. An element — `axisX`, `gridY`, `legendColor` — draws a scale, so it takes a singular `channel` rather than a `channels` map, and an edit on it reshapes that field's domain. A guide draws the rule and the state: a target line, the range you should stay inside, how much of a budget is left.
+
+A guide is **read-only**. Every guide option takes a literal or a function of the chart context, so `guides.rule({ y: ({ data }) => d3.mean(data, d => d.y) })` follows the rows — but a guide has no `table`, no channels and no `edit`. Note this is not the same as a [derived channel](#derived): a derived channel is per-row and its mark can still be edited, while a guide's expressions run once per chart and never write.
+
+`guides.remaining({ field: "y" })` reads its target from a `maintainSum` constraint when you don't pass one, so the total you enforce and the total you show stay the same number.
+
+</Section>
+
 <Section id="edits" title="Edits">
 
 An edit is the inverse of an encoding. Encoding maps data → visual; an edit maps a gesture → data, back through the same scale. Put it on a channel (`y: { field, edit: move() }`) to write one field, or at mark level (`edits: [...]`) for a gesture that writes several at once. Full catalogue on [Editing](/editing).

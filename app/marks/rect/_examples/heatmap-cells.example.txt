@@ -28,6 +28,6 @@ mount(Elicit({
     }),
     // Colour isn't gesture-invertible, so the ramp handle sets the value by hand.
     // It tracks the selected cell — click a cell, then drag the handle to set it.
-    legendColor({ anchor: "right", title: "load", edit: edit.legendValue() }),
+    legendColor({ anchor: "right", title: "load", edit: edit.legend.value() }),
   ],
 }))

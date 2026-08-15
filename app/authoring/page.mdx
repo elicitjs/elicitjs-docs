@@ -17,18 +17,18 @@ export default function Layout({ children }) {
 
 # Authoring SDK
 
-<Lead>Build new elicitation devices without forking the engine. Marks use `plot.encodeChannel` / `resolveStyle`; edits use `edit.makeEdit` + `invertChannel`; multi-event lifecycles register via `edit.registerDriver`. Attach edits on a channel (`y: { field, edit: move() }`) or at mark level (`edits: [...]`) — never as a fake `channels.edit` key. For the model these extend, see [Core concepts](/concepts); for the stock catalogue, see [Editing](/editing).</Lead>
+<Lead>Build new elicitation devices without forking the engine. Marks use `authoring.encodeChannel` / `resolveStyle`; edits use `authoring.makeEdit` + `invertChannel`; multi-event lifecycles register via `authoring.registerDriver`. Attach edits on a channel (`y: { field, edit: move() }`) or at mark level (`edits: [...]`) — never as a fake `channels.edit` key. For the model these extend, see [Core concepts](/concepts); for the stock catalogue, see [Editing](/editing).</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="custom-mark" title="A custom mark">
 
-A mark is a view over the chart’s one dataset. The factory returns a feature object; the only required method is `build(data, scales, width, height)`. Call `normalizeMarkOptions` first, resolve every channel through `encodeChannel` / `resolveStyle`, spread `markCommon(opts)` to pass `id` / `edits` / `constraints` / `table` through verbatim, and set `discreteScale` when discrete data needs a band or a point. Don’t set mark-wide `pointerEvents` — leave that to the engine. To let a datum’s [derived channels (`{ fn }`)](/concepts#derived) see their row index and the dataset, pass the optional `index` and `data` args when you resolve per datum: `resolveStyle(scales, channels, d, defaults, i, data)`.
+A mark is a view over the chart’s one dataset. The factory returns a feature object; the only required method is `build(data, scales, width, height)`. Call `normalizeMarkOptions` first, resolve every channel through `encodeChannel` / `resolveStyle`, spread `authoring.markCommon(opts)` to pass `id` / `edits` / `constraints` / `table` through verbatim, and set `discreteScale` when discrete data needs a band or a point. Don’t set mark-wide `pointerEvents` — leave that to the engine. To let a datum’s [derived channels (`{ fn }`)](/concepts#derived) see their row index and the dataset, pass the optional `index` and `data` args when you resolve per datum: `authoring.resolveStyle(scales, channels, d, defaults, i, data)`.
 
 <Example
   code={aCustomSquareMark}
   title="A custom square mark"
-  blurb="normalizeMarkOptions → encodeChannel / resolveStyle → FeatureNode[]. Stock drag still works because the nodes carry data and index."
+  blurb="authoring.normalizeMarkOptions → encodeChannel / resolveStyle → FeatureNode[]. Stock drag still works because the nodes carry data and index."
   try={(
     <>
       <b>Drag</b> a square — same edit path as a point.
@@ -121,7 +121,7 @@ Don’t reinvent proximity or minting:
 
 - `invertChannel` / `recenterSpan` / `markCenter` — pointer ↔ data for positional edits
 - `schemaDefaults(schema)` — mint a row with every field set to its default (or `null`)
-- `edit.nextSeriesKey(data, seriesField)` — next free series id for a new line
+- `authoring.nextSeriesKey(data, seriesField)` — next free series id for a new line
 - `nearestMark` / `nearestSeries` / `nearestMarkOnAxis` — shared distance pickers
 
 For create-like customs, set `cardinality: "append"` so constraints know which row is new. For external UI, give the edit a `name` and drive it with [`el.control(name)`](/editing/external-controls).

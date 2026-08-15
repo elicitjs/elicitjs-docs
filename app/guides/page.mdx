@@ -9,6 +9,7 @@ import aTargetBandWithARule from './_examples/a-target-band-with-a-rule.example.
 import aMeanLineThatChasesTheBars from './_examples/a-mean-line-that-chases-the-bars.example.txt';
 import anEditDrawsItsBounds from './_examples/an-edit-draws-its-bounds.example.txt';
 import restylingTheParts from './_examples/restyling-the-parts.example.txt';
+import howMuchIsLeftToAllocate from './_examples/how-much-is-left-to-allocate.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -16,7 +17,7 @@ export default function Layout({ children }) {
 
 # Guides
 
-<Lead>A guide draws a **rule** — something true about the chart that isn't one of its rows. Two kinds: an edit draws its own rules with `guide:` (its constraint bounds, its pick's reach, its handle's track), and you declare annotations in `guides: [...]` on the spec (`guides.rule`, `guides.region`, `guides.proximity`). Guides rebuild every render and never capture a gesture. For feedback on interaction state — hovered, selected, grabbed — see [Effects](/effects).</Lead>
+<Lead>A guide draws the **rule** and the **state** — what a gesture is allowed to do, and what is left to do. It views chart state rather than rows, so it has no channels, no table and no `edit`, and can never write data. Declare one in `guides: [...]` (`guides.rule`, `guides.region`, `guides.remaining`, `guides.proximity`, `guides.custom`), or let an edit draw its own with `guide:`. Guides rebuild every render and never capture a gesture. For feedback on interaction state — hovered, selected, grabbed — see [Effects](/effects).</Lead>
 
 <ApiReference entries={api} />
 
@@ -45,6 +46,30 @@ Bounds follow the edit's axis. The same `clamp` draws horizontal lines on a y-ed
   try={(
     <>
       <b>Drag</b> a bar past a limit, or between the snap stops.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="remaining" title="What is left to do">
+
+`guides.remaining()` states how much of a budget is still unallocated — the count a reader needs while placing tokens or splitting a total.
+
+```js
+guides.remaining({ field: "y", unit: "token" })   // "3 tokens left"
+guides.remaining({ field: "y", total: 100 })      // "45 of 100 left"
+```
+
+Pass no `total` and it reads the target from the chart's own `maintainSum` constraint, so the number you enforce and the number you show cannot drift apart. Set `unit` for the countable phrasing, `anchor` (`"top-right"` by default) for the corner, and `label` for a function of `(remaining, used, total)` when you want your own wording.
+
+<Example
+  code={howMuchIsLeftToAllocate}
+  title="A budget with its remainder"
+  blurb="guides.remaining reads the target from the maintainSum constraint, so the budget is written once."
+  try={(
+    <>
+      <b>Drag</b> a bar — the count updates as the total moves.
     </>
   )}
 />

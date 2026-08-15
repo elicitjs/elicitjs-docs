@@ -1,10 +1,10 @@
-const snapDrag = edit.makeEdit({
+const snapDrag = authoring.makeEdit({
   type: "snapDrag",
   gesture: "drag",
   channels: ["y"],
   apply: (ctx) => {
     const ch = ctx.channels[0];
-    const v = edit.invertChannel(ch, ctx.pointer);
+    const v = authoring.invertChannel(ch, ctx.pointer);
     if (v === undefined || !ctx.datum) return undefined;
     return { ...ctx.datum, [ch.field]: Math.round(v / 10) * 10 };
   },

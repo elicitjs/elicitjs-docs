@@ -2,7 +2,7 @@ import type { ApiEntry } from '../../lib/types';
 
 export const api: ApiEntry[] = [
   {
-    name: "guides.rule · guides.region · guides.proximity",
+    name: "guides.rule · guides.region · guides.remaining · guides.proximity",
     summary: (
       <>
         Import from <code className="inline">elicit.guides</code> and pass in the chart’s <code className="inline">guides: [...]</code>. All position in <b>data space</b> through the same <code className="inline">scale.encode()</code> a mark uses, so they compose across scale types. Non-interactive.
@@ -11,6 +11,7 @@ export const api: ApiEntry[] = [
     signatures: [
       "guides.rule({ x?, y?, stroke, strokeDasharray, label }) → Guide",
       "guides.region({ x?, y?, fill, opacity }) → Guide",
+      "guides.remaining({ field, total?, unit?, anchor?, label? }) → Guide",
       "guides.proximity({ target, color }) → Guide",
       "guides.custom((ctx) => FeatureNode[]) → Guide",
       "",
@@ -18,6 +19,18 @@ export const api: ApiEntry[] = [
       "guides.rule({ y: ({ data }) => d3.mean(data, (d) => d.y), label: \"mean\" })",
     ],
     options: [
+      {
+        name: "remaining.field / total",
+        type: "string | (ctx) => string  ·  number | (ctx) => number",
+        default: "'y' · from constraints",
+        desc: "The column being allocated, and the target sum. Omit `total` and it reads the target from the chart's `maintainSum` constraint, so the total you enforce and the total you show stay one number.",
+      },
+      {
+        name: "remaining.unit / anchor / label",
+        type: "string · string · (remaining, used, total) => string",
+        default: "— · 'top-right' · —",
+        desc: "`unit` gives the countable phrasing (\"3 tokens left\"); `anchor` picks the corner; `label` replaces the wording entirely.",
+      },
       {
         name: "rule.x / y",
         type: "any | (ctx) => any",

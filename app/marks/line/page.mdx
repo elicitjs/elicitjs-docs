@@ -19,7 +19,7 @@ export default function Layout({ children }) {
 
 # Line
 
-<Lead>A connected path over an ordered set of points, with a draggable handle on each. It is deliberately general — a you-draw-it curve, a multi-series line chart, and a connected scatter are the same mark along four orthogonal knobs: **grouping** (`series`), **ordering** (`order`), **editing** (the edit on the handles), and **creation** (`anchor` / `newSeries` / `draw`). `lineY`/`lineX` fix the value axis; `connectedScatter`/`path` default to order: "sequence".</Lead>
+<Lead>A connected path over an ordered set of points, with a draggable handle on each. It is deliberately general — a you-draw-it curve, a multi-series line chart, and a connected scatter are the same mark along four orthogonal knobs: **grouping** (`series`), **ordering** (`order`), **editing** (the edit on the handles), and **creation** (`anchor` / `newSeries` / `draw`). `lineY`/`lineX` fix the value axis; `path`/`path` default to order: "sequence".</Lead>
 
 <ApiReference entries={api} />
 
@@ -93,7 +93,7 @@ With `order: "sequence"` the points connect in creation order, not by domain —
 <Example
   code={a2dPathYouCanReshape}
   title="A 2D path you can reshape"
-  blurb={"connectedScatter defaults to order: \"sequence\"; a 2D drag moves points, anchor extends the one path in click order."}
+  blurb={"path defaults to order: \"sequence\"; a 2D drag moves points, anchor extends the one path in click order."}
   try={(
     <>
       <b>Drag</b> a point anywhere, or <b>click</b> empty space to add the next anchor.

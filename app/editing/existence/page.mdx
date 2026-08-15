@@ -39,7 +39,7 @@ Creation writes dataset **rows**, so it belongs on a **data mark positioned by a
       <tr><td><code>rect</code></td><td>✓</td><td><b>seed an extent</b> (<code>x1</code>/<code>x2</code> or <code>y1</code>/<code>y2</code>) via <code>defaults</code> so it isn't minted zero-size</td></tr>
       <tr><td><code>dotstack</code></td><td>✓ (special)</td><td>one axis is a slot; the stack position is <i>derived</i> from the count</td></tr>
       <tr><td><code>composite</code> (glyph)</td><td>✓</td><td>several marks over one dataset — create on <b>one</b> part; the row renders across all</td></tr>
-      <tr><td><code>line</code> · <code>connectedScatter</code></td><td>✓</td><td><code>edit.line.anchor</code> / <code>newSeries</code> / <code>draw</code> — series-aware, needs a series field</td></tr>
+      <tr><td><code>line</code> · <code>path</code></td><td>✓</td><td><code>edit.line.anchor</code> / <code>newSeries</code> / <code>draw</code> — series-aware, needs a series field</td></tr>
       <tr><td><code>geo*</code></td><td>✓</td><td><code>edit.geo.create</code> / <code>createRect</code> / <code>draw</code> — invert the projection (lon/lat)</td></tr>
       <tr><td><code>rule</code> · <code>axis</code> · <code>grid</code></td><td>✗</td><td><b>guides</b>, not data — a guide edits the <i>domain</i> (<code>edit.axis.*</code>), not rows</td></tr>
       <tr><td><code>trend</code></td><td>✗</td><td><b>derived</b>: the line is a fit over every row, so there's no single field to mint</td></tr>

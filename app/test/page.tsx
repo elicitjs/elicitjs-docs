@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { DocShell } from "../../components/DocShell";
-import { Elicit, plot, edit } from "@elicit";
+import { Elicit, plot, elements, edit } from "@elicit";
 
-const { bar, tickX, tickY, legend } = plot;
+const { bar, tickX, tickY } = plot;
+const { legend } = elements;   // a legend views a SCALE, so it is an element
 const { move } = edit;
 
 /**

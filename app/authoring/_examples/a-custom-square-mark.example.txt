@@ -1,20 +1,20 @@
 // A minimal mark factory — same contract as point/bar.
 function square(options = {}) {
-  const opts = normalizeMarkOptions(options);
+  const opts = authoring.normalizeMarkOptions(options);
   const { channels = {} } = opts;
   return {
     // id / edits / constraints / table, passed through verbatim.
-    ...markCommon(opts),
+    ...authoring.markCommon(opts),
     channels,
     discreteScale: "point",
     xKey: channels.x && channels.x.field,
     yKey: channels.y && channels.y.field,
     build(data, scales, width, height) {
       return data.map((d, i) => {
-        const style = resolveStyle(scales, channels, d, { fill: "#4f46e5" });
-        const cx = encodeChannel(scales, channels, "x", d, width / 2);
-        const cy = encodeChannel(scales, channels, "y", d, height / 2);
-        const r = encodeChannel(scales, channels, "size", d, 8);
+        const style = authoring.resolveStyle(scales, channels, d, { fill: "#4f46e5" });
+        const cx = authoring.encodeChannel(scales, channels, "x", d, width / 2);
+        const cy = authoring.encodeChannel(scales, channels, "y", d, height / 2);
+        const r = authoring.encodeChannel(scales, channels, "size", d, 8);
         const side = Math.max(0, r * 2);
         return {
           type: "rect",

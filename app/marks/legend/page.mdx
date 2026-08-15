@@ -79,7 +79,7 @@ A quantitative `fill` resolves to a **sequential** colour scale, so the same `le
 
 <Section id="picker" title="A category picker">
 
-Pass `edit: edit.legend()` to make each swatch a click target that sets the channel's field on the target row (the first, by default).
+Pass `edit: edit.legend.category()` to make each swatch a click target that sets the channel's field on the target row (the first, by default).
 
 <Example
   code={categoryPicker}
@@ -113,7 +113,7 @@ Selection is **pipeline state**, not a data column: give the bars an `edit.selec
 
 <Section id="value" title="A continuous value picker">
 
-Pass `edit: edit.legendValue()` to add a handle you drag along the ramp. A colour scale isn't invertible, so the edit maps the drag position back into the domain by hand and writes the value.
+Pass `edit: edit.legend.value()` to add a handle you drag along the ramp. A colour scale isn't invertible, so the edit maps the drag position back into the domain by hand and writes the value.
 
 <Example
   code={valuePicker}

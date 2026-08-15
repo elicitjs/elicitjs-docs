@@ -1,0 +1,25 @@
+mount(Elicit({
+  width: 380, height: 260,
+  margins: { top: 26, right: 14, bottom: 26, left: 34 },
+  // No `total` here: the guide reads the target off the maintainSum
+  // constraint, so the budget is written once.
+  guides: [ guides.remaining({ field: "y", unit: "point" }) ],
+  data: [
+    { x: "A", y: 25 }, { x: "B", y: 20 },
+    { x: "C", y: 15 }, { x: "D", y: 10 },
+  ],
+  schema: {
+    x: { type: "categorical", domain: ["A", "B", "C", "D"] },
+    y: { type: "quantitative", domain: [0, 100] },
+  },
+  constraints: [ clamp({ min: 0 }), maintainSum({ targetSum: 100, mode: "cap" }) ],
+  marks: [
+    barY({
+      fill: "#7c3aed",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y", edit: move() },
+      },
+    }),
+  ],
+}))

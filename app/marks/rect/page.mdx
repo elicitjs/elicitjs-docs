@@ -38,7 +38,7 @@ Give both axes explicit endpoints and each datum draws a rectangle spanning x1�
 
 <Section id="heatmap" title="Heatmap (both axes categorical)">
 
-Put a category on **both** axes and each datum draws one cell at that (x, y) intersection — a heatmap. A quantitative `fill` resolves to a sequential colour ramp; a categorical `fill` to a palette. Band scales pad by default, so set `scale: { padding: 0 }` on each axis to close the gap and let the cells touch. Colour isn't gesture-invertible, so edit a cell's value through the ramp: `select()` on the cells makes the one you click the target row, and `legendColor({ edit: edit.legendValue() })` drags that row's value along the ramp.
+Put a category on **both** axes and each datum draws one cell at that (x, y) intersection — a heatmap. A quantitative `fill` resolves to a sequential colour ramp; a categorical `fill` to a palette. Band scales pad by default, so set `scale: { padding: 0 }` on each axis to close the gap and let the cells touch. Colour isn't gesture-invertible, so edit a cell's value through the ramp: `select()` on the cells makes the one you click the target row, and `legendColor({ edit: edit.legend.value() })` drags that row's value along the ramp.
 
 <Example
   code={heatmapCells}

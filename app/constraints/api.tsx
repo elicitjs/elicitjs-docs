@@ -152,14 +152,14 @@ export const api: ApiEntry[] = [
     ),
   },
   {
-    name: "constraints.define(reducer, meta?)",
+    name: "constraints.defineConstraint(reducer, meta?)",
     summary: (
       <>
-        Author your own (aliased <code className="inline">constraints.custom</code>). The reducer gets a pure-data context and returns the shape that’s natural.
+        Author your own (aliased <code className="inline">constraints.defineConstraint</code>). The reducer gets a pure-data context and returns the shape that’s natural.
       </>
     ),
     signatures: [
-      "constraints.define(({ data, oldData, activeIndex, active, field, value, domain }) => result, meta?) → Constraint",
+      "constraints.defineConstraint(({ data, oldData, activeIndex, active, field, value, domain }) => result, meta?) → Constraint",
     ],
     options: [
       {

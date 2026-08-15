@@ -35,7 +35,7 @@ export const api: ApiEntry[] = [
         name: "edit",
         type: "Edit | Edit[]",
         default: "—",
-        desc: "Opt-in interactivity: edit.legend() (click a swatch to set a category) or edit.legendValue() (drag the ramp handle to set a value).",
+        desc: "Opt-in interactivity: edit.legend.category() (click a swatch to set a category) or edit.legend.value() (drag the ramp handle to set a value).",
       },
       {
         name: "row",
@@ -70,10 +70,10 @@ export const api: ApiEntry[] = [
     ],
   },
   {
-    name: "edit.legend · edit.legendValue",
+    name: "edit.legend · edit.legend.value",
     summary: (
       <>
-        The legend pickers, written back through the normal edit pipeline. <code className="inline">edit.legend()</code> is a category picker (a direct-pick click on a swatch, whose value it sets). <code className="inline">edit.legendValue()</code> is a continuous value picker (a direct-pick drag on the ramp handle). Pass one to a legend’s <code className="inline">edit</code> option — the legend injects its channel.
+        The legend pickers, written back through the normal edit pipeline. <code className="inline">edit.legend.category()</code> is a category picker (a direct-pick click on a swatch, whose value it sets). <code className="inline">edit.legend.value()</code> is a continuous value picker (a direct-pick drag on the ramp handle). Pass one to a legend’s <code className="inline">edit</code> option — the legend injects its channel.
       </>
     ),
     signatures: [
