@@ -1,0 +1,23 @@
+mount(Elicit({
+  width: 340, height: 200,
+  margins: { top: 20, right: 16, bottom: 20, left: 20 },
+  axes: false,
+  data: [ { status: "Active" } ],
+  schema: {
+    status: { type: "categorical", domain: ["Active", "Paused", "Archived"] },
+  },
+  marks: [
+    point({
+      size: 40,
+      channels: {
+        x: { value: 100 },
+        y: { value: 100 },
+        fill: { field: "status" },
+      },
+    }),
+    legendColor({
+      anchor: "right",
+      edit: edit.legend.category(),
+    }),
+  ],
+}));

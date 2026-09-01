@@ -1,0 +1,47 @@
+mount(Elicit({
+  width: 420, height: 260,
+  margins: { top: 20, right: 20, bottom: 20, left: 20 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      people: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+          // The SAME vocabulary is declared on both tables.
+          team: { type: "categorical", domain: ["red", "blue"] },
+        },
+      },
+      ties: {
+        role: "links",
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+          team: { type: "categorical", domain: ["red", "blue"] },
+        },
+      },
+    },
+  },
+  data: {
+    people: [
+      { id: "a", x: 20, y: 75, team: "red"  },
+      { id: "b", x: 75, y: 78, team: "blue" },
+      { id: "c", x: 48, y: 22, team: "red"  },
+    ],
+    ties: [
+      { source: "a", target: "c", team: "red"  },
+      { source: "b", target: "c", team: "blue" },
+    ],
+  },
+  marks: [
+    // One `stroke` scale spans BOTH tables' `team` columns.
+    link({ strokeWidth: 3, channels: { stroke: { field: "team" } } }),
+    point({ size: 12, fill: "#fff", strokeWidth: 3, channels: {
+      x: { field: "x" }, y: { field: "y" }, stroke: { field: "team" },
+    } }),
+    legendColor({ channel: "stroke", anchor: "right", edit: edit.scale.categories() }),
+  ],
+}))

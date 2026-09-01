@@ -10,6 +10,7 @@ import likelihoodNeedle from "./_examples/likelihood-needle.example.txt";
 import pinsOnAMap from "./_examples/pins-on-a-map.example.txt";
 import answerAScale from "./_examples/answer-a-scale.example.txt";
 import howAChartIsBuilt from "./_examples/how-a-chart-is-built.example.txt";
+import drawTheLineForTheMissingYears from "./_examples/draw-the-line-for-the-missing-years.example.txt";
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -120,6 +121,23 @@ Classic survey scales work too. Hover to preview, then click to lock in an answe
   try={
     <>
       Hover across the scale, then <b>click</b> your answer.
+    </>
+  }
+/>
+
+</Section>
+
+<Section id="you-draw-it" title="What happened to U.S. traffic deaths after 1990?" codeMode="collapsed">
+
+The New York Times' “You Draw It” format: 1968–1990 is historical record (locked), 1991–2016 is what you draw. When you finish, press the button to reveal the answer key.
+
+<Example
+  code={drawTheLineForTheMissingYears}
+  title="Draw the missing years"
+  blurb="Drag across the empty space to draw 1991–2016, then advance to reveal the truth."
+  try={
+    <>
+      <b>Drag</b> left-to-right to draw the missing years · then press <b>Show me how I did</b>.
     </>
   }
 />

@@ -1,0 +1,24 @@
+mount(Elicit({
+  width: 300, height: 260,
+  margins: { top: 20, right: 20, bottom: 20, left: 20 },
+  axes: false,
+  data: [
+    { source: "Solar", share: 45 },
+    { source: "Wind", share: 35 },
+    { source: "Hydro", share: 20 },
+  ],
+  schema: {
+    source: { type: "categorical" },
+    share: { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    pie({
+      outerRadius: 95,
+      edits: [edit.stack.edge()],
+      channels: {
+        value: { field: "share" },
+        fill: { field: "source" },
+      },
+    }),
+  ],
+}));

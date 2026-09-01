@@ -8,7 +8,7 @@ mount(Elicit({
   schema: {
     x: { type: "quantitative", domain: [0, 3] },
     y: { type: "quantitative", domain: [0, 100] },
-    g: { type: "ordinal" },
+    g: { type: "categorical" },  // a group identifier, not an ordered scale
   },
   marks: [
     lineY({

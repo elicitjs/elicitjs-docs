@@ -3,6 +3,7 @@
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
+    "checkJs": false,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
@@ -15,7 +16,7 @@
     "incremental": true,
     "plugins": [{ "name": "next" }],
     "paths": {
-      "@elicit": ["../elicitjs/src/index.js"],
+      "@elicit": ["../elicitjs/src/index.d.ts"],
       "@/*": ["./*"]
     }
   },

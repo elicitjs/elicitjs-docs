@@ -1,0 +1,21 @@
+mount(Elicit({
+  width: 320, height: 210,
+  margins: { top: 20, right: 16, bottom: 20, left: 20 },
+  data: [ { temp: 18 } ],
+  schema: { temp: { type: "quantitative", domain: [0, 30] } },
+  axes: false,
+  marks: [
+    point({
+      size: 35,
+      channels: {
+        x: { value: 80 },
+        y: { value: 95 },
+        fill: { field: "temp" },
+      },
+    }),
+    legendColor({
+      anchor: "right",
+      edit: edit.legend.value(),
+    }),
+  ],
+}));

@@ -1,0 +1,32 @@
+mount(Elicit({
+  width: 380, height: 220,
+  margins: { top: 14, right: 16, bottom: 26, left: 60 },
+  data: [
+    { task: "Research", start: 2, end: 6 },
+    { task: "Design",   start: 4, end: 9 },
+    { task: "Build",    start: 7, end: 12 },
+  ],
+  schema: {
+    task:  { type: "categorical", domain: ["Research", "Design", "Build"] },
+    start: { type: "quantitative", domain: [0, 14] },
+    end:   { type: "quantitative", domain: [0, 14] },
+  },
+  marks: [
+    barX({
+      fill: "#2563eb",
+      channels: {
+        y: { field: "task" },
+        x1: { field: "start" },
+        x2: { field: "end" },
+      },
+      edits: [
+        brushSpan({
+          channels: ["x1", "x2"],
+          threshold: 30,
+          edgeInset: 12,
+          guide: true,
+        }),
+      ],
+    }),
+  ],
+}));

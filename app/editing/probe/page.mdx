@@ -5,51 +5,61 @@ import { Example } from '../../../components/Example';
 import { Lead } from '../../../components/Lead';
 import { api } from './api';
 
-import aimThenOpen from './_examples/aim-then-open.example.txt';
 import probeASingleValue from './_examples/probe-a-single-value.example.txt';
-import aTentativeToken from './_examples/a-tentative-token.example.txt';
+import aimThenOpen from './_examples/aim-then-open.example.txt';
+import twoStagePoint from './_examples/two-stage-point.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Probe
+# Probe & multi-step stages
 
-<Lead>The **probe / settle** flow: the pointer **probes** a value and the proposal follows the cursor as an inert **ghost** — the committed mark stays put, so nothing flickers — while `getData()` still reports the last committed belief. A **commit** settles it, and there are two ways to commit, so both natural gestures work: **move-then-click** (no button held), and **grab-and-drag** — press on the mark, drag, release. Give any edit `pick: "probe"` and it works this way, so the same primitive drives a correlation line, a slider knob, a Likert answer and a dot plot's tentative token. Add a `stage` and each commit settles that stage's field and advances to the next — "set the line, now open the cone".</Lead>
+<Lead>The probe flow lets respondents inspect ephemeral proposals before committing: pointer movement renders an uncommitted ghost while `getData()` reports only the last settled belief. Combining `pick: "probe"` with numeric `stage` values enables progressive multi-step elicitation pipelines.</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="twostep" title="Two questions, two clicks">
+<Section id="preview" title="Ephemeral ghost proposals">
 
-Stage 0 owns the slope, stage 1 owns the spread. The driver advances on each commit; no app code, no buttons.
+Setting `pick: "probe"` on any edit splits interaction into preview and commit. As the cursor moves, marks render an inert **ghost** showing what a commit would produce.
 
-<Example
-  code={aimThenOpen}
-  title="Line, then cone"
-  blurb="Move to aim the line, click. Move to open the cone, click. Both are then frozen."
-  try={"move the mouse, click, move again, click."}
-/>
-
-</Section>
-
-<Section id="preview" title="The ghost is the commit">
-
-A probe proposes; `getData()` still reports the last committed belief. The knob below shows a translucent **ghost** at the pointer — commit it either way: move and click, or grab the knob and drag. The readout only moves on commit, and the ghost is exactly what a commit writes.
-
-A proposal is about the **dataset**, not about the mark that made it, so **every** mark viewing those rows ghosts it — not only the one carrying the edit. That is what keeps a glyph split across marks whole while the pointer moves: the cone above is a `trendBand` reading a spread the gesture writes on the `trend` line, and it opens under the cursor rather than snapping into place on the click.
+Because proposals operate on the dataset rather than a single mark, every mark reading those rows reflects the ghost in real time. `getData()` and `onChange` remain untouched until commit.
 
 <Example
   code={probeASingleValue}
   title="Probe a single value"
-  blurb={"move({ pick: \"probe\" }) — move and click, or grab and drag to release."}
-  try={"move across the track and click — or grab the knob and drag."}
+  blurb="move({ pick: 'probe' }) displays a ghost knob that settles on click or drag release."
+  try={"Move across the track and click — or grab the knob and drag."}
+/>
+
+</Section>
+
+<Section id="commit-modes" title="Dual commit gestures">
+
+`pick: "probe"` accepts two natural gestures interchangeably:
+1. **Move-then-click**: Move the pointer without pressing a button to position the ghost, then click to settle.
+2. **Grab-and-drag**: Press on the mark, drag to the target value, and release.
+
+</Section>
+
+<Section id="stages" title="Multi-step stages (progressive elicitation)">
+
+For multi-part questions ("first set the mean, then specify your confidence"), assign a numeric `stage` to each edit. An edit is active only when its `stage` matches the chart's current stage.
+
+Edits with `pick: "probe"` advance to the next stage automatically upon commit. You can also control stages programmatically with `chart.nextStage()`, `chart.setStage(n)`, and `chart.getStage()`.
+
+<Example
+  code={aimThenOpen}
+  title="Two-step pipeline: slope, then spread"
+  blurb="Stage 0 sets the trend slope; stage 1 opens the confidence cone."
+  try={"Move the mouse to aim the line and click; then move to open the confidence cone and click."}
 />
 
 <Example
-  code={aTentativeToken}
-  title="A tentative token"
-  blurb={"create({ pick: \"probe\" }) ghosts the dot before it is real. Alt-click removes one."}
-  try={"hover a bin, click to drop; alt-click to take back."}
+  code={twoStagePoint}
+  title="Progression via nextStage()"
+  blurb="Stage 0 moves position along x; stage 1 resizes the magnitude."
+  try={"Drag horizontally, click Next, then drag outward to resize."}
 />
 
 </Section>

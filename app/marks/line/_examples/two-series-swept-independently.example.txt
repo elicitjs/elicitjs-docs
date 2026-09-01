@@ -9,7 +9,7 @@ mount(Elicit({
     s: { type: "categorical" },  // the series key; declared so create() mints it
     x: { type: "quantitative", domain: [0, 3] },
     y: { type: "quantitative", domain: [0, 100] },
-    g: { type: "ordinal" },
+    g: { type: "categorical" },  // a group identifier, not an ordered scale
   },
   marks: [
     lineY({

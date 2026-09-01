@@ -1,0 +1,98 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import selectABar from './_examples/select-a-bar.example.txt';
+import selectSeveral from './_examples/select-several.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Selection
+
+<Lead>Which rows are currently picked. Selection is **pipeline state**, not a column: `edit.select()` makes a mark selectable, the selected rows get the `selected` effect, and an edit that needs a row to write to — a legend picker, an external control — reads the selection instead of guessing. Nothing about it touches the elicited data.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="what-it-is" title="State, not data">
+
+A `selected` column would be answers mixed with interface state: it would show up in `getData()`, fire `change`, and land in undo. So selection lives beside the data instead. It survives edits, resets when you call `setData` or advance a stage, and reports through its own `select` event.
+
+`edit.select()` is a direct-pick click. A plain click selects one row and clears the rest; clicking the selected row again deselects it.
+
+<Example
+  code={selectABar}
+  title="Click a bar to select it"
+  blurb="The selected bar takes the highlight outline. getData() gains no column."
+  try={(
+    <>
+      <b>Click</b> a bar to select it, <b>click</b> it again to deselect · <b>drag</b> the top to change its value.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="feedback" title="Seeing the selection">
+
+Selected rows get the `selected` [effect](/effects) — an orange outline by default, on every mark over that row, so selecting a bar also outlines its label. Restyle it on the spec:
+
+```js
+effects: { selected: { outline: { color: "#2563eb", width: 3 } } }
+```
+
+Selection outranks `hovered` and is outranked by `grabbed`, so a row you are dragging reads as grabbed rather than merely selected.
+
+</Section>
+
+<Section id="multi" title="Selecting several rows">
+
+`edit.select({ multi: true })` makes shift-click (or meta-click) add to the selection; shift-clicking a selected row takes it back out. A plain click still replaces the whole selection, so the gesture you already had is unchanged. Use `exclusive: false` for a chart where every click should be additive with no modifier.
+
+An edit that writes "the selected row" writes **all** of them, so one legend swatch click recategorises the whole selection.
+
+<Example
+  code={selectSeveral}
+  title="Shift-click to build a selection"
+  blurb="One swatch click sets the group on every selected bar."
+  try={(
+    <>
+      <b>Click</b> a bar, <b>shift-click</b> another, then <b>click</b> a legend swatch.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="external" title="Driving it from outside">
+
+The same commit backs every route, so an external control and a click leave the selection in one shape. See [External controls](/editing/external-controls#selection) for the surrounding API.
+
+```js
+el.select(2);                                 // replace with row 2
+el.select([0, 2]);                            // replace with rows 0 and 2
+el.toggleSelection(3);                        // add or remove row 3
+el.selectAll();
+el.selectWhere("group", "North", { all: true });   // a whole category
+el.clearSelection();
+
+el.getSelection();                            // 0  (the first, or null)
+el.getSelectionAll();                         // [0, 2]
+el.on("select", (first, all) => …);
+```
+
+`selectWhere` takes the first match by default. Pass `{ all: true }` for every row of a category — the usual meaning when a control names a value rather than a row.
+
+</Section>
+
+<Section id="targets" title="Edits that read the selection">
+
+A gesture that carries no row of its own has to get one from somewhere, and the selection is it. A [legend](/marks/legend) picker is the main case: a swatch names a *value*, so its `row` defaults to the selection.
+
+The swatch the selection currently holds is ringed. With nothing selected and more than one row, a picker has no target and no ring. A one-row table needs no selection — one row is unambiguous. If nothing in the chart can ever select, the picker is decoration, and a warning says so.
+
+</Section>

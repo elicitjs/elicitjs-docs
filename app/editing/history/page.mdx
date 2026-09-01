@@ -6,48 +6,42 @@ import { Lead } from '../../../components/Lead';
 import { api } from './api';
 
 import undoADrag from './_examples/undo-a-drag.example.txt';
-import keyboardNudge from './_examples/keyboard-nudge.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# History & keyboard
+# History & undo
 
-<Lead>An elicitation is someone’s belief being _drafted_, so “take that back” is a primitive rather than a nicety — a person who cannot undo a slip stops exploring and starts being careful, which is the opposite of what you asked them for. `undo()` / `redo()` step the chart’s dataset a **gesture** at a time. The same reasoning covers the keyboard: a value someone can only set by dragging is a value some people cannot set at all, so every mark that takes a drag also takes **arrow keys**, through the same edit and the same constraints. Neither is a mode, an option, or a plugin — both are simply on.</Lead>
+<Lead>Belief elicitation is a drafting process: respondents need the freedom to explore hypotheses and take back slips. `chart.undo()` and `chart.redo()` step the dataset backwards and forwards one full gesture at a time, preserving snapshots of data rows, schema domains, and responsive sizing.</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="undo" title="Undo / redo">
+<Section id="undo" title="Gesture-level undo & redo">
 
-Drag a bar and undo it. The whole drag is one step, because the history’s unit is the gesture — which is the unit the person thinks in, too.
+History transactions open when a gesture starts and close when it ends. A whole drag across the screen is recorded as a single atomic undo step rather than hundreds of pixel increments.
+
+Calling `undo()` or `redo()` returns a boolean indicating whether the history stack moved, and dispatches the standard `change` event so downstream listeners update automatically.
 
 <Example
   code={undoADrag}
   title="Undo a whole drag"
-  blurb="chart.undo() / chart.redo(), with canUndo() / canRedo() driving the buttons."
+  blurb="chart.undo() / chart.redo() step the belief data. canUndo() / canRedo() drive the button states."
   try={(
     <>
-      <b>Drag</b> a bar all the way across, then <b>Undo</b> — it goes back in one step, not one pixel at a time. Drag again and the redo branch is dropped.
+      <b>Drag</b> a bar, then press <b>Undo</b> — the bar resets in one atomic step.
     </>
   )}
 />
 
 </Section>
 
-<Section id="keyboard" title="Arrow keys">
+<Section id="transactions" title="Transaction boundaries & snapshots">
 
-Nothing below asks for keyboard support — the point takes a drag on x and y, so it takes arrow keys on x and y. That is the whole feature: a fallback for anyone who can’t drag precisely (or at all), and a precision tool for anyone who can. The browser’s focus ring is off by default (`focusOutline: false`); this example turns it on so Tab is visible.
+Snapshots hold the complete chart state: data rows, schema domain changes (such as added categories or rescaled axes), and chart sizing.
 
-<Example
-  code={keyboardNudge}
-  title="Arrow keys move a point"
-  blurb="A mark that takes a drag takes the keyboard too. focusOutline: true shows the native ring while you Tab."
-  try={(
-    <>
-      <b>Tab</b> until a dot is focused (blue ring), then use the <b>arrow keys</b> — 1% of the domain a press, <b>Shift+arrow</b> for 10%. Hold an arrow at the edge: the clamp stops it exactly where a drag would.
-    </>
-  )}
-/>
+- **Gesture unit**: A drag, a sweep, a category addition, and a keyboard nudge each form their own transaction.
+- **Redo branch**: Performing a new edit after undoing drops the previous redo branch.
+- **Reseed**: Calling `chart.setData()` establishes a fresh baseline and clears the undo stack.
 
 </Section>

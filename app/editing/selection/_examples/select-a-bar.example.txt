@@ -1,0 +1,21 @@
+mount(Elicit({
+  width: 380, height: 210,
+  margins: { top: 20, right: 16, bottom: 30, left: 40 },
+  data: [
+    { name: "A", value: 12 },
+    { name: "B", value: 8  },
+    { name: "C", value: 15 },
+    { name: "D", value: 6  },
+  ],
+  schema: {
+    name:  { type: "categorical", domain: ["A", "B", "C", "D"] },
+    value: { type: "quantitative", domain: [0, 16] },
+  },
+  marks: [
+    barY({
+      fill: "#4f46e5",
+      channels: { x: { field: "name" }, y: { field: "value", edit: move() } },
+      edits: [ edit.select() ]
+    }),
+  ],
+}))

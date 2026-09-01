@@ -50,7 +50,9 @@ export default function Layout({ children }) {
 
 <Section id="categorical" title="Add, rename & remove categories">
 
-`axisX(\{ edit: edit.axis.categories() \})` turns each category label into a rename target (double-click to type), gives each an × to remove, and adds a ＋ at the end to append a new one. Renaming relabels matching rows; removing deletes them — schema and data stay in step.
+`axisX(\{ edit: edit.scale.categories() \})` turns each category label into a rename target (double-click to type), gives each an × to remove, and adds a ＋ at the end to append a new one. Renaming relabels matching rows; removing deletes them — schema and data stay in step.
+
+The domain belongs to the **scale**, not to the axis, so the same edit works on any element drawing that scale — a [legend](/marks/legend#categories) takes it too. Where one scale spans several columns, or several tables, every one is written.
 
 <Example
   code={editTheCategoryList}

@@ -89,7 +89,7 @@ A cut mints a row, and its category comes from the schema's domain — so buildi
   try={<><b>Click</b> inside a segment to cut it, <b>drag</b> a boundary to shift value, <b>double-click</b> one to merge.</>}
 />
 
-Set `open: true` on the field's schema entry and the domain becomes a starting set instead: a cut appends a new category to it, named from `label` (`"Category"` by default) for you to rename later with `edit.axis.categories()`. An open field also skips the out-of-domain check on seed data.
+Set `open: true` on the field's schema entry and the domain becomes a starting set instead: a cut appends a new category to it, named from `label` (`"Category"` by default) for you to rename later with `edit.scale.categories()`. An open field also skips the out-of-domain check on seed data.
 
 <Example
   code={anOpenDomain}

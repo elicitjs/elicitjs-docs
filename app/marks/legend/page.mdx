@@ -11,6 +11,13 @@ import legendOnTheBottom from './_examples/legend-on-the-bottom.example.txt';
 import categoryPicker from './_examples/category-picker.example.txt';
 import valuePicker from './_examples/value-picker.example.txt';
 import pickAndEdit from './_examples/pick-and-edit.example.txt';
+import pinTheColumn from './_examples/pin-the-column.example.txt';
+import declareOnTheMark from './_examples/declare-on-the-mark.example.txt';
+import multiSelectPicker from './_examples/multi-select-picker.example.txt';
+import editTheCategories from './_examples/edit-the-categories.example.txt';
+import oneVocabularyTwoTables from './_examples/one-vocabulary-two-tables.example.txt';
+import graduatedSize from './_examples/graduated-size.example.txt';
+import angleAndWidth from './_examples/angle-and-width.example.txt';
 import theLegendsKey from './_examples/the-legends-key.example.txt';
 
 export default function Layout({ children }) {
@@ -19,31 +26,39 @@ export default function Layout({ children }) {
 
 # Legend
 
-<Lead>A legend for a non-positional channel — `fill`, `stroke`, `size`, `symbol`. Like an axis, it is a composable mark that reads the channel's scale; unlike an axis, it **reserves space** on its side, so the plot shrinks to make room and the legend never overlaps the marks. It can also be a **picker**: click a swatch to set a category, or drag a ramp handle to set a value, written straight back to the data.</Lead>
+<Lead>A key for one **encoding** — a field on a non-positional channel like `fill`, `size` or `symbol`. Declare it where the encoding is (`fill: \{ field, legend: true \}`) and the legend knows exactly which scale it draws. Unlike an axis it **reserves space** on its side, so the plot shrinks and the legend never overlaps the marks. It can also be a **picker**: click a swatch to set a category, or drag a ramp handle to set a value, written straight back to the data.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="legends-key" title="The legends key">
 
-A legend is a **chart element**, not a data mark: it draws a *scale* rather than columns, so it has no channel map and no fields of its own (see [Chart elements](/marks/axes#chart-elements)). Like axes, it has an implicit layer — `legends` on the spec, the counterpart to `axes`:
+A legend is a key for one **encoding** — a (channel, field) pair. That is the unit throughout: a scale belongs to an encoding, and a legend belongs to a scale.
 
-- `legends: true` — one legend per non-positional channel bound to a field
-- `legends: \{ fill: \{ anchor: "top" \}, size: false \}` — per-channel config; `false` suppresses one
-- omitted — none, which is the default
+There are three ways to ask for one, most specific first:
 
-It defaults to **off**, unlike `axes`, because a legend reserves layout space; injecting one the moment a `fill` field appears would silently shrink the plot. An explicit `legendColor()` in `marks` always wins for its channel.
+1. **an element you compose** — `legendColor(\{ field: "group" \})`
+2. **the channel** — `fill: \{ field: "group", legend: \{ anchor: "bottom" \} \}`
+3. **the chart** — `legends: true`
+
+Each wins over the ones below it. `legends: \{ fill: false \}` suppresses a channel; `legend: false` on a channel suppresses that one encoding.
+
+`legends` defaults to **off**, unlike `axes`, because a legend reserves layout space; injecting one the moment a `fill` field appears would silently shrink the plot.
+
+Two marks stating the **same** encoding share one scale and get **one** legend. Two marks with different fields on one channel are two encodings, so they get two scales and two keys — in different colour families, so they read as different things.
 
 <Example
   code={theLegendsKey}
   title="legends: true"
-  blurb="One key per bound non-positional scale, with no legend mark composed by hand."
+  blurb="One key per encoding, with no legend composed by hand."
 />
 
 </Section>
 
 <Section id="discrete" title="A discrete colour legend">
 
-`legendColor()` reads the `fill` scale and draws a swatch per category. `anchor` sets which side it's on. The plot shrinks to leave room, so the legend never overlaps the marks.
+`legendColor()` draws a swatch per category. It names no field: `fill` carries one encoding here, so there is one scale it could be a key for and the legend binds to it. `anchor` sets which side it's on, and the plot shrinks to leave room so the legend never overlaps the marks.
+
+The title defaults to the encoded field's name, so a correct legend restates nothing the spec already said.
 
 <Example
   code={discreteColorLegend}
@@ -62,6 +77,40 @@ A quantitative `fill` resolves to a **sequential** colour scale, so the same `le
   title="Gradient ramp"
   blurb="fill: { field: 'temp' } over a quantitative field becomes a ramp."
 />
+
+</Section>
+
+<Section id="size" title="A size legend">
+
+`legendSize()` over a quantitative field draws **graduated circles** at tick values, not a gradient — a size scale has no colour to ramp, so the key shows the sizes themselves.
+
+The radii come from the scale, so the legend reports whichever one the channel resolved. `size` defaults to a **linear radius**, which keeps a drag predictable: the same pointer movement is the same change in value anywhere on the scale. Pass `scale: "sqrt"` on the channel for linear *area* instead, the perceptual convention for a static read, and the legend follows.
+
+```js
+size: { field: "people", scale: "sqrt" }
+```
+
+<Example
+  code={graduatedSize}
+  title="Graduated circles"
+  blurb="Nested circles at tick values, sized by the same scale as the dots."
+/>
+
+A categorical `size` field gets swatches instead — one dot per category, at that category's radius.
+
+</Section>
+
+<Section id="angle-width" title="Angle and stroke width">
+
+Every legendable channel gets a key shaped like the channel. `angle` draws a **fan** of spokes at their encoded bearings; `strokeWidth` draws a **stack of segments** at their encoded thicknesses. Both read the scale, so the key matches the marks.
+
+<Example
+  code={angleAndWidth}
+  title="A fan and a weight stack"
+  blurb="One needle mark encoding two channels; a key for each."
+/>
+
+Legendable channels are `fill`, `stroke`, `size`, `symbol`, `opacity`, `angle` and `strokeWidth`. Asking for a legend on anything else logs a warning rather than drawing a shape that would misreport the scale — and for `x`/`y`, an axis is the key.
 
 </Section>
 
@@ -94,9 +143,78 @@ Pass `edit: edit.legend.category()` to make each swatch a click target that sets
 
 </Section>
 
+<Section id="two-encodings" title="Two encodings on one channel">
+
+A scale belongs to one encoding, so two marks colouring by **different** fields get two scales — each with its own domain, its own colour family, and its own key. Neither has to be told which column it is about: the channel already said.
+
+<Example
+  code={pinTheColumn}
+  title="Two encodings on fill"
+  blurb="Two scales, two keys, two colour families — and each picker writes its own column."
+  try={(
+    <>
+      <b>Click</b> a swatch in either legend — each writes only its own column.
+    </>
+  )}
+/>
+
+When you compose a legend **by hand** for a channel that carries two encodings, say which with `field`:
+
+```js
+legendColor({ field: "goal" })
+```
+
+With one encoding on the channel it can be left out. With two and no `field`, the legend takes the first and logs a warning naming both — an ambiguity you can see rather than one silently resolved by declaration order.
+
+`table` is the companion for a multi-table schema, naming which table the column is in. It is only needed when a hand-composed legend cannot get it from the encoding.
+
+</Section>
+
+<Section id="declare-on-the-mark" title="Declaring it on the channel">
+
+Putting `legend:` on the channel is the shortest way to a correct legend, because the channel already names the field and the mark already names the table. Nothing has to be restated, so nothing can disagree.
+
+```js
+fill: { field: "group", legend: true }
+fill: { field: "group", legend: { anchor: "bottom", title: "region" } }
+fill: { field: "group", legend: false }   // suppress under legends: true
+```
+
+A **picker** goes in the same place. The gesture still happens on the legend — the mark's own bars are not click targets for it, and the edit is taken off the channel so they stay inert.
+
+```js
+fill: { field: "group", legend: { edit: edit.legend.category() } }
+```
+
+<Example
+  code={declareOnTheMark}
+  title="The picker on the fill channel"
+  blurb="No legendColor() in the spec — the legend is built from the encoding."
+  try={(
+    <>
+      <b>Click</b> a bar to select it, then <b>click</b> a swatch to change its group.
+    </>
+  )}
+/>
+
+Compose a `legendColor()` for the same encoding and it takes the edit instead of a separate key, so the mark says *what* is edited and the element says how it looks:
+
+```js
+barY({ channels: { fill: { field: "group", legend: { edit: edit.legend.category() } } } }),
+legendColor({ anchor: "bottom" }),
+```
+
+</Section>
+
 <Section id="dynamic-target" title="Editing a selected item">
 
-Selection is **pipeline state**, not a data column: give the bars an `edit.select()` and a click selects one (the selected bar gets the highlight outline). The legend's `row` **defaults to the selection**, so the swatch you click edits the bar you picked — no `selected` field, no `findIndex` to keep in sync. Pin `row` to a number or a `(data, { selection }) => index` function to override.
+Selection is **pipeline state**, not a data column: give the bars an `edit.select()` and a click selects one (the selected bar gets the highlight outline). The legend's `row` **defaults to the selection**, so the swatch you click edits the bar you picked — no `selected` field, no `findIndex` to keep in sync. See [Selection](/editing/selection) for the full model.
+
+The swatch the target row currently holds is **ringed**, so the legend shows what a click would replace as well as what it can set. A swatch names a value, not a row, so with nothing selected a picker has no target and no ring — the absence is the signal. The exception is a one-row table, which needs no selection to be unambiguous.
+
+The swatches themselves never dim: a legend is a key first, and their fills are the encoding.
+
+Pin `row` to a number, an array of indices, or a `(data, { selection }) => index` function to override.
 
 <Example
   code={pickAndEdit}
@@ -108,6 +226,63 @@ Selection is **pipeline state**, not a data column: give the bars an `edit.selec
     </>
   )}
 />
+
+</Section>
+
+<Section id="multi-select" title="Editing several rows at once">
+
+`edit.select({ multi: true })` makes shift-click (or meta-click) add to the selection instead of replacing it; shift-clicking a selected row takes it back out. A plain click still replaces, so turning this on changes nothing about the gesture you already had.
+
+A picker writes **every** selected row, so one swatch click recategorises the whole selection. Where the selected rows hold different values, each of those swatches is ringed.
+
+<Example
+  code={multiSelectPicker}
+  title="Shift-click to select several bars"
+  blurb="One swatch click sets the group on every selected bar."
+  try={(
+    <>
+      <b>Click</b> a bar, <b>shift-click</b> another, then <b>click</b> a swatch.
+    </>
+  )}
+/>
+
+From outside the chart, `el.select([0, 2])` replaces the selection with those rows, `el.toggleSelection(i)` adds or removes one, `el.selectAll()` takes every row, and `el.selectWhere('group', 'North', { all: true })` takes a whole category. `el.getSelectionAll()` reads them back.
+
+</Section>
+
+<Section id="categories" title="Editing the category list">
+
+The pickers above write a **row**. `edit.scale.categories()` writes the **domain** — the list of categories itself — which is a property of the scale the legend draws, so it needs no target row at all.
+
+It adds three affordances: **double-click a swatch** to rename its category, **click the ×** to drop it, and **double-click the +** to add one. Renaming relabels every row carrying the old value, and removing deletes them, so the schema and the data never disagree.
+
+<Example
+  code={editTheCategories}
+  title="Rename, remove, add"
+  blurb="The domain and the rows move together."
+  try={(
+    <>
+      <b>Double-click</b> a swatch to rename · <b>click</b> a × to remove · <b>double-click</b> the ＋ to add.
+    </>
+  )}
+/>
+
+The same edit works on an axis — `axisX({ edit: edit.scale.categories() })` — because both draw a scale.
+
+Where one scale spans several columns, every one is written — including columns in **different tables**. A category is one vocabulary however many columns share it, so renaming it in one table and not the other would split it in two.
+
+<Example
+  code={oneVocabularyTwoTables}
+  title="One vocabulary across two tables"
+  blurb="`team` is declared on both nodes and links; renaming writes both schemas and both row sets."
+  try={(
+    <>
+      <b>Double-click</b> a swatch and rename it — the nodes and the ties move together.
+    </>
+  )}
+/>
+
+`edit.axis.categories()` is the old spelling and still works, with a deprecation warning.
 
 </Section>
 

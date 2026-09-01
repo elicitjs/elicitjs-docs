@@ -28,7 +28,6 @@ mount(Elicit({
     // defaults to the chart's selection, so there is no findIndex to keep in sync.
     legendColor({
       anchor: "right",
-      title: "group",
       edit: edit.legend.category(),
     }),
   ],

@@ -14,7 +14,7 @@ export default function Layout({ children }) {
 
 # Editing — the inverse of encoding
 
-<Lead>Attach an edit to a channel and a gesture writes that channel back to the data through the same scale. An edit is a small descriptor — `gesture` (drag / click / dblclick), `pick` (direct / nearest / plane), `when` (arbitration), `constrain`, and `guide` — with an `apply` that does the inverting. The named factories (`move`, `resize`, `rotate`, `cycle`, …) are just presets over `makeEdit` with a fixed `apply`; see [Gestures](/editing/gestures) for the full set. Place an edit on a channel (`channels.y.edit`) or at mark level (`edits: [...]`).</Lead>
+<Lead>Attach an edit to a channel and a gesture writes that channel back to the data through the same scale. An edit is a descriptor — `gesture` (`drag` / `click` / `dblclick`), `pick` (`direct` / `nearest` / `plane` / `probe` / `sweep`), `when` (arbitration), `constrain`, and `guide` — with an `apply` that performs the inversion. Declare edits on a channel (`channels.y.edit`), at mark level (`edits: [...]`), or on [legends](/editing/legend) and [axes](/editing/axis).</Lead>
 
 <ApiReference entries={api} />
 

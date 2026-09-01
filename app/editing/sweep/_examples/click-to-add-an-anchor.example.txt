@@ -1,0 +1,25 @@
+mount(Elicit({
+  width: 380, height: 220,
+  margins: { top: 16, right: 16, bottom: 28, left: 34 },
+  data: [
+    { step: 1, val: 20 },
+    { step: 2, val: 50 },
+    { step: 3, val: 35 },
+  ],
+  schema: {
+    step: { type: "quantitative", domain: [1, 6] },
+    val:  { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    line({
+      stroke: "#2563eb",
+      channels: {
+        x: { field: "step" },
+        y: { field: "val", edit: move() },
+      },
+      edits: [
+        edit.line.anchor({ into: "nearest" }),
+      ],
+    }),
+  ],
+}));

@@ -81,7 +81,9 @@ Each facial parameter is a channel; bind it to a field with a named `set()` edit
 
 <Section id="selection" title="Driving the selection">
 
-Selection is **pipeline state**, not a data column — so it has its own external API beside `getData`/`setData`, and its own `select` event. `el.select(index)` picks a **specific item**; `el.selectWhere(field, value)` picks by **category** (the first row matching). Both go through the same path a click on a mark does (`edit.select()`), so the selected row gets the highlight outline and a legend picker edits it — whichever input moved the selection. `on("select")` reports the change; `getData` and `on("change")` stay silent, because no belief data moved.
+Selection is **pipeline state**, not a data column — so it has its own external API beside `getData`/`setData`, and its own `select` event. `el.select(index)` picks a **specific item**; `el.selectWhere(field, value)` picks by **category** (the first row matching, or every one with `{ all: true }`). Both go through the same path a click on a mark does (`edit.select()`), so the selected row gets the highlight outline and a legend picker edits it — whichever input moved the selection. `on("select")` reports the change; `getData` and `on("change")` stay silent, because no belief data moved.
+
+Pass an array to `el.select` for several rows at once. See [Selection](/editing/selection) for the whole model — multi-select, the `selected` effect, and the edits that read it.
 
 <Example
   code={selectItemOrCategory}

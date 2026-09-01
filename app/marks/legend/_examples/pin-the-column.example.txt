@@ -1,0 +1,23 @@
+mount(Elicit({
+  width: 340, height: 190,
+  margins: { top: 20, right: 16, bottom: 20, left: 20 },
+  data: [ { now: "low", goal: "mid" } ],
+  schema: {
+    now:  { type: "categorical", domain: ["low", "mid", "high"] },
+    goal: { type: "categorical", domain: ["low", "mid", "high"] },
+  },
+  axes: false,
+  marks: [
+    // Two marks put DIFFERENT columns on `fill`. That is two encodings, so it
+    // is two scales — different colour families, not one shared vocabulary.
+    point({ size: 22, channels: { x: { value: 60 }, y: { value: 70 }, fill: { field: "now" } } }),
+    point({ size: 22, channels: { x: { value: 60 }, y: { value: 115 }, fill: { field: "goal" } } }),
+    text({ text: "now",  channels: { x: { value: 95 }, y: { value: 74 } }, textAnchor: "start", fontSize: 12 }),
+    text({ text: "goal", channels: { x: { value: 95 }, y: { value: 119 } }, textAnchor: "start", fontSize: 12 }),
+    // `field` NAMES the encoding each legend is a key for — the one case where
+    // it is required, because the channel alone no longer identifies a scale.
+    // It doubles as the title, so neither legend restates anything.
+    legendColor({ anchor: "right", field: "now",  edit: edit.legend.category() }),
+    legendColor({ anchor: "right", field: "goal", edit: edit.legend.category() }),
+  ],
+}))

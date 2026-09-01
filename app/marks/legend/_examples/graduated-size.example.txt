@@ -1,0 +1,24 @@
+const rows = [
+  { city: "A", x: 20, y: 70, people: 120 },
+  { city: "B", x: 55, y: 40, people: 640 },
+  { city: "C", x: 85, y: 76, people: 980 },
+  { city: "D", x: 38, y: 22, people: 320 },
+];
+mount(Elicit({
+  width: 400, height: 230,
+  margins: { top: 20, right: 20, bottom: 24, left: 24 },
+  axes: false,
+  data: rows,
+  schema: {
+    city:   { type: "categorical", domain: ["A", "B", "C", "D"] },
+    x:      { type: "quantitative", domain: [0, 100] },
+    y:      { type: "quantitative", domain: [0, 100] },
+    people: { type: "quantitative", domain: [0, 1000] },
+  },
+  marks: [
+    point({ fill: "#4f46e5", fillOpacity: 0.5, channels: {
+      x: { field: "x" }, y: { field: "y" }, size: { field: "people" },
+    } }),
+    legendSize({ anchor: "right" }),
+  ],
+}))

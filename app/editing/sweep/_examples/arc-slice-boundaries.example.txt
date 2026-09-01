@@ -1,0 +1,24 @@
+mount(Elicit({
+  width: 300, height: 260,
+  margins: { top: 20, right: 20, bottom: 20, left: 20 },
+  axes: false,
+  data: [
+    { cat: "A", val: 50 },
+    { cat: "B", val: 30 },
+    { cat: "C", val: 20 },
+  ],
+  schema: {
+    cat: { type: "categorical" },
+    val: { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    pie({
+      outerRadius: 95,
+      edits: [edit.stack.edge()],
+      channels: {
+        value: { field: "val" },
+        fill: { field: "cat" },
+      },
+    }),
+  ],
+}));

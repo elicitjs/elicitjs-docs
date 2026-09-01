@@ -32,17 +32,17 @@ export const api: ApiEntry[] = [
     ),
   },
   {
-    name: "edit.axis.categories(options)",
-    summary: "Categorical / ordinal axis — add, rename and remove categories. Reuses the inline-typing lifecycle: double-click the \"＋\" to add, double-click a label to rename, click its \"×\" to remove.",
+    name: "edit.scale.categories(options)",
+    summary: "Categorical / ordinal SCALE — add, rename and remove categories, from any element that draws it (an axis or a legend). Reuses the inline-typing lifecycle: double-click the \"＋\" to add, double-click a label or swatch to rename, click its \"×\" to remove. Renaming and removing write every column on the scale, in every table it spans.",
     signatures: [
-      "edit.axis.categories({ field, mode }) → Edit[]",
+      "edit.scale.categories({ field, mode }) → Edit[]",
     ],
     options: [
       {
         name: "field",
         type: "string",
         default: "first on axis",
-        desc: "The categorical field whose domain (and rows, on rename/remove) to edit.",
+        desc: "The categorical field whose domain (and rows, on rename/remove) to edit. Unset, every field on the scale is written.",
       },
       {
         name: "mode",

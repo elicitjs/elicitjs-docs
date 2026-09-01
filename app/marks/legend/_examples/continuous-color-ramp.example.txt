@@ -21,6 +21,6 @@ mount(Elicit({
         fill: { field: "temp" },
       },
     }),
-    legendColor({ anchor: "right", title: "temp" }),
+    legendColor({ anchor: "right" }),
   ],
 }))

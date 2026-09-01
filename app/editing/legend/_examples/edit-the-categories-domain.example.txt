@@ -1,0 +1,26 @@
+mount(Elicit({
+  width: 380, height: 220,
+  margins: { top: 20, right: 16, bottom: 28, left: 40 },
+  data: [
+    { cat: "Alpha", val: 30 },
+    { cat: "Beta", val: 55 },
+    { cat: "Gamma", val: 40 },
+  ],
+  schema: {
+    cat: { type: "categorical", domain: ["Alpha", "Beta", "Gamma"] },
+    val: { type: "quantitative", domain: [0, 60] },
+  },
+  marks: [
+    barY({
+      channels: {
+        x: { field: "cat" },
+        y: { field: "val" },
+        fill: { field: "cat" },
+      },
+    }),
+    legendColor({
+      anchor: "right",
+      edit: edit.scale.categories(),
+    }),
+  ],
+}));

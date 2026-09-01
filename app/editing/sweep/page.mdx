@@ -7,25 +7,28 @@ import { api } from './api';
 
 import drawACurve from './_examples/draw-a-curve.example.txt';
 import twoLinesSweptIndependently from './_examples/two-lines-swept-independently.example.txt';
+import clickToAddAnAnchor from './_examples/click-to-add-an-anchor.example.txt';
+import cutAStack from './_examples/cut-a-stack.example.txt';
+import arcSliceBoundaries from './_examples/arc-slice-boundaries.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Sweep (you-draw-it)
+# Mark-specific & path edits
 
-<Lead>`edit.line.sweep()` is a drag that repaints each point’s value as the pointer crosses its column — the NYT “you draw it” interaction. It is sugar over `move({ pick: "sweep", guide: true })`, and it is series-scoped: it locks onto the nearest line at drag-start and paints only that one.</Lead>
+<Lead>Certain marks maintain multi-row or geometric invariants that require specialised edits. `edit.line.sweep()` repaints points across columns, `edit.line.anchor()` builds connected paths, and `edit.stack.edge()` and `edit.stack.cut()` reallocate slices in pies and stacked bars.</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="sweep" title="Sweep a single line">
+<Section id="sweep" title="Line sweep (you-draw-it)">
 
-Press and drag horizontally; every point the pointer passes takes the pointer’s value.
+`edit.line.sweep()` updates each point's value as the pointer crosses its horizontal column — the canonical "you-draw-it" interaction. The $x$ coordinates remain fixed while the curve conforms to the gesture.
 
 <Example
   code={drawACurve}
-  title="Draw a curve"
-  blurb={"edit: move({ pick: \"sweep\" }) on the value channel; the x positions stay fixed."}
+  title="Sweep to shape a curve"
+  blurb={"edit: move({ pick: \"sweep\" }) on the y channel paints values as you drag horizontally."}
   try={(
     <>
       <b>Sweep</b> left-to-right across the chart.
@@ -35,17 +38,64 @@ Press and drag horizontally; every point the pointer passes takes the pointer’
 
 </Section>
 
-<Section id="series" title="Series-scoped sweep">
+<Section id="series" title="Series-scoped multi-line sweeps">
 
-With multiple lines, a sweep locks onto the nearest line at drag-start and paints only it — the others hold. Grouping comes from the stroke field.
+When multiple lines share a plot, a sweep locks onto the nearest line at drag-start and paints only that series. Other series remain untouched.
 
 <Example
   code={twoLinesSweptIndependently}
-  title="Two lines, swept independently"
-  blurb="The sweep touches only the line it started nearest to."
+  title="Two lines swept independently"
+  blurb="The sweep locks onto the closest series at the start of the drag."
   try={(
     <>
-      <b>Sweep</b> over one line to reshape it; the other stays put.
+      <b>Sweep</b> over one line to reshape it; the other remains fixed.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="anchors" title="Line anchors & freehand paths">
+
+`edit.line.anchor()` appends new points to the nearest line or starts a fresh series in empty space. `edit.line.draw()` samples pointer movement to record freehand continuous strokes.
+
+<Example
+  code={clickToAddAnAnchor}
+  title="Click to add an anchor"
+  blurb="Clicking empty space appends the next anchor point to the line."
+  try={(
+    <>
+      <b>Drag</b> an existing point, or <b>click</b> empty space to append an anchor.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="stacks-and-arcs" title="Arc slices & stacked bars">
+
+Stacked marks (such as `pie`, `donut`, and `barY`) use `edit.stack.edge()` and `edit.stack.cut()` to modify proportions while holding the total constant.
+
+`edit.stack.edge()` lets you drag interior seams between segments. `edit.stack.cut()` clicks inside a segment to split it into distinct categories drawn from the schema domain.
+
+<Example
+  code={cutAStack}
+  title="Cut a stack into categories"
+  blurb="Click inside a 100% bar to cut it into categories; drag seams to adjust proportions."
+  try={(
+    <>
+      <b>Click</b> inside the bar to cut it into asset categories · <b>drag</b> seams to rebalance.
+    </>
+  )}
+/>
+
+<Example
+  code={arcSliceBoundaries}
+  title="Pie slice boundary redistribution"
+  blurb="edit.stack.edge() on a pie mark redistributes adjacent shares."
+  try={(
+    <>
+      <b>Drag</b> any slice seam to shift proportions between adjacent categories.
     </>
   )}
 />

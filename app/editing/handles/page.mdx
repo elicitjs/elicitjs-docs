@@ -1,0 +1,77 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import visibleVsInvisibleHandles from './_examples/visible-vs-invisible-handles.example.txt';
+import boundaryHandlesPie from './_examples/boundary-handles-pie.example.txt';
+import brushSpanHandles from './_examples/brush-span-handles.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Handles & affordances
+
+<Lead>Handles give continuous geometries — curves, envelopes, partition seams, and interval spans — explicit grab targets. They bridge visual clarity and physical affordance: use visible circular grips, enlarged invisible hit targets (`handles: 'hit'`), or boundary seams. All marks share the same sizing, colour, and hit-testing contract.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="contract" title="Visible grips vs. invisible hit targets">
+
+Continuous geometries like lines and area fills have no natural individual nodes to grab. Handles supply the grab targets.
+
+`handles: true` draws visible circular grips on each vertex. `handles: 'hit'` renders no visible circles, but keeps the enlarged pointer hit targets along the path — keeping editorial charts uncluttered while remaining easy to drag. `handles: false` disables interaction on that mark.
+
+<Example
+  code={visibleVsInvisibleHandles}
+  title="Invisible hit targets (handles: 'hit')"
+  blurb="handles: 'hit' leaves no visible dots, but lets you drag along the top edge."
+  try={(
+    <>
+      <b>Drag</b> along the top edge of the area to reshape the distribution.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="seams" title="Boundary seams (arcs & stacked bars)">
+
+On partitions and shares, handles appear at the **interior boundaries** between adjacent slices. An _n_-slice pie or stacked bar carries _n_ − 1 boundary handles.
+
+`edit.stack.edge()` lets you drag any interior boundary to redistribute value between the two adjacent slices. The shared total remains constant.
+
+<Example
+  code={boundaryHandlesPie}
+  title="Drag slice boundaries"
+  blurb="Each handle pair-shifts adjacent shares while preserving the 100% total."
+  try={(
+    <>
+      <b>Drag</b> any slice boundary to reallocate share between categories.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="spans" title="Span endpoints & body brushes">
+
+On marks with explicit ranges (`x1`/`x2` or `y1`/`y2`), handles sit at the span endpoints.
+
+`brushSpan()` provides two distinct behaviours on one mark: grab near an edge handle to resize just that bound, or grab the middle body to translate the entire span. Dragging the lower handle past the upper handle automatically flips the fields to preserve ordering without visual jumps.
+
+<Example
+  code={brushSpanHandles}
+  title="Resize edges or drag span body"
+  blurb="Grab within edgeInset pixels to resize an endpoint; grab the centre to slide the task."
+  try={(
+    <>
+      <b>Drag</b> an end handle to resize · <b>drag</b> the bar body to move the whole range.
+    </>
+  )}
+/>
+
+</Section>

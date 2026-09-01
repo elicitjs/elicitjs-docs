@@ -1,0 +1,115 @@
+// Ableton-style knob: a donut-slice ring (track + value fill) plus a needle.
+// The ring is a tiny mark over authoring.arcPath; the needle carries rotate().
+// Stock arc/donut partition a total among rows — a knob's fill is one value
+// swept from the arc's start, so the ring is a short authoring mark instead.
+const START = 225; // ~7 o'clock
+const END = -45;   // ~5 o'clock — 270° clockwise through the top
+
+function knobArc(options = {}) {
+  const opts = authoring.normalizeMarkOptions(options, {
+    mark: "knobArc",
+    allow: ["outerRadius", "innerRadius", "start", "end", "track"],
+  });
+  const {
+    channels = {},
+    outerRadius = 90,
+    innerRadius = 78,
+    start = START,
+    end = END,
+    track = "#1a1a1a",
+  } = opts;
+  return {
+    ...authoring.markCommon(opts),
+    markName: "knobArc",
+    channels,
+    build(data, scales, width, height) {
+      const cx = width / 2, cy = height / 2;
+      return data.flatMap((d, i) => {
+        const deg = authoring.encodeAngle(scales, channels, d, start, i, data);
+        const style = authoring.resolveStyle(
+          scales, channels, d, { fill: "#00aebc" }, i, data,
+        );
+        const nodes = [];
+        const trackD = authoring.arcPath(cx, cy, outerRadius, start, end, { innerRadius });
+        if (trackD) {
+          nodes.push({
+            type: "path", d: trackD, fill: track, stroke: "none",
+            data: d, index: i, pointerEvents: "none",
+          });
+        }
+        const fillD = authoring.arcPath(cx, cy, outerRadius, start, deg, { innerRadius });
+        if (fillD) {
+          nodes.push({
+            type: "path", d: fillD, ...style, stroke: "none",
+            data: d, index: i, pointerEvents: "none",
+          });
+        }
+        // Max tick — the small end-cap Ableton puts at 5 o'clock.
+        const tip = authoring.polarToXY(cx, cy, (outerRadius + innerRadius) / 2, end);
+        nodes.push({
+          type: "circle", cx: tip.x, cy: tip.y, r: 2.5,
+          fill: track, stroke: "none",
+          data: d, index: i, pointerEvents: "none",
+        });
+        return nodes;
+      });
+    },
+  };
+}
+
+mount(Elicit({
+  width: 260, height: 280,
+  margins: { top: 40, right: 24, bottom: 44, left: 24 },
+  axes: false,
+  theme: { background: "#323232", ink: "#b4b4b4" },
+  data: [{ level: 25 }],
+  schema: { level: { type: "quantitative", domain: [0, 100] } },
+  marks: [
+    composite({
+      id: "knob",
+      parts: [
+        text({
+          fontSize: 13, dy: -108,
+          channels: {
+            text: { value: "Compress" },
+            fill: { value: "#b4b4b4" },
+            textAnchor: { value: "middle" },
+            lineAnchor: { value: "middle" },
+          },
+        }),
+        knobArc({
+          outerRadius: 88, innerRadius: 76,
+          start: START, end: END,
+          track: "#1a1a1a",
+          channels: {
+            angle: { field: "level", scale: { range: [START, END] } },
+            fill: { value: "#00aebc" },
+          },
+        }),
+        needle({
+          start: START, end: END,
+          length: 70, baseWidth: 2.5,
+          handles: "hit",
+          fill: "#1a1a1a", stroke: "#1a1a1a",
+          channels: {
+            angle: {
+              field: "level",
+              scale: { range: [START, END] },
+              edit: rotate({ pivot: "mark", fold: false, pick: "direct" }),
+            },
+          },
+        }),
+        text({
+          fontSize: 14, dy: 108,
+          format: (v) => `${Math.round(v)} %`,
+          channels: {
+            text: { field: "level" },
+            fill: { value: "#b4b4b4" },
+            textAnchor: { value: "middle" },
+            lineAnchor: { value: "middle" },
+          },
+        }),
+      ],
+    }),
+  ],
+}))

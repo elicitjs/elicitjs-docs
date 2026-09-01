@@ -3,78 +3,63 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "edit.line.sweep(options)",
-    summary: (
-      <>
-        Line-scoped (<code className="inline">scope: "line"</code>). Sugar over <code className="inline">move({'{'} pick: "sweep", guide: true {'}'})</code>: a drag repaints the value of each point the pointer crosses, locked to one series.
-      </>
-    ),
-    signatures: [
-      "edit.line.sweep(options?) → Edit",
-    ],
+    summary: "Sweep across columns to repaint curve points sequentially.",
+    signature: "edit.line.sweep(options?) → Edit",
     options: [
       {
-        name: "options",
-        type: "object",
-        default: "{}",
-        desc: (
-          <>
-            Any shared Edit fields — <code className="inline">channels</code>, <code className="inline">when</code>, <code className="inline">threshold</code>, <code className="inline">constrain</code>. <code className="inline">pick</code>/<code className="inline">guide</code>/<code className="inline">scope</code> are preset.
-          </>
-        ),
+        name: "guide",
+        type: "boolean",
+        default: "true",
+        desc: "Draw tracking indicators along the swept column.",
       },
     ],
-    returns: (
-      <>
-        An <b>Edit</b> the engine routes through the <code className="inline">sweep</code> driver (locks the nearest line at drag-start).
-      </>
-    ),
   },
   {
     name: "edit.line.draw(options)",
-    summary: (
-      <>
-        The authoring counterpart: near an existing line it edits (sweeps) it; in empty space it draws a new one — you-draw-it for domain lines, freehand for <code className="inline">order:"sequence"</code>.
-      </>
-    ),
-    signatures: [
-      "edit.line.draw({ along, value, samples, minDist, threshold, into }) → Edit",
-    ],
+    summary: "Freehand path sampling or you-draw-it upsert on line marks.",
+    signature: "edit.line.draw({ along, value, samples, minDist, threshold, into }) → Edit",
     options: [
       {
         name: "along / value",
         type: "'x' | 'y'",
         default: "'x' / 'y'",
-        desc: "The positional axes — the independent axis to draw along, and the value axis.",
+        desc: "Independent axis to draw along, and the dependent value axis.",
       },
       {
         name: "samples",
         type: "number | any[]",
         default: "ticks",
-        desc: "Domain grid the you-draw-it upsert snaps to.",
-      },
-      {
-        name: "minDist",
-        type: "number",
-        default: "8",
-        desc: "Freehand pointer-sampling distance in pixels.",
-      },
-      {
-        name: "threshold",
-        type: "number",
-        default: "40",
-        desc: "Proximity radius for the edit-vs-draw decision.",
+        desc: "Domain grid points that you-draw-it snaps to.",
       },
       {
         name: "into",
         type: "'nearest' | 'new'",
         default: "'nearest'",
-        desc: "Near edits / far draws, or always draw a fresh line.",
+        desc: "Append to the nearest line or start a fresh series.",
       },
     ],
-    returns: (
-      <>
-        An <b>Edit</b> routed through the <code className="inline">draw</code> driver (owns the per-drag mode lock).
-      </>
-    ),
+  },
+  {
+    name: "edit.line.anchor(options)",
+    summary: "Click to add sequential anchor points to a line.",
+    signature: "edit.line.anchor({ into, gesture }) → Edit",
+    options: [
+      {
+        name: "into",
+        type: "'nearest' | 'new'",
+        default: "'nearest'",
+        desc: "Add point to the closest existing series or start a new series.",
+      },
+    ],
+  },
+  {
+    name: "edit.stack.edge()",
+    summary: "Drag boundary seams between slices or stacked segments to redistribute shares.",
+    signature: "edit.stack.edge(options?) → Edit",
+  },
+  {
+    name: "edit.stack.cut()",
+    summary: "Click inside a stacked segment to divide it into multiple categories from the schema domain.",
+    signature: "edit.stack.cut(options?) → Edit",
   },
 ];

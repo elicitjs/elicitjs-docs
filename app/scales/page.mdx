@@ -11,6 +11,7 @@ import symlogAndADivergingRamp from './_examples/symlog-and-a-diverging-ramp.exa
 import logSqrtAnAdoptedD3Scale from './_examples/log-sqrt-an-adopted-d3-scale.example.txt';
 import ordinalPalette from './_examples/ordinal-palette.example.txt';
 import aDiscreteGrid from './_examples/a-discrete-grid.example.txt';
+import orderedVsUnorderedColour from './_examples/ordered-vs-unordered-colour.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -94,6 +95,35 @@ A categorical field on a colour channel resolves through the ordinal palette —
   title="Ordinal palette"
   blurb={"fill: { field: \"kind\" } assigns palette colours across the category domain."}
 />
+
+</Section>
+
+<Section id="ordered-colour" title="Ordered data gets an ordered ramp">
+
+Colour follows the field's **measure**, not just its scale. `categorical` values are unordered, so they get distinct hues. `ordinal` values run low to high, so they get a **ramp sampled to one swatch per category** — light to dark, in order. A Likert scale reads as a scale rather than as four unrelated colours.
+
+Declare the difference and the colour follows:
+
+```js
+agree: { type: "ordinal",     domain: ["disagree", "neutral", "agree", "strongly agree"] }
+team:  { type: "categorical", domain: ["north", "south", "east"] }
+```
+
+<Example
+  code={orderedVsUnorderedColour}
+  title="Ordinal above, categorical below"
+  blurb="One ramp for the ordered field, distinct hues for the unordered one."
+/>
+
+Use `categorical` for a group identifier even when you happen to list it in an order — a series key is not an ordered scale.
+
+</Section>
+
+<Section id="two-encodings-colour" title="Two encodings on one channel">
+
+A scale belongs to one **encoding** — a (channel, field) pair — so two marks colouring by *different* fields get two scales, each with its own domain and its own legend. They also get different scheme **families**, so the two are perceptually distinct rather than sharing one palette's slots.
+
+Two marks colouring by the *same* field share one scale, one set of colours, and one legend: that is what makes a shared colour mean a shared value.
 
 </Section>
 

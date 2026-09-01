@@ -61,9 +61,12 @@ export default function TestPage() {
     if (!host) return;
 
     const chart = buildChart();
-    host.replaceChildren(chart);
-    setRows(chart.getData());
-    const unsub = chart.on("change", () => setRows(chart.getData()));
+    const updateRows = () => {
+      const data = chart.getData();
+      setRows(Array.isArray(data) ? (data as Record<string, unknown>[]) : []);
+    };
+    updateRows();
+    const unsub = chart.on("change", updateRows);
 
     return () => {
       unsub();

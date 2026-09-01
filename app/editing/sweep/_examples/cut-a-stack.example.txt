@@ -1,0 +1,25 @@
+mount(Elicit({
+  width: 380, height: 220,
+  margins: { top: 16, right: 16, bottom: 28, left: 40 },
+  data: [
+    { year: "2024", share: 100, asset: "Stocks" },
+  ],
+  schema: {
+    year:  { type: "categorical", domain: ["2024"] },
+    asset: { type: "categorical", domain: ["Stocks", "Bonds", "Cash", "Real Estate"] },
+    share: { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    barY({
+      channels: {
+        x: { field: "year" },
+        y: { field: "share" },
+        fill: { field: "asset" },
+      },
+      edits: [
+        edit.stack.cut(),
+        edit.stack.edge(),
+      ],
+    }),
+  ],
+}));

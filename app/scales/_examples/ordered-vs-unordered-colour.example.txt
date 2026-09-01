@@ -1,0 +1,31 @@
+const rows = [
+  { q: "Q1", agree: "disagree", team: "north" },
+  { q: "Q2", agree: "neutral",  team: "south" },
+  { q: "Q3", agree: "agree",    team: "north" },
+  { q: "Q4", agree: "strongly agree", team: "east" },
+];
+mount(Elicit({
+  width: 420, height: 210,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  schema: {
+    q: { type: "categorical", domain: ["Q1", "Q2", "Q3", "Q4"] },
+    // ORDERED: the values run low -> high, so colour should too.
+    agree: { type: "ordinal", domain: ["disagree", "neutral", "agree", "strongly agree"] },
+    // UNORDERED: three labels with no sequence.
+    team: { type: "categorical", domain: ["north", "south", "east"] },
+  },
+  data: rows,
+  legends: true,
+  marks: [
+    point({ size: 13, channels: {
+      x: { field: "q" },
+      y: { value: 60 },
+      fill: { field: "agree" },
+    } }),
+    point({ size: 13, channels: {
+      x: { field: "q" },
+      y: { value: 110 },
+      fill: { field: "team" },
+    } }),
+  ],
+}))

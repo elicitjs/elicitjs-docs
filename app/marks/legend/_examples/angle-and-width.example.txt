@@ -1,0 +1,26 @@
+const rows = [
+  { site: "A", x: 60,  bearing: 20,  flow: 2 },
+  { site: "B", x: 140, bearing: 75,  flow: 6 },
+  { site: "C", x: 220, bearing: 130, flow: 9 },
+];
+mount(Elicit({
+  width: 460, height: 210,
+  margins: { top: 18, right: 18, bottom: 22, left: 22 },
+  axes: false,
+  data: rows,
+  schema: {
+    site:    { type: "categorical",  domain: ["A", "B", "C"] },
+    x:       { type: "quantitative", domain: [0, 280] },
+    bearing: { type: "quantitative", domain: [0, 180] },
+    flow:    { type: "quantitative", domain: [0, 10] },
+  },
+  marks: [
+    // A needle per site: its ANGLE reads bearing, its WIDTH reads flow.
+    needle({ channels: {
+      x: { field: "x" },
+      y: { value: 90 },
+      angle: { field: "bearing", legend: { anchor: "right" } },
+      strokeWidth: { field: "flow", legend: { anchor: "right" } },
+    } }),
+  ],
+}))

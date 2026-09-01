@@ -11,8 +11,8 @@ mount(Elicit({
     n:    { type: "quantitative", domain: [0, 100] },
     team: { type: "categorical", domain: ["north", "south"] },
   },
-  // One legend per non-positional channel bound to a field. For per-channel
-  // config: `legends: { fill: { anchor: "top" }, size: false }`.
+  // One legend per ENCODING — per (channel, field) pair, not per channel.
+  // For per-channel config: `legends: { fill: { anchor: "top" }, size: false }`.
   legends: true,
   marks: [
     bar({
