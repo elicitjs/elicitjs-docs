@@ -198,7 +198,7 @@ export const MARKS: MarkManifestEntry[] = [
   // 5. Polar & Gauges
   {
     family: 'arc',
-    label: 'Arc · Pie · Donut',
+    label: 'Arc · Donut',
     category: 'Polar & gauges',
     docHref: '/marks/arc',
     api: arcApi,

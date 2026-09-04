@@ -2,15 +2,14 @@ import type { ApiEntry } from '../../../lib/types';
 
 export const api: ApiEntry[] = [
   {
-    name: "arc(options) · pie(options) · donut(options)",
+    name: "arc(options) · donut(options)",
     summary: (
       <>
-        Import from <code className="inline">elicit.plot</code>. <code className="inline">pie</code> / <code className="inline">donut</code> are thin wrappers.
+        Import from <code className="inline">elicit.plot</code>. <code className="inline">donut</code> is <code className="inline">arc</code> with a default inner radius. A full pie is just <code className="inline">arc()</code>.
       </>
     ),
     signatures: [
       "arc({ channels, outerRadius, innerRadius, padAngle, arc, start, end }) → Feature",
-      "pie(options) → Feature",
       "donut(options) → Feature",
     ],
     options: [

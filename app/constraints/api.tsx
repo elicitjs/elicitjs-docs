@@ -11,7 +11,6 @@ export const api: ApiEntry[] = [
     signatures: [
       "clamp({ min, max, field }) → Constraint",
       "maintainSum({ targetSum, field, mode }) → Constraint",
-      "normalize({ field, targetSum }) → Constraint",
       "count({ max, strategy }) → Constraint",
       "unique({ field, max, strategy }) → Constraint",
       "snap({ field, step, origin }) → Constraint",

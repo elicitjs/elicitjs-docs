@@ -12,7 +12,7 @@ mount(Elicit({
   },
   legends: true,
   marks: [
-    pie({
+    arc({
       outerRadius: 100,
       channels: {
         value: { field: "share" },

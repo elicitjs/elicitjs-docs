@@ -3,7 +3,8 @@ node_modules/
 
 # Next.js
 .next/
-out/
+# `next export` output at the repo root only — figures/out/ is a committed artefact.
+/out/
 
 # Env
 .env
@@ -28,3 +29,5 @@ pnpm-debug.log*
 
 # TypeScript
 tsconfig.tsbuildinfo
+
+figures

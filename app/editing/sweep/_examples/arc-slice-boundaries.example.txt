@@ -12,7 +12,7 @@ mount(Elicit({
     val: { type: "quantitative", domain: [0, 100] },
   },
   marks: [
-    pie({
+    arc({
       outerRadius: 95,
       edits: [edit.stack.edge()],
       channels: {

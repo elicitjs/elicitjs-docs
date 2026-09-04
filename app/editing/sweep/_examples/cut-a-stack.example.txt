@@ -11,6 +11,7 @@ mount(Elicit({
   },
   marks: [
     barY({
+      stack: true,
       channels: {
         x: { field: "year" },
         y: { field: "share" },

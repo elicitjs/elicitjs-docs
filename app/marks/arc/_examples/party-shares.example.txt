@@ -12,7 +12,7 @@ mount(Elicit({
     share: { type: "quantitative", domain: [0, 100] },
   },
   marks: [
-    pie({
+    arc({
       outerRadius: 100,
       channels: {
         value: { field: "share" },
