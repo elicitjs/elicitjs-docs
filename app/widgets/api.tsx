@@ -21,7 +21,7 @@ export const api: ApiEntry[] = [
       "histogram({ question, bins, max, onChange }) → ElicitSpec",
       "region({ question, xDomain, yDomain, onChange }) → ElicitSpec",
       "thermometer({ question, domain, step, value, onChange }) → ElicitSpec",
-      "labeledValue({ question, mode, value, domain, onChange }) → ElicitSpec",
+      "labeledValue({ question, input, value, domain, onChange }) → ElicitSpec",
     ],
     options: [
       {

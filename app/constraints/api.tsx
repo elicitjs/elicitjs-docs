@@ -10,11 +10,11 @@ export const api: ApiEntry[] = [
     ),
     signatures: [
       "clamp({ min, max, field }) → Constraint",
-      "maintainSum({ targetSum, field, mode }) → Constraint",
+      "maintainSum({ targetSum, field, strategy }) → Constraint",
       "count({ max, strategy }) → Constraint",
       "unique({ field, max, strategy }) → Constraint",
       "snap({ field, step, origin }) → Constraint",
-      "ordering({ fields, lower, upper, mode }) → Constraint",
+      "ordering({ fields, lower, upper, strategy }) → Constraint",
       "monotonic({ field, along, dir, series }) → Constraint",
       "spacing({ field, min, series }) → Constraint",
     ],
@@ -38,22 +38,12 @@ export const api: ApiEntry[] = [
         desc: "Target total for the field.",
       },
       {
-        name: "maintainSum.mode",
+        name: "maintainSum.strategy",
         type: "'cap' | 'normalize' | 'redistribute'",
         default: "'cap'",
         desc: (
           <>
             <code className="inline">cap</code> bounds the touched datum (≤ sum); <code className="inline">normalize</code> scales all values to exact sum; <code className="inline">redistribute</code> holds the edited value and proportionally adjusts siblings.
-          </>
-        ),
-      },
-      {
-        name: "normalize",
-        type: "sugar",
-        default: "—",
-        desc: (
-          <>
-            Shortcut for <code className="inline">maintainSum({'{'} mode: "normalize", targetSum: 1 {'}'})</code>.
           </>
         ),
       },
@@ -98,7 +88,7 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "ordering.mode",
+        name: "ordering.strategy",
         type: "'push' | 'block'",
         default: "'push'",
         desc: (
