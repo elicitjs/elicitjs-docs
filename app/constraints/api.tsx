@@ -151,14 +151,14 @@ export const api: ApiEntry[] = [
     ),
   },
   {
-    name: "constraints.defineConstraint(reducer, meta?)",
+    name: "constraints.custom(reducer, meta?)",
     summary: (
       <>
-        Author your own (aliased <code className="inline">constraints.defineConstraint</code>). The reducer gets a pure-data context and returns the shape that’s natural.
+        Author your own. One word for “author your own X” in every grammar namespace — cf. <code className="inline">edit.custom</code> and <code className="inline">guides.custom</code>. (<code className="inline">authoring.defineConstraint</code> is the same function, under the name a mark author reaches for.) The reducer gets a pure-data context and returns the shape that’s natural.
       </>
     ),
     signatures: [
-      "constraints.defineConstraint(({ data, oldData, activeIndex, active, field, value, domain }) => result, meta?) → Constraint",
+      "constraints.custom(({ data, oldData, activeIndex, active, field, value, domain }) => result, meta?) → Constraint",
     ],
     options: [
       {

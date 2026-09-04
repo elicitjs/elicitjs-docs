@@ -17,7 +17,7 @@ mount(Elicit({
       // Invariant on the DATA: the centre stays within the ends. A cap drag and a
       // dot drag are different marks, but one rule gates both.
       constraints: [
-        defineConstraint(({ active }) => active
+        custom(({ active }) => active
           ? { hi: Math.max(active.hi, active.mean), lo: Math.min(active.lo, active.mean) }
           : undefined),
       ],

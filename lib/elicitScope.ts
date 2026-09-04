@@ -62,8 +62,9 @@ export function createElicitScope() {
     resolveTheme: elicit.resolveTheme,
     // The box a padded note occupies — `sticker`'s own sizing rule. An example
     // gives it to `link({ channels: { nodeWidth: … } })` so a connector docks to
-    // the edge of an auto-sized note.
-    noteBox: elicit.noteBox,
+    // the edge of an auto-sized note. It lives in the authoring kit: it can only
+    // ever appear inside a `{ fn }` channel, so it is never a spec keyword.
+    noteBox: elicit.authoring.noteBox,
     d3,
     vancouver,
   };
