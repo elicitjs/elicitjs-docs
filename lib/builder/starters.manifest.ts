@@ -43,7 +43,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: {},
           style: { fill: '#3b82f6', stroke: '#1d4ed8', strokeWidth: 1 },
           edits: [],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -59,7 +58,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { dy: -10 },
           style: { fill: '#1e293b', fontSize: 11 },
           edits: [],
-          constraints: [],
         },
       ],
       guides: [
@@ -123,7 +121,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { curve: 'catmullRom' },
           style: { stroke: '#2563eb', strokeWidth: 3 },
           edits: [],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -142,7 +139,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: {},
           style: { fill: '#1d4ed8', size: 6 },
           edits: [],
-          constraints: [],
         },
       ],
       guides: [
@@ -202,7 +198,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { render: 'gradient', levels: 5, distribution: 'normal', handles: true },
           style: { fill: '#7c3aed', opacity: 0.25 },
           edits: [],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -225,7 +220,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { handles: true, handleSize: 6 },
           style: { stroke: '#7c3aed', strokeWidth: 3 },
           edits: [],
-          constraints: [],
         },
       ],
       guides: [
@@ -273,7 +267,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           edits: [
             { id: createId('e'), name: 'edit.stack.edge', options: {} }
           ],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -291,7 +284,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: {},
           style: {},
           edits: [],
-          constraints: [],
         }
       ],
       guides: [
@@ -346,7 +338,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: {},
           style: { size: 10 },
           edits: [],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -358,7 +349,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: {},
           style: { stroke: '#e2e8f0', strokeWidth: 2 },
           edits: [],
-          constraints: [],
         }
       ],
       guides: [],
@@ -402,7 +392,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { fill: '#e8eef5', stroke: '#64748b', strokeWidth: 0.8 },
           style: {},
           edits: [],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -417,7 +406,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
             { id: createId('e'), name: 'edit.geo.move', options: {} },
             { id: createId('e'), name: 'edit.geo.create', options: {} },
           ],
-          constraints: [],
         },
       ],
       guides: [],
@@ -472,7 +460,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { size: 90, ink: '#1f2937' },
           style: { fill: '#fef08a', stroke: '#ca8a04' },
           edits: [],
-          constraints: [],
         },
       ],
       guides: [],
@@ -527,7 +514,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
             { id: createId('e'), name: 'move', options: { channels: ['x', 'y'] } },
             { id: createId('e'), name: 'edit.network.connect', options: {} },
           ],
-          constraints: [],
         },
       ],
       guides: [],
@@ -582,7 +568,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: {},
           style: { fill: '#3b82f6', opacity: 0.6 },
           edits: [],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -594,7 +579,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: {},
           style: { stroke: '#cbd5e1', strokeWidth: 2 },
           edits: [],
-          constraints: [],
         },
       ],
       guides: [
@@ -647,7 +631,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { unit: 1, multiple: 5, shape: 'rect', showEmpty: true, emptyFill: '#f1f5f9' },
           style: { fill: '#3b82f6' },
           edits: [],
-          constraints: [],
         },
       ],
       guides: [],
@@ -690,7 +673,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { arc: 'semi', radius: 95, ticks: 6 },
           style: {},
           edits: [],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -712,7 +694,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { orient: 'top', arc: 'semi', length: 85, handleSize: 7 },
           style: { fill: '#ef4444' },
           edits: [],
-          constraints: [],
         },
       ],
       guides: [],
@@ -770,7 +751,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: {},
           style: { fill: '#3b82f6', size: 9 },
           edits: [],
-          constraints: [],
         },
         {
           id: createId('m'),
@@ -782,7 +762,6 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           options: { dy: -12 },
           style: { fill: '#1e293b', fontSize: 11 },
           edits: [],
-          constraints: [],
         },
       ],
       guides: [

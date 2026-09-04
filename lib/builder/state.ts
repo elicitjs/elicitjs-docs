@@ -61,7 +61,6 @@ export function builderReducer(state: BuilderState, action: BuilderAction): Buil
         options: { ...(entry.defaultOptions || {}) },
         style: { ...(entry.defaultStyle || {}) },
         edits: [],
-        constraints: [],
       };
       return {
         ...state,
@@ -84,7 +83,6 @@ export function builderReducer(state: BuilderState, action: BuilderAction): Buil
         options: { ...target.options },
         style: { ...target.style },
         edits: target.edits.map((e) => ({ ...e, id: newId('edit'), options: { ...e.options } })),
-        constraints: target.constraints.map((c) => ({ ...c, id: newId('const'), options: { ...c.options } })),
       };
       const idx = state.marks.findIndex((m) => m.id === action.id);
       const nextMarks = [...state.marks];
@@ -264,68 +262,6 @@ export function builderReducer(state: BuilderState, action: BuilderAction): Buil
           };
         }),
       };
-    case 'ADD_MARK_CONSTRAINT':
-      return {
-        ...state,
-        marks: state.marks.map((m) => {
-          if (m.id !== action.markId) return m;
-          return {
-            ...m,
-            constraints: [...m.constraints, { id: newId('const'), name: action.name, options: {} }],
-          };
-        }),
-      };
-    case 'REMOVE_MARK_CONSTRAINT':
-      return {
-        ...state,
-        marks: state.marks.map((m) => {
-          if (m.id !== action.markId) return m;
-          return {
-            ...m,
-            constraints: m.constraints.filter((c) => c.id !== action.constraintId),
-          };
-        }),
-      };
-    case 'SET_MARK_CONSTRAINT_OPTION':
-      return {
-        ...state,
-        marks: state.marks.map((m) => {
-          if (m.id !== action.markId) return m;
-          return {
-            ...m,
-            constraints: m.constraints.map((c) =>
-              c.id === action.constraintId
-                ? { ...c, options: { ...c.options, [action.name]: action.value } }
-                : c
-            ),
-          };
-        }),
-      };
-
-    // =========================================================================
-    // Spec Guides
-    // =========================================================================
-    case 'ADD_GUIDE':
-      return {
-        ...state,
-        guides: [...(state.guides || []), { id: newId('guide'), type: action.guideType, options: {} }],
-      };
-    case 'REMOVE_GUIDE':
-      return {
-        ...state,
-        guides: state.guides.filter((g) => g.id !== action.id),
-      };
-    case 'SET_GUIDE_OPTION':
-      return {
-        ...state,
-        guides: state.guides.map((g) =>
-          g.id === action.id ? { ...g, options: { ...g.options, [action.name]: action.value } } : g
-        ),
-      };
-
-    // =========================================================================
-    // Spec Constraints
-    // =========================================================================
     case 'ADD_CONSTRAINT':
       return {
         ...state,

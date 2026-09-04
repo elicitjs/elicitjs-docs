@@ -51,7 +51,6 @@ export type MarkInstance = {
   options: Record<string, OptionValue>;
   style: Record<string, OptionValue>;
   edits: EditInstance[];
-  constraints: ConstraintInstance[];
 };
 
 export type ScaleState = {
@@ -145,9 +144,6 @@ export type BuilderAction =
   | { type: 'ADD_MARK_EDIT'; markId: InstanceId; name: string }
   | { type: 'REMOVE_MARK_EDIT'; markId: InstanceId; editId: InstanceId }
   | { type: 'SET_MARK_EDIT_OPTION'; markId: InstanceId; editId: InstanceId; name: string; value: OptionValue }
-  | { type: 'ADD_MARK_CONSTRAINT'; markId: InstanceId; name: string }
-  | { type: 'REMOVE_MARK_CONSTRAINT'; markId: InstanceId; constraintId: InstanceId }
-  | { type: 'SET_MARK_CONSTRAINT_OPTION'; markId: InstanceId; constraintId: InstanceId; name: string; value: OptionValue }
 
   // Spec-level Guides
   | { type: 'ADD_GUIDE'; guideType: GuideInstance['type'] }

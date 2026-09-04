@@ -11,16 +11,17 @@ mount(Elicit({
     mean: { type: "quantitative", domain: [0, 100] },
     hi:   { type: "quantitative", domain: [0, 100] },
   },
+  // Invariant on the DATA: the centre stays within the ends. A cap drag and a dot
+  // drag are different marks, but one rule gates both — which is exactly why a
+  // constraint is declared here, on the spec, and not inside either mark.
+  constraints: [
+    custom(({ active }) => active
+      ? { hi: Math.max(active.hi, active.mean), lo: Math.min(active.lo, active.mean) }
+      : undefined),
+  ],
   marks: [
     composite({
       id: "errorbar",
-      // Invariant on the DATA: the centre stays within the ends. A cap drag and a
-      // dot drag are different marks, but one rule gates both.
-      constraints: [
-        custom(({ active }) => active
-          ? { hi: Math.max(active.hi, active.mean), lo: Math.min(active.lo, active.mean) }
-          : undefined),
-      ],
       parts: [
         ruleX({
           stroke: "#64748b", strokeWidth: 1.5,

@@ -12,6 +12,7 @@ mount(Elicit({
     mag:  { type: "quantitative", domain: [0, 14] },
     team: { type: "categorical",  domain: ["A", "B", "C"] },
   },
+  constraints: [ clamp({ field: "mag", min: 1, max: 14 }) ],
   marks: [
     point({
       channels: {
@@ -24,7 +25,6 @@ mount(Elicit({
         move({ channels: ["x", "y"], when: when.noShift }),  // plain drag = move
         resize({ channel: "size", when: when.shift }),        // shift-drag = resize
       ],
-      constraints: [ clamp({ field: "mag", min: 1, max: 14 }) ],
     }),
   ],
 }))

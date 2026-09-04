@@ -19,7 +19,7 @@ export default function Layout({ children }) {
 
 # Constraints
 
-<Lead>A constraint is a rule over the dataset. It applies to every edit and every mark, regardless of which one declared it. It can reject a proposed change, or repair it by returning corrected rows — a repair shows up everywhere on the next render, since every mark reads the same rows. Declare it in `constraints: [...]` on the `Elicit` spec, or on a mark as shorthand; both end up on the dataset. `clamp` bounds a field, `maintainSum` fixes a total, `count` caps the size, and `unique` forbids duplicate keys. Three more constrain shape: `ordering` keeps a row's fields in order (lo ≤ mean ≤ hi), `monotonic` keeps a cumulative curve from dipping, and `spacing` keeps neighbours from colliding.</Lead>
+<Lead>A constraint is a rule over the dataset. It applies to every edit and every mark, regardless of which one declared it. It can reject a proposed change, or repair it by returning corrected rows — a repair shows up everywhere on the next render, since every mark reads the same rows. Declare it in `constraints: [...]` on the `Elicit` spec — the one place it goes, because it is a rule about the data, not about any one mark. `clamp` bounds a field, `maintainSum` fixes a total, `count` caps the size, and `unique` forbids duplicate keys. Three more constrain shape: `ordering` keeps a row's fields in order (lo ≤ mean ≤ hi), `monotonic` keeps a cumulative curve from dipping, and `spacing` keeps neighbours from colliding.</Lead>
 
 <ApiReference entries={api} />
 

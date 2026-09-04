@@ -8,6 +8,7 @@ const chart = Elicit({
     bin: { type: "categorical", domain: bins },
   },
   scales: { x: { type: "point" } },
+  constraints: [ count({ max: 20, strategy: "reject" }) ],
   marks: [
     dotStack({
       id: "tokens",
@@ -19,7 +20,6 @@ const chart = Elicit({
         // The plane owns the pointer in probe mode, so removal picks the nearest.
         remove({ pick: "nearest", when: when.alt }),
       ],
-      constraints: [ count({ max: 20, strategy: "reject" }) ],
     }),
   ],
 });

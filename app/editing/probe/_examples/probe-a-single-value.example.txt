@@ -6,13 +6,13 @@ const chart = Elicit({
   schema: {
     v: { type: "quantitative", domain: [0, 100] },
   },
+  constraints: [ clamp({ min: 0, max: 100, field: "v" }) ],
   marks: [
     point({
       id: "belief",
       size: 9, fill: "#2563eb",
       channels: { x: { field: "v",
                        edit: move({ pick: "probe", advance: false }) },},
-      constraints: [ clamp({ min: 0, max: 100, field: "v" }) ],
     }),
   ],
 });

@@ -10,6 +10,7 @@ mount(Elicit({
     x:     { type: "quantitative", domain: [0, 100] },
     value: { type: "quantitative", domain: [0, 100] },
   },
+  constraints: [ count({ max: 8 }) ],
   marks: [
     composite({
       id: "lollipop",
@@ -30,7 +31,6 @@ mount(Elicit({
             y: { field: "value", edit: move() },
           },
           edits: [ create({ gesture: "dblclick", channels: ["x", "y"] }) ],
-          constraints: [ count({ max: 8 }) ],
         }),
       ],
     }),

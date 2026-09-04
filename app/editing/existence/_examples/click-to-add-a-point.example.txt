@@ -9,6 +9,7 @@ mount(Elicit({
     x: { type: "quantitative", domain: [0, 100] },
     y: { type: "quantitative", domain: [0, 100] },
   },
+  constraints: [ count({ max: 8 }) ],   // dataset invariant: at most 8
   marks: [
     point({
       fill: "#0d9488",
@@ -18,7 +19,6 @@ mount(Elicit({
         y: { field: "y", edit: move() },
       },
       edits: [ create({ defaults: { group: "a" } }) ],
-      constraints: [ count({ max: 8 }) ],   // dataset invariant: at most 8
     }),
   ],
 }))

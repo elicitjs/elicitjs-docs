@@ -133,8 +133,6 @@ function singleMarkCallLiteral(mark: MarkInstance): Raw {
     }
   }
 
-  const constraintCalls = mark.constraints.map((c) => callLiteral(c.name, c.options));
-
   const options = cleanOptions(mark.options);
   if (mark.family === 'geoBasemap' && !options.geojson) {
     options.geojson = raw('vancouver') as unknown as OptionValue;
@@ -146,7 +144,6 @@ function singleMarkCallLiteral(mark: MarkInstance): Raw {
   };
   if (Object.keys(channels).length > 0) args.channels = channels;
   if (editCalls.length > 0) args.edits = editCalls;
-  if (constraintCalls.length > 0) args.constraints = constraintCalls;
 
   return raw(`${factory}(${jsLiteral(args)})`);
 }

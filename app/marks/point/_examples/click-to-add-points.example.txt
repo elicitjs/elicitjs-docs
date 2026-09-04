@@ -10,6 +10,7 @@ mount(Elicit({
     y: { type: "quantitative", domain: [0, 100] },
     group: { type: "categorical", default: "a" },
   },
+  constraints: [ count({ max: 10 }) ],
   marks: [
     point({
       fill: "#0d9488",
@@ -22,7 +23,6 @@ mount(Elicit({
       // mark. The pointer inverts through x and y to mint the datum; group comes
       // from the schema default. count caps the dataset.
       edits: [ create({ gesture: "dblclick" }) ],
-      constraints: [ count({ max: 10 }) ],
     }),
   ],
 }))

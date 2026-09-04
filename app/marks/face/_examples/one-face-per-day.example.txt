@@ -13,6 +13,7 @@ mount(Elicit({
     // Numeric y in [0, 1]: how good the day felt. It also drives the smile.
     mood: { type: "quantitative", domain: [0, 1] },
   },
+  constraints: [ unique({ field: "day" }) ],
   marks: [
     face({
       size: 24,
@@ -31,7 +32,6 @@ mount(Elicit({
       // lands ON a face carries a node, so it never fires the plane create — and
       // a click in a day that's already taken is rejected by `unique`.
       edits: [ create({ channels: ["x", "y"] }) ],
-      constraints: [ unique({ field: "day" }) ],
     }),
   ],
 }))

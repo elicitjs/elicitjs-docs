@@ -152,7 +152,7 @@ An edit is the inverse of an encoding. Encoding maps data → visual; an edit ma
 
 <Section id="constraints" title="Constraints">
 
-A constraint is a pure rule over **the dataset**. It holds no matter which edit fired it or which mark declared it — a mark's `constraints` is sugar the engine promotes to the whole dataset. A constraint can reject a proposed edit or repair it by returning corrected rows. Catalogue on [Constraints](/constraints).
+A constraint is a pure rule over **the dataset**. It holds no matter which edit fired it or which mark it was aimed at, which is why it is declared once on the spec rather than inside a mark. A constraint can reject a proposed edit or repair it by returning corrected rows. Catalogue on [Constraints](/constraints).
 
 <Example
   code={clampedDrag}

@@ -5,7 +5,7 @@ export const api: ApiEntry[] = [
     name: "Built-in constraints",
     summary: (
       <>
-        Import from <code className="inline">elicit.constraints</code> and pass on the <code className="inline">Elicit</code> spec’s <code className="inline">constraints: [...]</code> (a mark accepts them too, as sugar, and the engine promotes them). All are pure data invariants — they run on every commit and never see pixels.
+        Import from <code className="inline">elicit.constraints</code> and pass on the <code className="inline">Elicit</code> spec’s <code className="inline">constraints: [...]</code>. That is the only place they go: a constraint gates every edit from every mark, so writing one inside a mark would say something the engine does not mean. All are pure data invariants — they run on every commit and never see pixels.
       </>
     ),
     signatures: [

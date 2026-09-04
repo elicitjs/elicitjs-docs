@@ -8,11 +8,11 @@ mount(Elicit({
     bin: { type: "categorical", domain: cats },
   },
   scales: { x: { type: "band" } },
+  constraints: [ unique({ field: "bin", max: 5, strategy: "reject" }) ],
   marks: [
     dotStack({
       channels: { x: { field: "bin" } },
       edits: [ create({ gesture: "click", channels: ["x"] }), remove() ],
-      constraints: [ unique({ field: "bin", max: 5, strategy: "reject" }) ],
       label: true,
     }),
   ],

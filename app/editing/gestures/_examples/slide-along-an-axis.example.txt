@@ -9,6 +9,7 @@ mount(Elicit({
     y:   { type: "quantitative", domain: [0, 100] },
     mag: { type: "quantitative", domain: [0, 14] },
   },
+  constraints: [ clamp({ field: "mag", min: 1, max: 14 }) ],
   marks: [
     point({
       fill: "#ecfeff", stroke: "#0891b2", strokeWidth: 2,
@@ -17,7 +18,6 @@ mount(Elicit({
         y: { field: "y" },
         size: { field: "mag", edit: slide({ axis: "x", increase: "left" }) },
       },
-      constraints: [ clamp({ field: "mag", min: 1, max: 14 }) ],
     }),
   ],
 }))

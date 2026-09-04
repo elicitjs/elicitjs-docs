@@ -8,6 +8,7 @@ mount(Elicit({
     bin: { type: "categorical", domain: bins },
   },
   scales: { x: { type: "point" } },
+  constraints: [ count({ max: 10, strategy: "reject" }) ],
   marks: [
     dotStack({
       channels: { x: { field: "bin" } },
@@ -15,7 +16,6 @@ mount(Elicit({
         create({ pick: "probe", channels: ["x"], advance: false, when: when.noAlt }),
         remove({ pick: "nearest", when: when.alt }),
       ],
-      constraints: [ count({ max: 10, strategy: "reject" }) ],
     }),
   ],
 }));
