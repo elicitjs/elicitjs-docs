@@ -60,7 +60,7 @@ Put the band on y and the value on x, and the bars run horizontally. `barX` forc
 
 `stack: true` stacks the bars that share a band: each segment sits on the cumulative total of the ones before it. The stack's grouping is its band — rows with the same `x` (or `y`, for `barX`) stack together — so there's no grouping option to set. Declare a schema domain covering the stacked **total**, not the individual values.
 
-Segments are ordered by the mark's series field, so the same category sits at the same height in every band. `stack: true` infers that field from `fill` (then `stroke`); `stack: "asset"` names it outright. Span mode wins over `stack`: give the value axis `x1`/`x2` or `y1`/`y2` and the bars draw as spans instead.
+Segments are ordered by the mark's series field, so the same category sits at the same height in every band. `stack: true` says only *whether* to stack; **which** rows form a series is the `series` channel's job, and with none it falls back to `fill`'s field (then `stroke`'s). Span mode wins over `stack`: give the value axis `x1`/`x2` or `y1`/`y2` and the bars draw as spans instead.
 
 <Example
   code={aStackedBarChart}

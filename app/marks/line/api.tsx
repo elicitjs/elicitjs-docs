@@ -5,13 +5,13 @@ export const api: ApiEntry[] = [
     name: "line · lineY · lineX · path · path",
     summary: (
       <>
-        Import from <code className="inline">elicit.plot</code>. One non-interactive connector path per series, drawn under one draggable <code className="inline">circle</code> handle per datum. <code className="inline">lineY</code>/<code className="inline">lineX</code> pin the value axis; <code className="inline">path</code> and <code className="inline">path</code> default to <code className="inline">order:"sequence"</code>.
+        Import from <code className="inline">elicit.plot</code>. One non-interactive connector path per series, drawn under one draggable <code className="inline">circle</code> handle per datum. <code className="inline">lineY</code>/<code className="inline">lineX</code> pin the value axis; <code className="inline">path</code> defaults to <code className="inline">connect: "sequence"</code>.
       </>
     ),
     signatures: [
       "line({ channels, series, order, curve, handles, handleSize, samples, edits }) → Feature",
       "lineY(options) → Feature   // value on y (time series)",
-      "path(options) → Feature   // order: \"sequence\"",
+      "path(options) → Feature   // connect: \"sequence\"",
     ],
     options: [
       {
@@ -25,20 +25,30 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "series",
-        type: "string",
+        name: "channels.series",
+        type: "channel",
         default: "auto",
         desc: (
           <>
-            Field grouping points into lines (alias <code className="inline">z</code>). Defaults to the stroke/color field so a coloured chart auto-groups.
+            The column grouping points into lines. A <b>channel</b>, because it names a column. Defaults to <code className="inline">fill</code>&rsquo;s field (then <code className="inline">stroke</code>&rsquo;s), so a coloured chart auto-groups.
           </>
         ),
       },
       {
-        name: "order",
-        type: "'domain' | 'sequence' | field",
+        name: "channels.order",
+        type: "channel",
+        default: "—",
+        desc: (
+          <>
+            The column each series is sorted by. Also a channel — a route&rsquo;s <code className="inline">stop</code> number orders the line and encodes nothing, so there is no other channel to point at.
+          </>
+        ),
+      },
+      {
+        name: "connect",
+        type: "'domain' | 'sequence'",
         default: "'domain'",
-        desc: "How each series is connected: sorted by the domain axis, as-drawn, or by a named field.",
+        desc: "How points connect when no order channel is given: sorted by the domain axis, or as drawn. The mode only — it names no column.",
       },
       {
         name: "curve",

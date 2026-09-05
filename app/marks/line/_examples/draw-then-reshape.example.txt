@@ -9,8 +9,9 @@ mount(Elicit({
   },
   marks: [
     lineY({
-      stroke: "#4f46e5", strokeWidth: 3, curve: "catmullRom", series: "s",
+      stroke: "#4f46e5", strokeWidth: 3, curve: "catmullRom",
       channels: {
+        series: { field: "s" },
         x: { field: "x" },
         y: { field: "y" },
       },

@@ -19,7 +19,7 @@ export default function Layout({ children }) {
 
 # Line
 
-<Lead>A connected path over an ordered set of points, with a draggable handle on each. It is deliberately general — a you-draw-it curve, a multi-series line chart, and a connected scatter are the same mark along four orthogonal knobs: **grouping** (`series`), **ordering** (`order`), **editing** (the edit on the handles), and **creation** (`anchor` / `newSeries` / `draw`). `lineY`/`lineX` fix the value axis; `path`/`path` default to order: "sequence".</Lead>
+<Lead>A connected path over an ordered set of points, with a draggable handle on each. It is deliberately general — a you-draw-it curve, a multi-series line chart, and a connected scatter are the same mark along four orthogonal knobs: **grouping** (the `series` channel), **ordering** (the `order` channel, or the `connect` mode), **editing** (the edit on the handles), and **creation** (`anchor` / `newSeries` / `draw`). `lineY`/`lineX` fix the value axis; `path` defaults to `connect: "sequence"`.</Lead>
 
 <ApiReference entries={api} />
 
@@ -86,14 +86,14 @@ A stroke field groups points into separate lines (Observable Plot’s z), so one
 
 </Section>
 
-<Section id="connected-scatter" title="Connected scatter (order: sequence)">
+<Section id="connected-scatter" title="Connected scatter (connect: sequence)">
 
-With `order: "sequence"` the points connect in creation order, not by domain — a connected scatter, or a free 2D path. Both axes carry a drag, so each point moves in 2D and the links follow. `edit.line.anchor()` adds a point to the path — near the line or far, it extends the same single line in click order, so the path stays one sequence.
+With `connect: "sequence"` the points connect in creation order, not by domain — a connected scatter, or a free 2D path. Both axes carry a drag, so each point moves in 2D and the links follow. `edit.line.anchor()` adds a point to the path — near the line or far, it extends the same single line in click order, so the path stays one sequence.
 
 <Example
   code={a2dPathYouCanReshape}
   title="A 2D path you can reshape"
-  blurb={"path defaults to order: \"sequence\"; a 2D drag moves points, anchor extends the one path in click order."}
+  blurb={"path defaults to connect: \"sequence\"; a 2D drag moves points, anchor extends the one path in click order."}
   try={(
     <>
       <b>Drag</b> a point anywhere, or <b>click</b> empty space to add the next anchor.
