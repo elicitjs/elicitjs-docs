@@ -17,7 +17,7 @@ mount(Elicit({
       shape: "circle",
       unit: 1,
       gap: 0,
-      channels: { x: { field: "cat" }, y: { field: "value" } },
+      channels: { x: { field: "cat" }, count: { field: "value" } },
     }),
   ],
 }));

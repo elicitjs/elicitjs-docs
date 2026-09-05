@@ -1,7 +1,10 @@
 const cats = ["apples","bananas","oranges","pears"];
 mount(Elicit({
   width: 460, height: 300,
-  margins: { top: 16, right: 12, bottom: 28, left: 34 },
+  margins: { top: 16, right: 12, bottom: 28, left: 44 },
+  // The count axis is opt-in: it reserves layout space for a scale these marks
+  // already make countable by eye, so it sits with `legends`, not with x/y.
+  axes: { count: true },
   data: [
     { cat: "apples", value: 210 }, { cat: "bananas", value: 200 },
     { cat: "oranges", value: 310 }, { cat: "pears", value: 40 },
@@ -16,9 +19,10 @@ mount(Elicit({
       fill: "#4f46e5",
       channels: {
         x: { field: "cat" },
+        // The magnitude is `count`, on a count axis of its own — not `y`.
         count: { field: "value" },
       },
-      unit: 10,
+      unit: 10,          // one cell is worth 10, so 320 spans 32 cells
     }),
   ],
 }));

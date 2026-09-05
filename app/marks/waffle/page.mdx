@@ -9,6 +9,7 @@ import fruitCounts from './_examples/fruit-counts.example.txt';
 import proportionPicker from './_examples/proportion-picker.example.txt';
 import clickADotToSetTheCount from './_examples/click-a-dot-to-set-the-count.example.txt';
 import talliesOf16 from './_examples/tallies-of-1-6.example.txt';
+import aCountAxis from './_examples/a-count-axis.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -66,6 +67,22 @@ With `unit: 1` each cell is exactly one item, so small counts read directly — 
   code={talliesOf16}
   title="Tallies of 1–6"
   blurb="one cell = one item; counts of 1, 3, 6, 2 — count the cells directly."
+/>
+
+</Section>
+
+<Section id="count-axis" title="The count axis">
+
+A waffle's magnitude is the `count` channel, and it sits on a **count axis** — not on `y`. "How many cells" and "how far up the y axis" are different questions about different quantities, so they get different domains; a waffle and a bar in one chart never union theirs.
+
+The axis is **opt-in**. Ask for it with `axes: \{ count: true \}`. It defaults off for the same reason legends do — it reserves layout space for a scale the mark already makes countable by eye — and it reports **data units**, so it agrees with the column that fed it.
+
+`unit` is the exchange rate: one cell is worth `unit` of the field, so with the default `unit: 1` the column value *is* the number of cells. Pick a `unit` that divides the declared domain; when it doesn't, the top cell is a fraction and the mark says so.
+
+<Example
+  code={aCountAxis}
+  title="A count axis"
+  blurb={"axes: { count: true } — one cell is 10, so the 320 domain spans 32 cells."}
 />
 
 </Section>
