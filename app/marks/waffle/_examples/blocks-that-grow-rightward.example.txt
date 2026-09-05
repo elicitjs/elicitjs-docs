@@ -1,0 +1,26 @@
+const cats = ["apples","bananas","oranges","pears"];
+mount(Elicit({
+  width: 460, height: 260,
+  margins: { top: 16, right: 16, bottom: 28, left: 72 },
+  axes: { count: true },
+  data: [
+    { cat: "apples", value: 210 }, { cat: "bananas", value: 200 },
+    { cat: "oranges", value: 310 }, { cat: "pears", value: 40 },
+  ],
+  schema: {
+    cat:   { type: "categorical", domain: cats },
+    value: { type: "quantitative", domain: [0, 320] },
+  },
+  scales: { y: { type: "band" } },
+  marks: [
+    waffleX({
+      fill: "#4f46e5",
+      channels: {
+        // The category is on y, so the count runs along x.
+        y: { field: "cat" },
+        count: { field: "value" },
+      },
+      unit: 10,
+    }),
+  ],
+}));

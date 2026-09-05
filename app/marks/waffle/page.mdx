@@ -10,6 +10,7 @@ import proportionPicker from './_examples/proportion-picker.example.txt';
 import clickADotToSetTheCount from './_examples/click-a-dot-to-set-the-count.example.txt';
 import talliesOf16 from './_examples/tallies-of-1-6.example.txt';
 import aCountAxis from './_examples/a-count-axis.example.txt';
+import blocksThatGrowRightward from './_examples/blocks-that-grow-rightward.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -83,6 +84,18 @@ The axis is **opt-in**. Ask for it with `axes: \{ count: true \}`. It defaults o
   code={aCountAxis}
   title="A count axis"
   blurb={"axes: { count: true } — one cell is 10, so the 320 domain spans 32 cells."}
+/>
+
+</Section>
+
+<Section id="orientation" title="Orientation">
+
+Put the category on `y` and the blocks grow rightward instead of up. `waffleY` and `waffleX` force a direction; bare `waffle` takes it from the channel map, since the category's axis is the band and `count` runs along the other one. `orientation: "horizontal" | "vertical"` is the explicit form, the same option `bar` takes.
+
+<Example
+  code={blocksThatGrowRightward}
+  title="Blocks that grow rightward"
+  blurb={"waffleX with the category on y; the count axis sits at the bottom."}
 />
 
 </Section>

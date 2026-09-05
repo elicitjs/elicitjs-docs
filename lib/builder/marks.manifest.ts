@@ -71,7 +71,7 @@ export const MARKS: MarkManifestEntry[] = [
     api: waffleApi,
     factoryNames: { auto: 'waffle', x: 'waffleX', y: 'waffleY' },
     buildable: true,
-    channels: ['x', 'y'],
+    channels: ['x', 'y', 'count'],
     defaultOptions: { unit: 1, shape: 'rect', showEmpty: true },
     defaultStyle: { fill: 'steelblue' },
   },

@@ -5,11 +5,11 @@ export const api: ApiEntry[] = [
     name: "dotStack(options) · dotStackY(options) · dotStackX(options)",
     summary: (
       <>
-        Import from <code className="inline">elicit.plot</code>. The category axis is a band/point scale over the discrete slots. <code className="inline">dotStackY</code> stacks upward (category on x); <code className="inline">dotStackX</code> rightward (category on y); <code className="inline">dotStack</code> auto-detects.
+        Import from <code className="inline">elicit.plot</code>. The category axis is a band/point scale over the discrete slots. <code className="inline">dotStackY</code> stacks upward (slots on x), <code className="inline">dotStackX</code> rightward (slots on y). Bare <code className="inline">dotStack</code> reads the direction from the channel map: the slot channel's axis is the category, and tokens stack along the other one.
       </>
     ),
     signatures: [
-      "dotStack({ channels, size, gap, ghost, label, edits, constraints, id }) → Feature",
+      "dotStack({ channels, orientation, size, gap, ghost, label, edits, id }) → Feature",
     ],
     options: [
       {
@@ -23,6 +23,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "from the channel map",
+        desc: (
+          <>
+            Which way tokens stack. <code className="inline">dotStackY</code> / <code className="inline">dotStackX</code> set it; otherwise it follows the positional channel you bound. Same option <code className="inline">bar</code> and <code className="inline">waffle</code> take.
+          </>
+        ),
+      },
+      {
         name: "size",
         type: "number",
         default: "7",
@@ -32,7 +42,7 @@ export const api: ApiEntry[] = [
         name: "gap",
         type: "number",
         default: "2",
-        desc: "Vertical gap between stacked tokens.",
+        desc: "Gap between stacked tokens, along the stack direction.",
       },
       {
         name: "ghost",

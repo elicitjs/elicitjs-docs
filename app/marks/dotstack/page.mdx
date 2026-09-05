@@ -8,6 +8,7 @@ import { api } from './api';
 import probabilityTokensOverBins from './_examples/probability-tokens-over-bins.example.txt';
 import tentativeDotOnHoverProbe from './_examples/tentative-dot-on-hover-probe.example.txt';
 import perSlotCapWithUnique from './_examples/per-slot-cap-with-unique.example.txt';
+import tokensThatStackRightward from './_examples/tokens-that-stack-rightward.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -41,6 +42,19 @@ Click to drop a token into the nearest slot; click a token to take it back. coun
   code={perSlotCapWithUnique}
   title="Per-slot cap with unique"
   blurb={"unique({ field, max }) limits the height of any one column."}
+/>
+
+</Section>
+
+<Section id="orientation" title="Orientation">
+
+Put the slots on `y` and tokens stack rightward instead of up. `dotStackY` and `dotStackX` force a direction; bare `dotStack` takes it from the channel map, since the slot channel's axis is the category and tokens stack along the other one. `orientation: "horizontal" | "vertical"` is the explicit form, the same option `bar` and `waffle` take.
+
+<Example
+  code={tokensThatStackRightward}
+  title="Tokens that stack rightward"
+  blurb={"dotStackX with the slots on y; columns grow from the left edge."}
+  try={"click a row to add a token, click a token to remove it."}
 />
 
 </Section>

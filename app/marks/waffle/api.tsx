@@ -5,11 +5,11 @@ export const api: ApiEntry[] = [
     name: "waffle(options) · waffleY(options) · waffleX(options)",
     summary: (
       <>
-        Import from <code className="inline">elicit.plot</code>. <code className="inline">waffle</code> auto-detects orientation from which axis is a band; <code className="inline">waffleY</code> forces vertical, <code className="inline">waffleX</code> horizontal.
+        Import from <code className="inline">elicit.plot</code>. <code className="inline">waffleY</code> grows blocks upward (category on x), <code className="inline">waffleX</code> rightward (category on y). Bare <code className="inline">waffle</code> reads the direction from the channel map: the category's axis is the band, and <code className="inline">count</code> runs along the other one.
       </>
     ),
     signatures: [
-      "waffleY({ channels, unit, multiple, shape, showEmpty, emptyFill, gap, edits, constraints, id }) → Feature",
+      "waffleY({ channels, orientation, unit, multiple, shape, showEmpty, emptyFill, gap, edits, id }) → Feature",
     ],
     options: [
       {
@@ -18,7 +18,17 @@ export const api: ApiEntry[] = [
         default: "{}",
         desc: (
           <>
-            One band (category) axis and one linear (value) axis; put <code className="inline">edit: edit.waffle.fill()</code> on the value channel — it fills up to the exact cell under the pointer, for both drag and click.
+One band (category) axis — <code className="inline">x</code> or <code className="inline">y</code> — plus <code className="inline">count</code>, the magnitude. Put <code className="inline">edit: edit.waffle.fill()</code> on <code className="inline">count</code>; it fills up to the exact cell under the pointer, for both drag and click.
+          </>
+        ),
+      },
+      {
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "from the channel map",
+        desc: (
+          <>
+            Which way the blocks grow. <code className="inline">waffleY</code> / <code className="inline">waffleX</code> set it; otherwise it follows the positional channel you bound. Same option <code className="inline">bar</code> takes.
           </>
         ),
       },
@@ -74,8 +84,13 @@ export const api: ApiEntry[] = [
     channels: [
       {
         name: "x / y",
-        type: "band + linear",
-        desc: "The category (band) and value (linear) axes, as in bar.",
+        type: "band",
+        desc: "The category axis. Bind one of them; the count runs along the other.",
+      },
+      {
+        name: "count",
+        type: "linear",
+        desc: "The magnitude, in data units, on its own count axis — not on x or y. One cell is worth one unit of the field.",
       },
     ],
     returns: (

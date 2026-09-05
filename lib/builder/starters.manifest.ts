@@ -622,7 +622,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
           orientation: 'y',
           channels: {
             x: { field: 'category', isField: true },
-            y: {
+            count: {
               field: 'count',
               isField: true,
               edit: { id: createId('e'), name: 'edit.waffle.fill', options: {} },

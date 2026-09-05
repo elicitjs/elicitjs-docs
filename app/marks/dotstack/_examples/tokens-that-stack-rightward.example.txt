@@ -1,0 +1,21 @@
+const bins = ["never","rarely","sometimes","often","always"];
+mount(Elicit({
+  width: 460, height: 260,
+  margins: { top: 16, right: 16, bottom: 28, left: 84 },
+  data: [
+    { bin: "rarely" }, { bin: "rarely" }, { bin: "sometimes" },
+    { bin: "sometimes" }, { bin: "sometimes" }, { bin: "often" },
+  ],
+  onChange: (d) => console.log("tokens:", d.length),
+  schema: { bin: { type: "ordinal", domain: bins } },
+  scales: { y: { type: "point" } },
+  marks: [
+    dotStackX({
+      size: 8,
+      fill: "#0ea5e9",
+      // The category is on y, so tokens stack along x.
+      channels: { y: { field: "bin" } },
+      edits: [ create({ gesture: "click", channels: ["y"] }), remove() ],
+    }),
+  ],
+}));
