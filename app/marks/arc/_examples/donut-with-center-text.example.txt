@@ -16,7 +16,7 @@ mount(Elicit({
     donut({
       outerRadius: 100, innerRadius: 55,
       channels: {
-        value: { field: "share" },
+        theta: { field: "share" },
         fill: { field: "party" },
       },
     }),

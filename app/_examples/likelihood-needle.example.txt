@@ -19,14 +19,14 @@ mount(Elicit({
       orient: "top", radius: 110, bands: true, bandWidth: 22,
       tickSize: 0, labelOffset: 18, fontSize: 8,
       channels: {
-        angle: { field: "chance", scale: { range: [180, 0] } },
+        theta: { field: "chance", scale: { range: [180, 0] } },
         fill: { field: "chance", scale: { scheme: "RdBu", reverse: true } },
       },
     }),
     needle({
       orient: "top", length: 95, fill: "#b91c1c",
       channels: {
-        angle: {
+        theta: {
           field: "chance",
           scale: { range: [180, 0] },
           edit: rotate({ pivot: "mark", fold: false, pick: "direct" }),

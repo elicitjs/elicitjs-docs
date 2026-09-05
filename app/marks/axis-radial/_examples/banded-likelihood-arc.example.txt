@@ -16,7 +16,7 @@ mount(Elicit({
       orient: "top", radius: 110, bands: true, bandWidth: 28,
       labelOffset: 16, fontSize: 8,
       channels: {
-        angle: { field: "chance", scale: { range: [180, 0] } },
+        theta: { field: "chance", scale: { range: [180, 0] } },
         // RdBu is red→blue natively; reverse for the D→R (blue→red) reading.
         fill: { field: "chance", scale: { scheme: "RdBu", reverse: true } },
       },

@@ -16,7 +16,7 @@ mount(Elicit({
       outerRadius: 95,
       edits: [edit.stack.edge()],
       channels: {
-        value: { field: "val" },
+        theta: { field: "val" },
         fill: { field: "cat" },
       },
     }),

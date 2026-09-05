@@ -82,7 +82,7 @@ mount(Elicit({
           start: START, end: END,
           track: "#1a1a1a",
           channels: {
-            angle: { field: "level", scale: { range: [START, END] } },
+            theta: { field: "level", scale: { range: [START, END] } },
             fill: { value: "#00aebc" },
           },
         }),
@@ -92,7 +92,7 @@ mount(Elicit({
           handles: "hit",
           fill: "#1a1a1a", stroke: "#1a1a1a",
           channels: {
-            angle: {
+            theta: {
               field: "level",
               scale: { range: [START, END] },
               edit: rotate({ pivot: "mark", fold: false, pick: "direct" }),

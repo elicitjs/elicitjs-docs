@@ -15,7 +15,7 @@ mount(Elicit({
     arc({
       outerRadius: 100,
       channels: {
-        value: { field: "share" },
+        theta: { field: "share" },
         fill: { field: "category" },
       },
       edits: [

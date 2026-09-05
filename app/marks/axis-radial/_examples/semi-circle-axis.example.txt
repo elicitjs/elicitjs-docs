@@ -7,7 +7,7 @@ mount(Elicit({
   marks: [
     axisRadial({
       orient: "top", radius: 90, ticks: 6, title: "score",
-      channels: { angle: { field: "n", scale: { range: [180, 0] } } },
+      channels: { theta: { field: "n", scale: { range: [180, 0] } } },
     }),
   ],
 }));

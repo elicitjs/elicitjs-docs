@@ -204,7 +204,7 @@ export const MARKS: MarkManifestEntry[] = [
     api: arcApi,
     factoryNames: { auto: 'arc' },
     buildable: true,
-    channels: ['value', 'fill', 'x', 'y'],
+    channels: ['theta', 'fill', 'x', 'y'],
     defaultOptions: { innerRadius: 0.55, padAngle: 1 },
   },
   {
@@ -215,7 +215,7 @@ export const MARKS: MarkManifestEntry[] = [
     api: needleApi,
     factoryNames: { auto: 'needle' },
     buildable: true,
-    channels: ['angle', 'x', 'y'],
+    channels: ['theta', 'x', 'y'],
     defaultOptions: { orient: 'top', arc: 'semi' },
     defaultStyle: { fill: '#dc2626' },
   },
@@ -227,7 +227,7 @@ export const MARKS: MarkManifestEntry[] = [
     api: axisRadialApi,
     factoryNames: { auto: 'axisRadial' },
     buildable: true,
-    channels: ['angle', 'radius'],
+    channels: ['theta'],
   },
 
   // 6. Parametric Models & Uncertainty

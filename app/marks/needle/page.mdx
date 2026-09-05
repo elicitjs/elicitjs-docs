@@ -18,7 +18,7 @@ export default function Layout({ children }) {
 
 # Needle
 
-<Lead>A pivoted **needle** (NYT-style gauge or software dial). It encodes a value on the `angle` channel — degrees via the channel’s scale — and draws a tapered pointer + hub. The default semicircle is **horizontal** (left → right through the top, like a speedometer). Use `orient` (`top`·`right`·`bottom`·`left`), `arc: "full"`, or explicit `start`/`end` — and keep `scale.range` in sync. Optional `x`/`y` place the pivot on categorical or linear axes (many small needles in one chart).</Lead>
+<Lead>A pivoted **needle** (NYT-style gauge or software dial). It encodes a value on the `theta` channel — the polar angular *position*, in degrees via the channel’s scale — and draws a tapered pointer + hub. The default semicircle is **horizontal** (left → right through the top, like a speedometer). Use `orient` (`top`·`right`·`bottom`·`left`), `arc: "full"`, or explicit `start`/`end` — and keep `scale.range` in sync. Optional `x`/`y` place the pivot on categorical or linear axes (many small needles in one chart).</Lead>
 
 <ApiReference entries={api} />
 
@@ -47,12 +47,12 @@ A composite of `axisRadial` (ticks), `needle`, and `text`. Default orient is top
 
 <Section id="grid" title="Many needles on x × y">
 
-Each row is a pivot: `x` categorical, `y` quantitative, `angle` a third numeric belief. Drag any needle — direct-pick writes that row only.
+Each row is a pivot: `x` categorical, `y` quantitative, `theta` a third numeric belief. Drag any needle — direct-pick writes that row only.
 
 <Example
   code={smallNeedlesInAScatterOfPivots}
   title="Small needles in a scatter of pivots"
-  blurb="Group on x, layer on y, belief on angle. Cartesian axes frame the pivots."
+  blurb="Group on x, layer on y, belief on theta. Cartesian axes frame the pivots."
   try={(
     <>
       <b>Drag</b> any small needle to change that cell’s belief.
@@ -81,7 +81,7 @@ A knob: full 360° with `fold: false`.
 
 <Section id="ableton" title="Ableton-style knob">
 
-A software knob is a [composite](/marks/composite): a **donut-slice ring** (dark track + value fill) and a thin **needle** that shares the same `angle` scale. The ring is a tiny mark over `authoring.arcPath` — stock `arc` / `donut` partition a total among rows, while a knob's fill is one value swept from the arc's start. The needle carries `rotate({ pivot: "mark", fold: false, pick: "direct" })`; the ring stays inert and re-derives.
+A software knob is a [composite](/marks/composite): a **donut-slice ring** (dark track + value fill) and a thin **needle** that shares the same `theta` scale. The ring is a tiny mark over `authoring.arcPath` — stock `arc` / `donut` partition a total among rows, while a knob's fill is one value swept from the arc's start. The needle carries `rotate({ pivot: "mark", fold: false, pick: "direct" })`; the ring stays inert and re-derives.
 
 The span is Ableton's 270° arc with a gap at the bottom: `start: 225` (~7 o'clock) to `end: -45` (~5 o'clock). Keep `scale.range` in sync with that span.
 
@@ -100,7 +100,7 @@ The span is Ableton's 270° arc with a gap at the bottom: `start: 225` (~7 o'clo
 
 <Section id="categorical" title="Categorical needle">
 
-A discrete `angle` field uses a point scale — drag snaps to the nearest category. Colored bands come from `axisRadial({ bands: true })`.
+A discrete `theta` field uses a point scale — drag snaps to the nearest category. Colored bands come from `axisRadial({ bands: true })`.
 
 <Example
   code={likelihoodGauge}

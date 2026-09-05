@@ -68,9 +68,9 @@ export const api: ApiEntry[] = [
     ],
     channels: [
       {
-        name: "value",
+        name: "theta",
         type: "magnitude field",
-        desc: "Slice size in data units; layout normalizes by the sum of rows.",
+        desc: "Slice size in data units; layout normalizes by the sum of rows. The polar positional channel (Vega-Lite's name for it) — not `angle`, which is a mark's rotation in place, and not `value`, which already means a visual-space constant on any channel. Read raw here: an arc normalizes its own magnitudes, so it neither implies a radial axis nor draws a fan key.",
       },
       {
         name: "fill",

@@ -18,7 +18,7 @@ mount(Elicit({
       edits: [edit.stack.edge()],
       handleSize: 6,
       channels: {
-        value: { field: "v" },
+        theta: { field: "v" },
         fill: { field: "cat", scale: { scheme: "tableau10" } },
       },
     }),

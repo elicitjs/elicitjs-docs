@@ -18,7 +18,7 @@ mount(Elicit({
       orient: "top", radius: 110, bands: true, bandWidth: 22,
       tickSize: 0, labelOffset: 18, fontSize: 8,
       channels: {
-        angle: { field: "chance", scale: { range: [180, 0] } },
+        theta: { field: "chance", scale: { range: [180, 0] } },
         // ColorBrewer RdBu is red→blue; reverse so D (left) is blue and R (right)
         // is red — a proper 7-class diverging categorical palette.
         fill: { field: "chance", scale: { scheme: "RdBu", reverse: true } },
@@ -27,7 +27,7 @@ mount(Elicit({
     needle({
       orient: "top", length: 95, fill: "#b91c1c",
       channels: {
-        angle: {
+        theta: {
           field: "chance",
           scale: { range: [180, 0] },
           edit: rotate({ pivot: "mark", fold: false, pick: "direct" }),

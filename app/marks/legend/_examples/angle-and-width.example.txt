@@ -19,7 +19,7 @@ mount(Elicit({
     needle({ channels: {
       x: { field: "x" },
       y: { value: 90 },
-      angle: { field: "bearing", legend: { anchor: "right" } },
+      theta: { field: "bearing", legend: { anchor: "right" } },
       strokeWidth: { field: "flow", legend: { anchor: "right" } },
     } }),
   ],

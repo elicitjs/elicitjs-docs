@@ -100,9 +100,9 @@ A categorical `size` field gets swatches instead — one dot per category, at th
 
 </Section>
 
-<Section id="angle-width" title="Angle and stroke width">
+<Section id="angle-width" title="Theta and stroke width">
 
-Every legendable channel gets a key shaped like the channel. `angle` draws a **fan** of spokes at their encoded bearings; `strokeWidth` draws a **stack of segments** at their encoded thicknesses. Both read the scale, so the key matches the marks.
+Every legendable channel gets a key shaped like the channel. `theta` draws a **fan** of spokes at their encoded bearings; `strokeWidth` draws a **stack of segments** at their encoded thicknesses. Both read the scale, so the key matches the marks.
 
 <Example
   code={angleAndWidth}
@@ -110,7 +110,7 @@ Every legendable channel gets a key shaped like the channel. `angle` draws a **f
   blurb="One needle mark encoding two channels; a key for each."
 />
 
-Legendable channels are `fill`, `stroke`, `size`, `symbol`, `opacity`, `angle` and `strokeWidth`. Asking for a legend on anything else logs a warning rather than drawing a shape that would misreport the scale — and for `x`/`y`, an axis is the key.
+Legendable channels are `fill`, `stroke`, `size`, `symbol`, `opacity`, `theta` and `strokeWidth`. (`angle` is a mark's rotation in place, not an encoding a reader looks up, so it has no key.) Asking for a legend on anything else logs a warning rather than drawing a shape that would misreport the scale — and for `x`/`y`, an axis is the key.
 
 </Section>
 

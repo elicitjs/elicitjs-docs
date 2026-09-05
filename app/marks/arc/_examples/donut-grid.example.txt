@@ -23,7 +23,7 @@ mount(Elicit({
       handleSize: 6,
       channels: {
         x: { field: "state" },          // band axis → one donut per state
-        value: { field: "share" },      // party's share within its state
+        theta: { field: "share" },      // party's share within its state
         fill: { field: "party" },
       },
     }),

@@ -15,13 +15,13 @@ export default function Layout({ children }) {
 
 # Radial axis
 
-<Lead>A composable **radial axis**: arc spine, ticks, labels, and optional colored categorical bands. Sibling of `axisX`/`axisY`; reads the global `angle` scale. Default orient is `top` (left → right through the top). Inert by default — pair with `needle` for interaction.</Lead>
+<Lead>A composable **radial axis**: arc spine, ticks, labels, and optional colored categorical bands. Sibling of `axisX`/`axisY`; reads the global `theta` scale — the polar angular *position*, which is what a needle encodes. (`angle` is a mark's rotation in place and has no axis.) Default orient is `top` (left → right through the top). Inert by default — pair with `needle` for interaction.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="continuous" title="Continuous radial ticks">
 
-Spine + tick marks along a quantitative angle scale (top-facing by default).
+Spine + tick marks along a quantitative theta scale (top-facing by default).
 
 <Example
   code={semiCircleAxis}

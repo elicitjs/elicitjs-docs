@@ -15,7 +15,7 @@ export const api: ApiEntry[] = [
       {
         name: "channel",
         type: "string",
-        default: "'angle'",
+        default: "'theta'",
         desc: "Which scale to read.",
       },
       {
@@ -97,9 +97,9 @@ export const api: ApiEntry[] = [
     ],
     channels: [
       {
-        name: "angle",
+        name: "theta",
         type: "linear | point",
-        desc: "Usually shares the needle’s angle field + range.",
+        desc: "Usually shares the needle’s theta field + range.",
       },
       {
         name: "fill",

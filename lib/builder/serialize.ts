@@ -116,7 +116,7 @@ function singleMarkCallLiteral(mark: MarkInstance): Raw {
     // smartly bind it to the value channel if applicable
     const is1D = ['move', 'slide', 'moveSpan', 'brushSpan', 'cycle', 'rotate', 'resize'].includes(e.name);
     const valueChannel =
-      mark.orientation === 'x' ? 'x' : mark.orientation === 'y' ? 'y' : mark.family === 'needle' ? 'angle' : null;
+      mark.orientation === 'x' ? 'x' : mark.orientation === 'y' ? 'y' : mark.family === 'needle' ? 'theta' : null;
 
     if (is1D && valueChannel && channels[valueChannel] && !(channels[valueChannel] as any).edit) {
       (channels[valueChannel] as any).edit = callLiteral(e.name, e.options);

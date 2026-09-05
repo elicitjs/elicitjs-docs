@@ -27,7 +27,7 @@ mount(Elicit({
       channels: {
         x: { field: "g" },
         y: { field: "layer" },
-        angle: { field: "belief", scale: { range: [180, 0] } },
+        theta: { field: "belief", scale: { range: [180, 0] } },
       },
     }),
     needle({
@@ -35,7 +35,7 @@ mount(Elicit({
       channels: {
         x: { field: "g" },
         y: { field: "layer" },
-        angle: {
+        theta: {
           field: "belief",
           scale: { range: [180, 0] },
           edit: rotate({ pivot: "mark", fold: false, pick: "direct" }),

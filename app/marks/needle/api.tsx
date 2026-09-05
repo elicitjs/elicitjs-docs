@@ -18,7 +18,7 @@ export const api: ApiEntry[] = [
         default: "{}",
         desc: (
           <>
-            Must include <code className="inline">angle</code>. Optional <code className="inline">x</code>/<code className="inline">y</code> place the pivot (default: plot centre).
+            Must include <code className="inline">theta</code> — the polar angular position. (<code className="inline">angle</code> is a mark&rsquo;s rotation in place and is not read here.) Optional <code className="inline">x</code>/<code className="inline">y</code> place the pivot (default: plot centre).
           </>
         ),
       },
@@ -77,7 +77,7 @@ export const api: ApiEntry[] = [
     ],
     channels: [
       {
-        name: "angle",
+        name: "theta",
         type: "linear | point (deg)",
         desc: (
           <>

@@ -7,12 +7,12 @@ mount(Elicit({
   marks: [
     axisRadial({
       arc: "full", radius: 95, ticks: 8,
-      channels: { angle: { field: "n", scale: { range: [-180, 180] } } },
+      channels: { theta: { field: "n", scale: { range: [-180, 180] } } },
     }),
     needle({
       arc: "full", length: 80, fill: "#0f172a",
       channels: {
-        angle: {
+        theta: {
           field: "n",
           scale: { range: [-180, 180] },
           edit: rotate({ pivot: "mark", fold: false, pick: "direct" }),
