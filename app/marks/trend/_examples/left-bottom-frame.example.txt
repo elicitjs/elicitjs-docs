@@ -1,0 +1,31 @@
+mount(Elicit({
+  width: 360, height: 300,
+  margins: { top: 16, right: 16, bottom: 28, left: 34 },
+  // Without this, axes here would still cross at zero — a trend mark is
+  // present and axes was otherwise unspecified. origin: false states the
+  // ordinary left/bottom frame explicitly instead of leaving it inferred.
+  axes: { origin: false },
+  schema: {
+    // A domain that doesn't need to span negative values, so trend's default
+    // anchor (0, whenever 0 lies in the x domain — here that's the domain's
+    // own start) lands exactly where the y-axis is drawn, instead of
+    // floating mid-plot the way it would over a domain like [-10, 10].
+    x: { type: "quantitative", domain: [0, 20] },
+    y: { type: "quantitative", domain: [0, 20] },
+    intercept: { type: "quantitative" },
+    slope:     { type: "quantitative" },
+  },
+  data: [{ intercept: 2, slope: 0.5 }],
+  marks: [
+    trend({
+      // grip: "probe" mounts a single slope handle at the domain's far end.
+      // The default pair (grip: "end") would put its near-end grip on the
+      // same point as the intercept handle now that anchor sits at x = 0.
+      grip: "probe",
+      channels: {
+        intercept: { field: "intercept", edit: edit.trend.intercept() },
+        slope:     { field: "slope",     edit: edit.trend.slope() },
+      },
+    }),
+  ],
+}));

@@ -13,6 +13,7 @@ import threeReadings from './_examples/three-readings-of-one-band.example.txt';
 import aCorrelation from './_examples/a-correlation-is-a-pinned-trend.example.txt';
 import inertWithoutAnEdit from './_examples/inert-without-an-edit.example.txt';
 import swingTheLine from './_examples/swing-the-line.example.txt';
+import leftBottomFrame from './_examples/left-bottom-frame.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -20,7 +21,7 @@ export default function Layout({ children }) {
 
 # Trend + Band
 
-<Lead>A **parametric line** and its uncertainty. The datum `{ intercept, slope }` is a linear belief; `trend` draws `y = intercept + slope·x` across the plot (clipped to the plot rectangle) plus its handles — an **intercept** handle at `x = 0` that translates the line, and a **slope** grip at each end of the line that rotates it about the anchor. `trendBand` draws the band: a range on the intercept, a range on the slope, and every line between them. Trend is the one mark whose `x`/`y` channels name the plot’s _axes_ rather than columns of its datum — declare them in the schema (typically spanning negatives, so the intercept sits in the middle of the frame) and the axes cross at the origin by default.</Lead>
+<Lead>A **parametric line** and its uncertainty. The datum `{ intercept, slope }` is a linear belief; `trend` draws `y = intercept + slope·x` across the plot (clipped to the plot rectangle) plus its handles — an **intercept** handle at `x = 0` that translates the line, and a **slope** grip at each end of the line that rotates it about the anchor. `trendBand` draws the band: a range on the intercept, a range on the slope, and every line between them. Trend is the one mark whose `x`/`y` channels name the plot’s _axes_ rather than columns of its datum — declare them in the schema (typically spanning negatives, so the intercept sits in the middle of the frame). Left unspecified, `axes` crosses at the origin by default; state the frame explicitly with `axes: { origin: true | false }` — see [Axis, Grid & Rule](/marks/axes#global).</Lead>
 
 <ApiReference entries={api} />
 
@@ -60,6 +61,16 @@ The parameters are channels like any other, so the columns are renameable — `c
   code={bothHandlesAtOnce}
   title="Both handles at once"
   blurb="Omit the stages (default null) to leave both handles always active."
+/>
+
+That default is an inference, not a fixed rule: it only applies while `axes` is left unspecified. State the frame instead of relying on it — `axes: { origin: false }` forces the ordinary left/bottom frame even with a trend mark on the chart.
+
+`axes` only moves the axis spines; it says nothing about where the handles sit. Those follow `anchor`/`probe`, which default for the origin-crossing frame (`anchor` is 0 whenever 0 lies in the x domain). Over a domain that doesn't need to cross zero, that same default places `anchor` at the domain's own start — exactly where a left/bottom y-axis is drawn — so the intercept handle lands on the axis instead of floating mid-plot. Pair it with `grip: "probe"` for a single slope handle at the domain's far end, rather than the default pair, whose near-end grip would otherwise sit on top of the intercept handle.
+
+<Example
+  code={leftBottomFrame}
+  title="Left/bottom frame"
+  blurb={'axes: { origin: false }, plus a domain starting at 0 and grip: "probe" — the intercept handle sits on the y-axis, the one slope handle on the right edge.'}
 />
 
 </Section>

@@ -70,7 +70,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        A <b>feature</b> emitting the <code className="inline">line</code> (edge-to-edge through the plot) plus handle <code className="inline">circle</code>s tagged <code className="inline">intercept</code> / <code className="inline">slope</code> — one at the anchor, and one at each end of the line under the default grip. Sets <code className="inline">isTrend</code> so unspecified chart axes cross at the origin.
+        A <b>feature</b> emitting the <code className="inline">line</code> (edge-to-edge through the plot) plus handle <code className="inline">circle</code>s tagged <code className="inline">intercept</code> / <code className="inline">slope</code> — one at the anchor, and one at each end of the line under the default grip. If the chart's <code className="inline">axes</code> is left unspecified, chart axes cross at the origin; state it explicitly with <code className="inline">axes: {'{'} origin: true | false {'}'}</code> either way.
       </>
     ),
   },

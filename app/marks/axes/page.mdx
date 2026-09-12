@@ -64,10 +64,12 @@ Pass a per-channel config to shape ticks, formats and titles, or a transform to 
   blurb="y gets a grid and percent formatting; x a tick count and a title."
 />
 
+`origin: true` is the shorthand for crossing both axes at zero — declare it once instead of writing a `transform` on each channel by hand. It's the same frame [`trend`/`trendBand`](/marks/trend) draw automatically; `origin: false` states the ordinary left/bottom frame explicitly on a chart that would otherwise infer the origin frame from its marks. A per-channel `transform` still covers anything `origin` doesn't — crossing at a value other than zero, or on one axis only.
+
 <Example
   code={originCrossingAxes}
   title="Origin-crossing axes"
-  blurb="transform moves each axis to the zero line on the other scale."
+  blurb="axes: { origin: true } crosses both scales at zero, without a hand-written transform."
 />
 
 <Example

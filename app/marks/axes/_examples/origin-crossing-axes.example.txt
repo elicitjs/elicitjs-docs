@@ -2,8 +2,9 @@ mount(Elicit({
   width: 360, height: 300,
   margins: { top: 16, right: 16, bottom: 24, left: 28 },
   axes: {
-    x: { transform: ({ scales }) => ({ y: scales.y(0) }), ticks: 5 },
-    y: { transform: ({ scales }) => ({ x: scales.x(0) }), ticks: 5 },
+    origin: true,
+    x: { ticks: 5 },
+    y: { ticks: 5 },
   },
   data: [
     { x: -8, y: 6 }, { x: 5, y: -3 }, { x: -4, y: -7 },
