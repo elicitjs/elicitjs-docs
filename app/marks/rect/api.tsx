@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "rect({ channels, edits, constraints, id }) → Feature",
+      "rect({ channels, orientation, width, height, rx, edits, id }) → Feature",
       "rectX(options) → Feature   // value on x",
       "rectY(options) → Feature   // value on y",
     ],
@@ -25,6 +25,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "auto",
+        desc: (
+          <>
+            Which axis the value runs along (<code className="inline">'vertical'</code> = y). Inferred from each axis’s own span, band or value; a band scale or the lone bound channel; <code className="inline">rectY / rectX</code> pin it.
+          </>
+        ),
+      },
+      {
         name: "edits",
         type: "Edit[]",
         default: "—",
@@ -33,12 +43,6 @@ export const api: ApiEntry[] = [
             Mark-level edits; per-channel edits live in <code className="inline">channels[ch].edit</code>. Use <code className="inline">brushRect</code> for 2-D edge/corner/body editing.
           </>
         ),
-      },
-      {
-        name: "constraints",
-        type: "Constraint[]",
-        default: "—",
-        desc: "Data invariants, promoted to the dataset.",
       },
       {
         name: "fill, stroke, …",

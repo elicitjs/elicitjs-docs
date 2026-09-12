@@ -9,9 +9,9 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "curveY({ channels, length, edits, constraints, id }) → Mark",
-      "curveX({ … }) → Mark",
-      "curve({ … }) → Mark",
+      "curve({ channels, orientation, length, edits, id }) → Mark",
+      "curveY(options) → Mark   // value on y (chord along x)",
+      "curveX(options) → Mark   // value on x (chord along y)",
     ],
     options: [
       {
@@ -19,6 +19,16 @@ export const api: ApiEntry[] = [
         type: "Channels",
         default: "{}",
         desc: "The chord endpoints (x1/x2 or y1/y2), the position on the other axis, curvature, angle, plus the standard style channels.",
+      },
+      {
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "auto",
+        desc: (
+          <>
+            Which axis the value runs along (<code className="inline">'vertical'</code> = y). Inferred from the declared chord pair, a band scale or the lone bound channel; <code className="inline">curveY / curveX</code> pin it.
+          </>
+        ),
       },
       {
         name: "length",

@@ -11,7 +11,7 @@ mount(Elicit({
   ],
   constraints: [
     clamp({ field: "share", min: 0 }),
-    maintainSum({ field: "share", targetSum: 100 }),
+    maintainSum({ field: "share", total: 100 }),
   ],
   schema: {
     category: { type: "categorical", domain: ["Product", "Marketing", "Ops", "R&D"] },

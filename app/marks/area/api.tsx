@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "area({ channels, series, order, curve, handles, edits, … }) → Feature",
+      "area({ channels, orientation, curve, connect, handles, edits, … }) → Feature",
       "areaY(options) → Feature",
       "areaX(options) → Feature",
     ],

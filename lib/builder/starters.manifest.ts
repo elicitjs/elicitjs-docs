@@ -66,7 +66,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
       ],
       constraints: [
         { id: createId('c'), name: 'clamp', options: { min: 0, max: 100, field: 'probability' } },
-        { id: createId('c'), name: 'maintainSum', options: { targetSum: 100, field: 'probability' } },
+        { id: createId('c'), name: 'maintainSum', options: { total: 100, field: 'probability' } },
       ],
       scales: {},
       layout: { width: 620, height: 380, responsive: 'scale', marginTop: 30, marginRight: 20, marginBottom: 40, marginLeft: 50, renderer: 'd3' },
@@ -290,7 +290,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
         { id: createId('g'), type: 'remaining', options: { field: 'budget', unit: '%' } },
       ],
       constraints: [
-        { id: createId('c'), name: 'maintainSum', options: { targetSum: 100, field: 'budget' } },
+        { id: createId('c'), name: 'maintainSum', options: { total: 100, field: 'budget' } },
       ],
       scales: {},
       layout: { width: 560, height: 380, responsive: 'scale', marginTop: 20, marginRight: 20, marginBottom: 20, marginLeft: 20, renderer: 'd3' },

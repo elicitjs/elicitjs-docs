@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "text({ channels, dx, dy, lineAnchor, format, edits, constraints, id }) → Feature",
+      "text({ channels, orientation, format, wrap, lineHeight, edits, id }) → Feature",
       "textX(options) → Feature   // value on x",
       "textY(options) → Feature   // value on y",
     ],
@@ -21,6 +21,16 @@ export const api: ApiEntry[] = [
         desc: (
           <>
             Channel map. See <b>Channels</b>.
+          </>
+        ),
+      },
+      {
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "auto",
+        desc: (
+          <>
+            Which axis the value runs along (<code className="inline">'vertical'</code> = y). Inferred from a band scale or the lone bound channel; <code className="inline">textY / textX</code> pin it.
           </>
         ),
       },

@@ -85,7 +85,7 @@ export const api: ApiEntry[] = [
       "markCenter(node) → { x, y }",
       "schemaDefaults(schema) → Datum",
       "nearestMark(marks, x, y, threshold) → index | null",
-      "registerDriver({ name, wants, onEvent, selects? })",
+      "registerDriver({ name, onEvent, sessionKeys?, options?, wants?, selects? })",
     ],
     options: [
       {
@@ -120,7 +120,7 @@ export const api: ApiEntry[] = [
       },
       {
         name: "cardinality",
-        type: "'append' | 'delete'",
+        type: "'append' | 'appendMany' | 'toggle' | 'delete'",
         default: "—",
         desc: "Tell constraints which row is active when the dataset’s shape changes (create/remove).",
       },
@@ -136,7 +136,7 @@ export const api: ApiEntry[] = [
       },
       {
         name: "scope",
-        type: "'line' | 'axis' | 'arc' | …",
+        type: "'line' | 'axis' | 'scale' | …",
         default: "null",
         desc: (
           <>
@@ -165,7 +165,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "registerDriver({ name, wants(edit), onEvent(ctx), selects? })",
+      "registerDriver({ name, onEvent(ctx), sessionKeys?, options?, wants?(edit), selects? })",
     ],
     options: [
       {

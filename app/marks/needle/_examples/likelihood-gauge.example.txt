@@ -25,7 +25,7 @@ mount(Elicit({
       },
     }),
     needle({
-      orient: "top", length: 95, fill: "#b91c1c",
+      length: 95, fill: "#b91c1c",
       channels: {
         theta: {
           field: "chance",

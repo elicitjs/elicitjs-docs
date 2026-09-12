@@ -24,7 +24,7 @@ export const CONSTRAINTS: ConstraintManifestEntry[] = [
   {
     name: 'maintainSum', label: 'maintainSum', docHref: '/constraints',
     options: [
-      { name: 'targetSum', type: 'number', default: '—', desc: 'Target total for the field.' },
+      { name: 'total', type: 'number', default: '—', desc: 'Target total for the field.' },
       { name: 'field', type: 'string', default: "'y'", desc: 'The data field to sum.' },
       { name: 'mode', type: "'cap' | 'normalize' | 'redistribute'", default: "'cap'", desc: 'How the touched datum and its siblings compensate.' },
     ],

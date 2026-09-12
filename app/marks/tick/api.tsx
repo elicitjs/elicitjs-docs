@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "tick({ channels, inset, length, edits, constraints, id }) → Feature",
+      "tick({ channels, orientation, inset, length, edits, id }) → Feature",
       "tickY(options) → Feature   // value on y",
       "tickX(options) → Feature   // value on x",
     ],

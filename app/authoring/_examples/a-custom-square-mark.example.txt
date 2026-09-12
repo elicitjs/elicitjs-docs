@@ -1,10 +1,11 @@
 // A minimal mark factory — same contract as point/bar.
 function square(options = {}) {
-  const opts = authoring.normalizeMarkOptions(options);
+  const opts = authoring.normalizeMarkOptions(options, { mark: "square", allow: [] });
   const { channels = {} } = opts;
   return {
     // id / edits / constraints / table, passed through verbatim.
     ...authoring.markCommon(opts),
+    type: "square",
     channels,
     discreteScale: "point",
     xKey: channels.x && channels.x.field,

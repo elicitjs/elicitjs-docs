@@ -12,7 +12,7 @@ mount(Elicit({
     x: { type: "categorical", domain: ["A", "B", "C", "D"] },
     y: { type: "quantitative", domain: [0, 100] },
   },
-  constraints: [ clamp({ min: 0 }), maintainSum({ targetSum: 100, strategy: "cap" }) ],
+  constraints: [ clamp({ min: 0 }), maintainSum({ total: 100, strategy: "cap" }) ],
   marks: [
     barY({
       fill: "#7c3aed",

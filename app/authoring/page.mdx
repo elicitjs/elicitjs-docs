@@ -92,7 +92,7 @@ Most edits return one datum and the engine splices it at `index`. Whole-dataset 
 
 <Section id="drivers" title="Register a driver">
 
-Stock `pick` values (`direct`, `nearest`, `plane`, `probe`, `sweep`, …) already cover most lifecycles. When you need a new one, register a driver: `wants(edit)` claims by `pick`, `onEvent` owns hover/click/drag, and `runEdit` / `previewEdit` commit or preview through the same constraint and undo path. Set `selects: true` if `guide: true` should draw a snap ring.
+Stock `pick` values (`direct`, `nearest`, `plane`, `probe`, `sweep`, …) already cover most lifecycles. When you need a new one, register a driver. An edit reaches it by naming it — `pick: "clickNearest"` — and every edit reaches exactly one driver; `wants(edit)` is only for claiming an edit by capability (a relative slide) and never re-tests `pick`. `onEvent` owns hover/click/drag, and `runEdit` / `previewEdit` commit or preview through the same constraint and undo path. Declare `sessionKeys`: the per-feature session is shared with every other driver on the mark, and the `session.clear()` you are handed nulls exactly those keys. Declare `options` for any knob your driver reads off the edit, or the engine reports it as an unknown option. Set `selects: true` if `guide: true` should draw a snap ring.
 
 <Example
   code={clickNearestDriver}
@@ -124,7 +124,7 @@ Don’t reinvent proximity or minting:
 - `authoring.nextSeriesKey(data, seriesField)` — next free series id for a new line
 - `nearestMark` / `nearestSeries` / `nearestMarkOnAxis` — shared distance pickers
 
-For create-like customs, set `cardinality: "append"` so constraints know which row is new. For external UI, give the edit a `name` and drive it with [`el.control(name)`](/editing/external-controls).
+For create-like customs, set `cardinality: "append"` so constraints know which row is new; for an edit that runs the pointer back through a scale, set `inverts: true` so the dead-drag guard can check the channel. A custom mark stamps `type: "square"` — the one identity key every feature kind carries. For external UI, give the edit a `name` and drive it with [`el.control(name)`](/editing/external-controls).
 
 </Section>
 

@@ -20,7 +20,7 @@ function knobArc(options = {}) {
   } = opts;
   return {
     ...authoring.markCommon(opts),
-    markName: "knobArc",
+    type: "knobArc",
     channels,
     build(data, scales, width, height) {
       const cx = width / 2, cy = height / 2;
@@ -87,7 +87,6 @@ mount(Elicit({
           },
         }),
         needle({
-          start: START, end: END,
           length: 70, baseWidth: 2.5,
           handles: "hit",
           fill: "#1a1a1a", stroke: "#1a1a1a",

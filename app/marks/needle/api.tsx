@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "needle({ channels, length, handleSize, baseWidth, orient, arc, start, end, id }) → Feature",
+      "needle({ channels, length, handles, handleSize, handleColor, baseWidth, id }) → Feature",
     ],
     options: [
       {
@@ -43,36 +43,6 @@ export const api: ApiEntry[] = [
         type: "number",
         default: "10",
         desc: "Width of the needle base in px.",
-      },
-      {
-        name: "orient",
-        type: "'top' | 'right' | 'bottom' | 'left'",
-        default: "'top'",
-        desc: (
-          <>
-            Semicircle facing that side. <code className="inline">top</code> = NYT / speedometer (range <code className="inline">[180, 0]</code>). Match with <code className="inline">scale.range</code>.
-          </>
-        ),
-      },
-      {
-        name: "arc",
-        type: "'semi' | 'full'",
-        default: "'semi'",
-        desc: (
-          <>
-            <code className="inline">full</code> → <code className="inline">[-180, 180]</code>. Otherwise same as <code className="inline">orient</code> (default top).
-          </>
-        ),
-      },
-      {
-        name: "start / end",
-        type: "number",
-        default: "—",
-        desc: (
-          <>
-            Explicit degree span (overrides <code className="inline">orient</code> / <code className="inline">arc</code>).
-          </>
-        ),
       },
     ],
     channels: [

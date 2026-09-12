@@ -6,7 +6,7 @@ mount(Elicit({
   // Invariants on the DATA — they gate every edit, from every mark.
   constraints: [
     clamp({ field: "y", min: 0 }),
-    maintainSum({ field: "y", targetSum: 100 }),
+    maintainSum({ field: "y", total: 100 }),
   ],
   schema: {
     x: { type: "categorical", domain: ["A", "B", "C", "D"] },

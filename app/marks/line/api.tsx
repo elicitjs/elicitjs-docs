@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "line({ channels, series, order, curve, handles, handleSize, samples, edits }) → Feature",
+      "line({ channels, orientation, curve, connect, handles, handleSize, handleColor, edits, id }) → Feature",
       "lineY(options) → Feature   // value on y (time series)",
       "path(options) → Feature   // connect: \"sequence\"",
     ],
@@ -21,6 +21,16 @@ export const api: ApiEntry[] = [
         desc: (
           <>
             Channel map — see <b>Channels</b>.
+          </>
+        ),
+      },
+      {
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "auto",
+        desc: (
+          <>
+            Which axis the value runs along (<code className="inline">'vertical'</code> = y). Inferred from a band scale or the lone bound channel; <code className="inline">lineY / lineX</code> pin it.
           </>
         ),
       },
@@ -73,17 +83,7 @@ export const api: ApiEntry[] = [
         desc: "Pixel radius of each handle.",
       },
       {
-        name: "samples",
-        type: "number | any[]",
-        default: "ticks",
-        desc: (
-          <>
-            Domain grid used by line authoring (<code className="inline">newSeries</code>/<code className="inline">draw</code>).
-          </>
-        ),
-      },
-      {
-        name: "edits, constraints, id",
+        name: "edits, id",
         type: "—",
         default: "—",
         desc: (

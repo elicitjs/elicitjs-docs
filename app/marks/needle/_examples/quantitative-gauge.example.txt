@@ -13,7 +13,7 @@ mount(Elicit({
           channels: { theta: { field: "n", scale: { range: [180, 0] } } },
         }),
         needle({
-          orient: "top", length: 90, fill: "#1d4ed8",
+          length: 90, fill: "#1d4ed8",
           channels: {
             theta: {
               field: "n",

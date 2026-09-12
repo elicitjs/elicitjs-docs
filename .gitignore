@@ -31,3 +31,6 @@ pnpm-debug.log*
 tsconfig.tsbuildinfo
 
 figures
+# Paper submission artefacts — built bundles, not sources.
+supplementary-material/
+supplementary-material*.zip

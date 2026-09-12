@@ -10,11 +10,11 @@ export const api: ApiEntry[] = [
     ),
     signatures: [
       "clamp({ min, max, field }) → Constraint",
-      "maintainSum({ targetSum, field, strategy }) → Constraint",
+      "maintainSum({ total, field, strategy }) → Constraint",
       "count({ max, strategy }) → Constraint",
       "unique({ field, max, strategy }) → Constraint",
       "snap({ field, step, origin }) → Constraint",
-      "ordering({ fields, lower, upper, strategy }) → Constraint",
+      "ordering({ field, strategy }) → Constraint",
       "monotonic({ field, along, dir, series }) → Constraint",
       "spacing({ field, min, series }) → Constraint",
     ],
@@ -28,11 +28,11 @@ export const api: ApiEntry[] = [
       {
         name: "clamp.field",
         type: "string",
-        default: "'y'",
+        default: "the edited column",
         desc: "The data field to bound.",
       },
       {
-        name: "maintainSum.targetSum",
+        name: "maintainSum.total",
         type: "number",
         default: "—",
         desc: "Target total for the field.",
@@ -62,7 +62,7 @@ export const api: ApiEntry[] = [
       {
         name: "unique.field",
         type: "string | string[]",
-        default: "'x'",
+        default: "the edited column",
         desc: "Category key(s); an array makes a composite (per-cell) key.",
       },
       {
@@ -78,7 +78,7 @@ export const api: ApiEntry[] = [
         desc: "Quantize the field to a grid (slider steps, waffle cells).",
       },
       {
-        name: "ordering.fields",
+        name: "ordering.field",
         type: "string[]",
         default: "—",
         desc: (
@@ -100,7 +100,7 @@ export const api: ApiEntry[] = [
       {
         name: "monotonic.field / along",
         type: "string",
-        default: "'y' / 'x'",
+        default: "the edited column / 'x'",
         desc: (
           <>
             The value that may never reverse, and the axis it runs along. Where <code className="inline">ordering</code> keeps <b>fields</b> of one row in order, this keeps <b>rows</b> in order along an axis. Rows are sorted by <code className="inline">along</code>, not by array position, so an appended anchor lands in the right place.
@@ -120,7 +120,7 @@ export const api: ApiEntry[] = [
       {
         name: "spacing.field / min",
         type: "string / number",
-        default: "'x' / 1",
+        default: "the edited column / 1",
         desc: (
           <>
             Adjacent values of <code className="inline">field</code> stay at least <code className="inline">min</code> apart, in <b>data</b> units — never pixels. Implies an order too (pushing apart preserves the sort), so a field with <code className="inline">spacing</code> needs no <code className="inline">ordering</code>.
@@ -141,14 +141,14 @@ export const api: ApiEntry[] = [
     ),
   },
   {
-    name: "constraints.custom(reducer, meta?)",
+    name: "constraints.custom(apply, meta?)",
     summary: (
       <>
-        Author your own. One word for “author your own X” in every grammar namespace — cf. <code className="inline">edit.custom</code> and <code className="inline">guides.custom</code>. (<code className="inline">authoring.defineConstraint</code> is the same function, under the name a mark author reaches for.) The reducer gets a pure-data context and returns the shape that’s natural.
+        Author your own. One word for “author your own X” in every grammar namespace — cf. <code className="inline">edit.custom</code> and <code className="inline">guides.custom</code>. (<code className="inline">authoring.defineConstraint</code> is the same function, under the name a mark author reaches for.) Every constraint is a descriptor — <code className="inline">{'{ type, field?, options, apply }'}</code> — and <code className="inline">field</code> left out means the column the dispatching edit writes, so a one-column instrument names nothing twice. The rule gets a pure-data context and returns the shape that’s natural.
       </>
     ),
     signatures: [
-      "constraints.custom(({ data, oldData, activeIndex, active, field, value, domain }) => result, meta?) → Constraint",
+      "constraints.custom(({ data, oldData, activeIndex, active, field, fields, value, domain, table, tables }) => result, meta?) → Constraint",
     ],
     options: [
       {

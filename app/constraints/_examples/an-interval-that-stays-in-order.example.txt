@@ -11,7 +11,7 @@ mount(Elicit({
   data: [{ q: "2027 GDP", lo: 2, mean: 4, hi: 6 }],
   // Declared ONCE, on the dataset — so it holds whichever of the three
   // handles you grab, and would hold for a create or a keyboard nudge too.
-  constraints: [ ordering({ fields: ["lo", "mean", "hi"] }) ],
+  constraints: [ ordering({ field: ["lo", "mean", "hi"] }) ],
   marks: [
     // An interval glyph is three marks over three FIELDS of one row.
     ruleY({ channels: { x: { field: "q" },

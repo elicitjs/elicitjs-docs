@@ -1,7 +1,8 @@
 // A tiny driver: hover highlights the nearest mark; click bumps its y.
 authoring.registerDriver({
   name: "clickNearest",
-  wants: (e) => e.pick === "clickNearest",
+  // The keys this driver owns in the shared per-feature session; clear() nulls them.
+  sessionKeys: ["px", "py", "threshold", "hoverIndex"],
   selects: true,
   onEvent({ event, edits, marks, session, runEdit }) {
     const threshold = 48;

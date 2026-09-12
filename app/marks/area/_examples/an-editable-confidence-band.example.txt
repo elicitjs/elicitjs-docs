@@ -11,7 +11,7 @@ mount(Elicit({
     hi:   { type: "quantitative", domain: [0, 100] },
   },
   // A dataset invariant: it holds whichever edge you grab.
-  constraints: [ ordering({ lower: "lo", upper: "hi" }) ],
+  constraints: [ ordering({ field: ["lo", "hi"] }) ],
   marks: [
     areaY({
       fill: "#2563eb", stroke: "#2563eb",
