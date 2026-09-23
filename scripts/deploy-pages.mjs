@@ -207,10 +207,12 @@ fs.writeFileSync(
 // once, and treat "committed but unpushed" as a state to finish rather than to
 // repeat.
 function pushPages() {
-  if (
-    sh("git", ["config", "--local", "--get", "http.postBuffer"], pagesRoot) ===
-    ""
-  ) {
+  // `git config --get` exits 1 when the key is unset (every fresh clone, e.g. CI).
+  let postBuffer = "";
+  try {
+    postBuffer = sh("git", ["config", "--local", "--get", "http.postBuffer"], pagesRoot);
+  } catch {}
+  if (postBuffer === "") {
     sh("git", ["config", "--local", "http.postBuffer", "524288000"], pagesRoot);
     sh("git", ["config", "--local", "http.version", "HTTP/1.1"], pagesRoot);
   }
