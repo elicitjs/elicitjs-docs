@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "arc({ channels, outerRadius, innerRadius, padAngle, arc, start, end }) → Feature",
+      "arc({ channels, outerRadius, innerRadius, padAngle, arc, start, end, handles, handleSize, handleColor, edits, id }) → Feature",
       "donut(options) → Feature",
     ],
     options: [
@@ -36,10 +36,24 @@ export const api: ApiEntry[] = [
         desc: "Gap between slices in degrees.",
       },
       {
-        name: "arc / start / end",
-        type: "…",
+        name: "arc",
+        type: "'semi' | 'full'",
         default: "'full'",
-        desc: "Angular span of the whole pie.",
+        desc: (
+          <>
+            Angular span of the whole pie. <code className="inline">'semi'</code> is the top half.
+          </>
+        ),
+      },
+      {
+        name: "start / end",
+        type: "number",
+        default: "-180 / 180",
+        desc: (
+          <>
+            Explicit span in degrees, clockwise from 12 o&rsquo;clock. Both given, they override <code className="inline">arc</code>.
+          </>
+        ),
       },
       {
         name: "edits",
@@ -56,12 +70,28 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "handles / handleSize",
-        type: "boolean / number",
-        default: "true / 5",
+        name: "handles",
+        type: "boolean | 'hit'",
+        default: "true",
         desc: (
           <>
-            <code className="inline">handles: false</code> keeps the edge grabbable but hides the dot.
+            <code className="inline">'hit'</code> keeps each boundary grabbable but draws no dot. <code className="inline">false</code> is neither drawn nor grabbable.
+          </>
+        ),
+      },
+      {
+        name: "handleSize",
+        type: "number",
+        default: "5",
+        desc: "Pixel radius of each boundary handle.",
+      },
+      {
+        name: "handleColor",
+        type: "string",
+        default: "theme",
+        desc: (
+          <>
+            Handle fill. Defaults to the theme&rsquo;s <code className="inline">handle</code> colour.
           </>
         ),
       },

@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "point({ channels, shape, edits, constraints, id }) → Feature",
+      "point({ channels, shape, edits, id }) → Feature",
     ],
     options: [
       {
@@ -37,12 +37,6 @@ export const api: ApiEntry[] = [
         type: "Edit[]",
         default: "—",
         desc: "Mark-level edits; per-channel edits live in the channels map.",
-      },
-      {
-        name: "constraints",
-        type: "Constraint[]",
-        default: "—",
-        desc: "Data invariants. Sugar — promoted to the dataset, so they hold for every edit from every mark.",
       },
       {
         name: "fill, stroke, size, angle, …",
@@ -81,11 +75,11 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "fill / color",
+        name: "fill",
         type: "const | field",
         desc: (
           <>
-            Fill; a field tints through the ordinal palette (<code className="inline">color</code> is the legacy fallback).
+            Fill; a field tints through the ordinal palette.
           </>
         ),
       },

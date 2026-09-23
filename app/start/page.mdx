@@ -1,0 +1,152 @@
+import { DocShell } from "../../components/DocShell";
+import { Section } from "../../components/Section";
+import { Example } from "../../components/Example";
+import { Lead } from "../../components/Lead";
+
+import aStaticChart from "./_examples/a-static-chart.example.txt";
+import nowEditable from "./_examples/now-editable.example.txt";
+import readingTheAnswer from "./_examples/reading-the-answer.example.txt";
+import withAConstraint from "./_examples/with-a-constraint.example.txt";
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Getting started
+
+<Lead>
+  Install ElicitJS, build a chart with `Elicit(spec)`, make it editable by putting
+  an `edit` on a channel, and read the answer back through `onChange`.
+</Lead>
+
+<Section id="install" title="Install">
+
+ElicitJS is ESM-only. Use it with a bundler (Vite, webpack, Next) or an import map.
+
+```bash
+npm install elicitjs
+```
+
+`d3` v7 is a peer dependency. npm 7+ and pnpm 8+ install it for you; on Yarn, add it yourself with `yarn add elicitjs d3`.
+
+```javascript
+import { Elicit, plot, edit, constraints } from "elicitjs";
+```
+
+Types ship with the package, so TypeScript needs no separate `@types` install. `elicitjs/dist` is a prebuilt single-file bundle if you would rather not bundle the source.
+
+For a plain HTML page, map both names in an import map:
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm",
+      "elicitjs": "https://cdn.jsdelivr.net/npm/elicitjs@alpha/dist/elicit.js"
+    }
+  }
+</script>
+<script type="module">
+  import { Elicit, plot, edit } from "elicitjs";
+</script>
+```
+
+</Section>
+
+<Section id="spec" title="A chart is a spec">
+
+`Elicit(spec)` takes one object and returns a DOM element you append. A spec has three required keys:
+
+- `data` — the dataset. A chart elicits exactly one, and every mark is a view over those rows.
+- `schema` — each field's **type** and **domain**. Scales are derived from this, so no mark declares one.
+- `marks` — how the rows are drawn.
+
+<Example
+  code={aStaticChart}
+  title="A static bar chart"
+  blurb="A complete spec: data, schema and one mark. Nothing here is editable yet."
+/>
+
+A mark names its columns in `channels`. `x: { field: "cat" }` encodes `cat` on the x position. The schema declares `cat` as `categorical` and a bar needs an interval, so that resolves to a band scale. You never write the scale down.
+
+</Section>
+
+<Section id="editable" title="Make it editable">
+
+An edit is the inverse of encoding. A channel encodes data to pixels through a scale. An `edit` on that channel maps a gesture back through the same scale, and writes the column the channel names.
+
+<Example
+  code={nowEditable}
+  title="The same chart, now editable"
+  blurb="`edit: move()` on the y channel. Dragging a bar inverts the y scale and writes `n`."
+  try={<><b>Drag</b> any bar up or down.</>}
+/>
+
+A mark is inert until an edit names the column it writes. No mark interacts by default, so the spec always says which column a gesture changes.
+
+`move()` is one of the universal edits, which work on any mark. Others create and delete rows, draw a path, turn a needle, pick a category from a legend, or rewrite a scale's domain. See [Editing](/editing) for the vocabulary, or the [API index](/api) for every name.
+
+</Section>
+
+<Section id="reading" title="Read the answer back">
+
+Two ways to get the elicited data:
+
+- `onChange(data)` fires after every committed edit, with the whole dataset.
+- `chart.getData()` returns it on demand.
+
+<Example
+  code={readingTheAnswer}
+  title="Reading the elicited data"
+  blurb="`onChange` writes the current values under the chart."
+  try={<><b>Drag</b> a bar — the numbers below follow.</>}
+/>
+
+The returned element also carries `getSchema()`, `setData()`, `on("change" | "stage", cb)`, `undo()`, `redo()` and `destroy()`. Call `destroy()` when unmounting in a framework to release the resize observer and pointer handlers.
+
+</Section>
+
+<Section id="constraints" title="Constrain what can be said">
+
+A constraint is a rule over the dataset. It applies to every edit and every mark, so declare it once in `constraints: [...]` on the spec.
+
+<Example
+  code={withAConstraint}
+  title="Four bars that always sum to 100"
+  blurb="`clamp` keeps values non-negative. `maintainSum` redistributes so the total holds."
+  try={<><b>Drag</b> a bar — the others compensate.</>}
+/>
+
+A constraint can reject a proposed change, or repair it by returning corrected rows. See [Constraints](/constraints) for the full set.
+
+</Section>
+
+<Section id="widgets" title="Widgets">
+
+Common survey instruments are one call each. Each returns a spec you pass to `Elicit`, so you can start from a widget and edit its spec when you need something it does not do.
+
+```javascript
+import { Elicit, widgets } from "elicitjs";
+
+document.body.appendChild(Elicit(widgets.likert({
+  question: "How confident are you?",
+  scale: ["Not at all", "Slightly", "Moderately", "Very", "Extremely"],
+})));
+```
+
+`likert`, `slider`, `matrix`, `ranking`, `allocation`, `interval`, `thermometer` and `histogram` are documented on [Widgets](/widgets).
+
+</Section>
+
+<Section id="next" title="Where to go next">
+
+<div className="next-grid">
+  <a className="next-card" href="/concepts"><b>Core concepts</b><span>Schema, channels, scales, and the encode/edit duality</span></a>
+  <a className="next-card" href="/api"><b>API index</b><span>Every name in the grammar, searchable</span></a>
+  <a className="next-card" href="/marks/bar"><b>Marks</b><span>The drawing vocabulary, one page per mark</span></a>
+  <a className="next-card" href="/editing"><b>Editing</b><span>Gestures, handles, and multi-step stages</span></a>
+  <a className="next-card" href="/widgets"><b>Widgets</b><span>Ready-made survey instruments</span></a>
+  <a className="next-card" href="/playground"><b>Playground</b><span>Compose a chart from menus and read the code</span></a>
+</div>
+
+</Section>

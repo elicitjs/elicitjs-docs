@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "export": "DOCS_EXPORT=1 next build",
+    "gen:api": "node scripts/gen-api-index.mjs",
+    "deploy:pages": "node scripts/deploy-pages.mjs",
     "start": "next start",
     "figures": "node figures/render.mjs"
   },

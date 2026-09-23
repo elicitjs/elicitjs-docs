@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "theme: { ink, accent, muted, background, palette, ramp, diverging, font, axis, grid, guide, constraint, ghost, widget, marks }",
+      "theme: { ink, accent, muted, handle, handleStroke, background, palette, ramp, diverging,\n         font, axis, grid, guide, constraint, effects, ghost, widget, marks }",
     ],
     options: [
       {
@@ -23,6 +23,18 @@ export const api: ApiEntry[] = [
         type: "string",
         default: "#2563eb",
         desc: <>Interactive emphasis: draggable handles, a committed survey answer, an editable-axis handle.</>,
+      },
+      {
+        name: "muted",
+        type: "string",
+        default: "#9ca3af",
+        desc: <>Secondary ink — a de-emphasised mark, a supporting label.</>,
+      },
+      {
+        name: "handle / handleStroke",
+        type: "string",
+        default: "#2563eb / #fff",
+        desc: <>Fill and rim of every grip a mark draws. A mark&rsquo;s own <code className="inline">handleColor</code> still wins.</>,
       },
       {
         name: "background",
@@ -47,6 +59,18 @@ export const api: ApiEntry[] = [
         type: "object",
         default: "neutral greys",
         desc: <>Chart chrome tokens — axis spine/labels/handle, grid lines, and the reference-rule / region / legend guides.</>,
+      },
+      {
+        name: "constraint",
+        type: "{ color }",
+        default: "#e4572e",
+        desc: <>The colour an edit&rsquo;s <a className="underline" href="/guides">guide</a> draws its bounds, catchment and track in.</>,
+      },
+      {
+        name: "effects",
+        type: "object",
+        default: "outline + dim",
+        desc: <>Theme-level defaults for the <a className="underline" href="/effects">effects</a> layer. A chart&rsquo;s own <code className="inline">effects</code> option layers over it.</>,
       },
       {
         name: "ghost",

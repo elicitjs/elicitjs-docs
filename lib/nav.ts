@@ -5,6 +5,7 @@ export const SITE: NavGroup[] = [
     group: "Getting started",
     pages: [
       { href: "/", title: "Intro" },
+      { href: "/start", title: "Getting started" },
       { href: "/overview", title: "Overview" },
       { href: "/concepts", title: "Core concepts" },
       { href: "/concepts/contracts", title: "Mark & element contracts" },
@@ -85,11 +86,11 @@ export const SITE: NavGroup[] = [
     ],
   },
   {
-    group: "Playground",
-    pages: [{ href: "/playground", title: "Composition playground" }],
+    group: "Reference",
+    pages: [{ href: "/api", title: "API index" }],
   },
   {
-    group: "test",
-    pages: [{ href: "/test", title: "Test" }],
+    group: "Playground",
+    pages: [{ href: "/playground", title: "Composition playground" }],
   },
 ];

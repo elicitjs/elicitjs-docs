@@ -55,6 +55,22 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "wrap",
+        type: "number | fn",
+        default: "—",
+        desc: (
+          <>
+            Wrap the label at this pixel width. A function <code className="inline">(d, i, data) ={'>'} number</code> gives a per-datum width, for a label that has to fit the box it sits in.
+          </>
+        ),
+      },
+      {
+        name: "lineHeight",
+        type: "number",
+        default: "1.35 × fontSize",
+        desc: "Pixel step between wrapped lines.",
+      },
+      {
         name: "edits",
         type: "Edit[]",
         default: "—",

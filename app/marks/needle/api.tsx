@@ -33,10 +33,30 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "handles",
+        type: "boolean | 'hit'",
+        default: "true",
+        desc: (
+          <>
+            <code className="inline">'hit'</code> keeps the hub grabbable but draws no circle. <code className="inline">false</code> is neither drawn nor grabbable.
+          </>
+        ),
+      },
+      {
         name: "handleSize",
         type: "number",
         default: "5",
-        desc: "Pivot circle radius in px.",
+        desc: "Hub circle radius in px. The hub is the needle's handle.",
+      },
+      {
+        name: "handleColor",
+        type: "string",
+        default: "theme",
+        desc: (
+          <>
+            Hub fill. Defaults to the theme&rsquo;s <code className="inline">handle</code> colour.
+          </>
+        ),
       },
       {
         name: "baseWidth",

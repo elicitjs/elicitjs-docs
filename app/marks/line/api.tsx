@@ -2,7 +2,7 @@ import type { ApiEntry } from '../../../lib/types';
 
 export const api: ApiEntry[] = [
   {
-    name: "line · lineY · lineX · path · path",
+    name: "line(options) · lineY(options) · lineX(options) · path(options)",
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. One non-interactive connector path per series, drawn under one draggable <code className="inline">circle</code> handle per datum. <code className="inline">lineY</code>/<code className="inline">lineX</code> pin the value axis; <code className="inline">path</code> defaults to <code className="inline">connect: "sequence"</code>.
@@ -72,15 +72,29 @@ export const api: ApiEntry[] = [
       },
       {
         name: "handles",
-        type: "boolean",
+        type: "boolean | 'hit'",
         default: "true",
-        desc: "Show the per-datum handles. When false they stay (for hit-testing) but render invisible.",
+        desc: (
+          <>
+            <code className="inline">true</code> draws a grabbable circle per datum. <code className="inline">'hit'</code> keeps the grab target but draws nothing. <code className="inline">false</code> is neither drawn nor grabbable.
+          </>
+        ),
       },
       {
         name: "handleSize",
         type: "number",
-        default: "4",
+        default: "5",
         desc: "Pixel radius of each handle.",
+      },
+      {
+        name: "handleColor",
+        type: "string",
+        default: "theme",
+        desc: (
+          <>
+            Handle fill. Defaults to the theme&rsquo;s <code className="inline">handle</code> colour.
+          </>
+        ),
       },
       {
         name: "edits, id",
@@ -105,7 +119,7 @@ export const api: ApiEntry[] = [
         desc: "The other axis; the value axis carries the handle edit.",
       },
       {
-        name: "stroke / color",
+        name: "stroke",
         type: "const | field",
         desc: (
           <>

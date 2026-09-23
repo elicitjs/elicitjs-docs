@@ -38,6 +38,12 @@ export const api: ApiEntry[] = [
         desc: "Target total for the field.",
       },
       {
+        name: "maintainSum.field",
+        type: "string",
+        default: "the edited column",
+        desc: "The column whose rows must sum to the total.",
+      },
+      {
         name: "maintainSum.strategy",
         type: "'cap' | 'normalize' | 'redistribute'",
         default: "'cap'",
@@ -74,8 +80,14 @@ export const api: ApiEntry[] = [
       {
         name: "snap.step / origin",
         type: "number",
-        default: "—",
-        desc: "Quantize the field to a grid (slider steps, waffle cells).",
+        default: "1 / 0",
+        desc: "Quantize the field to a grid (slider steps, waffle cells): the spacing, and the value the grid is anchored at.",
+      },
+      {
+        name: "snap.field",
+        type: "string",
+        default: "the edited column",
+        desc: "The data field to quantize.",
       },
       {
         name: "ordering.field",
@@ -83,7 +95,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Fields of one row that must stay in this order — <code className="inline">["lo", "mean", "hi"]</code> means lo ≤ mean ≤ hi. <code className="inline">lower</code>/<code className="inline">upper</code> are sugar for the two-field case.
+            Columns of one row that must stay in this order, as one ordered list — <code className="inline">["lo", "mean", "hi"]</code> means lo ≤ mean ≤ hi. At least two are needed.
           </>
         ),
       },

@@ -9,16 +9,46 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "guides.rule({ x?, y?, stroke, strokeDasharray, label }) → Guide",
+      "guides.rule({ x?, y?, label, stroke, strokeDasharray, strokeWidth, opacity }) → Guide",
       "guides.region({ x?, y?, fill, opacity }) → Guide",
-      "guides.remaining({ field, total?, unit?, anchor?, label? }) → Guide",
-      "guides.proximity({ target, color }) → Guide",
+      "guides.remaining({ field, total?, unit?, format?, anchor?, label?, fill?, fontSize? }) → Guide",
+      "guides.proximity({ target, stroke, strokeDasharray, strokeWidth, opacity }) → Guide",
       "guides.custom((ctx) => FeatureNode[]) → Guide",
       "",
       "// any option may be a function of the guide context:",
       "guides.rule({ y: ({ data }) => d3.mean(data, (d) => d.y), label: \"mean\" })",
     ],
     options: [
+      {
+        name: "rule.x / y",
+        type: "any | (ctx) => any",
+        default: "—",
+        desc: "The value to draw the reference line at — a number, a category, or a function of the data. Give both for a crosshair.",
+      },
+      {
+        name: "rule.label",
+        type: "string | (ctx) => string",
+        default: "—",
+        desc: "Text drawn beside the line.",
+      },
+      {
+        name: "rule.stroke / strokeDasharray / strokeWidth / opacity",
+        type: "style",
+        default: "theme.guide.rule",
+        desc: "Line paint. Restyle every reference line at once through the theme instead.",
+      },
+      {
+        name: "region.x / y",
+        type: "[a, b] | (ctx) => [a, b]",
+        default: "—",
+        desc: "The two values to shade between on that axis. Give both for a rectangle.",
+      },
+      {
+        name: "region.fill / opacity",
+        type: "style",
+        default: "#64748b / 0.1",
+        desc: "Band fill and opacity.",
+      },
       {
         name: "remaining.field / total",
         type: "string | (ctx) => string  ·  number | (ctx) => number",
@@ -32,46 +62,34 @@ export const api: ApiEntry[] = [
         desc: "`unit` gives the countable phrasing (\"3 tokens left\"); `anchor` picks the corner; `label` replaces the wording entirely.",
       },
       {
-        name: "rule.x / y",
-        type: "any | (ctx) => any",
-        default: "—",
-        desc: "The value to draw the reference line at (a number, a category, or a function of the data).",
+        name: "remaining.format",
+        type: "string | fn",
+        default: "auto",
+        desc: "How the number reads: a d3-format string, or a formatter function.",
       },
       {
-        name: "rule.label",
-        type: "string | (ctx) => string",
-        default: "—",
-        desc: "Optional text label near the line.",
-      },
-      {
-        name: "rule.stroke / strokeDasharray",
-        type: "style",
-        default: "#64748b / '5 4'",
-        desc: "Line colour and dash pattern.",
-      },
-      {
-        name: "region.x / y",
-        type: "[a, b] | (ctx) => [a, b]",
-        default: "—",
-        desc: "The two values to shade between on that axis.",
-      },
-      {
-        name: "region.fill / opacity",
-        type: "style",
-        default: "#64748b / 0.1",
-        desc: "Band fill and opacity.",
+        name: "remaining.fill / fontSize",
+        type: "string / number",
+        default: "theme / 11",
+        desc: "Readout colour and size.",
       },
       {
         name: "proximity.target",
         type: "string",
         default: "—",
-        desc: "The feature id whose nearest-pick selection to visualize (ring + highlight).",
+        desc: "The `id` of the feature whose proximity catchment to draw — a dashed ring at the pointer, the radius within which it reaches for a mark. Prefer `guide: { catchment: true }` on the edit itself, which needs no id.",
       },
       {
-        name: "proximity.color",
+        name: "proximity.stroke / strokeDasharray / strokeWidth / opacity",
+        type: "style",
+        default: "theme catchment",
+        desc: "Ring paint.",
+      },
+      {
+        name: "id",
         type: "string",
-        default: "effect",
-        desc: "Override the highlight colour (else the effects layer’s).",
+        default: "—",
+        desc: "Stable identity, on every guide.",
       },
     ],
     returns: (
@@ -79,6 +97,84 @@ export const api: ApiEntry[] = [
         Each returns a <b>Guide</b> (<code className="inline">{'{'} isGuide: true, build(ctx) {'}'}</code>), rebuilt every render so it tracks live data.
       </>
     ),
+  },
+  {
+    name: "guides.custom(build)",
+    summary: (
+      <>
+        Draw your own non-interactive nodes from the live render context. One word for &ldquo;author your own&rdquo; in every namespace — cf. <code className="inline">edit.custom</code> and <code className="inline">constraints.custom</code>.
+      </>
+    ),
+    signatures: [
+      "guides.custom((ctx) => FeatureNode[]) → Guide",
+    ],
+    options: [
+      {
+        name: "ctx",
+        type: "object",
+        default: "—",
+        desc: "The guide context: { scales, state, features, featureNodes, ui, effects, width, height, stage }.",
+      },
+      {
+        name: "return",
+        type: "FeatureNode[]",
+        default: "—",
+        desc: "Nodes to draw. Every one is tagged pointerEvents: 'none', so a custom guide can never capture a gesture.",
+      },
+      {
+        name: "node.background",
+        type: "boolean",
+        default: "false",
+        desc: "Draw this node behind the marks — a track, a cell grid — rather than in front.",
+      },
+    ],
+  },
+  {
+    name: "Instrument affordances",
+    summary: (
+      <>
+        The chrome a survey instrument draws itself with. Guides like any other — pass them in <code className="inline">guides: [...]</code>. The built-in <a href="/widgets">widgets</a> are assembled from these, so a hand-built instrument gets the same look.
+      </>
+    ),
+    signatures: [
+      "guides.prompt(text, { y }) → Guide            // the question, in the top margin",
+      "guides.optionRings({ labelOffset, radius }) → Guide   // a Likert scale's rings",
+      "guides.cellGrid({ pad }) → Guide              // a matrix's cells + headers",
+      "guides.sliderTrack({ format }) → Guide        // a track with end labels",
+      "guides.crosshair({ x, y }) → Guide            // centred axes + four end labels",
+    ],
+    options: [
+      {
+        name: "prompt.y",
+        type: "number",
+        default: "—",
+        desc: "Lift the prompt clear of whatever sits below it — column headers, an axis title.",
+      },
+      {
+        name: "optionRings.radius / labelOffset",
+        type: "number",
+        default: "—",
+        desc: "Ring radius, and the label's distance below it.",
+      },
+      {
+        name: "cellGrid.pad",
+        type: "number",
+        default: "—",
+        desc: "Gap between cells, in px.",
+      },
+      {
+        name: "sliderTrack.format",
+        type: "fn",
+        default: "String",
+        desc: "How the two end labels read.",
+      },
+      {
+        name: "crosshair.x / y",
+        type: "string",
+        default: "—",
+        desc: "The variable name to label each axis's high and low ends with.",
+      },
+    ],
   },
   {
     name: "guide (on an edit)",
@@ -119,7 +215,7 @@ export const api: ApiEntry[] = [
         name: "<part>.dash · width · opacity",
         type: "any",
         default: "—",
-        desc: "Per-part stroke appearance. Every one of these used to be a hard-coded literal.",
+        desc: "Per-part stroke appearance.",
       },
     ],
   },

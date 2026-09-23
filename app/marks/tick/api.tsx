@@ -25,6 +25,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "auto",
+        desc: (
+          <>
+            Which axis the value runs along (<code className="inline">'vertical'</code> = y). Inferred from which axis is a band; <code className="inline">tickY / tickX</code> pin it.
+          </>
+        ),
+      },
+      {
         name: "inset",
         type: "number",
         default: "0",
@@ -36,7 +46,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Explicit centered span length in pixels. On a band axis it centres in the band; when the span axis also has a channel (e.g. scatter <code className="inline">x</code>+<code className="inline">y</code>), it centres on that channel’s encoded position so a short tick sits on the datum.
+            Explicit centred span length in pixels. On a band axis it centres in the band; when the span axis also has a channel (e.g. scatter <code className="inline">x</code>+<code className="inline">y</code>), it centres on that channel’s encoded position so a short tick sits on the datum.
           </>
         ),
       },
@@ -45,12 +55,6 @@ export const api: ApiEntry[] = [
         type: "Edit[]",
         default: "—",
         desc: "Mark-level edits; per-channel edits live in the channels map.",
-      },
-      {
-        name: "constraints",
-        type: "Constraint[]",
-        default: "—",
-        desc: "Data invariants. Sugar — promoted to the dataset, so they hold for every edit from every mark.",
       },
       {
         name: "stroke, strokeWidth, …",

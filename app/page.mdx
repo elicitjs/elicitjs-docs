@@ -16,13 +16,35 @@ export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# What you can elicit
+<div className="hero">
+
+# ElicitJS
+
+<div className="hero-tag">
+  A declarative library for visual <b>belief elicitation</b>. Build a chart people
+  fill in: they drag a bar, place a point or turn a dial, and you get structured
+  data back.
+</div>
+
+<div className="hero-actions">
+  <a className="hero-btn primary" href="/start">Get started →</a>
+  <a className="hero-btn" href="/api">API reference</a>
+  <a className="hero-btn" href="/playground">Playground</a>
+  <a className="hero-btn" href="https://github.com/elicitjs/elicitjs">GitHub</a>
+  <span className="hero-install"><span className="sigil">$</span> npm install elicitjs</span>
+</div>
+
+<div className="hero-alpha">
+  Alpha: pre-1.0 and under active development, so expect breaking changes.
+  ESM-only, with `d3` v7 as a peer dependency.
+</div>
+
+</div>
+
+## What you can elicit
 
 <Lead>
-  ElicitJS lets you build charts you can use to elicit information (beliefs,
-  preferences, and other things) from people. drag a bar, place a point, turn a
-  dial — and you get structured data back (see the panel next to each chart).
-  Try the questions below.
+  Each chart below is live. Drag it, and the data it produces updates beside it.
 </Lead>
 
 <Section id="allocate" title="How would you allocate 100% across these categories?" codeMode="collapsed">

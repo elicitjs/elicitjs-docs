@@ -76,6 +76,12 @@ export const api: ApiEntry[] = [
         desc: "Select by category or predicate. The default takes the first match; { all: true } takes every one, which is what selecting a category usually means.",
       },
       {
+        name: "clearSelection",
+        type: "()",
+        default: "—",
+        desc: "Empty the selection. The same commit path, so the select event fires.",
+      },
+      {
         name: "on('select')",
         type: "(first, all) => void",
         default: "—",

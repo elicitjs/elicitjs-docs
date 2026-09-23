@@ -10,7 +10,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "link({ channels, key, curve, curvature, spread, arrow, arrowSize, inset, sourceInset, targetInset, loopRadius, nodeWidth, nodeHeight, cornerRadius, sourceSide, targetSide, labelBackground, labelPadding, labelRadius, labelOpacity, table, format, id }) → Feature",
+      "link({ channels, curve, curvature, spread, arrow, arrowSize, inset, sourceInset, targetInset, loopRadius, nodeWidth, nodeHeight, cornerRadius, sourceSide, targetSide, labelBackground, labelPadding, labelRadius, labelOpacity, format, handles, handleSize, handleColor, table, edits, id }) → Feature",
     ],
     options: [
       {
@@ -32,25 +32,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "key",
-        type: "string",
-        default: "the node table’s key",
-        desc: (
-          <>
-            The column that identifies a node. Declare it in the schema with{" "}
-            <code className="inline">key: true</code> instead where you can.
-          </>
-        ),
-      },
-      {
         name: "curve",
-        type: '"line" | "step" | "stepBefore" | "stepAfter" | "arc" | "bezier"',
+        type: '"line" | "step" | "stepBefore" | "stepAfter" | "orthogonal" | "arc" | "bezier"',
         default: '"line"',
         desc: (
           <>
             The connector’s shape. <code className="inline">step</code> and its two variants
-            are right-angled elbows; <code className="inline">arc</code> is a quadratic bow
-            and <code className="inline">bezier</code> a cubic with square tangents.{" "}
+            are right-angled elbows drawn between node centres; <code className="inline">orthogonal</code>
+            is the flowchart elbow, docked to each node&rsquo;s box edge.{" "}
+            <code className="inline">arc</code> is a quadratic bow and{" "}
+            <code className="inline">bezier</code> a cubic with square tangents.{" "}
             <code className="inline">"smooth"</code> is an alias of{" "}
             <code className="inline">bezier</code>. A link whose source and target are the
             same node draws a loop whatever you set here.
@@ -196,6 +187,54 @@ export const api: ApiEntry[] = [
         desc: <>The plate&rsquo;s corner radius, in px.</>,
       },
       {
+        name: "sourceInset / targetInset",
+        type: "number",
+        default: "inset",
+        desc: <>Override <code className="inline">inset</code> for one end only.</>,
+      },
+      {
+        name: "targetSide",
+        type: '"auto" | "top" | "right" | "bottom" | "left"',
+        default: '"auto"',
+        desc: <>Which edge the connector enters the target node by, under <code className="inline">curve: "orthogonal"</code>.</>,
+      },
+      {
+        name: "format",
+        type: "string | fn",
+        default: "String",
+        desc: (
+          <>
+            Display formatter for <code className="inline">channels.text</code>: a d3-format
+            string, or <code className="inline">(v) ={'>'} string</code>. Display-only — the
+            column stays raw.
+          </>
+        ),
+      },
+      {
+        name: "handles",
+        type: "boolean | 'hit'",
+        default: "true",
+        desc: (
+          <>
+            Endpoint grips. Drawn only where a channel carries an edit, so an inert link
+            shows none. <code className="inline">'hit'</code> keeps the grip grabbable but
+            draws nothing.
+          </>
+        ),
+      },
+      {
+        name: "handleSize",
+        type: "number",
+        default: "5",
+        desc: "Pixel radius of each endpoint grip.",
+      },
+      {
+        name: "handleColor",
+        type: "string",
+        default: "theme",
+        desc: <>Grip fill. Defaults to the theme&rsquo;s <code className="inline">handle</code> colour.</>,
+      },
+      {
         name: "table",
         type: "string",
         default: "the links-role table",
@@ -220,7 +259,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "node({ channels, dy, shape, size, format, table, edits, constraints, id }) → Feature[]",
+      "node({ channels, dy, shape, size, format, table, edits, id }) → Feature[]",
     ],
     options: [
       {
@@ -251,6 +290,17 @@ export const api: ApiEntry[] = [
         type: '"circle" | "square"',
         default: '"circle"',
         desc: <>Passed to the dot.</>,
+      },
+      {
+        name: "format",
+        type: "string | fn",
+        default: "String",
+        desc: (
+          <>
+            Display formatter for the label: a d3-format string, or{" "}
+            <code className="inline">(v) ={'>'} string</code>. Display-only.
+          </>
+        ),
       },
     ],
     returns: (

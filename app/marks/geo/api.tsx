@@ -17,7 +17,7 @@ export const api: ApiEntry[] = [
     name: "geoBasemap({ geojson, … })",
     summary: (
       <>
-        Inert background map. Pass topology as a mark option — <code className="inline">geojson</code> (or <code className="inline">features</code>) — not as <code className="inline">Elicit</code> data. Load your own: <code className="inline">const map = await fetch("…").then(r ={'>'} r.json())</code> then <code className="inline">geoBasemap({'{'} geojson: map {'}'})</code>. A FeatureCollection draws <b>one path per feature</b> so boundaries show.
+        Inert background map. Pass topology as a mark option — <code className="inline">geojson</code> — not as <code className="inline">Elicit</code> data. Load your own: <code className="inline">const map = await fetch("…").then(r ={'>'} r.json())</code> then <code className="inline">geoBasemap({'{'} geojson: map {'}'})</code>. A FeatureCollection draws <b>one path per feature</b> so boundaries show.
       </>
     ),
     signatures: [
@@ -29,16 +29,6 @@ export const api: ApiEntry[] = [
         type: "GeoJSON",
         default: "—",
         desc: "FeatureCollection, Feature, or Geometry. Required for a visible basemap.",
-      },
-      {
-        name: "features",
-        type: "GeoJSON",
-        default: "—",
-        desc: (
-          <>
-            Alias of <code className="inline">geojson</code>.
-          </>
-        ),
       },
       {
         name: "fill / stroke / strokeWidth",
@@ -57,7 +47,7 @@ export const api: ApiEntry[] = [
     ),
     signatures: [
       "geoTile() → Feature  // OSM standard + attribution",
-      "geoTile({ url, subdomains, opacity, attribution, minZoom, maxZoom, zoomOffset }) → Feature",
+      "geoTile({ url, subdomains, tileSize, opacity, attribution, attributionSize, minZoom, maxZoom, zoomOffset, id }) → Feature",
     ],
     options: [
       {
@@ -93,10 +83,22 @@ export const api: ApiEntry[] = [
         desc: "Drawn bottom-right. A licence condition of every tile service — only pass null if you render the credit yourself.",
       },
       {
+        name: "attributionSize",
+        type: "number",
+        default: "9",
+        desc: "Attribution font size in px.",
+      },
+      {
         name: "zoomOffset / minZoom / maxZoom",
         type: "number",
         default: "0 / 0 / 19",
         desc: "Nudge or clamp the chosen zoom level (picked from the fitted scale).",
+      },
+      {
+        name: "tileSize",
+        type: "number",
+        default: "256",
+        desc: "Edge length of one tile in px. Set it for a server that serves retina tiles.",
       },
     ],
     returns: "A Feature emitting image nodes into the background layer, keyed by {z}/{x}/{y} so on-screen tiles survive a re-render without re-fetching.",
@@ -111,10 +113,71 @@ export const api: ApiEntry[] = [
     signatures: [
       "geoPoint({ channels: { lon, lat, size, fill }, edits }) → Feature",
       "geoPolygon({ channels: { geometry, fill } }) → Feature",
-      "geoLine({ channels: { coordinates }, showVertices }) → Feature  // one line per row",
-      "geoLine({ channels: { lon, lat }, order, series }) → Feature    // one path across rows",
+      "geoLine({ channels: { coordinates }, curve, showVertices }) → Feature  // one line per row",
+      "geoLine({ channels: { lon, lat, series, order }, connect }) → Feature  // one path across rows",
       "geoText({ channels: { lon, lat, text }, dx, dy, format }) → Feature",
       "geoRect({ channels: { west, south, east, north } }) → Feature",
+    ],
+    options: [
+      {
+        name: "showVertices",
+        type: "boolean",
+        default: "row mode: false",
+        desc: (
+          <>
+            <code className="inline">geoLine</code> only. Draw a draggable circle at each
+            vertex. On by default for a <code className="inline">coordinates</code> line,
+            whose vertices it owns; off for a <code className="inline">lon</code>/
+            <code className="inline">lat</code> line, whose dots belong to a sibling{" "}
+            <code className="inline">geoPoint</code>.
+          </>
+        ),
+      },
+      {
+        name: "curve",
+        type: "string",
+        default: "'linear'",
+        desc: (
+          <>
+            <code className="inline">geoLine</code> interpolation between vertices, e.g.{" "}
+            <code className="inline">"catmullRom"</code>.
+          </>
+        ),
+      },
+      {
+        name: "connect",
+        type: "'sequence' | 'domain'",
+        default: "'sequence'",
+        desc: (
+          <>
+            <code className="inline">geoLine</code> row order when no{" "}
+            <code className="inline">order</code> channel is given. A route follows the rows
+            as written, so this is the opposite default to <code className="inline">line</code>.
+          </>
+        ),
+      },
+      {
+        name: "handles / handleSize / handleColor",
+        type: "boolean | 'hit' / number / string",
+        default: "true / 5 / theme",
+        desc: (
+          <>
+            <code className="inline">geoLine</code> vertex grips, as on{" "}
+            <code className="inline">line</code>.
+          </>
+        ),
+      },
+      {
+        name: "format",
+        type: "string | fn",
+        default: "String",
+        desc: (
+          <>
+            <code className="inline">geoText</code> display formatter for the{" "}
+            <code className="inline">text</code> channel. Display-only.
+          </>
+        ),
+      },
     ],
     channels: [
       {
@@ -178,10 +241,11 @@ export const api: ApiEntry[] = [
     signatures: [
       "edit.geo.move() — move a geoPoint",
       "edit.geo.create() — click to place a lon/lat row",
-      "edit.geo.draw() — drag to author a coordinates list",
+      "edit.geo.draw({ minDist }) — drag to author a coordinates list (minDist: 8 px per vertex)",
       "edit.geo.dragVertex() — move a geoLine vertex handle",
-      "edit.geo.brush({ move, edgeInset }) — resize/move a geoRect (geoBrush driver)",
-      "edit.geo.createRect({ width, height }) — click open map to mint a bbox (degrees)",
+      "edit.geo.removeVertex({ min }) — click a vertex away (min: 2 vertices kept)",
+      "edit.geo.brush({ move, edgeInset }) — resize/move a geoRect",
+      "edit.geo.createRect({ width, height, edgeInset }) — click open map to mint a bbox (degrees)",
     ],
   },
 ];

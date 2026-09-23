@@ -5,7 +5,7 @@ export const api: ApiEntry[] = [
     name: "anyEdit({ pick: \"probe\", stage, advance })",
     summary: (
       <>
-        Not a new edit — a <b>pick</b>, i.e. a driver (<code className="inline">src/edit/drivers/probe.js</code>). It runs the edit you gave it twice through one shared code path: on <code className="inline">hover</code>/<code className="inline">drag</code> the proposal is parked as a preview and drawn as an inert <b>ghost</b>, and on <code className="inline">click</code>/<code className="inline">dragend</code> the identical proposal is committed. The ghost therefore <i>is</i> what a commit writes — it cannot drift. Both gestures settle, so a knob can be dragged as well as clicked.
+        Not a new edit — a <b>pick</b> you give an existing one. It runs that edit twice. On <code className="inline">hover</code> or <code className="inline">drag</code> the proposal is parked as a preview and drawn as an inert <b>ghost</b>; on <code className="inline">click</code> or <code className="inline">dragend</code> the same proposal is committed. The ghost is therefore exactly what a commit writes. Both gestures settle, so a knob can be dragged as well as clicked.
       </>
     ),
     signatures: [

@@ -16,5 +16,40 @@ export const api: ApiEntry[] = [
       "el.nextStage()               // setStage(current + 1)",
       "el.on(\"stage\", (n) => …)     // subscribe; returns an unsubscribe fn",
     ],
+    options: [
+      {
+        name: "edit.stage",
+        type: "number",
+        default: "null",
+        desc: "The stage this edit is active in. Unset, it is active in every stage.",
+      },
+      {
+        name: "spec.stage",
+        type: "number",
+        default: "0",
+        desc: "Which stage the chart starts on.",
+      },
+      {
+        name: "spec.stageLabels",
+        type: "string[]",
+        default: "[]",
+        desc: "A caption per stage, read back with getStageLabel().",
+      },
+      {
+        name: "edit.advance",
+        type: "boolean",
+        default: "true",
+        desc: (
+          <>
+            Whether a settled <a href="/editing/probe">probe</a> click moves the chart on. Set <code className="inline">false</code> to answer repeatedly within one stage.
+          </>
+        ),
+      },
+    ],
+    returns: (
+      <>
+        <code className="inline">setStage</code> and <code className="inline">nextStage</code> emit <code className="inline">stage</code> and re-render. The stage gates dispatch, the cursor, plane pick order, and guides, so an edit outside the current stage is inert everywhere at once.
+      </>
+    ),
   },
 ];

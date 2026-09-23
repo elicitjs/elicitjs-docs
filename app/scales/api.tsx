@@ -36,6 +36,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "fn",
+        type: "(d, i, data) => any",
+        default: "—",
+        desc: (
+          <>
+            A <b>derived</b> channel, computed per datum in visual space — the result is used as-is, never scaled. <code className="inline">fill: d ={'>'} …</code> is the shorthand. It is <b>read-only</b>: a derived channel cannot carry an <code className="inline">edit</code>, because it is opaque to the edit layer. Put the edit on the source field&rsquo;s channel; the function re-derives from the committed rows on every render.
+          </>
+        ),
+      },
+      {
         name: "type",
         type: "MeasureType",
         default: "from schema",
@@ -52,6 +62,26 @@ export const api: ApiEntry[] = [
         desc: (
           <>
             How to draw it. <code className="inline">null</code> passes the field through unscaled (a literal colour / pixel). See <b>Scale forms</b>.
+          </>
+        ),
+      },
+      {
+        name: "frame",
+        type: "number | [lo, hi] | boolean",
+        default: "—",
+        desc: (
+          <>
+            Position this channel <b>locally</b>, inside the enclosing <a href="/marks/composite">composite</a>&rsquo;s box, and switch that composite into box mode. Shorthand for a <code className="inline">frame</code> scale.
+          </>
+        ),
+      },
+      {
+        name: "legend",
+        type: "boolean | object | null",
+        default: "—",
+        desc: (
+          <>
+            Draw a key for this encoding. Non-positional channels only — an axis is the key for x and y. See <a href="/marks/legend">Legend</a>.
           </>
         ),
       },
@@ -113,6 +143,22 @@ export const api: ApiEntry[] = [
         type: "any[]",
         default: "from geometry",
         desc: "The output extent — pixels, radii, colours. Positional ranges default to the plot size.",
+      },
+      {
+        name: "ScaleSpec.scheme",
+        type: "string",
+        default: "—",
+        desc: (
+          <>
+            A named colour palette (<code className="inline">"RdBu"</code>, <code className="inline">"Tableau10"</code>, …), used when no explicit <code className="inline">range</code> is given. An explicit range still wins.
+          </>
+        ),
+      },
+      {
+        name: "ScaleSpec.reverse",
+        type: "boolean",
+        default: "false",
+        desc: "Flip the range end for end — a scheme read the other way, or an axis that counts down.",
       },
       {
         name: "ScaleSpec.padding",

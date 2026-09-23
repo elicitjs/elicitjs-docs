@@ -10,8 +10,18 @@ const libRoot = path.join(workspaceRoot, 'elicitjs');
 const elicitEntry = path.join(libRoot, 'src/index.js');
 const rawLoader = path.join(__dirname, 'loaders/raw-string-loader.cjs');
 
+// Static export is OPT-IN, via DOCS_EXPORT=1 (see scripts/deploy-pages.mjs).
+// It must never be the default: `next dev` backs both regression gates in the
+// library repo (verify:browser drives real gestures, check:warnings reads console
+// output), and an exported build has no dev server to drive. Gating it here keeps
+// one config honest for both jobs.
+const isExport = process.env.DOCS_EXPORT === '1';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // GitHub Pages serves no directory-index rewrites, so every route is emitted as
+  // its own `index.html` under a trailing-slash path.
+  ...(isExport ? { output: 'export', trailingSlash: true, images: { unoptimized: true } } : {}),
   // Allow importing the library from the sibling ../elicitjs/src
   outputFileTracingRoot: workspaceRoot,
   pageExtensions: ['ts', 'tsx', 'mdx'],

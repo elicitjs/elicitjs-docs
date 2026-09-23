@@ -5,7 +5,7 @@ export const api: ApiEntry[] = [
     name: "axisRadial(options)",
     summary: (
       <>
-        Import from <code className="inline">elicit.plot</code>.
+        Import from <code className="inline">elicit.elements</code>. A curved axis for a polar scale: an arc spine with ticks and labels, and optional coloured bands behind it.
       </>
     ),
     signatures: [
@@ -36,7 +36,7 @@ export const api: ApiEntry[] = [
         default: "18",
         desc: (
           <>
-            Radial thickness of colored bands when <code className="inline">innerRadius</code> is 0.
+            Radial thickness of coloured bands when <code className="inline">innerRadius</code> is 0.
           </>
         ),
       },
@@ -86,13 +86,35 @@ export const api: ApiEntry[] = [
       },
       {
         name: "arc / start / end",
-        type: "…",
+        type: "'semi' | 'full' / number",
         default: "'semi'",
         desc: (
           <>
             <code className="inline">full</code> or an explicit degree span; the scale’s numeric <code className="inline">range</code> wins when set.
           </>
         ),
+      },
+      {
+        name: "title",
+        type: "string",
+        default: "—",
+        desc: "A caption for the axis.",
+      },
+      {
+        name: "channels",
+        type: "object",
+        default: "{}",
+        desc: (
+          <>
+            Placement only — <code className="inline">x</code>/<code className="inline">y</code> for one ring per row, and <code className="inline">fill</code> for band colour. An element views a scale, so this is chrome, not encoding.
+          </>
+        ),
+      },
+      {
+        name: "id",
+        type: "string",
+        default: "—",
+        desc: "Stable identity, as on every mark.",
       },
     ],
     channels: [
@@ -106,7 +128,7 @@ export const api: ApiEntry[] = [
         type: "ordinal",
         desc: (
           <>
-            Colors categorical bands when <code className="inline">bands: true</code>. Set a palette with <code className="inline">scale: {'{'} scheme: "…" {'}'}</code> (add <code className="inline">reverse: true</code> to flip) or <code className="inline">scale: {'{'} range: [...] {'}'}</code>.
+            Colours categorical bands when <code className="inline">bands: true</code>. Set a palette with <code className="inline">scale: {'{'} scheme: "…" {'}'}</code> (add <code className="inline">reverse: true</code> to flip) or <code className="inline">scale: {'{'} range: [...] {'}'}</code>.
           </>
         ),
       },

@@ -13,7 +13,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      'bar({ channels, orientation, edits, constraints, id }) → Feature',
+      'bar({ channels, orientation, edits, id }) → Feature',
       'barY(options) → Feature   // orientation: "vertical"',
       'barX(options) → Feature   // orientation: "horizontal"',
     ],
@@ -70,17 +70,6 @@ export const api: ApiEntry[] = [
             <code className="inline">edit.stack.cut()</code>,{' '}
             <code className="inline">edit.stack.edge()</code> and{' '}
             <code className="inline">edit.stack.merge()</code>.
-          </>
-        ),
-      },
-      {
-        name: 'constraints',
-        type: 'Constraint[]',
-        default: '—',
-        desc: (
-          <>
-            Data invariants. Sugar — promoted to the dataset, so they hold for every
-            edit from every mark (e.g. <code className="inline">maintainSum</code>).
           </>
         ),
       },

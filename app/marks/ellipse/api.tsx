@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "ellipse({ channels, edits, constraints, id }) → Mark",
+      "ellipse({ channels, edits, id }) → Mark",
     ],
     options: [
       {

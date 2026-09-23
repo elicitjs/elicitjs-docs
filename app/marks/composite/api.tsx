@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "composite({ parts, channels, edits, constraints, discreteScale, id }) → Feature[]",
+      "composite({ parts, channels, edits, discreteScale, id }) → Feature[]",
     ],
     options: [
       {
@@ -49,16 +49,6 @@ export const api: ApiEntry[] = [
         desc: (
           <>
             Mark-level edits. They ride the <b>last</b> part — one dataset, so a whole-dataset edit declared on every part would fire once per part. In box mode they ride the <b>box</b>, whose channel map holds the glyph’s placement columns.
-          </>
-        ),
-      },
-      {
-        name: "constraints",
-        type: "Constraint[]",
-        default: "—",
-        desc: (
-          <>
-            Group-level data invariants. Promoted into the <b>dataset’s</b> constraint set, so they gate and repair every edit — including one made through a different part. See <b>Constraints</b>.
           </>
         ),
       },
@@ -119,7 +109,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        An <b>array of features</b> — the parts, with ids assigned, composite channels merged in, and the composite&rsquo;s constraints attached. In box mode the array is led by the <b>box</b>, which carries the composite&rsquo;s x/y/size and covers the whole glyph — so a <code className="inline">move()</code> / <code className="inline">resize()</code> on those channels picks the glyph up from anywhere on it. Nothing about the glyph reaches the engine: it sees ordinary marks reading the one dataset.
+        An <b>array of features</b> — the parts, with ids assigned, composite channels merged in. In box mode the array is led by the <b>box</b>, which carries the composite&rsquo;s x/y/size and covers the whole glyph — so a <code className="inline">move()</code> / <code className="inline">resize()</code> on those channels picks the glyph up from anywhere on it. Nothing about the glyph reaches the engine: it sees ordinary marks reading the one dataset.
       </>
     ),
   },

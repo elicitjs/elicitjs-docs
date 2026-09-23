@@ -192,7 +192,7 @@ export const api: ApiEntry[] = [
         default: "injected",
         desc: (
           <>
-            The ordinal channel to advance (usually <code className="inline">color</code>/<code className="inline">fill</code>).
+            The ordinal channel to advance, usually <code className="inline">fill</code>.
           </>
         ),
       },
@@ -204,10 +204,110 @@ export const api: ApiEntry[] = [
     ),
   },
   {
+    name: "toggle(options)",
+    summary: (
+      <>
+        Slot edit — <code className="inline">create</code> and <code className="inline">remove</code> folded into the one gesture a checkbox has. Click an empty slot to mint a datum there; click an occupied one to take it back.
+      </>
+    ),
+    signatures: [
+      "toggle({ channels, pick, when, stage }) → Edit",
+    ],
+    options: [
+      {
+        name: "channels",
+        type: "string[]",
+        default: "injected",
+        desc: (
+          <>
+            The channels whose inverted values name a slot. One (<code className="inline">["x"]</code>) toggles an option on a scale; two (<code className="inline">["x","y"]</code>) toggle a cell of a grid.
+          </>
+        ),
+      },
+      {
+        name: "pick",
+        type: "'plane' | 'probe'",
+        default: "'plane'",
+        desc: (
+          <>
+            <code className="inline">probe</code> previews the toggle on hover before the click commits it.
+          </>
+        ),
+      },
+    ],
+    returns: (
+      <>
+        An <b>Edit</b> returning the full dataset. Pairs with <code className="inline">unique</code> for one pick per row and <code className="inline">count</code> for a cap.
+      </>
+    ),
+  },
+  {
+    name: "set(options)",
+    summary: (
+      <>
+        Value edit — write a value straight into the channel&rsquo;s field, whatever its type. Its input is the value itself, not a pixel, so it is the edit an <a href="/editing/external-controls">external control</a> drives.
+      </>
+    ),
+    signatures: [
+      "set({ channel, channels, name, when, stage }) → Edit",
+    ],
+    options: [
+      {
+        name: "channel / channels",
+        type: "string / string[]",
+        default: "injected",
+        desc: "Which channel's field to write.",
+      },
+      {
+        name: "name",
+        type: "string",
+        default: "—",
+        desc: (
+          <>
+            Address it from outside with <code className="inline">el.control(name).set(value)</code>. <code className="inline">accepts()</code> reports what the channel&rsquo;s scale allows.
+          </>
+        ),
+      },
+    ],
+    returns: (
+      <>
+        An <b>Edit</b> (gesture <code className="inline">commit</code>) returning the datum with that field set.
+      </>
+    ),
+  },
+  {
+    name: "rank(options)",
+    summary: (
+      <>
+        Reorder by dragging along a rank axis. The pointer inverts to a rank slot, and the datum <b>swaps</b> with whoever holds it, so ranks stay unique.
+      </>
+    ),
+    signatures: [
+      "rank({ channel, channels, when, stage }) → Edit",
+    ],
+    options: [
+      {
+        name: "channel / channels",
+        type: "string / string[]",
+        default: "injected",
+        desc: (
+          <>
+            The rank axis — a band, point or quantitative scale. Place it on that channel: <code className="inline">y: {'{'} field: "rank", edit: rank() {'}'}</code>.
+          </>
+        ),
+      },
+    ],
+    returns: (
+      <>
+        An <b>Edit</b> returning the full dataset, with the two swapped rows rewritten.
+      </>
+    ),
+  },
+  {
     name: "custom(fn, options)",
     summary: (
       <>
-        The escape hatch — an arbitrary edit. <code className="inline">fn</code> is the body of <code className="inline">apply</code>; the descriptor still declares which gesture fires it.
+        An arbitrary edit. <code className="inline">fn</code> becomes the edit&rsquo;s <code className="inline">apply</code>; the descriptor still declares which gesture fires it.
       </>
     ),
     signatures: [

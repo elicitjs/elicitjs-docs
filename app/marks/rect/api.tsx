@@ -35,6 +35,26 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "width / height",
+        type: "number",
+        default: "—",
+        desc: (
+          <>
+            Fixed pixel extent for every rect, centred on its <code className="inline">x</code>/<code className="inline">y</code> anchor. Overrides the band cell and the baseline&rarr;value span. Also available per datum as channels.
+          </>
+        ),
+      },
+      {
+        name: "rx",
+        type: "number",
+        default: "0",
+        desc: (
+          <>
+            Corner radius in px. Also available per datum as a <code className="inline">rx</code> channel.
+          </>
+        ),
+      },
+      {
         name: "edits",
         type: "Edit[]",
         default: "—",

@@ -43,12 +43,22 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "elements",
+        type: "Feature[]",
+        default: "[]",
+        desc: (
+          <>
+            Scale chrome — <a href="/marks/axes">axis</a>, grid, <a href="/marks/legend">legend</a>, <a href="/marks/axis-radial">axisRadial</a>. Drawn alongside <code className="inline">marks</code>; the split only separates chrome from data in your own source.
+          </>
+        ),
+      },
+      {
         name: "constraints",
         type: "Constraint[]",
         default: "[]",
         desc: (
           <>
-            Dataset invariants that gate or repair every edit. See <a href="/constraints">Constraints</a>.
+            Dataset invariants that gate or repair every edit. The only place they go. See <a href="/constraints">Constraints</a>.
           </>
         ),
       },
@@ -133,6 +143,52 @@ export const api: ApiEntry[] = [
         desc: "Interaction-feedback layer (grab / select), kept off mark paint channels.",
       },
       {
+        name: "legends",
+        type: "boolean | object",
+        default: "none",
+        desc: (
+          <>
+            <code className="inline">true</code> draws one legend per bound non-positional scale; an object configures or suppresses each. Off by default, unlike <code className="inline">axes</code>, because a legend reserves layout space. See <a href="/marks/legend">Legend</a>.
+          </>
+        ),
+      },
+      {
+        name: "theme",
+        type: "object | string",
+        default: "the app default",
+        desc: (
+          <>
+            Per-chart theme, over whatever <code className="inline">setTheme()</code> set. See <a href="/theming">Theming</a>.
+          </>
+        ),
+      },
+      {
+        name: "projection",
+        type: "string | object",
+        default: "—",
+        desc: (
+          <>
+            Turns the plane into a map; auto-axes go off when it is set. See <a href="/marks/geo">Geo</a>.
+          </>
+        ),
+      },
+      {
+        name: "stage / stageLabels",
+        type: "number / string[]",
+        default: "0 / []",
+        desc: (
+          <>
+            The stage a multi-step elicitation starts on, and the caption for each. See <a href="/editing/stages">Stages</a>.
+          </>
+        ),
+      },
+      {
+        name: "overflow",
+        type: "'hidden' | 'visible'",
+        default: "'hidden'",
+        desc: "Whether marks are clipped to the plot viewport. 'visible' lets a radial or gauge label sit in the margin band.",
+      },
+      {
         name: "renderer",
         type: "Renderer",
         default: "D3Renderer",
@@ -155,6 +211,8 @@ export const api: ApiEntry[] = [
       "chart.on(\"change\" | \"stage\", cb) → () => void",
       "chart.undo() · chart.redo() · chart.canUndo() · chart.canRedo()",
       "chart.getStage() · chart.setStage(i) · chart.nextStage() · chart.getStageLabel()",
+      "chart.select(i) · selectWhere · toggleSelection · selectAll · clearSelection",
+      "chart.getSelection() · chart.getSelectionAll()",
       "chart.control(name, index?) → EditControl",
       "chart.emit(event) → void",
       "chart.destroy() → void",
@@ -209,6 +267,32 @@ export const api: ApiEntry[] = [
             Step one <b>gesture</b>, and report whether they moved. See <a href="/editing/history">History & keyboard</a>.
           </>
         ),
+      },
+      {
+        name: "getStage() / setStage(i) / nextStage() / getStageLabel()",
+        type: "→ number | string | void",
+        default: "—",
+        desc: (
+          <>
+            Read and drive a multi-step elicitation from outside. See <a href="/editing/stages">Stages</a>.
+          </>
+        ),
+      },
+      {
+        name: "select(i) / selectWhere / toggleSelection / selectAll / clearSelection",
+        type: "void",
+        default: "—",
+        desc: (
+          <>
+            Set which rows the chart considers selected, by index or by a field match. See <a href="/editing/selection">Selection</a>.
+          </>
+        ),
+      },
+      {
+        name: "getSelection() / getSelectionAll()",
+        type: "→ number | number[]",
+        default: "—",
+        desc: "The selected row, and every selected row when the selection is multiple.",
       },
       {
         name: "control(name, index?)",

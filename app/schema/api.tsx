@@ -70,6 +70,26 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "tables",
+        type: "Record<name, table>",
+        default: "—",
+        desc: (
+          <>
+            Under a multi-table <code className="inline">structure</code>, the tables by <b>name</b> — and the name is the key you seed <code className="inline">data</code> with and read <code className="inline">getData()</code> back by. A table whose value is a bare field map takes its role from its own name.
+          </>
+        ),
+      },
+      {
+        name: "role",
+        type: "string",
+        default: "the table's name",
+        desc: (
+          <>
+            Which role in the structure this table fills (<code className="inline">nodes</code>, <code className="inline">links</code>). Separate from the name, so an argument map can call its tables <code className="inline">claims</code> and <code className="inline">supports</code> and marks still find them.
+          </>
+        ),
+      },
+      {
         name: "default",
         type: "any",
         default: "null",

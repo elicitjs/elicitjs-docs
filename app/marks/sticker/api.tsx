@@ -12,7 +12,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "sticker({ channels, padding, radius, maxWidth, minWidth, minHeight, lineHeight, fontSize, fontFamily, format, table, edits, constraints, id }) → Feature[]",
+      "sticker({ channels, padding, radius, maxWidth, minWidth, minHeight, lineHeight, fontFamily, format, table, edits, id }) → Feature[]",
     ],
     options: [
       {
@@ -94,6 +94,19 @@ export const api: ApiEntry[] = [
         type: "string",
         default: "the theme’s font",
         desc: <>Measured with, when your page font differs from the theme’s.</>,
+      },
+      {
+        name: "format",
+        type: "string | fn",
+        default: "String",
+        desc: (
+          <>
+            Display formatter for the <code className="inline">text</code> channel: a
+            d3-format string, or <code className="inline">(v) ={'>'} string</code>.
+            Display-only — the column stays raw, so{" "}
+            <code className="inline">editText</code> still writes the real value.
+          </>
+        ),
       },
     ],
     returns: (

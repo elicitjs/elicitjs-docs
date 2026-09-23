@@ -21,9 +21,17 @@ export default function Layout({ children }) {
 
 # Trend + Band
 
-<Lead>A **parametric line** and its uncertainty. The datum `{ intercept, slope }` is a linear belief; `trend` draws `y = intercept + slope·x` across the plot (clipped to the plot rectangle) plus its handles — an **intercept** handle at `x = 0` that translates the line, and a **slope** grip at each end of the line that rotates it about the anchor. `trendBand` draws the band: a range on the intercept, a range on the slope, and every line between them. Trend is the one mark whose `x`/`y` channels name the plot’s _axes_ rather than columns of its datum — declare them in the schema (typically spanning negatives, so the intercept sits in the middle of the frame). Left unspecified, `axes` crosses at the origin by default; state the frame explicitly with `axes: { origin: true | false }` — see [Axis, Grid & Rule](/marks/axes#global).</Lead>
+<Lead>A **parametric line** and its uncertainty. The datum `{ intercept, slope }` is a linear belief, and `trend` draws `y = intercept + slope·x` across the plot with a handle for each parameter: an **intercept** handle at `x = 0` that translates the line, and a **slope** grip at each end that rotates it about the anchor. `trendBand` draws the band — a range on the intercept, a range on the slope, and every line between them.</Lead>
 
 <ApiReference entries={api} />
+
+<Section id="axes" title="Its channels name the axes, not the columns">
+
+Trend is the one mark whose `x` and `y` channels name the plot's **axes** rather than columns of its datum. Declare their domains in the schema, typically spanning negatives so the intercept sits in the middle of the frame.
+
+Left unspecified, `axes` crosses at the origin when a trend is present. State the frame explicitly with `axes: { origin: true | false }` — see [Axis, Grid & Rule](/marks/axes#global).
+
+</Section>
 
 <Section id="not-creatable" title="Trend can't be created by a gesture">
 

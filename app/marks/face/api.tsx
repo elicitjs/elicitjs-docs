@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "face({ channels, size, ink, edits, constraints, id }) → Feature[]",
+      "face({ channels, size, ink, edits, id }) → Feature[]",
     ],
     options: [
       {

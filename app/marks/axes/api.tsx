@@ -2,10 +2,60 @@ import type { ApiEntry } from '../../../lib/types';
 
 export const api: ApiEntry[] = [
   {
+    name: "axes (on Elicit)",
+    summary: (
+      <>
+        The implicit layer. Every key desugars into the <code className="inline">axis</code> and <code className="inline">grid</code> marks below, and an explicit one you compose yourself always wins over the injected one.
+      </>
+    ),
+    signatures: [
+      "axes: false                                  // no axes at all",
+      "axes: { x, y, count, origin }                // per-channel config",
+      "axes: { y: { grid: true, ticks: 8 } }        // any axis option",
+    ],
+    options: [
+      {
+        name: "x / y",
+        type: "object | false",
+        default: "{}",
+        desc: (
+          <>
+            Options for that channel&rsquo;s axis — any option in the table below. <code className="inline">false</code> suppresses the channel.
+          </>
+        ),
+      },
+      {
+        name: "count",
+        type: "boolean | object",
+        default: "false",
+        desc: (
+          <>
+            Draw the <code className="inline">count</code> axis of a counting mark (<a href="/marks/waffle">waffle</a>, <a href="/marks/dotstack">dotStack</a>). It sits on whichever side that mark stacks along. Pass an object for the usual axis options.
+          </>
+        ),
+      },
+      {
+        name: "origin",
+        type: "boolean",
+        default: "auto",
+        desc: (
+          <>
+            Cross both axes at zero, instead of the left/bottom frame. Inferred <code className="inline">true</code> when a <a href="/marks/trend">trend</a> is present and you wrote no <code className="inline">axes</code> at all; state it either way to override.
+          </>
+        ),
+      },
+    ],
+    returns: (
+      <>
+        The injected <code className="inline">axis</code> / <code className="inline">grid</code> marks, in the background layer.
+      </>
+    ),
+  },
+  {
     name: "axis · axisX · axisY",
     summary: (
       <>
-        A spine, ticks, labels and an optional title for one channel’s scale. Import from <code className="inline">elicit.plot</code>, or configure implicitly via the global <code className="inline">axes:{'{'}…{'}'}</code> on <code className="inline">Elicit</code> (which desugars into these).
+        A spine, ticks, labels and an optional title for one channel’s scale. Import from <code className="inline">elicit.elements</code>, or reach it through the <code className="inline">axes</code> option above.
       </>
     ),
     signatures: [
@@ -80,6 +130,40 @@ export const api: ApiEntry[] = [
         default: "false",
         desc: "Also add a matching grid mark alongside the axis.",
       },
+      {
+        name: "edit / edits",
+        type: "Edit / Edit[]",
+        default: "—",
+        desc: (
+          <>
+            An axis is inert until you give it one. <code className="inline">edit.axis.scale()</code> drags the domain; see <a href="/editing/axis">Editing the scale</a>.
+          </>
+        ),
+      },
+      {
+        name: "field",
+        type: "string",
+        default: "the scale's first field",
+        desc: "Which column an edit on this axis writes, when the scale carries several.",
+      },
+      {
+        name: "table",
+        type: "string",
+        default: "the primary table",
+        desc: "Which table that edit writes to, by name.",
+      },
+      {
+        name: "handleColor / handleSize",
+        type: "string / number",
+        default: "theme / 5",
+        desc: "The grip an axis edit draws. Inert axes draw none.",
+      },
+      {
+        name: "id",
+        type: "string",
+        default: "—",
+        desc: "Stable identity, as on every mark.",
+      },
     ],
     returns: (
       <>
@@ -122,6 +206,12 @@ export const api: ApiEntry[] = [
         default: "#e5e7eb / 1",
         desc: "Line colour and width.",
       },
+      {
+        name: "id",
+        type: "string",
+        default: "—",
+        desc: "Stable identity, as on every mark.",
+      },
     ],
     returns: (
       <>
@@ -152,14 +242,30 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "edits / constraints",
-        type: "Edit[] / Constraint[]",
+        name: "orientation",
+        type: "'vertical' | 'horizontal'",
+        default: "auto",
+        desc: (
+          <>
+            Which axis carries the reference value (<code className="inline">'vertical'</code> = y). Inferred from the bound channel; <code className="inline">ruleY / ruleX</code> pin it.
+          </>
+        ),
+      },
+      {
+        name: "edits",
+        type: "Edit[]",
         default: "—",
         desc: (
           <>
             As on any mark. A per-channel <code className="inline">edit</code> makes that endpoint draggable.
           </>
         ),
+      },
+      {
+        name: "discreteScale",
+        type: "'band' | 'point'",
+        default: "—",
+        desc: "Which variant of a categorical axis the rule sits on. Left unset so a composite can stamp its own.",
       },
       {
         name: "strokeDasharray",

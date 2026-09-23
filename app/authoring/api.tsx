@@ -125,6 +125,26 @@ export const api: ApiEntry[] = [
         desc: "Tell constraints which row is active when the dataset’s shape changes (create/remove).",
       },
       {
+        name: "inverts",
+        type: "boolean",
+        default: "false",
+        desc: (
+          <>
+            Declares that this edit runs a <b>pointer</b> back through a channel&rsquo;s scale, so that scale must be invertible. Set it on any edit that reads <code className="inline">ctx.pointer</code>; the dead-drag guard reads this rather than a list of type names.
+          </>
+        ),
+      },
+      {
+        name: "inline",
+        type: "boolean",
+        default: "false",
+        desc: (
+          <>
+            Declares that this edit opens an inline text editor over the mark. It is what wires the double-click lifecycle — type, then Enter or blur commits and Escape cancels — and what <code className="inline">editText</code> sets.
+          </>
+        ),
+      },
+      {
         name: "name",
         type: "string",
         default: "null",
@@ -136,7 +156,7 @@ export const api: ApiEntry[] = [
       },
       {
         name: "scope",
-        type: "'line' | 'axis' | 'scale' | …",
+        type: "'line' | 'scale' | 'legend' | 'network' | 'geo'",
         default: "null",
         desc: (
           <>

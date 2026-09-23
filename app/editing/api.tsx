@@ -11,9 +11,9 @@ export const api: ApiEntry[] = [
     options: [
       {
         name: "gesture",
-        type: "'drag'|'click'|'dblclick'",
+        type: "'drag'|'click'|'dblclick'|'commit'",
         default: "'drag'",
-        desc: "The raw gesture that triggers the edit.",
+        desc: "The raw gesture that triggers the edit. 'commit' is a typed string arriving from an inline editor.",
       },
       {
         name: "channels",
@@ -37,11 +37,11 @@ export const api: ApiEntry[] = [
       },
       {
         name: "pick",
-        type: "'direct'|'nearest'|'plane'|driver",
+        type: "'direct'|'nearest'|'plane'|'probe'|'sweep'|'draw'|'brush'|'brushRect'",
         default: "'direct'",
         desc: (
           <>
-            How the gesture selects its target. <code className="inline">nearest</code>/<code className="inline">sweep</code>/<code className="inline">draw</code>/<code className="inline">brush</code> route through drivers.
+            How the gesture selects its target. Everything but <code className="inline">direct</code> and <code className="inline">plane</code> routes through a driver; register your own with <code className="inline">authoring.registerDriver</code> and name it here.
           </>
         ),
       },
@@ -57,9 +57,9 @@ export const api: ApiEntry[] = [
       },
       {
         name: "scope",
-        type: "null | 'line'",
+        type: "null | 'line' | 'scale' | 'legend' | 'network' | 'geo'",
         default: "null",
-        desc: "Universal, or line-scoped (needs a series-grouping mark).",
+        desc: "The mark capability this edit needs. A mismatch warns instead of silently doing nothing.",
       },
       {
         name: "constrain",
@@ -78,6 +78,82 @@ export const api: ApiEntry[] = [
         desc: "Self-draw this edit’s guide (constraint bounds + snap ring).",
       },
       {
+        name: "name",
+        type: "string",
+        default: "null",
+        desc: (
+          <>
+            The handle an external control addresses this edit by — <code className="inline">el.control(name)</code>. See <a href="/editing/external-controls">External controls</a>. Unnamed edits stay pointer- and keyboard-driven.
+          </>
+        ),
+      },
+      {
+        name: "channel",
+        type: "string",
+        default: "—",
+        desc: (
+          <>
+            The single-channel spelling of <code className="inline">channels</code>. Every factory takes either; the singular wins, so it overrides a factory&rsquo;s own default.
+          </>
+        ),
+      },
+      {
+        name: "stage",
+        type: "number",
+        default: "null",
+        desc: (
+          <>
+            Only active when the chart is on this stage. See <a href="/editing/stages">Stages</a>.
+          </>
+        ),
+      },
+      {
+        name: "advance",
+        type: "boolean",
+        default: "true",
+        desc: (
+          <>
+            Whether a settled <code className="inline">probe</code> click moves to the next stage. Set <code className="inline">false</code> to commit repeatedly within one stage.
+          </>
+        ),
+      },
+      {
+        name: "into",
+        type: "'nearest' | 'new'",
+        default: "null",
+        desc: (
+          <>
+            Where a path-authoring gesture writes: extend the closest series, or start a fresh one. See <a href="/editing/sweep">Sweep and draw</a>.
+          </>
+        ),
+      },
+      {
+        name: "table",
+        type: "string",
+        default: "the mark's table",
+        desc: "Which table this edit writes to, by name. Only meaningful on a multi-table schema.",
+      },
+      {
+        name: "target",
+        type: "'domain'",
+        default: "—",
+        desc: (
+          <>
+            Write the <b>schema</b> rather than the dataset. Set by <code className="inline">edit.axis.*</code> and <code className="inline">edit.scale.*</code>; see <a href="/editing/axis">Editing the scale</a>.
+          </>
+        ),
+      },
+      {
+        name: "type",
+        type: "string",
+        default: "—",
+        desc: (
+          <>
+            The edit&rsquo;s kind, as its dotted path (<code className="inline">move</code>, <code className="inline">line.draw</code>, <code className="inline">geo.brush</code>). Each factory sets its own.
+          </>
+        ),
+      },
+      {
         name: "apply",
         type: "(ctx) => datum | data[] | undefined",
         default: "—",
@@ -90,7 +166,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        An <b>Edit</b>. The engine matches <code className="inline">gesture</code> + <code className="inline">pick</code>, builds an <code className="inline">EditContext</code>, then calls <code className="inline">apply(ctx)</code>.
+        An <b>Edit</b>. The engine matches <code className="inline">gesture</code> + <code className="inline">pick</code>, builds an <code className="inline">EditContext</code>, then calls <code className="inline">apply(ctx)</code>. Three more keys — <code className="inline">cardinality</code>, <code className="inline">inverts</code> and <code className="inline">inline</code> — declare what a new edit does to the dataset; see <a href="/authoring">Authoring</a>.
       </>
     ),
   },
@@ -199,7 +275,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        See <code className="inline">EditContext</code> in <code className="inline">src/types.d.ts</code> for the full shape (including line-scoped fields like <code className="inline">seriesKey</code> / <code className="inline">session</code>).
+        A line-scoped or driver-backed edit sees more — <code className="inline">seriesKey</code>, <code className="inline">connect</code>, and the driver&rsquo;s own <code className="inline">session</code>. The TypeScript definitions carry the full shape.
       </>
     ),
   },
@@ -207,37 +283,57 @@ export const api: ApiEntry[] = [
     name: "Edit catalogue",
     summary: (
       <>
-        Universal edits import bare (<code className="inline">elicit.edit.move</code>); line-scoped ones live under <code className="inline">elicit.edit.line.*</code> so their scope shows in the name.
+        Universal edits import bare (<code className="inline">elicit.edit.move</code>). A scoped family sits under the subject it is about, and that dotted path is also the edit&rsquo;s <code className="inline">type</code>: <code className="inline">edit.line.draw()</code> is <code className="inline">{'{'} type: "line.draw" {'}'}</code>.
       </>
     ),
     options: [
       {
-        name: "move",
+        name: "move · moveSpan · brushSpan · brushRect",
         type: "drag",
-        default: "gestures",
-        desc: "Position — invert the pointer on each positional channel.",
-      },
-      {
-        name: "resize / slide",
-        type: "drag",
-        default: "gestures",
+        default: "gestures · handles",
         desc: (
           <>
-            Magnitude — the pointer's radius (<code className="inline">resize</code>) or axial distance (<code className="inline">slide</code>) inverts to a value (usually <code className="inline">size</code>).
+            Position. <code className="inline">move</code> inverts the pointer on each positional channel; the other three move or resize a two-endpoint span or a 2-D box.
           </>
         ),
       },
       {
-        name: "rotate",
+        name: "slide · resize · rotate",
         type: "drag",
         default: "gestures",
-        desc: "Angle — the pointer's angle about a pivot inverts to a value (degrees).",
+        desc: (
+          <>
+            Magnitude and angle. The pointer&rsquo;s axial distance (<code className="inline">slide</code>), radius (<code className="inline">resize</code>) or angle about a pivot (<code className="inline">rotate</code>) inverts to a value.
+          </>
+        ),
       },
       {
-        name: "cycle",
+        name: "cycle · toggle · set · rank",
         type: "click",
-        default: "gestures",
-        desc: "Discrete — advance a channel to its next domain value.",
+        default: "gestures · selection",
+        desc: (
+          <>
+            Discrete value. <code className="inline">cycle</code> advances a channel to its next domain value, <code className="inline">toggle</code> flips a row in or out, <code className="inline">set</code> writes a fixed value, <code className="inline">rank</code> reorders rows.
+          </>
+        ),
+      },
+      {
+        name: "create · remove",
+        type: "click",
+        default: "existence",
+        desc: "Mint a datum from the pointer, or delete the target.",
+      },
+      {
+        name: "editText",
+        type: "dblclick",
+        default: "sticker",
+        desc: "Open an inline editor over the mark and write the typed string back.",
+      },
+      {
+        name: "select",
+        type: "click",
+        default: "selection",
+        desc: "Chart state, not a data row — which rows the chart considers selected.",
       },
       {
         name: "custom",
@@ -245,32 +341,88 @@ export const api: ApiEntry[] = [
         default: "gestures",
         desc: (
           <>
-            Escape hatch — an arbitrary <code className="inline">(ctx) ={'>'} …</code> over the full EditContext.
+            An arbitrary <code className="inline">(ctx) ={'>'} …</code> over the full EditContext, for anything the named edits do not cover.
           </>
         ),
       },
       {
-        name: "moveSpan / brushSpan",
-        type: "drag",
-        default: "bar",
-        desc: "Move / resize a two-endpoint span (x1·x2 or y1·y2).",
-      },
-      {
-        name: "create / remove",
-        type: "click",
-        default: "existence",
-        desc: "Mint a datum from the pointer / delete the target.",
-      },
-      {
-        name: "line.anchor / newSeries / draw / sweep / removeSeries",
+        name: "edit.line.*",
         type: "line",
-        default: "existence · sweep",
-        desc: "Author and reshape connected paths.",
+        default: "sweep · existence",
+        desc: (
+          <>
+            <code className="inline">anchor</code>, <code className="inline">newSeries</code>, <code className="inline">draw</code>, <code className="inline">sweep</code>, <code className="inline">removeSeries</code> — author and reshape connected paths. Needs a series-grouping mark.
+          </>
+        ),
+      },
+      {
+        name: "edit.axis.scale · edit.scale.categories",
+        type: "scale",
+        default: "axis",
+        desc: (
+          <>
+            Reshape the <b>domain</b> rather than the dataset: drag a positional range, or add, rename and remove categories. <code className="inline">categories()</code> returns three edits — spread it.
+          </>
+        ),
+      },
+      {
+        name: "edit.legend.category · edit.legend.value",
+        type: "legend",
+        default: "legend",
+        desc: "Turn a legend into an input: click a swatch, or drag the ramp handle.",
+      },
+      {
+        name: "edit.stack.cut · edge · merge",
+        type: "stack",
+        default: "sweep · handles",
+        desc: "Divide a whole among rows: split a segment, move value across a boundary, fuse two back into one.",
+      },
+      {
+        name: "edit.trend.*",
+        type: "trend",
+        default: "trend",
+        desc: (
+          <>
+            <code className="inline">intercept</code>, <code className="inline">slope</code>, <code className="inline">interceptSpread</code>, <code className="inline">slopeSpread</code> — edit a parametric line by its parameters.
+          </>
+        ),
+      },
+      {
+        name: "edit.waffle.fill",
+        type: "waffle",
+        default: "waffle",
+        desc: "Fill up to the exact cell under the pointer.",
+      },
+      {
+        name: "edit.network.connect · rewire · reverse",
+        type: "network",
+        default: "network",
+        desc: "Build a network's topology. Nodes themselves are plain create / remove.",
+      },
+      {
+        name: "edit.geo.*",
+        type: "geo",
+        default: "geo",
+        desc: (
+          <>
+            <code className="inline">move</code>, <code className="inline">create</code>, <code className="inline">draw</code>, <code className="inline">dragVertex</code>, <code className="inline">removeVertex</code>, <code className="inline">brush</code>, <code className="inline">createRect</code> — placed through the chart&rsquo;s projection rather than through x/y scales.
+          </>
+        ),
+      },
+      {
+        name: "edit.when",
+        type: "predicate",
+        default: "gestures",
+        desc: (
+          <>
+            Not an edit — the arbitration predicates for an edit&rsquo;s <code className="inline">when</code> (<code className="inline">when.shift</code>, <code className="inline">when.alt</code>, …).
+          </>
+        ),
       },
     ],
     returns: (
       <>
-        See the <b>Gestures</b>, <b>Sweep</b> and <b>Existence</b> pages for each factory’s own options.
+        See <a href="/editing/gestures">Gestures</a>, <a href="/editing/sweep">Sweep</a>, <a href="/editing/existence">Existence</a> and each mark&rsquo;s page for a factory&rsquo;s own options. There is no <code className="inline">edit.face.*</code>: a face is a composite of ordinary marks, so its parameters take the universal edits.
       </>
     ),
   },

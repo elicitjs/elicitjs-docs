@@ -20,8 +20,73 @@ export const api: ApiEntry[] = [
       "h.begin(); h.set(v); h.end();   // live drag → ONE undo entry",
       "h.fire()              // TRIGGER edit (cycle/remove/toggle) — fires its click gesture",
       "h.emit(event)         // raw event passthrough, scoped to this feature/node",
-      "h.accepts()           // { field, type, kind, domain, values, range } from the scale",
+      "h.accepts()           // what the channel's scale allows",
     ],
+    options: [
+      {
+        name: "edit.name",
+        type: "string",
+        default: "null",
+        desc: "The handle this edit answers to. An edit with no name stays pointer- and keyboard-driven.",
+      },
+      {
+        name: "control(name, index?)",
+        type: "→ EditControl",
+        default: "index: 0",
+        desc: "A handle bound to that edit and that row. Ask for it again after the data changes; it resolves the edit on each call.",
+      },
+      {
+        name: "h.set(value)",
+        type: "void",
+        default: "—",
+        desc: (
+          <>
+            Write a <b>data</b> value. A scalar for a single-channel edit, or a map keyed by channel or field for a multi-channel one. Untouched axes hold their current position rather than teleporting.
+          </>
+        ),
+      },
+      {
+        name: "h.begin() / h.end()",
+        type: "void",
+        default: "—",
+        desc: (
+          <>
+            Bracket a live drag, so many <code className="inline">set</code> ticks collapse into one <a href="/editing/history">undo</a> entry — exactly as a pointer drag does.
+          </>
+        ),
+      },
+      {
+        name: "h.fire()",
+        type: "void",
+        default: "—",
+        desc: (
+          <>
+            Trigger an edit that takes no value — <code className="inline">cycle</code>, <code className="inline">remove</code>, <code className="inline">toggle</code>. It dispatches the edit&rsquo;s own gesture on the row.
+          </>
+        ),
+      },
+      {
+        name: "h.accepts()",
+        type: "→ object | null",
+        default: "—",
+        desc: (
+          <>
+            What the channel&rsquo;s scale allows: <code className="inline">{'{ field, type, kind, temporal, invertible, domain, values, range }'}</code>. <code className="inline">values</code> is the accepted set on a discrete channel and <code className="inline">null</code> on a continuous one, where <code className="inline">domain</code> is the accepted range — so a picker or slider can offer only valid choices.
+          </>
+        ),
+      },
+      {
+        name: "h.emit(event)",
+        type: "void",
+        default: "—",
+        desc: "A raw event, scoped to this edit's feature and node. The low-level route when you already hold pixels.",
+      },
+    ],
+    returns: (
+      <>
+        Every route runs the ordinary dispatch, so a constraint gates an external write exactly as it gates a drag. External control is not a bypass.
+      </>
+    ),
   },
   {
     name: "set(options?)",

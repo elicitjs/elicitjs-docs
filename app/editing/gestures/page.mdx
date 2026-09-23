@@ -19,7 +19,7 @@ export default function Layout({ children }) {
 
 # Transforms & Modalities
 
-<Lead>Transforms map user input into channel values through the channel's encoding scale. `move` translates position, `resize` adjusts radial magnitude, `slide` adjusts magnitude along an axis, `rotate` turns angles, and `cycle` advances discrete categories. A mark that accepts pointer drags also accepts keyboard arrow keys through the same edit and constraints.</Lead>
+<Lead>A transform maps input into a channel's value through that channel's own scale. `move` translates position, `resize` adjusts radial magnitude, `slide` adjusts magnitude along an axis, `rotate` turns angles, `cycle` advances discrete categories, `toggle` picks a slot on and off, `set` writes a value outright, and `rank` reorders rows. `custom` takes anything else. A mark that accepts pointer drags also accepts keyboard arrow keys, through the same edit and the same constraints.</Lead>
 
 <ApiReference entries={api} />
 

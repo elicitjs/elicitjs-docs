@@ -37,7 +37,7 @@ export const api: ApiEntry[] = [
         default: "[]",
         desc: (
           <>
-            Dataset invariants. A mark’s <code className="inline">constraints</code> is sugar — the engine promotes it. See <a href="/constraints">Constraints</a>.
+            Dataset invariants. They live here and nowhere else — a constraint gates every edit from every mark. See <a href="/constraints">Constraints</a>.
           </>
         ),
       },
