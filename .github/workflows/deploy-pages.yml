@@ -1,0 +1,82 @@
+# Build the docs and publish them to elicitjs/elicitjs.github.io.
+#
+# This runs the same scripts/deploy-pages.mjs you run locally, so the script
+# stays the one definition of a deploy. It expects three sibling checkouts,
+# the same layout as on a laptop:
+#
+#   $GITHUB_WORKSPACE/
+#     elicitjs-docs/        this repo (the source)
+#     elicitjs/             the library, imported through the @elicit alias
+#     elicitjs.github.io/   the build repo the script syncs into and pushes
+#
+# Required secret: PAGES_DEPLOY_TOKEN, a fine-grained PAT with
+# "Contents: read and write" on elicitjs/elicitjs.github.io. The default
+# GITHUB_TOKEN can't push to another repository.
+name: Deploy docs to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Two deploys pushing into the build repo at once would race. Queue them;
+# the later run rebuilds from newer source anyway.
+concurrency:
+  group: deploy-pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out docs
+        uses: actions/checkout@v4
+        with:
+          path: elicitjs-docs
+
+      - name: Check out library
+        uses: actions/checkout@v4
+        with:
+          repository: elicitjs/elicitjs
+          ref: main
+          path: elicitjs
+
+      - name: Check out Pages repo
+        uses: actions/checkout@v4
+        with:
+          repository: elicitjs/elicitjs.github.io
+          ref: main
+          path: elicitjs.github.io
+          token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            elicitjs-docs/package-lock.json
+            elicitjs/package-lock.json
+
+      # The library's source imports d3, which resolves from the library's own
+      # node_modules, not the docs'. --ignore-scripts skips anything a dev
+      # dependency (playwright, vite) would fetch on install.
+      - name: Install library dependencies
+        working-directory: elicitjs
+        run: npm ci --ignore-scripts
+
+      - name: Install docs dependencies
+        working-directory: elicitjs-docs
+        run: npm ci
+
+      - name: Set commit identity for the Pages repo
+        working-directory: elicitjs.github.io
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Build and publish
+        working-directory: elicitjs-docs
+        run: npm run deploy:pages
