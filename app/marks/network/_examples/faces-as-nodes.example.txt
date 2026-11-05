@@ -1,0 +1,59 @@
+mount(Elicit({
+  width: 540, height: 320,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      people: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+          valence: { type: "quantitative", domain: [-1, 1] },
+          arousal: { type: "quantitative", domain: [-1, 1] },
+        },
+      },
+      sways: {
+        role: "links",
+        // Whose mood rubs off on whom.
+        directed: true,
+        fields: { source: { type: "ref" }, target: { type: "ref" } },
+      },
+    },
+  },
+  data: {
+    people: [
+      { id: "ana", x: 16, y: 72, valence: 0.7, arousal: 0.3 },
+      { id: "ben", x: 50, y: 22, valence: -0.6, arousal: 0.5 },
+      { id: "cy", x: 84, y: 72, valence: 0.1, arousal: -0.4 },
+    ],
+    sways: [
+      { source: "ana", target: "ben" },
+      { source: "ben", target: "cy" },
+    ],
+  },
+  marks: [
+    link({
+      curve: "bezier",
+      stroke: "#94a3b8",
+      strokeWidth: 1.5,
+      edits: [edit.network.rewire()],
+    }),
+    face({
+      size: 34,
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        mouthCurve: { field: "valence", edit: slide({ axis: "y", increase: "up" }) },
+        eyeScale: { field: "arousal" },
+        // A link leaves a face on the right or below, and arrives on the left or above.
+        ports: {
+          value: { out: ["right", "bottom"], in: ["left", "top"] },
+          edit: edit.network.connect(),
+        },
+      },
+    }),
+  ],
+}));

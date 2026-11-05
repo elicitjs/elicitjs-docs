@@ -1,0 +1,52 @@
+mount(Elicit({
+  width: 540, height: 260,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      feelings: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          emoji: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      leadsTo: {
+        role: "links",
+        directed: true,
+        fields: { source: { type: "ref" }, target: { type: "ref" } },
+      },
+    },
+  },
+  data: {
+    feelings: [
+      { id: "tired", emoji: "😴", x: 12, y: 50 },
+      { id: "stressed", emoji: "😟", x: 40, y: 82 },
+      { id: "angry", emoji: "😠", x: 68, y: 82 },
+      { id: "calm", emoji: "😌", x: 40, y: 18 },
+      { id: "happy", emoji: "😀", x: 88, y: 50 },
+    ],
+    leadsTo: [
+      { source: "tired", target: "stressed" },
+      { source: "stressed", target: "angry" },
+      { source: "tired", target: "calm" },
+      { source: "calm", target: "happy" },
+    ],
+  },
+  marks: [
+    link({ curve: "arc", curvature: 0.15, stroke: "#94a3b8", strokeWidth: 1.5, edits: [edit.network.rewire()] }),
+    // A plain text mark is the node: its glyph's box is where links meet it.
+    text({
+      fontSize: 36,
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        text: { field: "emoji" },
+        ports: { value: true, edit: edit.network.connect() },
+      },
+    }),
+  ],
+}));

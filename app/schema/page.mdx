@@ -81,7 +81,9 @@ links: {
 }
 ```
 
-`true` draws arrowheads and separates reciprocal links; `false` treats the pair as unordered, so `connect` refuses `b → a` once `a → b` exists. Leave it out and neither applies. See [Directed or undirected](/marks/network#directed).
+`true` draws arrowheads and separates reciprocal links; `false` treats the pair as unordered, so `connect` refuses `b → a` once `a → b` exists. Leave it out and neither applies. See [Kinds of network](/marks/network#directed).
+
+`multi: true` lets a pair hold more than one link, and `selfLoops: true` lets a link join a node to itself. Both are off unless declared. See [Parallel links and loops](/marks/network#multi).
 
 </Section>
 

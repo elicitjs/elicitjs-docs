@@ -26,7 +26,7 @@ mount(Elicit({
     links: [],
   },
   marks: [
-    link({ inset: 16, stroke: "#94a3b8", strokeWidth: 1.5 }),
+    link({ inset: 3, stroke: "#94a3b8", strokeWidth: 1.5 }),
     node({
       size: 10,
       fill: "#4e79a7",

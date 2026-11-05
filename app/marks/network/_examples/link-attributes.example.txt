@@ -38,7 +38,7 @@ mount(Elicit({
   },
   marks: [
     link({
-      inset: 16,
+      inset: 3,
       fontSize: 11,
       labelBackground: true,
       channels: {

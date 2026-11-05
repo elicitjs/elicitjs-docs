@@ -1,0 +1,69 @@
+mount(Elicit({
+  width: 560, height: 240,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      states: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          label: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      transitions: {
+        role: "links",
+        // A multidigraph with loops: two events may join the same pair of
+        // states, and an event may leave a state where it was.
+        directed: true,
+        multi: true,
+        selfLoops: true,
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+          event: { type: "categorical", open: true },
+        },
+      },
+    },
+  },
+  data: {
+    states: [
+      { id: "locked", label: "Locked", x: 12, y: 62 },
+      { id: "closed", label: "Closed", x: 50, y: 62 },
+      { id: "open", label: "Open", x: 88, y: 62 },
+    ],
+    transitions: [
+      { source: "closed", target: "open", event: "open" },
+      { source: "open", target: "closed", event: "close" },
+      { source: "open", target: "closed", event: "slam" },
+      { source: "closed", target: "locked", event: "lock" },
+      { source: "locked", target: "closed", event: "unlock" },
+      { source: "locked", target: "locked", event: "wrong key" },
+      { source: "closed", target: "closed", event: "knock" },
+    ],
+  },
+  marks: [
+    link({
+      stroke: "#475569",
+      strokeWidth: 1.5,
+      labelBackground: true,
+      channels: { text: { field: "event" } },
+      edits: [edit.network.rewire(), editText()],
+    }),
+    sticker({
+      fill: "#f0f9ff",
+      stroke: "#0369a1",
+      radius: 14,
+      maxWidth: 90,
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        text: { field: "label" },
+        ports: { value: true, edit: edit.network.connect({ defaults: { event: "event" } }) },
+      },
+    }),
+  ],
+}));

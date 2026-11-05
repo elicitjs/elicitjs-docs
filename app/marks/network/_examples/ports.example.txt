@@ -1,0 +1,71 @@
+mount(Elicit({
+  width: 520, height: 320,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      notes: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          label: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      flows: {
+        role: "links",
+        directed: true,
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+          // The edge each end meets, or null to slide along the box.
+          fromSide: { type: "categorical", domain: ["top", "right", "bottom", "left"] },
+          toSide: { type: "categorical", domain: ["top", "right", "bottom", "left"] },
+        },
+      },
+    },
+  },
+  data: {
+    notes: [
+      { id: "idea", label: "Idea", x: 14, y: 72 },
+      { id: "draft", label: "Draft", x: 48, y: 72 },
+      { id: "review", label: "Review", x: 84, y: 24 },
+      { id: "ship", label: "Ship", x: 84, y: 80 },
+    ],
+    flows: [
+      { source: "idea", target: "draft", fromSide: "right", toSide: "left" },
+      { source: "draft", target: "review", fromSide: "right", toSide: "left" },
+    ],
+  },
+  marks: [
+    link({
+      curve: "orthogonal",
+      stroke: "#4e79a7",
+      strokeWidth: 2,
+      // The columns a connection writes.
+      channels: {
+        sourceSide: { field: "fromSide" },
+        targetSide: { field: "toSide" },
+      },
+      edits: [edit.network.rewire(), remove({ when: when.alt })],
+    }),
+    sticker({
+      fill: "#eef2ff",
+      stroke: "#4e79a7",
+      radius: 6,
+      maxWidth: 110,
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        text: { field: "label" },
+        // Links leave by the right edge and enter by the left.
+        ports: {
+          value: { out: ["right"], in: ["left"] },
+          edit: edit.network.connect(),
+        },
+      },
+    }),
+  ],
+}));

@@ -34,12 +34,13 @@ mount(Elicit({
   },
   marks: [
     link({
-      inset: 12,
+      inset: 3,
       channels: {
         strokeWidth: { field: "strength", scale: { range: [1, 7] } },
         stroke: { field: "strength", scale: { scheme: "blues" } },
-        source: { field: "source", edit: edit.network.rewire() },
       },
+      // A handle at each link's source end, shown when you hover the link.
+      edits: [edit.network.rewire({ channels: ["source"] })],
     }),
     node({
       size: 10,

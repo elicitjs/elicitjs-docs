@@ -38,7 +38,7 @@ mount(Elicit({
   },
   marks: [
     link({
-      inset: 9,
+      inset: 4,
       stroke: "#4e79a7",
       strokeWidth: 2,
       // A fixed bow. These links share no pair of nodes, so "auto" would leave

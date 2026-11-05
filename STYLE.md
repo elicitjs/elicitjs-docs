@@ -38,6 +38,18 @@ calibration page — its density and tone is the target for every other page.
    component. If a page has two distinct points, fold the second into
    whichever `Section` it's actually about.
 
+9. **Say what happens, not what doesn't.** Describe the behaviour the
+   reader gets. Don't rule out alternatives nobody expected ("never on every
+   part", "not just hidden", "needs no size of its own"), and don't restate a
+   fact as its negation. A limit the reader would hit is still an API fact,
+   so keep it — phrased as what does happen ("links treat a rotated shape as
+   unrotated", not "a rotated shape is not supported").
+
+   > Before: "A glyph puts `ports` on one shape, never on every part."
+   >
+   > After: "A glyph puts `ports` on its main shape: the box's circle, or its
+   > first shape part."
+
 ## Before / after
 
 **`geoTile()`** (marks/geo, tiles section) — states the why in plain terms,

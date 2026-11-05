@@ -45,10 +45,6 @@ mount(Elicit({
       // wherever the two boxes end up. Drop the two sides to let position choose.
       sourceSide: "right",
       targetSide: "left",
-      channels: {
-        nodeWidth: { field: "w" },
-        nodeHeight: { field: "h" },
-      },
     }),
     sticker({
       fill: "#eef2ff",

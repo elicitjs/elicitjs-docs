@@ -1,0 +1,73 @@
+mount(Elicit({
+  width: 520, height: 300,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      steps: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          label: { type: "categorical", open: true },
+          kind: { type: "categorical", domain: ["step", "end"] },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      next: {
+        role: "links",
+        directed: true,
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+          fromSide: { type: "categorical", domain: ["top", "right", "bottom", "left"] },
+          toSide: { type: "categorical", domain: ["top", "right", "bottom", "left"] },
+        },
+      },
+    },
+  },
+  data: {
+    steps: [
+      { id: "ask", label: "Ask", kind: "step", x: 12, y: 50 },
+      { id: "check", label: "Check", kind: "step", x: 42, y: 20 },
+      { id: "fix", label: "Fix", kind: "step", x: 42, y: 80 },
+      { id: "done", label: "Done", kind: "end", x: 86, y: 50 },
+    ],
+    next: [{ source: "ask", target: "check", fromSide: "right", toSide: "left" }],
+  },
+  // Each step leads to one next step.
+  constraints: [
+    constraints.custom(({ data }) => {
+      const sources = data.map((d) => d.source);
+      return new Set(sources).size === sources.length;
+    }, { table: "links" }),
+  ],
+  marks: [
+    link({
+      curve: "orthogonal",
+      stroke: "#64748b",
+      strokeWidth: 1.5,
+      channels: {
+        sourceSide: { field: "fromSide" },
+        targetSide: { field: "toSide" },
+      },
+      edits: [edit.network.rewire()],
+    }),
+    sticker({
+      radius: 6,
+      maxWidth: 100,
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        text: { field: "label" },
+        fill: { field: "kind", scale: { range: ["#fef3c7", "#dcfce7"] } },
+        // An end step takes links in but sends none out.
+        ports: {
+          fn: (d) => (d.kind === "end" ? { in: ["left"] } : { out: ["right"], in: ["left"] }),
+          edit: edit.network.connect(),
+        },
+      },
+    }),
+  ],
+}));

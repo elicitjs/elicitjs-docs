@@ -118,9 +118,11 @@ Nothing here is sticker-specific. The universal edits do the rest:
 
 A board you draw on is a `network` schema with a `sticker` over the nodes and a `link` over the links — there is no diagram mark. Draw `link()` first so connectors sit behind the boxes.
 
-Give the connectors `curve: "orthogonal"` and tell them how big a note is, and each one leaves a box square out of one of its edges rather than crossing a corner. A sticker measures its box from its own text, so measure it the same way with `noteBox` and pass the options you gave the sticker. `inset` is then the gap between the edge and the line, and `cornerRadius` rounds the turns.
+Give the connectors `curve: "orthogonal"` and each one leaves a box square out of one of its edges. It docks to the sticker's own box, however the text sized it, and routes around any note in the way — see [where a link meets a node](/marks/network#routing).
 
-`connect` and `move` both fire on a drag from a box, so split them with `when.shift` / `when.noShift`. Deleting a box drops its connectors: `source` and `target` are `ref` columns, so a link naming a missing node is removed from the dataset. See [Network](/marks/network) for the topology edits and connector styles.
+Give the sticker a `ports` channel with `edit.network.connect()` on it. Hover a box and a port appears on each edge. Drag from one to another box to connect them; drop on a port to pin that end, or on the box to connect at its facing port. The `link` mark's `sourceSide` and `targetSide` channels name the columns the sides are written to — see [Ports](/marks/network#ports). Dragging a box's body still moves it.
+
+`edit.network.rewire()` on the link puts a handle on each end while you hover it: drag one to another box to reconnect, or into space to disconnect. Deleting a box drops its connectors, because a link must name a node that exists.
 
 <Example
   code={flowchart}
@@ -129,9 +131,11 @@ Give the connectors `curve: "orthogonal"` and tell them how big a note is, and e
   try={(
     <>
       <b>Double-click</b> a box and type — Enter makes a new line, Cmd/Ctrl+Enter
-      commits, and the box grows to fit. <b>Shift-drag</b> from one box to another to
-      connect them. <b>Drag</b> a box past another and the connectors re-route to the
-      edges now facing. <b>Click</b> a connector to switch it between an elbow and a curve,
+      commits, and the box grows to fit. <b>Hover</b> a box and <b>drag</b> from one of
+      its ports to another box to connect them; drop on a port to pin that end, or on
+      the box to connect at its facing port. <b>Hover</b> a connector and drag its end to reconnect it, or
+      into space to remove it. <b>Drag</b> a box around another and watch its connectors
+      follow. <b>Click</b> a connector to switch it between an elbow and a curve,
       and <b>Alt-click</b> one to reverse it. <b>Click</b> empty space for a new box,
       and <b>Alt-click</b> a box to delete it — its connectors go too.
     </>

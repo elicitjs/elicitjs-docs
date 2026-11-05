@@ -1,0 +1,56 @@
+mount(Elicit({
+  width: 460, height: 280,
+  margins: { top: 28, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        name: { type: "categorical", open: true },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+      },
+      links: {
+        source: { type: "ref" },
+        target: { type: "ref" },
+        sourceSide: { type: "categorical", domain: ["left", "right"] },
+        targetSide: { type: "categorical", domain: ["left", "right"] },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "a", name: "Ana", x: 16, y: 70 },
+      { id: "b", name: "Ben", x: 84, y: 70 },
+      { id: "c", name: "Cleo", x: 50, y: 20 },
+    ],
+    links: [
+      { source: "a", target: "c", sourceSide: "right", targetSide: "left" },
+      { source: "c", target: "b", sourceSide: "right", targetSide: "left" },
+    ],
+  },
+  marks: [
+    link({
+      curve: "bezier",
+      stroke: "#94a3b8",
+      strokeWidth: 1.5,
+      channels: {
+        sourceSide: { field: "sourceSide" },
+        targetSide: { field: "targetSide" },
+      },
+      // Hover a connector for a handle at each end.
+      edits: [edit.network.rewire()],
+    }),
+    node({
+      size: 10,
+      fill: "#4e79a7",
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"] }) },
+        y: { field: "y" },
+        text: { field: "name" },
+        ports: { value: ["left", "right"], edit: edit.network.connect() },
+      },
+    }),
+  ],
+}));

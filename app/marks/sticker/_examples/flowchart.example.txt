@@ -21,6 +21,9 @@ mount(Elicit({
           source: { type: "ref" },
           target: { type: "ref" },
           kind: { type: "categorical", domain: ["orthogonal", "bezier"] },
+          // The edge each end meets, or null to slide along the box.
+          fromSide: { type: "categorical", domain: ["top", "right", "bottom", "left"] },
+          toSide: { type: "categorical", domain: ["top", "right", "bottom", "left"] },
         },
       },
     },
@@ -39,18 +42,15 @@ mount(Elicit({
   },
   marks: [
     link({
-      cornerRadius: 8,
-      inset: 6,
       stroke: "#94a3b8",
       strokeWidth: 1.5,
       channels: {
         curve: { field: "kind" },
-        // The box each connector docks to. A sticker sizes itself from its text,
-        // so `noteBox` measures the same note the same way.
-        nodeWidth: { fn: (d) => noteBox(d.label, { maxWidth: 130 }).width },
-        nodeHeight: { fn: (d) => noteBox(d.label, { maxWidth: 130 }).height },
+        sourceSide: { field: "fromSide" },
+        targetSide: { field: "toSide" },
       },
       edits: [
+        edit.network.rewire(),
         edit.network.reverse({ when: when.alt }),
         cycle({ channels: ["curve"], when: when.noAlt }),
       ],
@@ -62,14 +62,18 @@ mount(Elicit({
       radius: 8,
       edits: [
         editText({ multiline: true }),
-        edit.network.connect({ when: when.shift, defaults: { kind: "orthogonal" } }),
         create({ defaults: { label: "New step" } }),
         remove({ when: when.alt }),
       ],
       channels: {
-        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative", when: when.noShift }) },
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
         y: { field: "y" },
         text: { field: "label" },
+        // A dot on each edge, shown when you hover a box: drag from one to connect.
+        ports: {
+          value: true,
+          edit: edit.network.connect({ defaults: { kind: "orthogonal" } }),
+        },
       },
     }),
   ],

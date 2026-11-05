@@ -1,0 +1,63 @@
+mount(Elicit({
+  width: 520, height: 360,
+  margins: { top: 20, right: 20, bottom: 20, left: 20 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      steps: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          label: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 480] },
+          y: { type: "quantitative", domain: [0, 320] },
+          w: { type: "quantitative", domain: [40, 200] },
+          h: { type: "quantitative", domain: [24, 200] },
+        },
+      },
+      flows: {
+        role: "links",
+        directed: true,
+        fields: { source: { type: "ref" }, target: { type: "ref" } },
+      },
+    },
+  },
+  data: {
+    steps: [
+      // Collect sits 8px out of line with Score: close enough to join straight.
+      { id: "collect", label: "Collect", x: 60, y: 220, w: 92, h: 40 },
+      { id: "score", label: "Score", x: 68, y: 110, w: 92, h: 40 },
+      // Review stands in the corridor between Score and Publish.
+      { id: "review", label: "Legal review", x: 200, y: 150, w: 72, h: 180 },
+      // Ship is up and to the right of Publish, with a tight gap between them.
+      { id: "publish", label: "Publish", x: 300, y: 120, w: 80, h: 40 },
+      { id: "ship", label: "Ship", x: 430, y: 46, w: 80, h: 40 },
+    ],
+    flows: [
+      { source: "collect", target: "score" },
+      { source: "score", target: "publish" },
+      { source: "publish", target: "ship" },
+    ],
+  },
+  marks: [
+    link({
+      curve: "orthogonal",
+      inset: 4,
+      stroke: "#4e79a7",
+      strokeWidth: 2,
+    }),
+    sticker({
+      fill: "#eef2ff",
+      stroke: "#4e79a7",
+      radius: 6,
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        width: { field: "w", scale: null },
+        height: { field: "h", scale: null },
+        text: { field: "label" },
+      },
+    }),
+  ],
+}));

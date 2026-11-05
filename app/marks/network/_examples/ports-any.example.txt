@@ -1,0 +1,71 @@
+mount(Elicit({
+  width: 560, height: 340,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      ideas: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          label: { type: "categorical", open: true },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      ties: {
+        role: "links",
+        directed: false,
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+          fromSide: { type: "categorical", domain: ["top", "right", "bottom", "left"] },
+          toSide: { type: "categorical", domain: ["top", "right", "bottom", "left"] },
+        },
+      },
+    },
+  },
+  data: {
+    ideas: [
+      { id: "trust", label: "Trust in forecasts", x: 50, y: 50 },
+      { id: "past", label: "Past accuracy", x: 14, y: 18 },
+      { id: "source", label: "Who made it", x: 86, y: 18 },
+      { id: "range", label: "Shown as a range", x: 14, y: 84 },
+      { id: "stakes", label: "What is at stake", x: 86, y: 84 },
+    ],
+    ties: [
+      { source: "trust", target: "past", fromSide: "top", toSide: "right" },
+      { source: "trust", target: "source", fromSide: "right", toSide: "bottom" },
+      // Unpinned: each end meets the port facing the other note.
+      { source: "trust", target: "range", fromSide: null, toSide: null },
+      { source: "trust", target: "stakes", fromSide: null, toSide: null },
+    ],
+  },
+  marks: [
+    link({
+      curve: "bezier",
+      stroke: "#7c3aed",
+      strokeWidth: 1.5,
+      channels: {
+        sourceSide: { field: "fromSide" },
+        targetSide: { field: "toSide" },
+      },
+      edits: [edit.network.rewire(), remove({ when: when.alt })],
+    }),
+    sticker({
+      fill: "#f5f3ff",
+      stroke: "#7c3aed",
+      radius: 8,
+      maxWidth: 120,
+      edits: [editText(), create({ defaults: { label: "New idea" } })],
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        text: { field: "label" },
+        // Every edge, either way.
+        ports: { value: true, edit: edit.network.connect() },
+      },
+    }),
+  ],
+}));

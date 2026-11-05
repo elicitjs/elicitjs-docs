@@ -16,7 +16,7 @@ export type ApiIndexEntry = {
 export type ApiNamespace = { namespace: string; blurb: string; count: number };
 
 export const API_LIBRARY_VERSION = "0.1.0-alpha.1";
-export const API_GENERATED_AT = "2026-09-22T06:00:07.788Z";
+export const API_GENERATED_AT = "2026-11-05T18:33:28.763Z";
 export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "plot",
@@ -590,11 +590,11 @@ export const API_INDEX: ApiIndexEntry[] = [
       "labelPadding",
       "labelRadius",
       "labelOpacity",
-      "nodeWidth",
-      "nodeHeight",
       "cornerRadius",
       "sourceSide",
       "targetSide",
+      "sourceOffset",
+      "targetOffset",
       "handles",
       "handleSize",
       "handleColor"
@@ -1272,7 +1272,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/axis"
   },
@@ -1309,7 +1310,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/handles"
   },
@@ -1344,7 +1346,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/handles"
   },
@@ -1377,7 +1380,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/existence"
   },
@@ -1410,7 +1414,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/gestures"
   },
@@ -1443,7 +1448,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/gestures"
   },
@@ -1476,7 +1482,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/marks/sticker"
   },
@@ -1512,7 +1519,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -1545,7 +1553,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -1582,7 +1591,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -1615,7 +1625,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -1650,7 +1661,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -1683,7 +1695,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -1718,7 +1731,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -1751,7 +1765,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/legend"
   },
@@ -1784,7 +1799,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/legend"
   },
@@ -1819,7 +1835,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/sweep"
   },
@@ -1858,7 +1875,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/sweep"
   },
@@ -1896,7 +1914,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/sweep"
   },
@@ -1931,7 +1950,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/sweep"
   },
@@ -1966,7 +1986,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/sweep"
   },
@@ -2001,7 +2022,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/gestures"
   },
@@ -2034,7 +2056,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/handles"
   },
@@ -2044,11 +2067,7 @@ export const API_INDEX: ApiIndexEntry[] = [
     "name": "connect",
     "qualified": "edit.network.connect",
     "call": "edit.network.connect(options)",
-    "own": [
-      "source",
-      "target",
-      "selfLoops"
-    ],
+    "own": [],
     "universal": [
       "type",
       "name",
@@ -2071,7 +2090,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/marks/network"
   },
@@ -2081,10 +2101,7 @@ export const API_INDEX: ApiIndexEntry[] = [
     "name": "reverse",
     "qualified": "edit.network.reverse",
     "call": "edit.network.reverse(options)",
-    "own": [
-      "source",
-      "target"
-    ],
+    "own": [],
     "universal": [
       "type",
       "name",
@@ -2107,7 +2124,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/marks/network"
   },
@@ -2140,7 +2158,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/marks/network"
   },
@@ -2173,7 +2192,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/gestures"
   },
@@ -2206,7 +2226,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/existence"
   },
@@ -2239,7 +2260,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/gestures"
   },
@@ -2276,7 +2298,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/gestures"
   },
@@ -2309,7 +2332,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/axis"
   },
@@ -2346,7 +2370,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/external-controls"
   },
@@ -2379,7 +2404,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/external-controls"
   },
@@ -2417,7 +2443,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/gestures"
   },
@@ -2453,7 +2480,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/sweep"
   },
@@ -2486,7 +2514,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/handles"
   },
@@ -2519,7 +2548,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/sweep"
   },
@@ -2552,7 +2582,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing/gestures"
   },
@@ -2588,7 +2619,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2624,7 +2656,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2660,7 +2693,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2696,7 +2730,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2729,7 +2764,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2762,7 +2798,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2795,7 +2832,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2828,7 +2866,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2861,7 +2900,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2894,7 +2934,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2927,7 +2968,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2960,7 +3002,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -2993,7 +3036,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },
@@ -3026,7 +3070,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "inline",
       "multiline",
       "defaults",
-      "apply"
+      "apply",
+      "targets"
     ],
     "docs": "/editing"
   },

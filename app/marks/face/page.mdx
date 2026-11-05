@@ -147,7 +147,7 @@ Here the week starts with three days filled; click an empty day to add its face 
 
 <Section id="build" title="It's just a composite">
 
-`face()` builds nothing you couldn't assemble yourself. Below is a smaller version written out in full — a `point` head, two `ellipse` eyes, two `tickY` brows and a `curveY` mouth, each placed in the [composite's box](/marks/composite#box).
+`face()` builds nothing you couldn't assemble yourself. Because it is a composite, it can also draw a network's nodes — see [Faces as nodes](/marks/network#faces). Below is a smaller version written out in full — a `point` head, two `ellipse` eyes, two `tickY` brows and a `curveY` mouth, each placed in the [composite's box](/marks/composite#box).
 
 Read `frame:` as "this number is in the glyph's own coordinates": `x` and `y` in `[-1, 1]` from the centre with y **up**, radii as a fraction of the half-size. A part that states no position sits at the centre, which is where the head goes. A field-bound channel maps the field's declared domain onto a slice of the box (`frame: [0.05, 0.19]`), and the edit inverts back through it.
 

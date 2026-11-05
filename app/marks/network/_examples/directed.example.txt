@@ -35,7 +35,7 @@ mount(Elicit({
   },
   marks: [
     link({
-      inset: 14,
+      inset: 3,
       stroke: "#94a3b8",
       strokeWidth: 1.5,
       edits: [edit.network.reverse({ when: when.alt })],

@@ -40,6 +40,9 @@ export function createElicitScope() {
     ...elicit.elements,
     // Constraints — pure data invariants.
     ...elicit.constraints,
+    // The namespace too: `custom` is both an edit and a constraint, and the bare
+    // spread below takes the edit, so a custom constraint is `constraints.custom`.
+    constraints: elicit.constraints,
     // Universal edits (the scoped families stay under `edit.*`).
     ...universalEdits,
     Elicit: elicit.Elicit,
@@ -60,10 +63,9 @@ export function createElicitScope() {
     themes: elicit.themes,
     setTheme: elicit.setTheme,
     resolveTheme: elicit.resolveTheme,
-    // The box a padded note occupies — `sticker`'s own sizing rule. An example
-    // gives it to `link({ channels: { nodeWidth: … } })` so a connector docks to
-    // the edge of an auto-sized note. It lives in the authoring kit: it can only
-    // ever appear inside a `{ fn }` channel, so it is never a spec keyword.
+    // The box a padded note occupies — `sticker`'s own sizing rule, for an example
+    // that sizes something else to match a note. It lives in the authoring kit: it
+    // can only ever appear inside a `{ fn }` channel, so it is never a spec keyword.
     noteBox: elicit.authoring.noteBox,
     d3,
     vancouver,
