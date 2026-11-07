@@ -1,0 +1,20 @@
+// The entry files, in load order. Add a file here and it joins the gallery.
+window.ENTRY_FILES = [
+  'features.js',
+  'text.js',
+  'analysis-text.js',
+  'vl-bars.js',
+  'vl-distributions.js',
+  'vl-scatter-table-area.js',
+  'vl-line-calc.js',
+  'vl-layer-multi-geo.js',
+  'vl-interactive.js',
+  'plot-dot.js',
+  'plot-bar-1.js',
+  'plot-bar-2.js',
+  'plot-line-1.js',
+  'plot-line-2.js',
+  'plot-rule-geo-link.js',
+  'plot-misc.js',
+  'beyond.js',
+];
