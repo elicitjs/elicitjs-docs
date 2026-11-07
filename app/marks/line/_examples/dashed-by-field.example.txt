@@ -1,0 +1,28 @@
+mount(Elicit({
+  width: 420, height: 250,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  axes: { x: { tickFormat: "d" } },
+  data: [
+    { year: 2020, v: 42, kind: "observed" }, { year: 2021, v: 48, kind: "observed" },
+    { year: 2022, v: 45, kind: "observed" }, { year: 2023, v: 55, kind: "observed" },
+    { year: 2023, v: 55, kind: "forecast" }, { year: 2024, v: 60, kind: "forecast" },
+    { year: 2025, v: 64, kind: "forecast" }, { year: 2026, v: 70, kind: "forecast" },
+  ],
+  schema: {
+    year: { type: "quantitative", domain: [2020, 2026] },
+    v:    { type: "quantitative", domain: [0, 100] },
+    kind: { type: "categorical", domain: ["observed", "forecast"] },
+  },
+  marks: [
+    lineY({
+      stroke: "#0f766e", strokeWidth: 2.5,
+      channels: {
+        x: { field: "year" },
+        y: { field: "v", edit: move() },
+        series: { field: "kind" },
+        // A field picks a dash pattern per category: solid, then dashed.
+        strokeDash: { field: "kind" },
+      },
+    }),
+  ],
+}))

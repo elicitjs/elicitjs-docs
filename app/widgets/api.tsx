@@ -18,7 +18,7 @@ export const api: ApiEntry[] = [
       "allocation({ question, categories, total, values, onChange }) → ElicitSpec",
       "histogram({ question, bins, max, values, onChange }) → ElicitSpec",
       "probabilityTokens({ question, bins, maxTokens, onChange }) → ElicitSpec",
-      "interval({ question, category, mean, lo, hi, domain, onChange }) → ElicitSpec",
+      "interval({ question, category, mean, lo, hi, domain, symmetric, onChange }) → ElicitSpec",
       "region({ question, xDomain, yDomain, x1, x2, y1, y2, onChange }) → ElicitSpec",
       "lineCone({ question, x, y, r, spread, render, samples, seed, onChange }) → ElicitSpec",
       "labeledValue({ question, input, value, domain, label, onChange }) → ElicitSpec",
@@ -147,6 +147,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "symmetric",
+        type: "boolean",
+        default: "false",
+        desc: (
+          <>
+            <code className="inline">interval</code>: drag one cap and the other mirrors it about the mean. It adds <code className="inline">constraints.symmetric</code> to the widget’s <code className="inline">follow</code>, <code className="inline">ordering</code> and <code className="inline">clamp</code>.
+          </>
+        ),
+      },
+      {
         name: "xDomain / yDomain / x1 / x2 / y1 / y2",
         type: "[min,max] / number",
         default: "[0,10] / 3 · 7",
@@ -162,7 +172,7 @@ export const api: ApiEntry[] = [
         default: "'x' / 'y' / 0 / 0",
         desc: (
           <>
-            <code className="inline">lineCone</code>: the two variable names labelled on the crosshair, and the starting correlation and its width.
+            <code className="inline">lineCone</code>: the two variable names labelled on the quadrant frame, and the starting correlation and its width.
           </>
         ),
       },
@@ -189,7 +199,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        An <b>ElicitSpec</b> — an ordinary spec, so you can read it, change one key, and pass it on. The chrome each widget draws itself with is a <a href="/guides">guide</a>: <code className="inline">guides.prompt</code>, <code className="inline">guides.optionRings</code>, <code className="inline">guides.cellGrid</code>, <code className="inline">guides.sliderTrack</code>, <code className="inline">guides.crosshair</code>. The plain-API twins below use those same guides, so each block stands alone.
+        An <b>ElicitSpec</b> — an ordinary spec, so you can read it, change one key, and pass it on. The chrome each widget draws itself with is a <a href="/guides">guide</a>: <code className="inline">guides.prompt</code>, <code className="inline">guides.optionRings</code>, <code className="inline">guides.cellGrid</code>, <code className="inline">guides.sliderTrack</code>, <code className="inline">guides.quadrants</code>. The plain-API twins below use those same guides, so each block stands alone.
       </>
     ),
   },

@@ -93,3 +93,16 @@ Pass an array to `el.select` for several rows at once. See [Selection](/editing/
 />
 
 </Section>
+
+<Section id="domain" title="Driving a domain">
+
+`el.setDomain(field, domain)` writes a field's domain from outside the chart — a zoom button, a "reset view" control. It commits like [`edit.axis.zoom()`](/editing/zoom): one undo step, a `change` notification, and every scale reflows. Pass `null` to restore the domain declared in the schema.
+
+```js
+chart.setDomain("x", [20, 40]);   // zoom to 20–40
+chart.setDomain("x", null);       // back to the declared domain
+```
+
+See [Zoom & domains](/editing/zoom#set-domain) for buttons that zoom in, zoom out and reset.
+
+</Section>

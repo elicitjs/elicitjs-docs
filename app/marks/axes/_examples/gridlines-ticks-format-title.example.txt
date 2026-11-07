@@ -1,6 +1,6 @@
 mount(Elicit({
   width: 380, height: 300,
-  margins: { top: 16, right: 16, bottom: 30, left: 44 },
+  margins: { top: 16, right: 16, bottom: 42, left: 62 },
   axes: {
     x: { ticks: 4, title: "Funnel step" },
     y: { grid: true, tickFormat: ".0%", title: "Conversion" },

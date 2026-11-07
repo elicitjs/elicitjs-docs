@@ -14,15 +14,19 @@ export const api: ApiEntry[] = [
     options: [
       {
         name: "channel",
-        type: "string",
+        type: "'theta' | 'radius'",
         default: "'theta'",
-        desc: "Which scale to read.",
+        desc: (
+          <>
+            Which scale to read. <code className="inline">&apos;radius&apos;</code> draws concentric rings at the radius scale&rsquo;s ticks, the key for an arc with a <code className="inline">radius</code> channel.
+          </>
+        ),
       },
       {
         name: "radius",
         type: "number",
         default: "42% of min(w,h)",
-        desc: "Arc radius in px.",
+        desc: "Arc radius in px. Ignored with channel: 'radius', whose rings sit at the scale's own extent.",
       },
       {
         name: "bands",

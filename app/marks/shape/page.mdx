@@ -1,0 +1,95 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import namedShapes from './_examples/named-shapes.example.txt';
+import pictograms from './_examples/pictograms.example.txt';
+import rotateAndResize from './_examples/rotate-and-resize.example.txt';
+import shapeNodes from './_examples/shape-nodes.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Shape
+
+<Lead>`shape()` draws one SVG path per row, centred at its `x`/`y` — a named shape, a pictogram, any path you write. The shape comes from a `symbol` channel or the `path` option; `size` is the radius of the box it fits, and `angle` turns it in place. It takes every universal edit, as `point` does.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="named" title="Named shapes by category">
+
+Put a categorical field on `symbol` and each category takes a named shape: `circle`, `square`, `triangle`, `diamond`, `star`, `cross`, `wye`, in that order. `legends: true` keys each category with its shape.
+
+The shape is picked inside its whole body, so you can grab a star by any point of it.
+
+<Example
+  code={namedShapes}
+  title="Trees by species"
+  blurb="symbol on a categorical field maps each species to a named shape; the legend keys them."
+  try={(
+    <>
+      <b>Drag</b> a shape to move it · <b>click</b> one to cycle its species.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="pictograms" title="Pictograms from SVG paths">
+
+Give `symbol` a `scale: { range: [...] }` of SVG path strings, and each category draws its own pictogram. A path can use any coordinates: it is fitted to the box of radius `size` around its row's position.
+
+The elicited value is still the category. The path is its encoding, like a colour on `fill`.
+
+<Example
+  code={pictograms}
+  title="Rank three needs"
+  blurb="A path per category on the symbol scale; move() on y sets each priority."
+  try={(
+    <>
+      <b>Drag</b> a pictogram up or down to set its priority.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="path" title="One path for every row">
+
+With no `symbol` channel, the `path` option sets the shape: a name, an SVG path, or `(d, i, data) => string` for a shape chosen per row. It defaults to `"circle"`. A string that is neither a name nor a readable path draws a circle and logs a warning.
+
+`angle` rotates the shape in degrees, counter-clockwise from east. `rotate()` on `angle` turns it about its centre, and `resize()` on `size` grows it. Here a plain drag turns an arrow and Shift-drag sets its speed.
+
+<Example
+  code={rotateAndResize}
+  title="Wind arrows"
+  blurb="path sets one arrow for every row; rotate() writes dir and resize() writes speed."
+  try={(
+    <>
+      <b>Drag</b> around an arrow to turn it · <b>Shift-drag</b> outward to make it longer.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="network" title="Shapes as network nodes">
+
+A shape declares its box, so it can be the node mark of a [network](/marks/network). Links meet the box's edges, and a `ports` channel puts connection points on them. Links treat a rotated shape as unrotated.
+
+<Example
+  code={shapeNodes}
+  title="A supply network"
+  blurb="Each station is a shape by kind. ports with edit.network.connect() draws new links."
+  try={(
+    <>
+      <b>Drag</b> a station to move it · <b>drag</b> from a port to another station to link them · <b>drag</b> a link's end to rewire it.
+    </>
+  )}
+/>
+
+</Section>

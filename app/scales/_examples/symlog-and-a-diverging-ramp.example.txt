@@ -32,6 +32,6 @@ mount(Elicit({
     }),
     // The zero line, through the symlog scale (`datum`, not `value` — `value`
     // would put it 0 pixels from the left edge).
-    ruleX({ channels: { x: { datum: 0 } }, stroke: "#94a3b8", strokeDasharray: "3 3" }),
+    ruleX({ channels: { x: { datum: 0 } }, stroke: "#94a3b8", strokeDash: "3 3" }),
   ],
 }))

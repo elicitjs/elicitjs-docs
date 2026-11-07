@@ -1,0 +1,83 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import wheelBothAxes from './_examples/wheel-both-axes.example.txt';
+import oneAxisWithAModifier from './_examples/one-axis-with-a-modifier.example.txt';
+import zoomButtons from './_examples/zoom-buttons.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Zoom & domains
+
+<Lead>`edit.axis.zoom()` lets the wheel narrow or widen an axis's **domain** about the value under the pointer. Zoom is a schema change, like [an editable axis](/editing/axis): the dataset is untouched, and scales, axes, marks and guides reflow from the new domain. `el.setDomain(field, domain)` does the same from a button.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="wheel" title="Zoom with the wheel">
+
+Put `edit.axis.zoom()` on an axis in `axes`, one per axis you want to zoom. Scroll up to zoom in and down to zoom out. The value under the pointer stays where it is.
+
+The declared domain is the zoom-out ceiling, so you can always scroll back to the full view and no further. Set `limit` to an explicit `[lo, hi]` for a different ceiling, or `false` for none.
+
+A burst of wheel ticks is one step in [history](/editing/history), so one undo restores the domain from before you scrolled. Each tick notifies `change`, and `el.getSchema()` reads the current domain.
+
+Zoom works on numeric and temporal axes. Mark edits keep working at every zoom level: drag a point and it inverts through the zoomed scale.
+
+<Example
+  code={wheelBothAxes}
+  title="Zoom both axes"
+  blurb="edit.axis.zoom() on x and y. The point under the pointer stays put."
+  try={(
+    <>
+      <b>Scroll</b> over the plot to zoom · <b>drag</b> a point at any zoom level.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="modifier" title="One axis at a time">
+
+A plain wheel zooms every axis carrying `edit.axis.zoom()`. Give each a `when` to split them by modifier key: `when.noAlt` on one axis and `when.alt` on the other.
+
+`minSpan` sets the narrowest the domain may zoom in to, in data units. Here time stops at three months and value at ten units.
+
+<Example
+  code={oneAxisWithAModifier}
+  title="Time with the wheel, value with Alt"
+  blurb="when.noAlt on x and when.alt on y; minSpan caps how far each zooms in."
+  try={(
+    <>
+      <b>Scroll</b> to zoom time · <b>Alt + scroll</b> to zoom value · <b>drag</b> a point on the line.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="set-domain" title="Set a domain from outside">
+
+`el.setDomain(field, domain)` writes a field's domain. It takes the same path as a wheel tick: one undo step, a `change` notification, and every scale reflows. Pass `null` to restore the domain declared in the schema.
+
+`setDomain` returns `false` and logs a warning when the table declares no such field. Pass `{ table }` to name a field of a table other than the primary one.
+
+It writes the domain as given. Clamp to the declared domain yourself when zooming out, as the buttons below do.
+
+<Example
+  code={zoomButtons}
+  title="Zoom buttons and a reset"
+  blurb="setDomain halves or doubles the x span about its centre; null restores the declared domain."
+  try={(
+    <>
+      <b>Click</b> Zoom in, Zoom out or Reset · <b>scroll</b> over the plot to zoom too.
+    </>
+  )}
+/>
+
+</Section>

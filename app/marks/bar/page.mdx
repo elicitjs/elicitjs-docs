@@ -15,6 +15,7 @@ import nearestPickSelfDrawnGuide from './_examples/nearest-pick-self-drawn-guide
 import aStackedBarChart from './_examples/a-stacked-bar-chart.example.txt';
 import cutAStackIntoParts from './_examples/cut-a-stack-into-parts.example.txt';
 import anOpenDomain from './_examples/an-open-domain.example.txt';
+import aGradientFill from './_examples/a-gradient-fill.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -40,6 +41,14 @@ The band axis slots the bars; the linear axis sets their length from a baseline.
   code={colourByAField}
   title="Colour by a field"
   blurb={'fill: { field: "kind" } tints each bar through the ordinal palette.'}
+/>
+
+`gradient: { stops, direction }` fills each bar with a linear gradient over its own box. Each stop is `[offset, colour]`, from 0 to 1. `direction: 'vertical'` (the default) runs from the bottom of the bar to its top; `'horizontal'` runs left to right. `area` and `rect` take the same option.
+
+<Example
+  code={aGradientFill}
+  title="A gradient fill"
+  blurb={"gradient: { stops: [[0, pale], [1, indigo]] } — every bar shades from bottom to top."}
 />
 
 </Section>

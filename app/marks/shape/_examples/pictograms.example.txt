@@ -1,0 +1,30 @@
+// Hand-written SVG paths, one per category. Any coordinates work:
+// each path is fitted to a box of radius `size` around its row's x/y.
+const house = "M0 10 L10 0 L20 10 L17 10 L17 20 L3 20 L3 10 Z";
+const car = "M1 12 L4 6 L16 6 L19 12 L19 16 L1 16 Z M4 16 A2 2 0 0 0 8 16 Z M12 16 A2 2 0 0 0 16 16 Z";
+const heart = "M10 18 L2.5 10 A5 5 0 0 1 10 4.5 A5 5 0 0 1 17.5 10 Z";
+
+mount(Elicit({
+  width: 380, height: 260,
+  margins: { top: 20, right: 16, bottom: 32, left: 36 },
+  schema: {
+    need: { type: "categorical", domain: ["housing", "transport", "health"] },
+    priority: { type: "quantitative", domain: [0, 10] },
+  },
+  data: [
+    { need: "housing", priority: 7 },
+    { need: "transport", priority: 4 },
+    { need: "health", priority: 8 },
+  ],
+  marks: [
+    shape({
+      size: 16,
+      channels: {
+        x: { field: "need" },
+        y: { field: "priority", edit: move() },
+        symbol: { field: "need", scale: { range: [house, car, heart] } },
+        fill: { field: "need", scale: { range: ["#4e79a7", "#f28e2b", "#e15759"] } },
+      },
+    }),
+  ],
+}));

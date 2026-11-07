@@ -39,6 +39,16 @@ export const api: ApiEntry[] = [
         desc: "Mark-level edits; per-channel edits live in the channels map.",
       },
       {
+        name: "tip",
+        type: "true | string[] | (d) => string",
+        default: "—",
+        desc: (
+          <>
+            A tooltip of the row under the pointer, as on every mark: all columns, the listed ones, or your own text. See <a href="/guides#tips">Tooltips</a>.
+          </>
+        ),
+      },
+      {
         name: "fill, stroke, size, angle, …",
         type: "style",
         default: "fill: 'steelblue'",
@@ -87,6 +97,15 @@ export const api: ApiEntry[] = [
         name: "stroke, strokeWidth, opacity",
         type: "const | field",
         desc: "Standard style surface.",
+      },
+      {
+        name: "symbol",
+        type: "const | field",
+        desc: (
+          <>
+            Draws the point as a glyph (emoji or unicode shape), drawn as text and sized by <code className="inline">size</code>. An SVG path warns; use <a href="/marks/shape"><code className="inline">plot.shape()</code></a> for path shapes.
+          </>
+        ),
       },
     ],
     returns: (

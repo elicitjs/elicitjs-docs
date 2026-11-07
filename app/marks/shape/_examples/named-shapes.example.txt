@@ -1,0 +1,27 @@
+mount(Elicit({
+  width: 440, height: 280,
+  margins: { top: 16, right: 16, bottom: 32, left: 36 },
+  legends: true,
+  schema: {
+    x: { type: "quantitative", domain: [0, 100] },
+    y: { type: "quantitative", domain: [0, 100] },
+    kind: { type: "categorical", domain: ["oak", "pine", "birch", "maple"] },
+  },
+  data: [
+    { x: 18, y: 30, kind: "oak" },   { x: 30, y: 72, kind: "pine" },
+    { x: 46, y: 48, kind: "birch" }, { x: 62, y: 80, kind: "maple" },
+    { x: 74, y: 26, kind: "oak" },   { x: 86, y: 58, kind: "pine" },
+  ],
+  marks: [
+    shape({
+      size: 9, fill: "#0f766e",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        // Each category takes a named shape: circle, square, triangle, diamond, …
+        symbol: { field: "kind", edit: cycle() },
+      },
+      edits: [move({ channels: ["x", "y"] })],
+    }),
+  ],
+}));

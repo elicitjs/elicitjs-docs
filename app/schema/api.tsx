@@ -90,6 +90,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "context",
+        type: "boolean",
+        default: "false",
+        desc: (
+          <>
+            On a table entry (<code className="inline">{'{ context: true, fields: { … } }'}</code>): reference rows that are drawn and never elicited. Every row is read-only, and the table is left out of <code className="inline">getData()</code>, <code className="inline">onChange</code> and <code className="inline">getSchema()</code>. Any number may sit beside the structure&rsquo;s own tables. See <a href="#context">Context tables</a>.
+          </>
+        ),
+      },
+      {
         name: "default",
         type: "any",
         default: "null",

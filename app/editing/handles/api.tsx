@@ -13,7 +13,7 @@ export const api: ApiEntry[] = [
         name: 'handles',
         type: 'boolean | "hit"',
         default: 'true',
-        desc: '"hit" keeps the enlarged grab target without drawing a circle. false is neither drawn nor grabbable.',
+        desc: '"hit" keeps the enlarged grab target without drawing a circle. false is neither drawn nor grabbable, so a sweep or nearest pick on the mark has nothing to target (the chart warns).',
       },
       {
         name: 'handleSize',
@@ -24,8 +24,8 @@ export const api: ApiEntry[] = [
       {
         name: 'handleColor',
         type: 'string',
-        default: "theme.handle",
-        desc: "Grip fill. Falls back to the mark's own ink when the theme names none, so a recoloured mark keeps a matching grip.",
+        default: "series colour · theme.handle",
+        desc: "Grip fill. On line and area a grip is filled with its row's resolved stroke, so each series' grips match its line; trend uses its own ink, and other marks use theme.handle. The ring is theme.handleStroke. Setting handleColor overrides both fills.",
       },
     ],
     returns: (

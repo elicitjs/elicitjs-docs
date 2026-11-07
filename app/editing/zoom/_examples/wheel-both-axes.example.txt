@@ -1,0 +1,24 @@
+mount(Elicit({
+  width: 420, height: 280,
+  margins: { top: 16, right: 18, bottom: 32, left: 40 },
+  schema: {
+    x: { type: "quantitative", domain: [0, 100] },
+    y: { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { x: 12, y: 20 }, { x: 24, y: 42 }, { x: 38, y: 35 }, { x: 47, y: 58 },
+    { x: 55, y: 51 }, { x: 63, y: 70 }, { x: 71, y: 64 }, { x: 86, y: 82 },
+  ],
+  // The wheel zooms each axis about the value under the pointer.
+  axes: {
+    x: { edit: edit.axis.zoom() },
+    y: { edit: edit.axis.zoom() },
+  },
+  marks: [
+    point({
+      fill: "#7c3aed", size: 6,
+      channels: { x: { field: "x" }, y: { field: "y" } },
+      edits: [move({ channels: ["x", "y"] })],
+    }),
+  ],
+}));

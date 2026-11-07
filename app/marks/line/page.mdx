@@ -12,6 +12,8 @@ import twoSeriesSweptIndependently from './_examples/two-series-swept-independen
 import a2dPathYouCanReshape from './_examples/a-2d-path-you-can-reshape.example.txt';
 import doubleClickToSeedThenSweep from './_examples/double-click-to-seed-then-sweep.example.txt';
 import drawThenReshape from './_examples/draw-then-reshape.example.txt';
+import aGapWhereAValueIsMissing from './_examples/a-gap-where-a-value-is-missing.example.txt';
+import dashedByField from './_examples/dashed-by-field.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -19,7 +21,7 @@ export default function Layout({ children }) {
 
 # Line
 
-<Lead>A connected path over an ordered set of points, with a draggable handle on each. It is deliberately general — a you-draw-it curve, a multi-series line chart, and a connected scatter are the same mark along four orthogonal knobs: **grouping** (the `series` channel), **ordering** (the `order` channel, or the `connect` mode), **editing** (the edit on the handles), and **creation** (`anchor` / `newSeries` / `draw`). `lineY`/`lineX` fix the value axis; `path` defaults to `connect: "sequence"`.</Lead>
+<Lead>A connected path over an ordered set of points, with a draggable handle on each once the line carries an edit. It is deliberately general — a you-draw-it curve, a multi-series line chart, and a connected scatter are the same mark along four orthogonal knobs: **grouping** (the `series` channel), **ordering** (the `order` channel, or the `connect` mode), **editing** (the edit on the handles), and **creation** (`anchor` / `newSeries` / `draw`). `lineY`/`lineX` fix the value axis; `path` defaults to `connect: "sequence"`.</Lead>
 
 <ApiReference entries={api} />
 
@@ -32,6 +34,42 @@ export default function Layout({ children }) {
   title={"curve: \"catmullRom\""}
   blurb={"A smooth line through the points. Try \"linear\" or \"step\" for other shapes."}
 />
+
+</Section>
+
+<Section id="gaps" title="Missing values">
+
+A row whose value is `null`, `undefined` or `NaN` breaks the line there. The segments on either side draw on their own, and the missing row gets no handle.
+
+<Example
+  code={aGapWhereAValueIsMissing}
+  title="A gap where a value is missing"
+  blurb={"The row at x = 3 has y: null, so the line stops and starts again."}
+  try={(
+    <>
+      <b>Drag</b> a handle on either side of the gap.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="dashes" title="Dashed lines">
+
+`strokeDash` sets the dash pattern. A constant is an SVG dash array (`strokeDash: '4 2'`). A field maps each category onto a dash pattern (solid, dashed, dotted, dash-dot, long dash), the way `stroke` maps one onto a colour. Add `legend: true` to the channel for a key of dashed segments.
+
+<Example
+  code={dashedByField}
+  title="Observed and forecast"
+  blurb={"strokeDash: { field: \"kind\" } draws the forecast dashed; series: { field: \"kind\" } splits the two lines."}
+  try={(
+    <>
+      <b>Drag</b> a forecast point.
+    </>
+  )}
+/>
+
+Rows group into lines by `series`, `fill` or `stroke`, so a dashed chart names its grouping with `series`, as here, or puts the same field on `stroke`.
 
 </Section>
 
@@ -54,12 +92,12 @@ Put `edit: move(\{ pick: "sweep" \})` on the value channel for the NYT-style "yo
 
 <Section id="handles" title="Hiding the handles">
 
-The per-point handles are optional. `handles: false` renders them invisible but keeps them for hit-testing, so the line stays fully editable — you just don't see the dots. `handleSize` sizes them when shown.
+The per-point handles draw only when the line carries an edit. `handles: 'hit'` keeps them invisible but targetable, so a sweep or nearest pick still finds the line; `handles: false` removes them, and a proximity edit then has nothing to aim at (the chart warns). `handleSize` sizes them when shown.
 
 <Example
   code={aCleanLineStillSweepable}
   title="A clean line, still sweepable"
-  blurb="handles: false hides the dots; the sweep edit still works."
+  blurb="handles: 'hit' hides the dots; the sweep edit still works."
   try={(
     <>
       <b>Sweep</b> across — no handles, but the line still responds.

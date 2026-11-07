@@ -1,0 +1,27 @@
+mount(Elicit({
+  width: 300, height: 280,
+  margins: { top: 16, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  data: [
+    { month: "Jan", n: 30 }, { month: "Feb", n: 45 }, { month: "Mar", n: 70 },
+    { month: "Apr", n: 90 }, { month: "May", n: 60 }, { month: "Jun", n: 40 },
+  ],
+  schema: {
+    month: { type: "categorical" },
+    n:     { type: "quantitative", domain: [0, 100] },
+  },
+  elements: [
+    // Concentric rings at the radius scale's ticks, labelled up the vertical.
+    axisRadial({ channel: "radius", ticks: 4, tickFormat: "d" }),
+  ],
+  marks: [
+    arc({
+      outerRadius: 110, padAngle: 1.5,
+      channels: {
+        theta: { value: 1 },
+        radius: { field: "n" },
+        fill: { field: "month" },
+      },
+    }),
+  ],
+}));

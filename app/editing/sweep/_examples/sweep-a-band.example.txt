@@ -1,0 +1,26 @@
+mount(Elicit({
+  width: 420, height: 260,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  data: [
+    { x: 0, lo: 40, hi: 60 }, { x: 1, lo: 38, hi: 62 }, { x: 2, lo: 35, hi: 66 },
+    { x: 3, lo: 32, hi: 70 }, { x: 4, lo: 28, hi: 74 }, { x: 5, lo: 25, hi: 78 },
+    { x: 6, lo: 22, hi: 82 }, { x: 7, lo: 20, hi: 85 },
+  ],
+  schema: {
+    x:  { type: "quantitative", domain: [0, 7] },
+    lo: { type: "quantitative", domain: [0, 100] },
+    hi: { type: "quantitative", domain: [0, 100] },
+  },
+  constraints: [ ordering({ field: ["lo", "hi"] }) ],
+  marks: [
+    areaY({
+      fill: "#0891b2", stroke: "#0891b2", curve: "catmullRom",
+      channels: {
+        x:  { field: "x" },
+        // One sweep per edge: a drag paints the edge nearest where it starts.
+        y1: { field: "lo", edit: edit.line.sweep() },
+        y2: { field: "hi", edit: edit.line.sweep() },
+      },
+    }),
+  ],
+}))

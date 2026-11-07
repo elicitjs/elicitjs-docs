@@ -1,0 +1,23 @@
+mount(Elicit({
+  width: 400, height: 260,
+  margins: { top: 16, right: 16, bottom: 28, left: 34 },
+  data: [
+    { t: 1, n: 20 }, { t: 2, n: 45 }, { t: 3, n: 35 },
+    { t: 4, n: 60 }, { t: 5, n: 50 },
+  ],
+  schema: {
+    t: { type: "quantitative", domain: [1, 5] },
+    n: { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    areaY({
+      stroke: "#1d4ed8", fillOpacity: 0.9,
+      // Offset 0 is the bottom of the area's box, 1 the top.
+      gradient: { stops: [[0, "#eff6ff"], [1, "#3b82f6"]], direction: "vertical" },
+      channels: {
+        x: { field: "t" },
+        y: { field: "n", edit: move() },
+      },
+    }),
+  ],
+}));

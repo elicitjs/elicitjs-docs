@@ -55,6 +55,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "gradient",
+        type: "{ stops, direction }",
+        default: "—",
+        desc: (
+          <>
+            A linear-gradient fill over each rect&rsquo;s own box, in place of a flat <code className="inline">fill</code>. <code className="inline">stops</code> is a list of <code className="inline">[offset, colour]</code> with offsets 0–1; <code className="inline">direction</code> is <code className="inline">'vertical'</code> (default, bottom to top) or <code className="inline">'horizontal'</code> (left to right). Same option as on <code className="inline">bar</code> and <code className="inline">area</code>.
+          </>
+        ),
+      },
+      {
         name: "edits",
         type: "Edit[]",
         default: "—",

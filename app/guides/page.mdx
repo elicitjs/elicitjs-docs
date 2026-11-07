@@ -10,6 +10,9 @@ import aMeanLineThatChasesTheBars from './_examples/a-mean-line-that-chases-the-
 import anEditDrawsItsBounds from './_examples/an-edit-draws-its-bounds.example.txt';
 import restylingTheParts from './_examples/restyling-the-parts.example.txt';
 import howMuchIsLeftToAllocate from './_examples/how-much-is-left-to-allocate.example.txt';
+import aTipOnEveryBar from './_examples/a-tip-on-every-bar.example.txt';
+import aTipInYourOwnWords from './_examples/a-tip-in-your-own-words.example.txt';
+import aCrosshairWithReadouts from './_examples/a-crosshair-with-readouts.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -17,7 +20,7 @@ export default function Layout({ children }) {
 
 # Guides
 
-<Lead>A guide draws the **rule** and the **state** — what a gesture is allowed to do, and what is left to do. It views chart state rather than rows, so it has no channels, no table and no `edit`, and can never write data. Declare one in `guides: [...]` (`guides.rule`, `guides.region`, `guides.remaining`, `guides.proximity`, `guides.custom`), or let an edit draw its own with `guide:`. Guides rebuild every render and never capture a gesture. For feedback on interaction state — hovered, selected, grabbed — see [Effects](/effects).</Lead>
+<Lead>A guide draws the **rule** and the **state** — what a gesture is allowed to do, and what is left to do. It views chart state rather than rows, so it has no channels, no table and no `edit`, and can never write data. Declare one in `guides: [...]` (`guides.rule`, `guides.region`, `guides.remaining`, `guides.proximity`, `guides.tip`, `guides.crosshair`, `guides.custom`), or let an edit draw its own with `guide:`. Guides rebuild every render and never capture a gesture. For feedback on interaction state — hovered, selected, grabbed — see [Effects](/effects).</Lead>
 
 <ApiReference entries={api} />
 
@@ -131,6 +134,57 @@ Every option takes a literal or a function of the guide context (`{ data, scales
   try={(
     <>
       <b>Drag</b> a bar. The fixed target holds; the mean line and the band follow.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="tips" title="Tooltips">
+
+`tip: true` on any mark shows a tooltip of the row under the pointer: one `column: value` line per column. Pass a list of columns (`tip: ["city", "rain"]`) to show only those, or a function of the row (`tip: (d) => string`) for your own wording.
+
+A tip is a guide, so it never blocks editing. It makes no mark pointer-active and captures no gesture: drag a bar under its tooltip as if the tip were not there. It also shows on read-only rows — a locked seed, a [context table](/schema#context).
+
+<Example
+  code={aTipOnEveryBar}
+  title="A tip on every bar"
+  blurb="tip: true on a barY with move(). The tooltip follows the pointer; the drag works underneath."
+  try={(
+    <>
+      <b>Hover</b> a bar to read it · <b>drag</b> it while the tip is showing.
+    </>
+  )}
+/>
+
+`guides.tip()` is the long form. `text` takes the columns or a function of the row returning a string or an array of lines. `anchor: "mark"` pins the box beside the mark's centre instead of the pointer, and `mark` limits it to the mark with that `id`. `format` sets how numbers print, as a d3 format specifier or a function.
+
+<Example
+  code={aTipInYourOwnWords}
+  title="A tip in your own words"
+  blurb={"guides.tip({ anchor: \"mark\", text: (d) => [...] }) writes two lines beside the point."}
+  try={(
+    <>
+      <b>Hover</b> a point to read its share · <b>drag</b> it up or down.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="crosshair" title="Crosshair">
+
+`guides.crosshair()` draws dashed rules through the pointer across the plot. Each rule reads the value under the pointer off its axis, at the plot's bottom and left edges. Set `x: false` or `y: false` to draw one rule, and `readout: false` to drop the labels. `format` sets how the readouts print.
+
+The rules hide when the pointer leaves the plot, and never capture a gesture.
+
+<Example
+  code={aCrosshairWithReadouts}
+  title="A crosshair with readouts"
+  blurb={"guides.crosshair({ format: \".1f\" }) reads hours and score under the pointer."}
+  try={(
+    <>
+      <b>Move</b> over the plot to read both axes · <b>drag</b> a point to an exact value.
     </>
   )}
 />

@@ -1,0 +1,27 @@
+mount(Elicit({
+  width: 400, height: 260,
+  margins: { top: 16, right: 16, bottom: 32, left: 40 },
+  schema: {
+    party: { type: "categorical", domain: ["Green", "Labour", "Liberal", "Other"] },
+    share: { type: "quantitative", domain: [0, 60] },
+  },
+  data: [
+    { party: "Green", share: 12 }, { party: "Labour", share: 38 },
+    { party: "Liberal", share: 31 }, { party: "Other", share: 9 },
+  ],
+  guides: [
+    guides.tip({
+      anchor: "mark",
+      text: (d) => [`${d.party}`, `${d.share.toFixed(0)}% of the vote`],
+    }),
+  ],
+  marks: [
+    point({
+      fill: "#59a14f", size: 8,
+      channels: {
+        x: { field: "party" },
+        y: { field: "share", edit: move() },
+      },
+    }),
+  ],
+}));

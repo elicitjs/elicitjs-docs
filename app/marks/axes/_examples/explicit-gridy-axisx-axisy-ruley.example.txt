@@ -1,6 +1,6 @@
 mount(Elicit({
   width: 380, height: 280,
-  margins: { top: 16, right: 16, bottom: 30, left: 36 },
+  margins: { top: 16, right: 16, bottom: 42, left: 50 },
   axes: false,   // no auto axes; we place our own
   data: [{ x: 15, y: 30 }, { x: 40, y: 62 }, { x: 65, y: 44 }, { x: 88, y: 74 }],
   schema: {
@@ -11,7 +11,7 @@ mount(Elicit({
     gridY({ ticks: 5 }),
     // `datum` is a DATA-space constant: it goes through the y scale, so the
     // line lands where y = 50 is. (`value` would mean 50 pixels.)
-    ruleY({ channels: { y: { datum: 50 } }, stroke: "#e4572e", strokeDasharray: "4 3" }),
+    ruleY({ channels: { y: { datum: 50 } }, stroke: "#e4572e", strokeDash: "4 3" }),
     point({
       fill: "#4f46e5",
       size: 8,

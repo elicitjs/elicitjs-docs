@@ -9,10 +9,10 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "guides.rule({ x?, y?, label, stroke, strokeDasharray, strokeWidth, opacity }) → Guide",
+      "guides.rule({ x?, y?, label, stroke, strokeDash, strokeWidth, opacity }) → Guide",
       "guides.region({ x?, y?, fill, opacity }) → Guide",
       "guides.remaining({ field, total?, unit?, format?, anchor?, label?, fill?, fontSize? }) → Guide",
-      "guides.proximity({ target, stroke, strokeDasharray, strokeWidth, opacity }) → Guide",
+      "guides.proximity({ target, stroke, strokeDash, strokeWidth, opacity }) → Guide",
       "guides.custom((ctx) => FeatureNode[]) → Guide",
       "",
       "// any option may be a function of the guide context:",
@@ -32,7 +32,7 @@ export const api: ApiEntry[] = [
         desc: "Text drawn beside the line.",
       },
       {
-        name: "rule.stroke / strokeDasharray / strokeWidth / opacity",
+        name: "rule.stroke / strokeDash / strokeWidth / opacity",
         type: "style",
         default: "theme.guide.rule",
         desc: "Line paint. Restyle every reference line at once through the theme instead.",
@@ -80,7 +80,7 @@ export const api: ApiEntry[] = [
         desc: "The `id` of the feature whose proximity catchment to draw — a dashed ring at the pointer, the radius within which it reaches for a mark. Prefer `guide: { catchment: true }` on the edit itself, which needs no id.",
       },
       {
-        name: "proximity.stroke / strokeDasharray / strokeWidth / opacity",
+        name: "proximity.stroke / strokeDash / strokeWidth / opacity",
         type: "style",
         default: "theme catchment",
         desc: "Ring paint.",
@@ -130,6 +130,105 @@ export const api: ApiEntry[] = [
     ],
   },
   {
+    name: "guides.tip(options) · tip (on a mark)",
+    summary: (
+      <>
+        A tooltip of the row under the pointer. It reads state and writes nothing, so it never blocks a gesture, and it shows on read-only rows too. Every mark takes <code className="inline">tip</code> as a shorthand for a tip bound to that mark.
+      </>
+    ),
+    signatures: [
+      "barY({ tip: true, … })                 // every column of the row",
+      "barY({ tip: [\"city\", \"rain\"], … })    // these columns",
+      "barY({ tip: (d) => `${d.city}: ${d.rain}`, … })",
+      "guides.tip({ mark, text, anchor, dx, dy, fill, stroke, fontSize, format }) → Guide",
+    ],
+    options: [
+      {
+        name: "mark",
+        type: "string",
+        default: "any mark",
+        desc: "The id of the mark whose rows the tip reads. Left out, it reads whichever mark is under the pointer.",
+      },
+      {
+        name: "text",
+        type: "string[] | (row, ctx) => string | string[]",
+        default: "every column",
+        desc: "The columns to show as column: value lines, or a function of the row returning a string or an array of lines.",
+      },
+      {
+        name: "anchor",
+        type: "'pointer' | 'mark'",
+        default: "'pointer'",
+        desc: "Where the box sits: beside the pointer, or beside the mark's centre. It flips to stay inside the plot.",
+      },
+      {
+        name: "dx / dy",
+        type: "number",
+        default: "12 / 12",
+        desc: "The box's offset from its anchor, in px.",
+      },
+      {
+        name: "fill / stroke",
+        type: "string",
+        default: "theme background / axis stroke",
+        desc: "The box's paint.",
+      },
+      {
+        name: "fontSize",
+        type: "number",
+        default: "theme font size + 1",
+        desc: "The text size, in px.",
+      },
+      {
+        name: "format",
+        type: "string | (v) => string",
+        default: "—",
+        desc: "How a number prints: a d3 format specifier or a function. Without it, numbers round to three decimals.",
+      },
+    ],
+  },
+  {
+    name: "guides.crosshair(options)",
+    summary: (
+      <>
+        Rules through the pointer across the plot, each labelled with the value under the pointer on its axis. Hidden while the pointer is outside the plot.
+      </>
+    ),
+    signature: "guides.crosshair({ x, y, readout, stroke, strokeDash, fontSize, format }) → Guide",
+    options: [
+      {
+        name: "x / y",
+        type: "boolean",
+        default: "true / true",
+        desc: "Which rules to draw: the vertical one that reads x, the horizontal one that reads y.",
+      },
+      {
+        name: "readout",
+        type: "boolean",
+        default: "true",
+        desc: "Label each rule with its axis value, at the plot's bottom and left edges.",
+      },
+      {
+        name: "stroke / strokeDash",
+        type: "string",
+        default: "theme.guide.rule / '3 3'",
+        desc: "The rules' colour and dash pattern.",
+      },
+      {
+        name: "fontSize",
+        type: "number",
+        default: "theme font size",
+        desc: "The readout size, in px.",
+      },
+      {
+        name: "format",
+        type: "string | (v) => string",
+        default: "—",
+        desc: "How a readout prints: a d3 format specifier or a function. Without it, numbers round to two decimals.",
+      },
+    ],
+  },
+  {
     name: "Instrument affordances",
     summary: (
       <>
@@ -141,7 +240,7 @@ export const api: ApiEntry[] = [
       "guides.optionRings({ labelOffset, radius }) → Guide   // a Likert scale's rings",
       "guides.cellGrid({ pad }) → Guide              // a matrix's cells + headers",
       "guides.sliderTrack({ format }) → Guide        // a track with end labels",
-      "guides.crosshair({ x, y }) → Guide            // centred axes + four end labels",
+      "guides.quadrants({ x, y }) → Guide            // centred axes + four end labels",
     ],
     options: [
       {
@@ -169,7 +268,7 @@ export const api: ApiEntry[] = [
         desc: "How the two end labels read.",
       },
       {
-        name: "crosshair.x / y",
+        name: "quadrants.x / y",
         type: "string",
         default: "—",
         desc: "The variable name to label each axis's high and low ends with.",

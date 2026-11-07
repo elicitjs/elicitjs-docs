@@ -37,13 +37,13 @@ export const api: ApiEntry[] = [
       },
       {
         name: 'stack',
-        type: 'true | string',
-        default: '—',
+        type: 'boolean',
+        default: 'false',
         desc: (
           <>
-            Stack bars that share a category. <code className="inline">true</code>{' '}
-            uses the fill/series field; a string names the series field. Declare a
-            schema domain covering the stacked total.
+            Stack bars that share a category. The segments are the{' '}
+            <code className="inline">series</code> channel&rsquo;s groups (else the
+            fill or stroke field). Declare a schema domain covering the stacked total.
           </>
         ),
       },
@@ -56,6 +56,21 @@ export const api: ApiEntry[] = [
             Boundary dots on a stacked bar, drawn once a{' '}
             <code className="inline">edit.stack.*</code> edit is wired.{' '}
             <code className="inline">'hit'</code> keeps them grabbable but invisible.
+          </>
+        ),
+      },
+      {
+        name: 'gradient',
+        type: '{ stops, direction }',
+        default: '—',
+        desc: (
+          <>
+            A linear-gradient fill over each bar&rsquo;s own box, in place of a flat{' '}
+            <code className="inline">fill</code>. <code className="inline">stops</code> is a
+            list of <code className="inline">[offset, colour]</code> with offsets 0–1;{' '}
+            <code className="inline">direction</code> is <code className="inline">'vertical'</code>{' '}
+            (default, bottom to top) or <code className="inline">'horizontal'</code> (left to
+            right).
           </>
         ),
       },

@@ -9,7 +9,7 @@ mount(Elicit({
   marks: [
     // Dashed threshold at x = 50 (data units, through the scale).
     ruleX({
-      stroke: "#94a3b8", strokeWidth: 1.5, strokeDasharray: "4 3",
+      stroke: "#94a3b8", strokeWidth: 1.5, strokeDash: "4 3",
       channels: { x: { datum: 50 } },
     }),
     point({

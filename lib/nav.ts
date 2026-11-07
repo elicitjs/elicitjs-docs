@@ -26,6 +26,7 @@ export const SITE: NavGroup[] = [
       { href: "/marks/ellipse", title: "Ellipse" },
       { href: "/marks/curve", title: "Curve" },
       { href: "/marks/symbol", title: "Symbol & Emoji" },
+      { href: "/marks/shape", title: "Shape (pictograms)" },
       { href: "/marks/face", title: "Face (emotion)" },
       { href: "/marks/text", title: "Text" },
       { href: "/marks/line", title: "Line" },
@@ -63,6 +64,7 @@ export const SITE: NavGroup[] = [
         title: "External controls (UI · functions)",
       },
       { href: "/editing/axis", title: "Editable axes (domain)" },
+      { href: "/editing/zoom", title: "Zoom & domains" },
     ],
   },
   {

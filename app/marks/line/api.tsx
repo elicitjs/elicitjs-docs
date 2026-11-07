@@ -73,10 +73,10 @@ export const api: ApiEntry[] = [
       {
         name: "handles",
         type: "boolean | 'hit'",
-        default: "true",
+        default: "true with an edit",
         desc: (
           <>
-            <code className="inline">true</code> draws a grabbable circle per datum. <code className="inline">'hit'</code> keeps the grab target but draws nothing. <code className="inline">false</code> is neither drawn nor grabbable.
+            <code className="inline">true</code> draws a grabbable circle per datum. <code className="inline">'hit'</code> keeps the grab target but draws nothing. <code className="inline">false</code> is neither drawn nor grabbable, so a sweep or nearest pick has nothing to target. The default is <code className="inline">true</code> when the mark carries an edit and <code className="inline">false</code> otherwise.
           </>
         ),
       },
@@ -92,7 +92,7 @@ export const api: ApiEntry[] = [
         default: "theme",
         desc: (
           <>
-            Handle fill. Defaults to the theme&rsquo;s <code className="inline">handle</code> colour.
+            Handle fill. Defaults to the series&rsquo; stroke, so each handle matches its line; the ring is the theme&rsquo;s <code className="inline">handleStroke</code>.
           </>
         ),
       },
@@ -131,6 +131,15 @@ export const api: ApiEntry[] = [
         name: "strokeWidth, opacity",
         type: "const | field",
         desc: "Standard style surface for the connector + handles.",
+      },
+      {
+        name: "strokeDash",
+        type: "const | field",
+        desc: (
+          <>
+            Dash pattern. A constant is an SVG dash array (<code className="inline">'4 2'</code>); a field maps each category onto a dash vocabulary through an ordinal scale. Takes <code className="inline">legend: true</code>.
+          </>
+        ),
       },
     ],
     returns: (

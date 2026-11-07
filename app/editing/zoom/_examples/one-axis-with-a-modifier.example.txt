@@ -1,0 +1,28 @@
+// A forecast over 24 months. The plain wheel zooms time; Alt + wheel zooms the value.
+const data = d3.range(25).map((m) => ({
+  month: m,
+  value: 50 + 20 * Math.sin(m / 4) + m * 0.8,
+}));
+
+mount(Elicit({
+  width: 440, height: 260,
+  margins: { top: 16, right: 18, bottom: 32, left: 40 },
+  schema: {
+    month: { type: "quantitative", domain: [0, 24] },
+    value: { type: "quantitative", domain: [0, 100] },
+  },
+  data,
+  axes: {
+    x: { edit: edit.axis.zoom({ when: when.noAlt, minSpan: 3 }) },
+    y: { edit: edit.axis.zoom({ when: when.alt, minSpan: 10 }) },
+  },
+  marks: [
+    lineY({
+      stroke: "#0f766e", strokeWidth: 2,
+      channels: {
+        x: { field: "month" },
+        y: { field: "value", edit: move() },
+      },
+    }),
+  ],
+}));

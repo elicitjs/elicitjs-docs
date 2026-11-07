@@ -17,6 +17,8 @@ export const api: ApiEntry[] = [
       "ordering({ field, strategy }) → Constraint",
       "monotonic({ field, along, dir, series }) → Constraint",
       "spacing({ field, min, series }) → Constraint",
+      "follow({ field, lead }) → Constraint",
+      "symmetric({ field, about }) → Constraint",
     ],
     options: [
       {
@@ -27,9 +29,9 @@ export const api: ApiEntry[] = [
       },
       {
         name: "clamp.field",
-        type: "string",
+        type: "string | string[]",
         default: "the edited column",
-        desc: "The data field to bound.",
+        desc: "The column(s) to bound. Every cell the proposal changed in them is clamped, including a neighbour another constraint pushed.",
       },
       {
         name: "maintainSum.total",
@@ -85,9 +87,9 @@ export const api: ApiEntry[] = [
       },
       {
         name: "snap.field",
-        type: "string",
+        type: "string | string[]",
         default: "the edited column",
-        desc: "The data field to quantize.",
+        desc: "The column(s) to quantize. Every cell the proposal changed in them is snapped, so both rows of a stack edge stay on the grid. A temporal cell stays a Date, snapped in milliseconds.",
       },
       {
         name: "ordering.field",
@@ -136,6 +138,26 @@ export const api: ApiEntry[] = [
         desc: (
           <>
             Adjacent values of <code className="inline">field</code> stay at least <code className="inline">min</code> apart, in <b>data</b> units — never pixels. Implies an order too (pushing apart preserves the sort), so a field with <code className="inline">spacing</code> needs no <code className="inline">ordering</code>.
+          </>
+        ),
+      },
+      {
+        name: "follow.field / lead",
+        type: "string[] / string",
+        default: "—",
+        desc: (
+          <>
+            When <code className="inline">lead</code> moves, each column in <code className="inline">field</code> moves by the same amount. A column the edit set itself is left alone, so dragging an end moves only that end. Both are required.
+          </>
+        ),
+      },
+      {
+        name: "symmetric.field / about",
+        type: "[string, string] / string",
+        default: "—",
+        desc: (
+          <>
+            When one column of the pair moves, the other is set to its mirror image about <code className="inline">about</code>. Declare after <code className="inline">follow</code> and before <code className="inline">ordering</code> and <code className="inline">clamp</code>.
           </>
         ),
       },

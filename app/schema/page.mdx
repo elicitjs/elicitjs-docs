@@ -9,6 +9,7 @@ import elicitFromNothing from './_examples/elicit-from-nothing.example.txt';
 import beliefsOverTime from './_examples/beliefs-over-time.example.txt';
 import aKeyedTable from './_examples/a-keyed-table.example.txt';
 import barOfLinkWeights from './_examples/a-bar-of-link-weights.example.txt';
+import contextTable from './_examples/context-table.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -136,6 +137,37 @@ Positional scales are shared across the chart. Two tables encoding different kin
   try={(
     <>
       <b>Drag</b> a bar. The change lands in the <code>links</code> table.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="context" title="Context tables">
+
+A **context table** holds reference rows you draw but never elicit — last decade's figures behind a forecast, a published estimate beside your own. Declare it beside the elicited table with `context: true` and its columns under `fields`:
+
+```js
+schema: {
+  data: { year: { … }, rate: { … } },
+  history: { context: true, fields: { year: { … }, rate: { … } } },
+},
+data: { data: forecastRows, history: historyRows },
+```
+
+Point a mark at it with `table: "history"`. Every row is read-only, and an edit declared on a mark over a context table logs a warning.
+
+Context rows stay out of what the chart reports: `getData()`, `onChange` and `getSchema()` show only the elicited tables. A single-table chart with a context table still reports a bare array.
+
+You can declare any number of context tables. Their values widen the domains a scale infers, so a field with no declared `domain` spans both tables. `setData` keeps the context rows of every table it does not name.
+
+<Example
+  code={contextTable}
+  title="A forecast over its history"
+  blurb="The grey line draws the history context table; only the blue forecast is elicited."
+  try={(
+    <>
+      <b>Drag</b> a point on the blue line. The grey history stays put, and <code>getData()</code> lists only the forecast.
     </>
   )}
 />

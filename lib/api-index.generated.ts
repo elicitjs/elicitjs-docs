@@ -15,13 +15,13 @@ export type ApiIndexEntry = {
 
 export type ApiNamespace = { namespace: string; blurb: string; count: number };
 
-export const API_LIBRARY_VERSION = "0.1.0-alpha.1";
-export const API_GENERATED_AT = "2026-11-05T18:33:28.763Z";
+export const API_LIBRARY_VERSION = "0.1.0-alpha.2";
+export const API_GENERATED_AT = "2026-11-07T18:10:28.235Z";
 export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "plot",
     "blurb": "Marks draw the rows of your dataset.",
-    "count": 50
+    "count": 51
   },
   {
     "namespace": "elements",
@@ -31,17 +31,17 @@ export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "edit",
     "blurb": "Edits map a gesture back through a scale to write a column.",
-    "count": 52
+    "count": 53
   },
   {
     "namespace": "constraints",
     "blurb": "Constraints are rules over the dataset. Each one rejects or repairs every edit.",
-    "count": 9
+    "count": 11
   },
   {
     "namespace": "guides",
     "blurb": "Guides draw reference lines and interaction state. They never write data.",
-    "count": 10
+    "count": 12
   },
   {
     "namespace": "widgets",
@@ -118,7 +118,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/arc"
   },
@@ -134,13 +135,15 @@ export const API_INDEX: ApiIndexEntry[] = [
       "handles",
       "handleSize",
       "handleColor",
-      "connect"
+      "connect",
+      "gradient"
     ],
     "universal": [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/area"
   },
@@ -155,7 +158,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/area"
   },
@@ -170,7 +174,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/area"
   },
@@ -185,13 +190,15 @@ export const API_INDEX: ApiIndexEntry[] = [
       "stack",
       "handles",
       "handleSize",
-      "handleColor"
+      "handleColor",
+      "gradient"
     ],
     "universal": [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/bar"
   },
@@ -206,7 +213,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/bar"
   },
@@ -221,7 +229,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/bar"
   },
@@ -239,7 +248,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/composite"
   },
@@ -257,7 +267,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/curve"
   },
@@ -272,7 +283,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/curve"
   },
@@ -287,7 +299,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/curve"
   },
@@ -302,7 +315,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/arc"
   },
@@ -322,7 +336,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/dotstack"
   },
@@ -337,7 +352,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/dotstack"
   },
@@ -352,7 +368,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/dotstack"
   },
@@ -367,7 +384,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/ellipse"
   },
@@ -384,7 +402,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/face"
   },
@@ -404,7 +423,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/geo"
   },
@@ -426,7 +446,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/geo"
   },
@@ -441,7 +462,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/geo"
   },
@@ -456,7 +478,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/geo"
   },
@@ -471,7 +494,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/geo"
   },
@@ -488,7 +512,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/geo"
   },
@@ -513,7 +538,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/geo"
   },
@@ -535,7 +561,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/line"
   },
@@ -550,7 +577,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/line"
   },
@@ -565,7 +593,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/line"
   },
@@ -603,7 +632,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/network"
   },
@@ -624,7 +654,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/needle"
   },
@@ -643,7 +674,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/network"
   },
@@ -658,7 +690,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/line"
   },
@@ -675,7 +708,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/point"
   },
@@ -689,13 +723,15 @@ export const API_INDEX: ApiIndexEntry[] = [
       "orientation",
       "width",
       "height",
-      "rx"
+      "rx",
+      "gradient"
     ],
     "universal": [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/rect"
   },
@@ -710,7 +746,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/rect"
   },
@@ -725,7 +762,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/rect"
   },
@@ -737,14 +775,14 @@ export const API_INDEX: ApiIndexEntry[] = [
     "call": "plot.rule(options)",
     "own": [
       "orientation",
-      "strokeDasharray",
       "discreteScale"
     ],
     "universal": [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/axes"
   },
@@ -759,7 +797,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/axes"
   },
@@ -774,9 +813,28 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/axes"
+  },
+  {
+    "namespace": "plot",
+    "group": "plot",
+    "name": "shape",
+    "qualified": "plot.shape",
+    "call": "plot.shape(options)",
+    "own": [
+      "path"
+    ],
+    "universal": [
+      "channels",
+      "id",
+      "edits",
+      "table",
+      "tip"
+    ],
+    "docs": "/marks/shape"
   },
   {
     "namespace": "plot",
@@ -798,7 +856,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/sticker"
   },
@@ -818,7 +877,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/text"
   },
@@ -833,7 +893,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/text"
   },
@@ -848,7 +909,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/text"
   },
@@ -867,7 +929,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/tick"
   },
@@ -882,7 +945,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/tick"
   },
@@ -897,7 +961,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/tick"
   },
@@ -919,7 +984,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/trend"
   },
@@ -947,7 +1013,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/trend"
   },
@@ -970,7 +1037,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/waffle"
   },
@@ -985,7 +1053,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/waffle"
   },
@@ -1000,7 +1069,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "channels",
       "id",
       "edits",
-      "table"
+      "table",
+      "tip"
     ],
     "docs": "/marks/waffle"
   },
@@ -1019,6 +1089,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "tickFormat",
       "tickSize",
       "title",
+      "titleAngle",
       "stroke",
       "fill",
       "fontSize",
@@ -1268,6 +1339,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1276,6 +1348,46 @@ export const API_INDEX: ApiIndexEntry[] = [
       "targets"
     ],
     "docs": "/editing/axis"
+  },
+  {
+    "namespace": "edit",
+    "group": "edit.axis",
+    "name": "zoom",
+    "qualified": "edit.axis.zoom",
+    "call": "edit.axis.zoom(options)",
+    "own": [
+      "field",
+      "factor",
+      "limit",
+      "minSpan"
+    ],
+    "universal": [
+      "type",
+      "name",
+      "gesture",
+      "channel",
+      "channels",
+      "when",
+      "pick",
+      "threshold",
+      "scope",
+      "into",
+      "constrain",
+      "guide",
+      "stage",
+      "advance",
+      "target",
+      "cardinality",
+      "inverts",
+      "spans",
+      "table",
+      "inline",
+      "multiline",
+      "defaults",
+      "apply",
+      "targets"
+    ],
+    "docs": "/editing/zoom"
   },
   {
     "namespace": "edit",
@@ -1306,6 +1418,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1342,6 +1455,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1376,6 +1490,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1410,6 +1525,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1444,6 +1560,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1478,6 +1595,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1515,6 +1633,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1549,6 +1668,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1587,6 +1707,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1621,6 +1742,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1657,6 +1779,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1691,6 +1814,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1727,6 +1851,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1761,6 +1886,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1795,6 +1921,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1831,6 +1958,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1871,6 +1999,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1910,6 +2039,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1946,6 +2076,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -1982,6 +2113,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2018,6 +2150,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2052,6 +2185,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2086,6 +2220,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2120,6 +2255,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2154,6 +2290,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2188,6 +2325,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2222,6 +2360,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2256,6 +2395,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2294,6 +2434,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2328,6 +2469,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2366,6 +2508,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2400,6 +2543,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2439,6 +2583,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2476,6 +2621,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2510,6 +2656,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2544,6 +2691,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2578,6 +2726,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2615,6 +2764,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2652,6 +2802,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2689,6 +2840,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2726,6 +2878,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2760,6 +2913,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2794,6 +2948,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2828,6 +2983,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2862,6 +3018,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2896,6 +3053,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2930,6 +3088,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2964,6 +3123,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -2998,6 +3158,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -3032,6 +3193,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -3066,6 +3228,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "target",
       "cardinality",
       "inverts",
+      "spans",
       "table",
       "inline",
       "multiline",
@@ -3109,6 +3272,19 @@ export const API_INDEX: ApiIndexEntry[] = [
     "qualified": "constraints.custom",
     "call": "constraints.custom(options)",
     "own": [],
+    "universal": [],
+    "docs": "/constraints"
+  },
+  {
+    "namespace": "constraints",
+    "group": "constraints",
+    "name": "follow",
+    "qualified": "constraints.follow",
+    "call": "constraints.follow(options)",
+    "own": [
+      "field",
+      "lead"
+    ],
     "universal": [],
     "docs": "/constraints"
   },
@@ -3185,6 +3361,19 @@ export const API_INDEX: ApiIndexEntry[] = [
   {
     "namespace": "constraints",
     "group": "constraints",
+    "name": "symmetric",
+    "qualified": "constraints.symmetric",
+    "call": "constraints.symmetric(options)",
+    "own": [
+      "field",
+      "about"
+    ],
+    "universal": [],
+    "docs": "/constraints"
+  },
+  {
+    "namespace": "constraints",
+    "group": "constraints",
     "name": "unique",
     "qualified": "constraints.unique",
     "call": "constraints.unique(options)",
@@ -3218,7 +3407,12 @@ export const API_INDEX: ApiIndexEntry[] = [
     "call": "guides.crosshair(options)",
     "own": [
       "x",
-      "y"
+      "y",
+      "readout",
+      "stroke",
+      "strokeDash",
+      "fontSize",
+      "format"
     ],
     "universal": [
       "id"
@@ -3275,9 +3469,24 @@ export const API_INDEX: ApiIndexEntry[] = [
     "own": [
       "target",
       "stroke",
-      "strokeDasharray",
+      "strokeDash",
       "strokeWidth",
       "opacity"
+    ],
+    "universal": [
+      "id"
+    ],
+    "docs": "/guides"
+  },
+  {
+    "namespace": "guides",
+    "group": "guides",
+    "name": "quadrants",
+    "qualified": "guides.quadrants",
+    "call": "guides.quadrants(options)",
+    "own": [
+      "x",
+      "y"
     ],
     "universal": [
       "id"
@@ -3334,7 +3543,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "x",
       "y",
       "stroke",
-      "strokeDasharray",
+      "strokeDash",
       "strokeWidth",
       "opacity",
       "label"
@@ -3351,6 +3560,28 @@ export const API_INDEX: ApiIndexEntry[] = [
     "qualified": "guides.sliderTrack",
     "call": "guides.sliderTrack(options)",
     "own": [
+      "format"
+    ],
+    "universal": [
+      "id"
+    ],
+    "docs": "/guides"
+  },
+  {
+    "namespace": "guides",
+    "group": "guides",
+    "name": "tip",
+    "qualified": "guides.tip",
+    "call": "guides.tip(options)",
+    "own": [
+      "mark",
+      "text",
+      "anchor",
+      "dx",
+      "dy",
+      "fill",
+      "stroke",
+      "fontSize",
       "format"
     ],
     "universal": [

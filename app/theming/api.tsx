@@ -34,7 +34,7 @@ export const api: ApiEntry[] = [
         name: "handle / handleStroke",
         type: "string",
         default: "#2563eb / #fff",
-        desc: <>Fill and rim of every grip a mark draws. A mark&rsquo;s own <code className="inline">handleColor</code> still wins.</>,
+        desc: <>Grip fill and rim. A <code className="inline">line</code> or <code className="inline">area</code> fills its grips with the series&rsquo; own colour instead, keeping <code className="inline">handleStroke</code> as the rim. A mark&rsquo;s own <code className="inline">handleColor</code> still wins.</>,
       },
       {
         name: "background",
@@ -58,7 +58,13 @@ export const api: ApiEntry[] = [
         name: "axis / grid / guide",
         type: "object",
         default: "neutral greys",
-        desc: <>Chart chrome tokens — axis spine/labels/handle, grid lines, and the reference-rule / region / legend guides.</>,
+        desc: <>Chart chrome tokens — axis spine/labels/handle, grid lines, and the reference-rule / region / legend guides. A dash pattern is spelled <code className="inline">strokeDash</code>, e.g. <code className="inline">guide: {'{ rule: { strokeDash: "5 4" } }'}</code>.</>,
+      },
+      {
+        name: "title / subtitle / caption",
+        type: "{ fill, fontSize, fontWeight }",
+        default: "fontSize 16 (weight 600) / 12 / 11",
+        desc: <>Text style of the spec&rsquo;s <a className="underline" href="#titles"><code className="inline">title</code>, <code className="inline">subtitle</code> and <code className="inline">caption</code></a>. A null <code className="inline">fill</code> (the default) takes <code className="inline">axis.labelFill</code>.</>,
       },
       {
         name: "constraint",
@@ -74,7 +80,7 @@ export const api: ApiEntry[] = [
       },
       {
         name: "ghost",
-        type: "{ opacity, fill, stroke, strokeDasharray }",
+        type: "{ opacity, fill, stroke, strokeDash }",
         default: "opacity: 0.45",
         desc: <>How a <a className="underline" href="/editing/probe">probe</a> preview is dimmed: a ghost multiplies its opacity by this, and a non-null fill/stroke/dash overrides the committed paint.</>,
       },

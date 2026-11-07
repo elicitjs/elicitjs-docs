@@ -1,6 +1,7 @@
 // Chart elements via elicit.elements + ElicitSpec.elements (also still work in marks).
 mount(Elicit({
   width: 420, height: 220,
+  margins: { top: 16, right: 16, bottom: 42, left: 52 },
   schema: {
     cat: { type: 'categorical', domain: ['A', 'B', 'C'] },
     n: { type: 'quantitative', domain: [0, 100] },

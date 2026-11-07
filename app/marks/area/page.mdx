@@ -8,6 +8,7 @@ import { api } from './api';
 import editableArea from './_examples/editable-area.example.txt';
 import anEditableConfidenceBand from './_examples/an-editable-confidence-band.example.txt';
 import hitHandles from './_examples/hit-handles.example.txt';
+import aGradientFill from './_examples/a-gradient-fill.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -21,7 +22,7 @@ export default function Layout({ children }) {
 
 <Section id="basics" title="Filled series">
 
-Drag handles to reshape the belief curve.
+Drag handles to reshape the belief curve. Each handle is filled with the area's colour. Handles draw only when the area carries an edit.
 
 <Example
   code={editableArea}
@@ -38,7 +39,7 @@ Drag handles to reshape the belief curve.
 
 <Section id="hit" title="Invisible handles">
 
-`handles: 'hit'` keeps the grab targets without drawing the circles — the shared contract with `line` and `arc` (`false` is neither drawn nor grabbable).
+`handles: 'hit'` keeps the grab targets without drawing the circles — the shared contract with `line` and `arc`. `false` is neither drawn nor grabbable, so a sweep or nearest pick has nothing to target and the chart warns.
 
 <Example
   code={hitHandles}
@@ -47,6 +48,23 @@ Drag handles to reshape the belief curve.
   try={(
     <>
       <b>Drag</b> along the upper edge where a handle would sit.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="gradient" title="Gradient fill">
+
+`gradient: { stops, direction }` paints the area with a linear gradient instead of a flat `fill`. Each stop is `[offset, colour]`, with `offset` from 0 to 1 across the area's own box. `direction: 'vertical'` (the default) runs from bottom (0) to top (1); `'horizontal'` runs left to right. `bar` and `rect` take the same option.
+
+<Example
+  code={aGradientFill}
+  title="A gradient fill"
+  blurb={"gradient: { stops: [[0, pale], [1, blue]] } fades the area toward its baseline."}
+  try={(
+    <>
+      <b>Drag</b> a handle — the gradient stretches over the new shape.
     </>
   )}
 />
@@ -67,5 +85,7 @@ Give the value axis an endpoint **pair** and the area fills between them — the
     </>
   )}
 />
+
+A row whose value is `null`, `undefined` or `NaN` breaks the area or band there, as it breaks a [line](/marks/line#gaps), and gets no handle. To repaint one edge in a single drag, put `edit.line.sweep()` on `y1` and `y2`; see [Sweeping a band](/editing/sweep#band).
 
 </Section>

@@ -1,0 +1,22 @@
+mount(Elicit({
+  width: 380, height: 240,
+  margins: { top: 16, right: 16, bottom: 28, left: 34 },
+  data: [
+    { cat: "A", n: 30 }, { cat: "B", n: 55 },
+    { cat: "C", n: 22 }, { cat: "D", n: 44 },
+  ],
+  schema: {
+    cat: { type: "categorical", domain: ["A", "B", "C", "D"] },
+    n:   { type: "quantitative", domain: [0, 60] },
+  },
+  marks: [
+    bar({
+      // Offset 0 is the bottom of each bar, 1 the top.
+      gradient: { stops: [[0, "#c7d2fe"], [1, "#4338ca"]] },
+      channels: {
+        x: { field: "cat" },
+        y: { field: "n", edit: move() },
+      },
+    }),
+  ],
+}))

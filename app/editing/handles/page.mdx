@@ -25,6 +25,8 @@ Continuous geometries like lines and area fills have no natural individual nodes
 
 `handles: true` draws visible circular grips on each vertex. `handles: 'hit'` renders no visible circles, but keeps the enlarged pointer hit targets along the path — keeping editorial charts uncluttered while remaining easy to drag. `handles: false` disables interaction on that mark.
 
+On a `line` or `area`, a grip is filled with its series' colour — the row's resolved `stroke` — and ringed with the theme's `handleStroke`, so on a multi-series chart each line's grips match it. `handleColor` sets one fill for every grip.
+
 <Example
   code={visibleVsInvisibleHandles}
   title="Invisible hit targets (handles: 'hit')"

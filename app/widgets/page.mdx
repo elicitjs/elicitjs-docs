@@ -16,6 +16,7 @@ import ranking from './_examples/ranking.example.txt';
 import allocation from './_examples/allocation.example.txt';
 import region from './_examples/region.example.txt';
 import intervalCi from './_examples/interval-ci.example.txt';
+import intervalSymmetric from './_examples/interval-symmetric.example.txt';
 import thermometer from './_examples/thermometer.example.txt';
 import histogram from './_examples/histogram.example.txt';
 import probabilityTokens from './_examples/probability-tokens.example.txt';
@@ -162,6 +163,19 @@ Ranking, allocation, tokens, intervals, histograms, regions, thermometers, and l
   try={(
     <>
       <b>Drag</b> the centre — lo/hi follow. <b>Drag</b> a cap — mean stays put.
+    </>
+  )}
+/>
+
+`interval` is three plain `move()` handles over one row, coupled by [constraints](/constraints#follow): `follow` carries the caps with the mean, `ordering` keeps lo ≤ mean ≤ hi, and `clamp` holds all three inside `domain`. `symmetric: true` adds `symmetric`, so one cap's drag mirrors the other about the mean.
+
+<Example
+  code={intervalSymmetric}
+  title="Symmetric interval"
+  blurb="widgets.interval({ symmetric: true }) — one cap mirrors the other."
+  try={(
+    <>
+      <b>Drag</b> a cap — the other moves the same distance the opposite way. <b>Drag</b> the centre — the interval follows.
     </>
   )}
 />

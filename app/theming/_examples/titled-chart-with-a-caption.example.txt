@@ -1,0 +1,28 @@
+mount(Elicit({
+  width: 440, height: 260,
+  margins: { top: 12, right: 40, bottom: 12, left: 56 },
+  title: "How will the vote split?",
+  subtitle: "Drag each bar to your estimate",
+  caption: "Shares in percent; they need not sum to 100.",
+  // Title tokens restyle all three; omitted ones keep their defaults.
+  theme: { title: { fill: "#1e3a8a" }, caption: { fill: "#64748b" } },
+  axes: { x: false },
+  data: [{ party: "Left", n: 38 }, { party: "Centre", n: 24 }, { party: "Right", n: 33 }],
+  schema: {
+    party: { type: "categorical", domain: ["Left", "Centre", "Right"] },
+    n:     { type: "quantitative", domain: [0, 60] },
+  },
+  marks: [
+    barX({
+      fill: "#2563eb",
+      channels: {
+        y: { field: "party", scale: { reverse: true } },
+        x: { field: "n", edit: move() },
+      },
+    }),
+    text({
+      dx: 6, textAnchor: "start", fontSize: 12, format: ".0f",
+      channels: { y: { field: "party" }, x: { field: "n" }, text: { field: "n" } },
+    }),
+  ],
+}));

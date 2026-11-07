@@ -9,6 +9,7 @@ import surveyTheme from './_examples/survey-theme.example.txt';
 import perChartTheme from './_examples/per-chart-theme.example.txt';
 import perMarkOverride from './_examples/per-mark-override.example.txt';
 import darkMode from './_examples/dark-mode.example.txt';
+import titledChartWithACaption from './_examples/titled-chart-with-a-caption.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -55,6 +56,19 @@ A theme is plain data — no functions, no classes — so it merges cleanly. `in
   title="Per-chart theme"
   blurb="ink recolours the bars; axis/grid restyle the chrome. Drag a bar — the value axis still works."
   try={"drag a bar up or down."}
+/>
+
+</Section>
+
+<Section id="titles" title="Titles and captions">
+
+`title`, `subtitle` and `caption` on the `Elicit` spec draw text above and below the plot, left-aligned with it. They reserve layout space the way a legend does: the chart keeps its declared `width` and `height`, and the plot shrinks to make room. The theme's `title`, `subtitle` and `caption` tokens style them, each `{ fill, fontSize, fontWeight }`. A token with no `fill` takes the axis label colour, so the titles follow a dark theme.
+
+<Example
+  code={titledChartWithACaption}
+  title="A titled chart with a caption"
+  blurb="title, subtitle and caption on the spec; theme.title and theme.caption recolour two of them."
+  try={"drag a bar — the plot sits between the title block and the caption."}
 />
 
 </Section>

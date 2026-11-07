@@ -153,6 +153,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "title / subtitle / caption",
+        type: "string",
+        default: "—",
+        desc: (
+          <>
+            Text above the plot (title, then subtitle) and below it (caption). Like a legend, they reserve layout space, so the chart keeps its declared size and the plot shrinks. Styled by the theme&rsquo;s <code className="inline">title</code> / <code className="inline">subtitle</code> / <code className="inline">caption</code> tokens. See <a href="/theming#titles">Theming</a>.
+          </>
+        ),
+      },
+      {
         name: "theme",
         type: "object | string",
         default: "the app default",

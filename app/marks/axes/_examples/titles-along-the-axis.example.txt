@@ -1,0 +1,27 @@
+mount(Elicit({
+  width: 400, height: 240,
+  margins: { top: 12, right: 16, bottom: 40, left: 96 },
+  axes: {
+    x: { title: "Hours per week" },
+    // The y title runs along the axis, past the widest label.
+    y: { title: "Activity" },
+  },
+  data: [
+    { activity: "Sleep", h: 52 }, { activity: "Work", h: 40 },
+    { activity: "Screens", h: 24 }, { activity: "Exercise", h: 4 },
+  ],
+  schema: {
+    activity: { type: "categorical", domain: ["Sleep", "Work", "Screens", "Exercise"] },
+    h:        { type: "quantitative", domain: [0, 60] },
+  },
+  marks: [
+    barX({
+      fill: "#0f766e",
+      channels: {
+        // A band y axis puts domain[0] at the bottom; reverse lists it top-down.
+        y: { field: "activity", scale: { reverse: true } },
+        x: { field: "h", edit: move() },
+      },
+    }),
+  ],
+}))

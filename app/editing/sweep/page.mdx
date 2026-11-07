@@ -10,6 +10,7 @@ import twoLinesSweptIndependently from './_examples/two-lines-swept-independentl
 import clickToAddAnAnchor from './_examples/click-to-add-an-anchor.example.txt';
 import cutAStack from './_examples/cut-a-stack.example.txt';
 import arcSliceBoundaries from './_examples/arc-slice-boundaries.example.txt';
+import sweepABand from './_examples/sweep-a-band.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -52,6 +53,25 @@ When multiple lines share a plot, a sweep locks onto the nearest line at drag-st
     </>
   )}
 />
+
+</Section>
+
+<Section id="band" title="Sweeping a band">
+
+Put `edit.line.sweep()` on both edges of an `areaY` band, `y1` and `y2`. A sweep locks onto the edge whose handle is nearest where the drag starts, and paints that edge alone. The other edge stays where it is. Dragging a single handle still moves just that point.
+
+<Example
+  code={sweepABand}
+  title="Sweep an uncertainty band"
+  blurb={"edit.line.sweep() on y1 and y2 — each sweep paints one edge; ordering keeps lo ≤ hi."}
+  try={(
+    <>
+      <b>Sweep</b> starting near the upper edge to reshape it, then near the lower edge. Sweep the lower edge above the upper one and the upper edge is pushed along.
+    </>
+  )}
+/>
+
+Place the sweep on the channel it paints. A mark-level `edits: [edit.line.sweep()]` names no channel, so it has nothing to write, and the chart warns. A sweep targets the mark's handles, so `handles: false` leaves it nothing to aim at (it warns too). Use `handles: 'hit'` to hide the handles and keep them targetable.
 
 </Section>
 

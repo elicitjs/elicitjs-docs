@@ -1,0 +1,52 @@
+mount(Elicit({
+  width: 460, height: 280,
+  margins: { top: 24, right: 24, bottom: 24, left: 24 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      stations: {
+        role: "nodes",
+        fields: {
+          id: { type: "categorical", key: true, open: true },
+          kind: { type: "categorical", domain: ["source", "relay", "sink"] },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+        },
+      },
+      feeds: {
+        role: "links",
+        directed: true,
+        fields: { source: { type: "ref" }, target: { type: "ref" } },
+      },
+    },
+  },
+  data: {
+    stations: [
+      { id: "a", kind: "source", x: 10, y: 50 },
+      { id: "b", kind: "relay", x: 40, y: 20 },
+      { id: "c", kind: "relay", x: 40, y: 80 },
+      { id: "d", kind: "relay", x: 68, y: 50 },
+      { id: "e", kind: "sink", x: 92, y: 50 },
+    ],
+    feeds: [
+      { source: "a", target: "b" },
+      { source: "a", target: "c" },
+      { source: "b", target: "d" },
+    ],
+  },
+  marks: [
+    link({ stroke: "#94a3b8", strokeWidth: 1.5, edits: [edit.network.rewire()] }),
+    shape({
+      size: 14,
+      channels: {
+        x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
+        y: { field: "y" },
+        symbol: { field: "kind", scale: { range: ["triangle", "circle", "square"] } },
+        fill: { field: "kind", scale: { range: ["#59a14f", "#4e79a7", "#e15759"] } },
+        // Drag from a port to another station to link them.
+        ports: { value: true, edit: edit.network.connect() },
+      },
+    }),
+  ],
+}));

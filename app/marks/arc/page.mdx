@@ -11,6 +11,7 @@ import dragAnyBoundary from './_examples/drag-any-boundary.example.txt';
 import donutFourSlices from './_examples/donut-four-slices.example.txt';
 import donutGrid from './_examples/donut-grid.example.txt';
 import cutASlice from './_examples/cut-a-slice.example.txt';
+import aRoseYouCanReshape from './_examples/a-rose-you-can-reshape.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -18,7 +19,7 @@ export default function Layout({ children }) {
 
 # Arc · Pie · Donut
 
-<Lead>Data-driven **pie** and **donut** slices. Each row’s magnitude (the `theta` channel) is stacked and normalized to a circle (or partial arc). Shares path math with `axisRadial`. Wire `edits: [edit.stack.edge()]` to **drag a slice boundary** and redistribute the two adjacent shares (the total stays fixed).</Lead>
+<Lead>Data-driven **pie** and **donut** slices. Each row’s magnitude (the `theta` channel) is stacked and normalized to a circle (or partial arc). Shares path math with `axisRadial`. Wire `edits: [edit.stack.edge()]` to **drag a slice boundary** and redistribute the two adjacent shares (the total stays fixed). A `radius` channel gives each slice its own rim, for a rose plot.</Lead>
 
 <ApiReference entries={api} />
 
@@ -111,5 +112,26 @@ Here `x: { field: 'state' }` gives a band axis, so `IL` / `NY` / `NC` each get a
     </>
   )}
 />
+
+</Section>
+
+<Section id="radius" title="Rose plots (radius)">
+
+The `radius` channel gives each slice its own outer radius, between `innerRadius` and `outerRadius` — a rose, or Vega-Lite's radial plot. `theta` still sets each slice's angle; `theta: { value: 1 }` makes every slice the same width, so the value reads from the rim alone. With no `outerRadius`, the ring's extent is 40% of the smaller plot dimension.
+
+`scale: 'sqrt'` makes a slice's area grow with its value; the default linear scale makes its radius grow with it. Put `edit: move()` on the channel to drag a slice's rim in or out. `axisRadial({ channel: 'radius' })` draws concentric rings as its key.
+
+<Example
+  code={aRoseYouCanReshape}
+  title="A rose you can reshape"
+  blurb={"radius: { field: \"speed\", scale: \"sqrt\", edit: move() } — eight equal slices, each rim a value."}
+  try={(
+    <>
+      <b>Drag</b> a slice's rim outward or inward to change its speed.
+    </>
+  )}
+/>
+
+A `radius` channel replaces a per-donut `size`, and it applies to a single ring. On a grid of donuts, every slot uses the one ring's extent.
 
 </Section>

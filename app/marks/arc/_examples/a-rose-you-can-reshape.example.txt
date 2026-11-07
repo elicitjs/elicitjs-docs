@@ -1,0 +1,28 @@
+mount(Elicit({
+  width: 320, height: 300,
+  margins: { top: 16, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  data: [
+    { dir: "N",  speed: 12 }, { dir: "NE", speed: 8 },
+    { dir: "E",  speed: 5 },  { dir: "SE", speed: 9 },
+    { dir: "S",  speed: 18 }, { dir: "SW", speed: 24 },
+    { dir: "W",  speed: 15 }, { dir: "NW", speed: 10 },
+  ],
+  schema: {
+    dir:   { type: "categorical" },
+    speed: { type: "quantitative", domain: [0, 30] },
+  },
+  elements: [ axisRadial({ channel: "radius", ticks: 3 }) ],
+  marks: [
+    arc({
+      innerRadius: 12, outerRadius: 120, padAngle: 2,
+      start: 112.5, end: -247.5,  // clockwise, N centred at the top
+      fill: "#0d9488", fillOpacity: 0.85, stroke: "white",
+      channels: {
+        theta: { value: 1 },  // equal slices: the value lives on the radius
+        // sqrt: a slice's AREA grows with the value, not its radius.
+        radius: { field: "speed", scale: "sqrt", edit: move() },
+      },
+    }),
+  ],
+}));

@@ -1,0 +1,37 @@
+// Wind at three stations: drag an arrow to turn it, Shift-drag to set its speed.
+const arrow = "M0 7 L12 7 L12 2 L20 10 L12 18 L12 13 L0 13 Z";   // points right (0°)
+
+mount(Elicit({
+  width: 400, height: 260,
+  margins: { top: 16, right: 16, bottom: 32, left: 36 },
+  schema: {
+    x: { type: "quantitative", domain: [0, 100] },
+    y: { type: "quantitative", domain: [0, 100] },
+    dir: { type: "quantitative", domain: [0, 360] },
+    speed: { type: "quantitative", domain: [0, 30] },
+  },
+  data: [
+    { x: 22, y: 62, dir: 30, speed: 12 },
+    { x: 52, y: 34, dir: 120, speed: 20 },
+    { x: 80, y: 70, dir: 300, speed: 6 },
+  ],
+  constraints: [clamp({ field: "speed", min: 2, max: 30 })],
+  marks: [
+    shape({
+      path: arrow,
+      fill: "#2563eb",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        // Degrees, counter-clockwise from east.
+        angle: {
+          field: "dir",
+          scale: { range: [0, 360] },
+          edit: rotate({ pick: "direct", pivot: "mark", fold: false, when: when.noShift }),
+        },
+        size: { field: "speed", scale: { range: [4, 28] } },
+      },
+      edits: [resize({ channel: "size", when: when.shift })],
+    }),
+  ],
+}));

@@ -1,0 +1,19 @@
+mount(Elicit({
+  width: 400, height: 220,
+  margins: { top: 14, right: 16, bottom: 28, left: 58 },
+  axes: { y: { title: "°C", titleAngle: 0 } },
+  data: [
+    { m: 1, t: 4 }, { m: 2, t: 6 }, { m: 3, t: 10 }, { m: 4, t: 14 },
+    { m: 5, t: 18 }, { m: 6, t: 22 },
+  ],
+  schema: {
+    m: { type: "quantitative", domain: [1, 6] },
+    t: { type: "quantitative", domain: [0, 30] },
+  },
+  marks: [
+    lineY({
+      stroke: "#dc2626", strokeWidth: 2,
+      channels: { x: { field: "m" }, y: { field: "t", edit: move() } },
+    }),
+  ],
+}))

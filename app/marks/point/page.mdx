@@ -40,6 +40,10 @@ A numeric field can drive the radius (size) and a continuous colour ramp at once
   blurb="Outlined, semi-transparent dots via top-level stroke / strokeWidth / opacity."
 />
 
+A `symbol` channel draws each point as a glyph — an emoji or a unicode shape — sized by `size`; see [Symbol](/marks/symbol). An SVG path string as a symbol logs a warning, because `point` draws a symbol as text. For path shapes, use [`plot.shape()`](/marks/shape).
+
+`tip: true` shows a tooltip of the row under the pointer, on `point` and every other mark. It never blocks a drag. See [Tooltips](/guides#tips).
+
 </Section>
 
 <Section id="heatmap" title="Heatmap of circles / squares">

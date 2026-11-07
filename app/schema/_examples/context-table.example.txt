@@ -1,0 +1,44 @@
+mount(Elicit({
+  width: 440, height: 260,
+  margins: { top: 16, right: 16, bottom: 32, left: 40 },
+  axes: { x: { tickFormat: "d" } },
+  schema: {
+    // The elicited table: your forecast.
+    data: {
+      year: { type: "quantitative", domain: [2010, 2030] },
+      rate: { type: "quantitative", domain: [0, 10] },
+    },
+    // A context table: drawn, read-only, never reported.
+    history: {
+      context: true,
+      fields: {
+        year: { type: "quantitative" },
+        rate: { type: "quantitative" },
+      },
+    },
+  },
+  data: {
+    data: [
+      { year: 2020, rate: 6.1 }, { year: 2023, rate: 6.1 }, { year: 2026, rate: 6.1 },
+      { year: 2030, rate: 6.1 },
+    ],
+    history: [
+      { year: 2010, rate: 4.2 }, { year: 2012, rate: 4.8 }, { year: 2014, rate: 5.1 },
+      { year: 2016, rate: 4.6 }, { year: 2018, rate: 5.5 }, { year: 2020, rate: 6.1 },
+    ],
+  },
+  marks: [
+    lineY({
+      table: "history",
+      stroke: "#9ca3af", strokeWidth: 2,
+      channels: { x: { field: "year" }, y: { field: "rate" } },
+    }),
+    lineY({
+      stroke: "#2563eb", strokeWidth: 2,
+      channels: {
+        x: { field: "year" },
+        y: { field: "rate", edit: move() },
+      },
+    }),
+  ],
+}));

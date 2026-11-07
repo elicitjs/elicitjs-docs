@@ -51,7 +51,7 @@ export const api: ApiEntry[] = [
         default: "-180 / 180",
         desc: (
           <>
-            Explicit span in degrees, clockwise from 12 o&rsquo;clock. Both given, they override <code className="inline">arc</code>.
+            Explicit span in degrees, measured counter-clockwise from 3 o&rsquo;clock (0° is the right, 90° the top). The span is signed: <code className="inline">start: 90, end: -270</code> walks clockwise from 12 o&rsquo;clock. Both given, they override <code className="inline">arc</code>.
           </>
         ),
       },
@@ -116,6 +116,15 @@ export const api: ApiEntry[] = [
         name: "size",
         type: "field | const",
         desc: "Optional per-donut outer radius (e.g. turnout), through the size scale. Overridden by an explicit outerRadius.",
+      },
+      {
+        name: "radius",
+        type: "linear | sqrt",
+        desc: (
+          <>
+            Per-slice outer radius (a rose plot), through a radius scale whose range runs from <code className="inline">innerRadius</code> to <code className="inline">outerRadius</code>. <code className="inline">scale: &apos;sqrt&apos;</code> makes area proportional to the value. Takes an edit: <code className="inline">move()</code> drags a slice&rsquo;s rim. Wins over <code className="inline">size</code>. Key it with <code className="inline">axisRadial(&#123; channel: &apos;radius&apos; &#125;)</code>.
+          </>
+        ),
       },
     ],
     returns: (

@@ -1,0 +1,20 @@
+mount(Elicit({
+  width: 420, height: 260,
+  margins: { top: 16, right: 16, bottom: 32, left: 40 },
+  schema: {
+    hours: { type: "quantitative", domain: [0, 12] },
+    score: { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { hours: 2, score: 35 }, { hours: 4, score: 52 },
+    { hours: 7, score: 68 }, { hours: 10, score: 81 },
+  ],
+  guides: [guides.crosshair({ format: ".1f" })],
+  marks: [
+    point({
+      fill: "#e15759", size: 6,
+      channels: { x: { field: "hours" }, y: { field: "score" } },
+      edits: [move({ channels: ["x", "y"] })],
+    }),
+  ],
+}));

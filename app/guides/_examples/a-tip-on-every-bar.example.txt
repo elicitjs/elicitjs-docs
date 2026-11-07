@@ -1,0 +1,23 @@
+mount(Elicit({
+  width: 400, height: 260,
+  margins: { top: 16, right: 16, bottom: 32, left: 40 },
+  schema: {
+    city: { type: "categorical", domain: ["Lima", "Oslo", "Pune", "Rome"] },
+    rain: { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { city: "Lima", rain: 12 }, { city: "Oslo", rain: 64 },
+    { city: "Pune", rain: 78 }, { city: "Rome", rain: 41 },
+  ],
+  marks: [
+    barY({
+      fill: "#4e79a7",
+      // A tooltip of the row's columns. The bars stay draggable under it.
+      tip: true,
+      channels: {
+        x: { field: "city" },
+        y: { field: "rain", edit: move() },
+      },
+    }),
+  ],
+}));

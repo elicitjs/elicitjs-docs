@@ -112,7 +112,13 @@ export const api: ApiEntry[] = [
         name: "title",
         type: "string",
         default: "—",
-        desc: "Axis title, centred and pushed past the labels.",
+        desc: "Axis title, centred along the axis and pushed past the tick labels. A y title is rotated to run along its axis.",
+      },
+      {
+        name: "titleAngle",
+        type: "number",
+        default: "-90 left · 90 right",
+        desc: "Rotation of the title in degrees. 0 lays a y title flat. On an x axis the title is flat unless set.",
       },
       {
         name: "stroke / fill / fontSize",
@@ -268,7 +274,7 @@ export const api: ApiEntry[] = [
         desc: "Which variant of a categorical axis the rule sits on. Left unset so a composite can stamp its own.",
       },
       {
-        name: "strokeDasharray",
+        name: "strokeDash",
         type: "string",
         default: "—",
         desc: "Dash pattern passthrough.",

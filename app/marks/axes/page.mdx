@@ -10,6 +10,8 @@ import originCrossingAxes from './_examples/origin-crossing-axes.example.txt';
 import ex1dCenteredSliderAxis from './_examples/1d-centered-slider-axis.example.txt';
 import explicitGridyAxisxAxisyRuley from './_examples/explicit-gridy-axisx-axisy-ruley.example.txt';
 import elementsNamespace from './_examples/elements-namespace.example.txt';
+import titlesAlongTheAxis from './_examples/titles-along-the-axis.example.txt';
+import aFlatYTitle from './_examples/a-flat-y-title.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -81,6 +83,33 @@ Pass a per-channel config to shape ticks, formats and titles, or a transform to 
       <b>Drag</b> a dot along the axis.
     </>
   )}
+/>
+
+</Section>
+
+<Section id="titles" title="Axis titles and band order">
+
+`title` labels an axis. An x title sits centred below the tick labels. A y title runs along the axis, reading bottom to top on the left, and sits past the widest tick label, so it never crosses one. Leave room for it in `margins`.
+
+A band or point y axis lists `domain[0]` at the bottom, the same direction a value increases. Set `scale: { reverse: true }` on the channel to list the categories top-down, as Vega-Lite and Observable Plot do for a horizontal bar chart.
+
+<Example
+  code={titlesAlongTheAxis}
+  title="Titles along the axis"
+  blurb={"axes: { x: { title }, y: { title } }; scale: { reverse: true } on the band y lists Sleep first."}
+  try={(
+    <>
+      <b>Drag</b> a bar to change its hours.
+    </>
+  )}
+/>
+
+`titleAngle` sets the title's rotation in degrees. `titleAngle: 0` lays a y title flat, for a short unit label.
+
+<Example
+  code={aFlatYTitle}
+  title="A flat y title"
+  blurb={"axes: { y: { title: \"°C\", titleAngle: 0 } }"}
 />
 
 </Section>

@@ -8,6 +8,7 @@ import { api } from './api';
 import semiCircleAxis from './_examples/semi-circle-axis.example.txt';
 import bandedLikelihoodArc from './_examples/banded-likelihood-arc.example.txt';
 import percentTicksAtChosenValues from './_examples/percent-ticks-at-chosen-values.example.txt';
+import ringsForARadiusScale from './_examples/rings-for-a-radius-scale.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -15,7 +16,7 @@ export default function Layout({ children }) {
 
 # Radial axis
 
-<Lead>A composable **radial axis**: arc spine, ticks, labels, and optional coloured categorical bands. Sibling of `axisX`/`axisY`; reads the global `theta` scale — the polar angular *position*, which is what a needle encodes. (`angle` is a mark's rotation in place and has no axis.) Default orient is `top` (left → right through the top). Inert by default — pair with `needle` for interaction.</Lead>
+<Lead>A composable **radial axis**: arc spine, ticks, labels, and optional coloured categorical bands. Sibling of `axisX`/`axisY`; reads the global `theta` scale — the polar angular *position*, which is what a needle encodes. (`angle` is a mark's rotation in place and has no axis.) Default orient is `top` (left → right through the top). `channel: 'radius'` draws the radius scale as concentric rings instead. Inert by default — pair with `needle` for interaction.</Lead>
 
 <ApiReference entries={api} />
 
@@ -51,6 +52,18 @@ Ticks reuse the same helpers as Cartesian axes: `ticks` (count), `tickValues` (e
   code={percentTicksAtChosenValues}
   title="Percent ticks at chosen values"
   blurb="Explicit tickValues, a percent tickFormat, and a custom label colour."
+/>
+
+</Section>
+
+<Section id="radius" title="Rings for a radius scale">
+
+`axisRadial({ channel: 'radius' })` reads the `radius` scale instead of `theta`. It draws a concentric ring at each tick, labelled up the vertical, so it keys an [arc](/marks/arc#radius) whose slices take their rim from a `radius` field. The rings sit at the scale's own extent (the arc's `innerRadius` to `outerRadius`), so the axis ignores its `radius` option. `ticks`, `tickValues` and `tickFormat` work as on the angular axis.
+
+<Example
+  code={ringsForARadiusScale}
+  title="Rings for a radius scale"
+  blurb={"axisRadial({ channel: \"radius\", ticks: 4 }) behind an arc with radius: { field: \"n\" }."}
 />
 
 </Section>

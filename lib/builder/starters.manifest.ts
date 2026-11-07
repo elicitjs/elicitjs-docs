@@ -62,7 +62,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
       ],
       guides: [
         { id: createId('g'), type: 'remaining', options: { field: 'probability', unit: '%' } },
-        { id: createId('g'), type: 'rule', options: { y: 20, label: 'Even Split (20%)', stroke: '#94a3b8', strokeDasharray: '4 4' } },
+        { id: createId('g'), type: 'rule', options: { y: 20, label: 'Even Split (20%)', stroke: '#94a3b8', strokeDash: '4 4' } },
       ],
       constraints: [
         { id: createId('c'), name: 'clamp', options: { min: 0, max: 100, field: 'probability' } },
@@ -142,7 +142,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
         },
       ],
       guides: [
-        { id: createId('g'), type: 'rule', options: { x: 2023, label: 'Historical Cutoff', stroke: '#64748b', strokeDasharray: '5 4' } },
+        { id: createId('g'), type: 'rule', options: { x: 2023, label: 'Historical Cutoff', stroke: '#64748b', strokeDash: '5 4' } },
         { id: createId('g'), type: 'region', options: { x: '2023, 2028', fill: '#3b82f6', opacity: 0.06 } },
       ],
       constraints: [
@@ -223,7 +223,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
         },
       ],
       guides: [
-        { id: createId('g'), type: 'rule', options: { y: 0, stroke: '#94a3b8', strokeDasharray: '4 4' } },
+        { id: createId('g'), type: 'rule', options: { y: 0, stroke: '#94a3b8', strokeDash: '4 4' } },
       ],
       constraints: [],
       scales: {},
@@ -582,7 +582,7 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
         },
       ],
       guides: [
-        { id: createId('g'), type: 'rule', options: { x: 50, label: 'Benchmark (50)', stroke: '#94a3b8', strokeDasharray: '4 4' } },
+        { id: createId('g'), type: 'rule', options: { x: 50, label: 'Benchmark (50)', stroke: '#94a3b8', strokeDash: '4 4' } },
       ],
       constraints: [
         { id: createId('c'), name: 'clamp', options: { min: 0, max: 100, field: 'estimate' } },
@@ -765,8 +765,8 @@ export const STARTER_TEMPLATES: StarterTemplate[] = [
         },
       ],
       guides: [
-        { id: createId('g'), type: 'rule', options: { x: 50, label: 'Feasibility Midpoint', stroke: '#94a3b8', strokeDasharray: '4 4' } },
-        { id: createId('g'), type: 'rule', options: { y: 50, label: 'Impact Midpoint', stroke: '#94a3b8', strokeDasharray: '4 4' } },
+        { id: createId('g'), type: 'rule', options: { x: 50, label: 'Feasibility Midpoint', stroke: '#94a3b8', strokeDash: '4 4' } },
+        { id: createId('g'), type: 'rule', options: { y: 50, label: 'Impact Midpoint', stroke: '#94a3b8', strokeDash: '4 4' } },
       ],
       constraints: [
         { id: createId('c'), name: 'clamp', options: { min: 0, max: 100, field: 'feasibility' } },

@@ -24,7 +24,7 @@ mount(Elicit({
     }),
     // value: visual units → skips the scale (pixel 28 from the top of the plot)
     ruleY({
-      stroke: "#b45309", strokeWidth: 2, strokeDasharray: "4 3",
+      stroke: "#b45309", strokeWidth: 2, strokeDash: "4 3",
       channels: { y: { value: 28 } },
     }),
   ],

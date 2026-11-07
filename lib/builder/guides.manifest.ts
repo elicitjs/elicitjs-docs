@@ -17,7 +17,7 @@ export const GUIDES: GuideManifestEntry[] = [
       { name: 'y', type: 'number', default: '—', desc: 'Y position in data units (horizontal rule).' },
       { name: 'label', type: 'string', default: '—', desc: 'Reference label text (e.g. "Target", "Mean").' },
       { name: 'stroke', type: 'string', default: "'#64748b'", desc: 'Line colour.' },
-      { name: 'strokeDasharray', type: 'string', default: "'5 4'", desc: 'Dash pattern.' },
+      { name: 'strokeDash', type: 'string', default: "'5 4'", desc: 'Dash pattern.' },
     ],
   },
   {

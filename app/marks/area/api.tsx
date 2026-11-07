@@ -69,10 +69,10 @@ export const api: ApiEntry[] = [
       {
         name: "handles",
         type: "boolean | 'hit'",
-        default: "true",
+        default: "true with an edit",
         desc: (
           <>
-            <code className="inline">true</code> draws a grabbable circle per datum. <code className="inline">'hit'</code> keeps the grab target but draws nothing. <code className="inline">false</code> is neither drawn nor grabbable.
+            <code className="inline">true</code> draws a grabbable circle per datum. <code className="inline">'hit'</code> keeps the grab target but draws nothing. <code className="inline">false</code> is neither drawn nor grabbable, so a sweep or nearest pick has nothing to target. The default is <code className="inline">true</code> when the mark carries an edit and <code className="inline">false</code> otherwise.
           </>
         ),
       },
@@ -88,7 +88,17 @@ export const api: ApiEntry[] = [
         default: "theme",
         desc: (
           <>
-            Handle fill. Defaults to the theme&rsquo;s <code className="inline">handle</code> colour.
+            Handle fill. Defaults to the area&rsquo;s own colour (its stroke, else its fill); the ring is the theme&rsquo;s <code className="inline">handleStroke</code>.
+          </>
+        ),
+      },
+      {
+        name: "gradient",
+        type: "{ stops, direction }",
+        default: "—",
+        desc: (
+          <>
+            A linear-gradient fill over the area&rsquo;s own box, in place of a flat <code className="inline">fill</code>. <code className="inline">stops</code> is a list of <code className="inline">[offset, colour]</code> with offsets 0–1; <code className="inline">direction</code> is <code className="inline">'vertical'</code> (default, bottom to top) or <code className="inline">'horizontal'</code> (left to right).
           </>
         ),
       },
@@ -122,6 +132,15 @@ export const api: ApiEntry[] = [
         name: "fill / stroke",
         type: "const | field",
         desc: "Area fill (default fillOpacity 0.35) and outline. A field here also becomes the default series grouping.",
+      },
+      {
+        name: "strokeDash",
+        type: "const | field",
+        desc: (
+          <>
+            Outline dash pattern: an SVG dash array (<code className="inline">'4 2'</code>), or a field mapped onto a dash vocabulary. Takes <code className="inline">legend: true</code>.
+          </>
+        ),
       },
     ],
     returns: "A feature emitting one filled path per series plus optional handle circles.",
