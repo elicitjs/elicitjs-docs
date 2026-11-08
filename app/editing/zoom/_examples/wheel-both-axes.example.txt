@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 280,
   margins: { top: 16, right: 18, bottom: 32, left: 40 },
   schema: {
@@ -21,4 +21,33 @@ mount(Elicit({
       edits: [move({ channels: ["x", "y"] })],
     }),
   ],
-}));
+});
+mount(chart);
+
+// Buttons zoom both axes about the centre of the view, clamped to the
+// declared domains.
+const DECLARED = { x: [0, 100], y: [0, 100] };
+const zoomBy = (k) => {
+  const schema = chart.getSchema();
+  for (const field of ["x", "y"]) {
+    const [lo, hi] = schema[field].domain;
+    const [LO, HI] = DECLARED[field];
+    const half = Math.min((hi - lo) * k, HI - LO) / 2;
+    const mid = Math.min(Math.max((lo + hi) / 2, LO + half), HI - half);
+    chart.setDomain(field, [mid - half, mid + half]);
+  }
+};
+
+const controls = document.createElement("div");
+controls.style.cssText = "display:flex;gap:8px;margin-top:10px;font:12px system-ui";
+const addButton = (label, onclick) => {
+  const b = document.createElement("button");
+  b.textContent = label;
+  b.onclick = onclick;
+  b.style.cssText = "padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer";
+  controls.append(b);
+};
+addButton("Zoom in", () => zoomBy(0.5));
+addButton("Zoom out", () => zoomBy(2));
+addButton("Reset", () => { chart.setDomain("x", null); chart.setDomain("y", null); });
+mount(controls);

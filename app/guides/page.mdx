@@ -144,7 +144,7 @@ Every option takes a literal or a function of the guide context (`{ data, scales
 
 `tip: true` on any mark shows a tooltip of the row under the pointer: one `column: value` line per column. Pass a list of columns (`tip: ["city", "rain"]`) to show only those, or a function of the row (`tip: (d) => string`) for your own wording.
 
-A tip is a guide, so it never blocks editing. It makes no mark pointer-active and captures no gesture: drag a bar under its tooltip as if the tip were not there. It also shows on read-only rows — a locked seed, a [context table](/schema#context).
+A tip is a guide, so it never blocks editing. It makes no mark pointer-active and captures no gesture: drag a bar under its tooltip as if the tip were not there. It also shows on read-only rows — a locked seed, a [context row](/editing/existence#context).
 
 <Example
   code={aTipOnEveryBar}

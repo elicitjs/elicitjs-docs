@@ -10,6 +10,7 @@ import existenceMoveOnOneMark from './_examples/existence-move-on-one-mark.examp
 import arbitrationClickRecoloursAltClickDeletes from './_examples/arbitration-click-recolours-alt-click-deletes.example.txt';
 import scatterObservedPointsYours from './_examples/scatter-observed-points-yours.example.txt';
 import actualsForecast from './_examples/actuals-forecast.example.txt';
+import contextRows from './_examples/context-rows.example.txt';
 import drawTheLineForTheMissingYears from './_examples/draw-the-line-for-the-missing-years.example.txt';
 
 export default function Layout({ children }) {
@@ -18,7 +19,7 @@ export default function Layout({ children }) {
 
 # Row lifecycle & lock
 
-<Lead>Manage dataset membership and permissions. `create()` inverts clicked pixels to append new rows, `remove()` deletes rows on modifier clicks, and `lock` protects given ground truth from accidental edits.</Lead>
+<Lead>Manage dataset membership and permissions. `create()` inverts clicked pixels to append new rows, `remove()` deletes rows on modifier clicks, and `lock` protects given ground truth from accidental edits. `context` marks given rows as reference, left out of your answer.</Lead>
 
 <ApiReference entries={api} />
 
@@ -120,6 +121,29 @@ Pass a predicate function to lock rows based on their fields (for example, separ
   try={(
     <>
       <b>Drag</b> Q3 or Q4 (blue). Q1 and Q2 are reported actuals and remain fixed.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="context" title="Context rows">
+
+A locked row is still part of your answer: `getData()` returns it. When the given rows are only there for reference, mark them as **context** instead. `context: true` makes every row in `data` context. A predicate picks the rows it accepts (`context: (d) => d.year <= 2020`).
+
+Context rows are rows of the same table, so they share its columns and its schema. Every mark over the table draws them, and they are read-only, as `lock` makes them. `getData()` and `onChange` leave them out, so a one-table chart still reports a bare array of your answers. The selection API and `control()` count reported rows only, so `getData()[i]` and `select(i)` name the same row.
+
+The predicate runs once, over the rows in `data`. A row you add or drag later stays part of your answer, even when the predicate would accept it. `setData(rows)` replaces your answers and keeps the context rows. Constraints see context rows too, because they are rows of the table.
+
+When the reference rows carry other columns (an observed `price` beside your `lo` and `hi`), declare all of them in the schema. Each row fills its own columns, and a mark skips a row whose value is missing. Reference data unrelated to the answer is a [guide](/guides).
+
+<Example
+  code={contextRows}
+  title="The record as context, the forecast as your answer"
+  blurb="2010–2020 is context: drawn and read-only. getData() returns only the four forecast years."
+  try={(
+    <>
+      <b>Drag</b> a forecast point (2022–2030). The record does not move.
     </>
   )}
 />

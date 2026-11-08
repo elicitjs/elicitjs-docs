@@ -68,4 +68,23 @@ export const api: ApiEntry[] = [
       },
     ],
   },
+  {
+    name: "context",
+    summary: "Marks seeded rows as reference: drawn and read-only, and left out of getData(), onChange, and the selection and control indices.",
+    signatures: [
+      "context: true | ((datum, index, table) => boolean)",
+    ],
+    options: [
+      {
+        name: "context: true",
+        type: "true",
+        desc: "Every row in data is context; rows you add are your answer.",
+      },
+      {
+        name: "context: (d) => boolean",
+        type: "Function",
+        desc: "The seeded rows the predicate accepts are context. It runs once, over the rows in data.",
+      },
+    ],
+  },
 ];

@@ -121,6 +121,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "context",
+        type: "ContextSpec",
+        default: "—",
+        desc: (
+          <>
+            Reference rows: drawn, read-only, and left out of <code className="inline">getData()</code>. See <a href="/editing/existence#context">Context rows</a>.
+          </>
+        ),
+      },
+      {
         name: "axes",
         type: "object | false",
         default: "auto",

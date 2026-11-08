@@ -52,10 +52,90 @@ export const api: ApiEntry[] = [
     ),
   },
   {
+    name: "edit.axis.pan(options)",
+    summary: (
+      <>
+        Dragging the plot slides the axis&rsquo;s domain along. It writes the schema&rsquo;s domain, never the dataset, and composes with <code className="inline">edit.axis.zoom()</code> on the same axis: <code className="inline">{'axes: { x: { edits: [edit.axis.zoom(), edit.axis.pan()] } }'}</code>.
+      </>
+    ),
+    signature: "edit.axis.pan({ limit, field, when }) → Edit",
+    options: [
+      {
+        name: "limit",
+        type: "'declared' | [lo, hi] | false",
+        default: "'declared'",
+        desc: "How far it may pan: the field's domain as declared in the schema, an explicit range, or false for no limit. At the limit the view stops and keeps its span.",
+      },
+      {
+        name: "field",
+        type: "string",
+        default: "every field on the axis",
+        desc: "The one field whose domain to write, when several fields share the axis.",
+      },
+      {
+        name: "when",
+        type: "(ctx) => boolean",
+        default: "—",
+        desc: (
+          <>
+            Gate the pan on a modifier key, e.g. <code className="inline">when.shift</code> to pan only with Shift held.
+          </>
+        ),
+      },
+    ],
+    returns: (
+      <>
+        An <b>Edit</b> scoped to <code className="inline">axis</code>. It acts on a continuous scale (numeric or temporal). A press on a mark with its own edit edits the mark. One drag is one undo step.
+      </>
+    ),
+  },
+  {
+    name: "clip",
+    summary: (
+      <>
+        A spec option. Clips the marks to the plot area, axis to axis. Only the part of a mark inside the clip takes a press or shows a tip. Axes, legends, guides and marks with <code className="inline">clip: false</code> keep drawing in the margins.
+      </>
+    ),
+    signatures: [
+      "Elicit({ clip: true | false, … })",
+      "Elicit({ clip: { pad: 6 }, … })",
+      "Elicit({ clip: { pad: { top: 4, bottom: 4 } }, … })",
+      "text({ clip: false, … })   // on a mark",
+    ],
+    options: [
+      {
+        name: "clip",
+        type: "boolean | { pad }",
+        default: "on with zoom or pan",
+        desc: (
+          <>
+            On by default when an axis carries <code className="inline">edit.axis.zoom()</code> or <code className="inline">edit.axis.pan()</code>, off otherwise. The object form turns it on.
+          </>
+        ),
+      },
+      {
+        name: "pad",
+        type: "number | { top, right, bottom, left }",
+        default: "0",
+        desc: "Pixels past the plot area the marks still draw: one number for every side, or a number per side.",
+      },
+      {
+        name: "clip (on a mark)",
+        type: "boolean",
+        default: "follows the chart",
+        desc: (
+          <>
+            <code className="inline">false</code> draws the mark past the clip. On a <code className="inline">composite</code>, it applies to every part.
+          </>
+        ),
+      },
+    ],
+  },
+  {
     name: "el.setDomain(field, domain, options)",
     summary: (
       <>
-        Write a field&rsquo;s domain from outside the chart — a zoom button, a reset control. The same commit a wheel tick makes: undoable, notified through <code className="inline">change</code>, and every scale reflows.
+        Write a field&rsquo;s domain from outside the chart — a zoom button, a reset control. The same commit a wheel tick or a pan makes: undoable, notified through <code className="inline">change</code>, and every scale reflows.
       </>
     ),
     signatures: [

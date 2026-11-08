@@ -64,7 +64,7 @@ export const SITE: NavGroup[] = [
         title: "External controls (UI · functions)",
       },
       { href: "/editing/axis", title: "Editable axes (domain)" },
-      { href: "/editing/zoom", title: "Zoom & domains" },
+      { href: "/editing/zoom", title: "Zoom & pan" },
     ],
   },
   {

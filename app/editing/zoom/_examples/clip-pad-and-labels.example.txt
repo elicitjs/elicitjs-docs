@@ -1,0 +1,41 @@
+// Daily highs that touch both ends of the scale. `pad` lets a point on the
+// edge draw whole; `clip: false` keeps the latest reading's label in the margin.
+const data = d3.range(30).map((day) => ({
+  day,
+  high: Math.max(0, Math.min(40, Math.round(20 + 18 * Math.sin(day / 3) + 6 * Math.cos(day)))),
+}));
+
+const W = 460, H = 260;
+const margins = { top: 16, right: 72, bottom: 32, left: 40 };
+
+const chart = Elicit({
+  width: W, height: H, margins,
+  schema: {
+    day: { type: "quantitative", domain: [0, 29] },
+    high: { type: "quantitative", domain: [0, 40] },
+  },
+  data,
+  // Clip to the plot, grown by 6 px on every side.
+  clip: { pad: 6 },
+  axes: {
+    x: { edits: [edit.axis.zoom({ minSpan: 5 }), edit.axis.pan()] },
+  },
+  marks: [
+    lineY({ stroke: "#ea580c", strokeWidth: 2, channels: { x: { field: "day" }, y: { field: "high" } } }),
+    point({
+      fill: "#ea580c", size: 6,
+      channels: { x: { field: "day" }, y: { field: "high", edit: move() } },
+    }),
+    // Pinned 8 px past the plot's right edge, at the latest day's value.
+    // `clip: false` lets it draw in the margin.
+    text({
+      clip: false, textAnchor: "start", fontSize: 12, fill: "#9a3412",
+      channels: {
+        x: { value: W - margins.left - margins.right + 8 },
+        y: { field: "high" },
+        text: { fn: (d, i, rows) => (i === rows.length - 1 ? `${d.high}° today` : "") },
+      },
+    }),
+  ],
+});
+mount(chart);
