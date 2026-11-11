@@ -125,6 +125,8 @@ Give a part a `frame:` channel and the composite becomes a **box**. Its own `x` 
 - `size` / `rx` / `ry` / `strokeWidth` — `[0, 1]`, a fraction of the half-size.
 - `angle` / `curvature` — the channel's own units. The scale belongs to its own part, so two parts can take opposite ranges.
 - `{ field: "f", frame: [lo, hi] }` maps the field's schema domain onto that slice of the box. The domain stays on the schema.
+- A categorical field spreads its categories evenly over `[lo, hi]`, and an edit snaps to the nearest one.
+- `{ fn: (d) => …, frame: true }` is derived in local units. It places a part where another part's value puts it, such as a forearm at the end of an upper arm.
 
 `x` / `y` / `size` describe the box, so they don't trickle into the parts. A part that states no position sits at the centre. `{ value }` still means pixels, so use `frame:` for anything that should scale with the glyph.
 
@@ -176,7 +178,7 @@ The box first, then the parts, all as plain marks. The box carries the composite
 
 Two limits apply to a part placed in the box:
 
-- A `{ fn }` channel is called once per row, as `(d, 0, [d])`, so it can't look across rows. Read the field instead.
+- A `{ fn }` channel is called once per row, as `(d, 0, [d])`, so it can't look across rows. Read the field instead. Its result is in pixels; add `frame: true` to return local units.
 - A line-family mark can't span rows inside a box. Position it on the global scales, or move it out of the composite.
 
 A part with no `frame:` channel keeps the global scales, so one part of a glyph can still span to a data value.

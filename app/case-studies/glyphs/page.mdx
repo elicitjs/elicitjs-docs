@@ -1,0 +1,86 @@
+import { DocShell } from '../../../components/DocShell';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+
+import angerOrDisgust from './_examples/anger-or-disgust.example.txt';
+import wellbeingPlant from './_examples/wellbeing-plant.example.txt';
+import hourglass from './_examples/hourglass.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Three new glyphs
+
+<Lead>Three elicitation interfaces built from existing marks and edits: a face whose colour you slide, a plant you grow, and an hourglass you fill. Each follows the same steps: declare the fields, draw the parts, then put an edit on each channel a gesture should write.</Lead>
+
+<Section id="steps" title="The steps">
+
+1. **Declare the answer.** One row, one field per thing you ask. The `schema` gives each field its type and domain.
+2. **Draw the glyph.** A [`composite` in box mode](/marks/composite#box) places every part in the glyph's own units: `x` and `y` from `-1` to `1`, y up. The composite's `size` sets the box's half-size, so the whole glyph scales with it.
+3. **Bind the fields.** A channel with a `field` and a `frame: [lo, hi]` range maps the field's domain onto that slice of the box. Two parts that read the same field and range always line up.
+4. **Add the gestures.** An edit on a channel writes that channel's field: `move` for a position, `slide` for a size, colour or angle. A part with no edit can't be grabbed, so a drag passes through it.
+
+</Section>
+
+<Section id="face" title="A face that changes colour">
+
+[`face()`](/marks/face) already draws a head, eyes, brows and a mouth. Its `fill` channel colours the head, so binding it to a field adds a question with no new parts.
+
+`feeling` runs from `-1` (anger) to `1` (disgust). A diverging scale maps it from red through yellow to green. `slide({ axis: "x" })` on the head writes it, so you drag the head left for anger and right for disgust. `slide` works on a colour ramp because it moves along the domain rather than inverting a colour. The mouth keeps its own `slide` on valence, so the two answers come from two different parts.
+
+<Example
+  code={angerOrDisgust}
+  title="Anger or disgust"
+  blurb="The emotion preset's mouth, plus a head colour bound to a field: red for anger, green for disgust."
+  try={(
+    <>
+      <b>Drag the head</b> left or right to colour it · <b>drag the mouth</b> up or down.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="plant" title="A plant that grows">
+
+Three answers about your week, one plant: `energy` is how tall it grows, `joy` how big it blooms, and `support` how full its leaves are.
+
+The stem's top and the flower both read `energy` over the same range, `frame: [-0.15, 0.65]`, so the flower always sits on the stem. Drag the flower up or down: `move({ channels: ["y"] })` writes `energy`. Drag it sideways: a `slide` on its `size` writes `joy`. The two edits read different directions of one drag, so they don't interfere.
+
+Each leaf's centre and width both read `support`. As the leaf widens, its centre moves out by the same amount, so its inner edge stays on the stem. Drag a leaf outward to make it fuller.
+
+<Example
+  code={wellbeingPlant}
+  title="How is your week going?"
+  blurb="A ruleX stem, two ellipse leaves, a rect pot and a point flower, each placed in the glyph's own units."
+  try={(
+    <>
+      <b>Drag the flower</b> up to grow the plant, sideways to open the bloom · <b>drag a leaf</b> outward.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="hourglass" title="An hourglass you fill">
+
+How long will this work take? The timer holds up to 12 weeks of sand, and the sand in the top bulb is your estimate.
+
+The sand is a `rect` whose top edge, `y2`, reads `weeks`. `move({ mode: "relative" })` on `y2` moves the surface by the drag distance, so it stays under the pointer wherever you grab the sand. `snap({ step: 1 })` rounds the answer to whole weeks. The label reads the same field through a `{ fn }` text channel.
+
+The glass, the stream and the caps carry no edit, so they are drawn but can't be grabbed.
+
+<Example
+  code={hourglass}
+  title="How long will this take?"
+  blurb="Rects for the glass and the sand; the sand's top edge is the estimate, snapped to whole weeks."
+  try={(
+    <>
+      <b>Drag the sand</b> up to add time, down to take it away.
+    </>
+  )}
+/>
+
+</Section>

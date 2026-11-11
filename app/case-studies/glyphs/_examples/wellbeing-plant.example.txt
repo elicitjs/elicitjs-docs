@@ -1,0 +1,59 @@
+mount(Elicit({
+  width: 320, height: 340,
+  margins: { top: 10, right: 10, bottom: 10, left: 10 },
+  // How is your week going? Three answers, one plant.
+  data: [{ energy: 0.5, joy: 0.4, support: 0.5 }],
+  schema: {
+    energy:  { type: "quantitative", domain: [0, 1] },   // how tall it grows
+    joy:     { type: "quantitative", domain: [0, 1] },   // how big it blooms
+    support: { type: "quantitative", domain: [0, 1] },   // how full its leaves are
+  },
+  marks: [
+    // Every part is placed in the glyph's own units: x and y run from -1 to 1, y up.
+    composite({
+      channels: { size: { value: 150 } },
+      parts: [
+        // The stem's top is `energy`; the flower below sits on the same field
+        // and range, so the two always meet.
+        ruleX({ channels: {
+          x: { frame: 0 }, y1: { frame: -0.55 },
+          y2: { field: "energy", frame: [-0.15, 0.65] },
+          stroke: { value: "#4d7c0f" }, strokeWidth: { value: 6 },
+        } }),
+        // Two leaves. A leaf's centre and its width both read `support`, so its
+        // inner edge stays on the stem as it grows.
+        ellipse({ channels: {
+          x: { field: "support", frame: [-0.08, -0.3] }, y: { frame: -0.3 },
+          rx: { field: "support", frame: [0.06, 0.28],
+                edit: slide({ axis: "x", increase: "left" }) },
+          ry: { frame: 0.07 }, angle: { value: -25 },
+          fill: { value: "#65a30d" },
+        } }),
+        ellipse({ channels: {
+          x: { field: "support", frame: [0.08, 0.3] }, y: { frame: -0.3 },
+          rx: { field: "support", frame: [0.06, 0.28],
+                edit: slide({ axis: "x", increase: "right" }) },
+          ry: { frame: 0.07 }, angle: { value: 25 },
+          fill: { value: "#65a30d" },
+        } }),
+        // The pot.
+        rect({ channels: {
+          x1: { frame: -0.3 }, x2: { frame: 0.3 }, y1: { frame: -0.95 }, y2: { frame: -0.55 },
+          fill: { value: "#b45309" },
+        } }),
+        // The flower: drag it up or down to set `energy`, sideways to set `joy`.
+        point({ channels: {
+          y: { field: "energy", frame: [-0.15, 0.65], edit: move({ channels: ["y"] }) },
+          size: { field: "joy", frame: [0.08, 0.3],
+                  edit: slide({ axis: "x", increase: "right" }) },
+          fill: { value: "#db2777" },
+        } }),
+        point({ channels: {
+          y: { field: "energy", frame: [-0.15, 0.65] },
+          size: { field: "joy", frame: [0.03, 0.11] },
+          fill: { value: "#fde047" },
+        } }),
+      ],
+    }),
+  ],
+}))

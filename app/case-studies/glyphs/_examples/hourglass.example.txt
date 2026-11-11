@@ -1,0 +1,57 @@
+mount(Elicit({
+  width: 320, height: 340,
+  margins: { top: 10, right: 10, bottom: 10, left: 10 },
+  // How long will this work take? The timer holds up to 12 weeks of sand.
+  data: [{ weeks: 4 }],
+  schema: { weeks: { type: "quantitative", domain: [0, 12] } },
+  // Whole weeks only.
+  constraints: [snap({ step: 1 })],
+  marks: [
+    composite({
+      channels: { size: { value: 150 } },
+      parts: [
+        // The glass: two bulbs and a neck, drawn in the glyph's own units.
+        rect({ channels: {
+          x1: { frame: -0.42 }, x2: { frame: 0.42 }, y1: { frame: 0.06 }, y2: { frame: 0.82 },
+          rx: { value: 18 }, fill: { value: "#f1f5f9" }, stroke: { value: "#94a3b8" }, strokeWidth: { value: 2 },
+        } }),
+        rect({ channels: {
+          x1: { frame: -0.42 }, x2: { frame: 0.42 }, y1: { frame: -0.82 }, y2: { frame: -0.06 },
+          rx: { value: 18 }, fill: { value: "#f1f5f9" }, stroke: { value: "#94a3b8" }, strokeWidth: { value: 2 },
+        } }),
+        rect({ channels: {
+          x1: { frame: -0.05 }, x2: { frame: 0.05 }, y1: { frame: -0.08 }, y2: { frame: 0.08 },
+          fill: { value: "#f1f5f9" }, stroke: { value: "#94a3b8" }, strokeWidth: { value: 2 },
+        } }),
+        // The sand in the top bulb is the estimate: its surface sits at `weeks`.
+        // Drag the sand up to add time, down to take it away.
+        rect({ channels: {
+          x1: { frame: -0.38 }, x2: { frame: 0.38 }, y1: { frame: 0.1 },
+          y2: { field: "weeks", frame: [0.1, 0.78],
+                edit: move({ mode: "relative" }) },
+          fill: { value: "#eab308" },
+        } }),
+        // A thin stream falls through the neck.
+        rect({ channels: {
+          x1: { frame: -0.012 }, x2: { frame: 0.012 }, y1: { frame: -0.3 }, y2: { frame: 0.1 },
+          fill: { value: "#eab308" },
+        } }),
+        // The two wooden caps.
+        rect({ channels: {
+          x1: { frame: -0.55 }, x2: { frame: 0.55 }, y1: { frame: 0.82 }, y2: { frame: 0.92 },
+          rx: { value: 4 }, fill: { value: "#78350f" },
+        } }),
+        rect({ channels: {
+          x1: { frame: -0.55 }, x2: { frame: 0.55 }, y1: { frame: -0.92 }, y2: { frame: -0.82 },
+          rx: { value: 4 }, fill: { value: "#78350f" },
+        } }),
+        // The answer, read off the same field.
+        text({ channels: {
+          y: { frame: -0.56 },
+          text: { fn: (d) => `${d.weeks} week${d.weeks === 1 ? "" : "s"}` },
+          fontSize: { value: 18 }, fill: { value: "#334155" },
+        } }),
+      ],
+    }),
+  ],
+}))

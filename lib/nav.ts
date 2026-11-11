@@ -72,6 +72,10 @@ export const SITE: NavGroup[] = [
     pages: [{ href: "/widgets", title: "Survey instruments" }],
   },
   {
+    group: "Case studies",
+    pages: [{ href: "/case-studies/glyphs", title: "Three new glyphs" }],
+  },
+  {
     group: "Scales & data",
     pages: [
       { href: "/scales", title: "Scales & channels" },

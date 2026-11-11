@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "needle({ channels, length, handles, handleSize, handleColor, baseWidth, id }) → Feature",
+      "needle({ channels, length, handles, handleSize, handleColor, baseWidth, tipWidth, id }) → Feature",
     ],
     options: [
       {
@@ -63,6 +63,16 @@ export const api: ApiEntry[] = [
         type: "number",
         default: "10",
         desc: "Width of the needle base in px.",
+      },
+      {
+        name: "tipWidth",
+        type: "number",
+        default: "0",
+        desc: (
+          <>
+            Width of the needle tip in px. <code className="inline">0</code> tapers to a point. Set it equal to <code className="inline">baseWidth</code> for a bar of even width, such as a limb you grab far from its pivot.
+          </>
+        ),
       },
     ],
     channels: [

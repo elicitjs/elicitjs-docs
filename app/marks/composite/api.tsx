@@ -98,6 +98,24 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "frame: [lo, hi]  (with a categorical field)",
+        type: "categories → stops",
+        desc: (
+          <>
+            A <code className="inline">categorical</code> or <code className="inline">ordinal</code> field spreads its categories evenly from <code className="inline">lo</code> to <code className="inline">hi</code>, the first category at <code className="inline">lo</code>. An edit on the channel snaps to the nearest category.
+          </>
+        ),
+      },
+      {
+        name: "{ fn, frame: true }",
+        type: "derived local",
+        desc: (
+          <>
+            <code className="inline">fn(d)</code> returns local units, the same units as <code className="inline">{'{'} frame: -0.4 {'}'}</code>. Use it to place a part where another part&rsquo;s value puts it: a forearm at the end of an upper arm. It writes nothing, so it carries no edit.
+          </>
+        ),
+      },
+      {
         name: "frame on angle / curvature",
         type: "private scale",
         desc: (

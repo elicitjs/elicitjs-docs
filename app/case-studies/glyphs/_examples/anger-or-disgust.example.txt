@@ -1,0 +1,27 @@
+mount(Elicit({
+  width: 320, height: 320,
+  margins: { top: 12, right: 12, bottom: 28, left: 12 },
+  data: [{ valence: -0.4, feeling: 0 }],
+  schema: {
+    valence: { type: "quantitative", domain: [-1, 1] },
+    // -1 is anger, +1 is disgust, 0 is neither.
+    feeling: { type: "quantitative", domain: [-1, 1] },
+  },
+  marks: [
+    face({
+      channels: {
+        // The mouth bends with valence, as in the emotion preset.
+        mouthCurve: { field: "valence", edit: slide({ axis: "y", increase: "up" }) },
+        // The head's colour is a field too: a diverging scale runs red → yellow → green,
+        // and a sideways slide on the head writes it.
+        fill: {
+          field: "feeling",
+          scale: { type: "diverging", range: ["#d62728", "#ffd666", "#2ca02c"] },
+          edit: slide({ axis: "x", increase: "right" }),
+        },
+      },
+    }),
+    text({ channels: { x: { value: 20 }, y: { value: 304 }, text: { value: "← anger" }, textAnchor: { value: "start" }, fill: { value: "#d62728" } } }),
+    text({ channels: { x: { value: 288 }, y: { value: 304 }, text: { value: "disgust →" }, textAnchor: { value: "end" }, fill: { value: "#2ca02c" } } }),
+  ],
+}))
