@@ -1,8 +1,10 @@
 # ElicitJS findings from the gallery study
 
-> **Status (2026-11-07):** every numbered item below was fixed on the library's `gallery-findings` branch; the
-> last column says how. Sections 4–6 are annotated in place. The original report is kept as
-> `LIBRARY-FINDINGS.v1.md`.
+> **Status (2026-11-10):** every numbered item in sections 1–3 was fixed on the library's `gallery-findings`
+> branch; the last column says how. Sections 4–6 are annotated in place. Section 7 records what moving the
+> entries from context tables to context rows found: the drawing bugs are fixed, three questions are open.
+> Section 8 records the style and theme limits, all fixed.
+> The original report is kept as `LIBRARY-FINDINGS.v1.md`.
 
 Building ~350 recreations and ~400 interfaces surfaced these library issues.
 Each was hit while authoring, and most were reported independently by more than
@@ -72,7 +74,7 @@ nothing, which is worse than one that draws wrong.
 - **`edit.scale.categories()` "＋" only extends the domain.** The axis docs say "Double-click ＋ to add a bar". Rename starts only from the swatch, not the label.
 - **Locked rows still draw stack seam handles** (inert, but they look grabbable).
 - **`angle` is counter-clockwise math degrees**, the opposite sign to Plot's `rotate`.
-- **One chart is one table.** — *fixed*: a context table (`{ context: true, fields }`) holds reference rows that are drawn, read-only, and left out of `getData()`.
+- **One chart is one table.** — *fixed*: `context` on the spec (`true`, or a predicate over the seeded rows) marks reference rows of the elicited table, which are drawn, read-only, and left out of `getData()`. A first fix, a separate context table (`{ context: true, fields }`), restated every shared column and was replaced; it now throws with the new spelling.
 
 ## 5. False-positive warnings
 
@@ -83,3 +85,65 @@ nothing, which is worse than one that draws wrong.
 ## 6. Missing warnings (validation gaps)
 
 An unknown colour scheme; `guides.region({ label })`; a mark-level `edit.line.sweep()`; `brushSpan()` with no channels; `directed` in the bare table form; a sweep on a bar; an arc with a negative usable span. — *fixed*: each now warns (`scheme:*`, `*:nochannel:*`, `schema:*:fact-as-column`, `arc:span`) or works (`region` label, `brushSpan` takes the mark's pair, a sweep on a bar).
+
+## 7. Found while moving to context rows (2026-11-08)
+
+Context rows share the elicited table, so every mark over the table sees every row, including rows that fill
+none of its columns. That exposed one bug class in many marks, and three open questions.
+
+**Fixed: a row that doesn't fill a mark's columns drew anyway.** The documented rule is that a missing value
+draws nothing; these marks fell back to a position instead. Each now skips the row (`missingValue`), and
+`test/context-rows.test.js` checks every mark.
+
+| Mark | What it drew for such a row |
+|---|---|
+| `text` | the label at the centre of the plot |
+| `rule` (span mode) | a full-length line at the centre, or a zero-length line at the baseline |
+| `trend`, `trendBand` | a flat line at intercept 0 with handles (hundreds per chart) |
+| `line`, `area` | a point at the centre, breaking the path there |
+| `shape`, `ellipse` | the shape at the centre |
+| `curve`, `needle` | a chord at fixed fractions of the plot; a needle at 0° |
+| `rect` | a zero-size rect at the origin |
+| `bar`, `waffle`, `dotStack` | a row with no category fell into the first band |
+
+A bar or waffle with a category and no value keeps its empty affordance (a zero-height bar, an empty grid),
+which a nearest pick can still fill. A line still breaks at a row that has its x but no value: that is the gap
+rule, and an entry whose context shares the x column uses a context-only `series` or `connect: 'sequence'`.
+
+**Open: decisions the library hasn't made.**
+
+| # | Issue | Minimal case | Effect in the gallery |
+|---|---|---|---|
+| 38 | `count({ max })` counts context rows, and `strategy: 'replace'` drops the oldest rows, which are the context rows, so the lock refuses the whole edit. | `context: true` over 10 rows, `create()`, `count({ max: 1 })`: every click is refused. | Five interfaces cap at `context.length + N` with `strategy: 'reject'`, and three `lock: 'seed'` interfaces already did the same arithmetic over locked rows (one with the default `replace`, which works only because the lock refuses the drop). "Hover, then commit" used to replace your answer on a second click and now refuses it. Counting only unlocked rows would restore `replace`, but changes `count` beside `lock`. |
+| 39 | A created row gets every declared column as `null`, including columns only context rows fill. | `schema: { x, y, gx, gy }`, `context: true`, `edit.line.draw()`: drawn rows read `{ x, y, gx: null, gy: null }`. | About a dozen creating interfaces now report extra `null` keys. Data at load is unchanged. |
+| 40 | Handles draw on locked rows: inert, but they look grabbable. Handle nodes carry no common tag, so the engine can't hide them. | A line with an edit over shared columns: every context point gets a dot. Stack seams likewise. | Most entries give context its own columns, drawn by a mark with no edit, partly to avoid this. "Survey a new island" (stacked bars) shows inert seam dots on its context bars. |
+
+Two smaller notes. `toggle` finds a slot's occupant by its column values, so a toggle grid can't share its key
+columns with context rows (it would toggle the locked row and be refused). Merging tables changes the order of
+a categorical domain's union, so the answer's categories must be listed first to keep their colours.
+
+
+## 8. Style and theme customization (fixed 2026-11-10)
+
+Every gap below was a STYLE limit: the chart drew, but an entry had to fake a piece of chrome with a mark,
+cut a label short, or list a cosmetic difference. All are fixed in the library's theme and axis options, and
+each entry now uses the option. The named themes (`theme: "nyt"`, seventeen in all, fourteen transcribed from
+[Flint](https://github.com/microsoft/flint-chart)) came out of the same pass; see `/theming/themes`.
+
+| # | Issue | Entries | Status |
+|---|---|---|---|
+| 41 | An axis cannot turn its tick labels, so rotated labels were a `text` mark under an axis with blank labels, or were cut to three letters. | plot-olympians-grouped-bar-chart, plot-vertical-bars-rotated-labels, vl-bar_grouped_repeated | fixed — `labelAngle` on `axis()` and `theme.axis`; the axis reserves the room the turned labels need. |
+| 42 | A tick label is one line, so a date axis could not put the year under its January. | plot-datawrapper-style-date-axis, vl-line_conditional_axis | fixed — a `\n` in the formatted label starts a second line. |
+| 43 | Tick length, tick colour, label weight and gridline dash cannot vary per tick, so a conditional grid was a `guides.rule` per tick. | vl-line_conditional_axis | fixed — `tickSize`, `stroke`, `fill`, `fontWeight` on an axis and `stroke`, `strokeWidth`, `strokeDash` on a grid take `(value, index) => …`. |
+| 44 | No plot-area fill: `theme.background` greys the margins too, and a `guides.region` paints over the grid. | plot-ggplot2-style-axes | fixed — `theme.panel: { fill, stroke }` paints under the grid and can frame the plot. |
+| 45 | No zero gridline, so a black line at 0 was a `ruleY`/`ruleX` mark or a `guides.rule`. | vl-bar_negative, vl-bar_negative_horizontal_label, vl-concat_layer_voyager_result | fixed — a grid's `zero` option and `theme.grid.zero`. |
+| 46 | An axis `fill` colours its labels and title together. | vl-layer_dual_axis | fixed — `titleFill`, `titleFontSize`, `titleFontWeight`, `titlePadding`. |
+| 47 | The text mark has no font weight, style or family. | plot-proportion-plot | fixed — `fontWeight`, `fontStyle`, `fontFamily`, each a constant or a channel; both renderers paint them. |
+| 48 | `bar({ stack: true })` has no corner radius, so a rounded stack was hand-stacked `rect` spans. | vl-stacked_bar_count_corner_radius_mark | fixed — `rx` on `bar`, and `theme.marks.bar.rx`. |
+| 49 | `scheme` knows only part of d3-scale-chromatic (`PRGn`, `PuRd`, `BuPu`, … were missing). | plot-proportion-plot, plot-impact-of-vaccines, plot-continuous-dimensions-heatmap | fixed — every d3-scale-chromatic scheme can be named. The last two keep a d3 scale for its sqrt/symlog transform. |
+| 50 | "No white halo" listed on six entries. Halos had landed (a `stroke` on text paints behind the glyphs) but the entries were not updated. | plot-cancer-survival-rates, plot-parcoords, plot-color-crosshair, plot-state-labels, plot-v-counties, plot-cluster-diagram | fixed — the entries draw `stroke: 'white'` halos. |
+| 51 | Axis spine and ticks, tick padding, gridline dash, band padding, legend swatch size and shape, and title fonts were not theme tokens, so a house style could not be one object. | (all) | fixed — `theme.axis` (with `discrete` / `continuous` per-kind overrides), `theme.grid` (`strokeDash`, `show`, `zero`), `theme.panel`, `theme.bandPadding`, `theme.guide.legend`, `theme.title.fontFamily`, `theme.marks.{bar,rect}.rx`, `theme.marks.point.size`. |
+| 52 | Axis labels cannot move inside the plot, gridlines sit only at band centres, and a y title cannot sit at the top of its axis — the space-saving axis was a `text` mark under a hidden axis. | vl-bar_axis_space_saving | fixed — `labelAlign` and `labelOffset` (with a negative `tickPadding`), a grid's `bandPosition`, and `titleAnchor`; all four are theme tokens too. |
+
+Still open, and still listed in the entries: a legend inside the plot, mirrored panels with the axis between
+them (vl-concat_population_pyramid, a multi-view layout), and Vega's own scheme names (`lighttealblue`).

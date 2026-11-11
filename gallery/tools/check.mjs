@@ -95,7 +95,7 @@ for (const id of ids) {
         paneIndex++;
         const pi = id === 'beyond' ? null : paneIndex;
         if (pi != null) {
-            await page.evaluate((k) => { const t = document.querySelectorAll('.tabs .tab')[k]; if (t) t.click(); }, pi);
+            await page.evaluate((k) => { const t = document.querySelector(`.tabs .tab[data-iface="${k}"]`); if (t) t.click(); }, pi);
             await page.waitForTimeout(100);
         }
         if (shotDir) {
@@ -144,6 +144,9 @@ for (const id of ids) {
         Object.assign(b, { candidates: probe.candidates, dragChanged, clickChanged });
     }
     if (shotDir && id !== 'beyond') {
+        // The comparison shot shows the recreation tab beside the original.
+        await page.evaluate(() => { const t = document.querySelector('.tabs .tab[data-view="rec"]'); if (t) t.click(); });
+        await page.waitForTimeout(100);
         const cmp = await page.$('.compare');
         if (cmp) await cmp.screenshot({ path: path.join(shotDir, `${id}.compare.png`) }).catch(() => {});
     }

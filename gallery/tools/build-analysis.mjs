@@ -142,7 +142,7 @@ for (const v of VOCAB) {
 }
 md += '\n';
 
-fs.writeFileSync(path.join(root, 'ANALYSIS.md'), md);
+fs.writeFileSync(path.join(root, 'analysis', 'ANALYSIS.md'), md);
 
 // The site's analysis page shows the same narrative (minus its title), as HTML.
 function mdToHtml(src) {

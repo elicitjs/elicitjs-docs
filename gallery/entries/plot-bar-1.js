@@ -151,40 +151,33 @@ mount(Elicit({
 // ---------------------------------------------------------------------------
 GALLERY.add({
   id: 'plot-grouped-bar-chart',
-  status: 'partial',
-  verdict: 'Faceting is not covered by this study, so the grouped bars are flattened into one band axis over a combined `state · age` key, with blank spacer bands between states and a state label under each group.',
-  needs: ['facet'],
+  status: 'full',
+  verdict: 'A `barY` with the state on x and the age group on `xOffset`, so each state band holds one bar per age group; the state labels are the x axis.',
+  needs: [],
   prep: ['prep-calculate'],
   gaps: [
-    'Faceting is not covered by this study: instead of an `fx` facet, the groups are one band scale over a combined key, separated by empty spacer bands, and the state names are the axis tick labels under each group’s middle bar.',
+    'Plot facets by state (`fx`); here the state is the x band and `xOffset` nests the ages inside it, which draws the same grouped layout.',
     'The state sort (by total population) is computed in JS.',
   ],
   recreation: {
     code: `const rows = await plotData("observablehq__plot-grouped-bar-chart", "population-state-age.csv");
 const ages = [...new Set(rows.map((d) => d.key))];
 const states = d3.groupSort(rows, (g) => -d3.sum(g, (d) => d.population), (d) => d.state);
-// One band per (state, age), plus an empty spacer band after each state.
-const slots = states.flatMap((s, i) =>
-  [...ages.map((a) => s + " · " + a), ...(i < states.length - 1 ? ["gap " + s] : [])]);
-const data = rows.map((d) => ({ slot: d.state + " · " + d.key, key: d.key, population: d.population }));
-const middle = (s) => s + " · " + ages[3];
 
 mount(Elicit({
   width: 470, height: 320,
   margins: { top: 16, right: 10, bottom: 22, left: 50 },
-  data,
+  data: rows,
   schema: {
-    slot:       { type: "categorical", domain: slots },
+    state:      { type: "categorical", domain: states },
     key:        { type: "categorical", domain: ages },
     population: { type: "quantitative", domain: [0, 11e6] },
   },
-  axes: {
-    x: { tickSize: 0, tickFormat: (s) => (states.find((st) => middle(st) === s) || "") },
-    y: { grid: true, tickFormat: "~s", title: "population →" },
-  },
+  axes: { x: { tickSize: 0 }, y: { grid: true, tickFormat: "~s", title: "population →" } },
   marks: [
     barY({ channels: {
-      x: { field: "slot" },
+      x: { field: "state" },
+      xOffset: { field: "key" }, //! one bar per age group inside each state
       y: { field: "population" },
       fill: { field: "key", scale: { scheme: "spectral" },
               legend: { anchor: "right", title: false } },
@@ -235,13 +228,12 @@ mount(Elicit({
 // ---------------------------------------------------------------------------
 GALLERY.add({
   id: 'plot-olympians-grouped-bar-chart',
-  status: 'partial',
-  verdict: 'Faceting is not covered by this study, so the counts per sport and sex are flattened into one band axis over a combined `sport · sex` key, coloured by sex; the facet labels are rotated `text` marks.',
-  needs: ['facet'],
+  status: 'full',
+  verdict: 'Athlete counts per sport and sex as a `barY` with the sport on x and the sex on `xOffset`, coloured by sex; the x axis turns the sport labels with `labelAngle`.',
+  needs: [],
   prep: ['prep-aggregate'],
   gaps: [
-    'Faceting is not covered by this study: instead of an `fx` facet, each sport is a pair of adjacent bands with a narrow spacer between sports.',
-    'The rotated facet labels are drawn by a `text` mark turned with `angle: -90` (math degrees, counter-clockwise), since an axis has no label angle option.',
+    'Plot facets by sport (`fx`); here the sport is the x band and `xOffset` nests the sexes inside it, which draws the same grouped layout.',
     'The count (`groupX({y2: "count"})`) is computed in JS.',
   ],
   recreation: {
@@ -249,33 +241,30 @@ GALLERY.add({
 const sports = [...new Set(olympians.map((d) => d.sport))].sort();
 const sexes = ["female", "male"];
 const counts = d3.rollup(olympians, (v) => v.length, (d) => d.sport, (d) => d.sex);
-const slots = sports.flatMap((s) => [s + "|female", s + "|male", s + "|gap"]);
 const data = sports.flatMap((sport) => sexes.map((sex) => ({
-  slot: sport + "|" + sex, sport, sex, count: (counts.get(sport) || new Map()).get(sex) || 0,
+  sport, sex, count: (counts.get(sport) || new Map()).get(sex) || 0,
 })));
 
 mount(Elicit({
   width: 480, height: 400,
-  margins: { top: 40, right: 6, bottom: 112, left: 50 },
+  margins: { top: 40, right: 6, bottom: 10, left: 50 },
   data,
   schema: {
-    slot:  { type: "categorical", domain: slots },
     sport: { type: "categorical", domain: sports },
     sex:   { type: "categorical", domain: sexes },
     count: { type: "quantitative", domain: [0, 1300] },
   },
-  axes: { x: false, y: { grid: true, title: "Frequency →" } },
+  // The axis turns its labels (math degrees: -90 reads top to bottom) and
+  // reserves the room they need below the plot.
+  axes: { x: { labelAngle: -90, tickSize: 0, fontSize: 9 }, y: { grid: true, title: "Frequency →" } },
   marks: [
     barY({ channels: {
-      x: { field: "slot", scale: { padding: 0 } },
+      x: { field: "sport", scale: { padding: 0 } },
+      xOffset: { field: "sex", scale: { padding: 0.2 } }, //! the sexes side by side in each sport
       y: { field: "count" },
       fill: { field: "sex", scale: { scheme: "observable10" }, legend: { anchor: "top", title: false } },
     } }),
     ruleY({ stroke: "#1f2937", channels: { y: { datum: 0 } } }),
-    // Facet labels: one rotated label per sport, under its female bar.
-    text({ angle: -90, fontSize: 9, textAnchor: "start", lineAnchor: "middle",
-      channels: { x: { field: "slot" }, y: { value: 250 },
-                  text: { fn: (d) => (d.sex === "female" ? d.sport : "") } } }),
   ],
 }))`,
   },
@@ -284,41 +273,32 @@ mount(Elicit({
       title: 'Fill in the women',
       question: 'The men’s bars show how many male athletes competed in each sport at Rio 2016. How many women do you think competed?',
       try: 'Drag the blue bars up or down. The orange bars are the record.',
-      why: 'The men are a `context: true` table: drawn by the same `barY` (with `table: "history"`), read-only, and left out of `getData()`, so only your estimates are reported. Both marks colour by `sex`, one encoding, so they share one scale and one legend.',
-      uses: ['context table', 'move()', 'clamp()'],
+      why: '`context: (d) => d.sex === "male"` marks the men as context rows: the same `barY` draws them, but they are read-only and left out of `getData()`, so only your estimates are reported. `xOffset` on `sex` puts each estimate beside its record, and one `fill` encoding on `sex` gives one scale and one legend.',
+      uses: ['context', 'move()', 'clamp()', 'xOffset'],
       code: `const olympians = await plotData("olympians");
 const sports = ["aquatics", "athletics", "cycling", "football", "gymnastics", "rowing"];
 const men = d3.rollup(olympians.filter((d) => d.sex === "male"), (v) => v.length, (d) => d.sport);
-const slots = sports.flatMap((s) => [s + "|female", s + "|male", s + "|gap"]);
-const fields = {
-  slot:  { type: "categorical", domain: slots },
-  sport: { type: "categorical", domain: sports },
-  sex:   { type: "categorical", domain: ["female", "male"] },
-  count: { type: "quantitative", domain: [0, 1400] },
-};
-const fill = { field: "sex", scale: { scheme: "observable10" }, legend: { anchor: "top", title: false } };
 mount(Elicit({
   width: 460, height: 300,
   margins: { top: 40, right: 8, bottom: 40, left: 50 },
   schema: {
-    data: fields,
-    history: { context: true, fields },                   //! the men are given, not elicited
+    sport: { type: "categorical", domain: sports },
+    sex:   { type: "categorical", domain: ["female", "male"] },
+    count: { type: "quantitative", domain: [0, 1400] },
   },
-  data: {
-    data: sports.map((sport) => ({ slot: sport + "|female", sport, sex: "female", count: 100 })),
-    history: sports.map((sport) => ({ slot: sport + "|male", sport, sex: "male", count: men.get(sport) || 0 })),
-  },
+  data: [
+    ...sports.map((sport) => ({ sport, sex: "male", count: men.get(sport) || 0 })),
+    ...sports.map((sport) => ({ sport, sex: "female", count: 100 })),
+  ],
+  context: (d) => d.sex === "male",                       //! the men are given, not elicited
   constraints: [clamp({ field: "count", min: 0, max: 1400 })],
-  axes: { x: { tickSize: 0, tickFormat: (s) => (s.endsWith("|male") ? s.split("|")[0] : "") },
-          y: { grid: true, title: "athletes →" } },
+  axes: { x: { tickSize: 0 }, y: { grid: true, title: "athletes →" } },
   marks: [
-    barY({ table: "history", channels: {                  //! the record, read-only
-      x: { field: "slot", scale: { padding: 0.05 } }, y: { field: "count" }, fill,
-    } }),
     barY({ channels: {
-      x: { field: "slot" },
-      y: { field: "count", edit: move() },                //! your estimates
-      fill,
+      x: { field: "sport" },
+      xOffset: { field: "sex", scale: { padding: 0.05 } }, //! your estimate beside the record
+      y: { field: "count", edit: move() },                //! your estimates; the men stay put
+      fill: { field: "sex", scale: { scheme: "observable10" }, legend: { anchor: "top", title: false } },
     } }),
   ],
 }))`,
@@ -556,8 +536,8 @@ mount(Elicit({
       title: 'Survey a new island',
       question: 'A fourth island is surveyed and 100 penguins are counted. How do you think they split by species?',
       try: 'Click inside the new bar to cut it, drag a boundary dot to move penguins between species, alt-click a boundary to merge two segments.',
-      why: 'The new bar starts as one segment. `edit.stack.cut()` splits a segment and hands the new part the next species the bar does not have yet (the domain is closed, so it never invents one); `edge` and `merge` move and fuse, keeping the 100 by arithmetic. The three surveyed islands are a `context: true` table: the same stacked `bar`, read-only and left out of `getData()`.',
-      uses: ['edit.stack.cut()', 'edit.stack.edge()', 'edit.stack.merge()', 'context table'],
+      why: 'The new bar starts as one segment. `edit.stack.cut()` splits a segment and hands the new part the next species the bar does not have yet (the domain is closed, so it never invents one); `edge` and `merge` move and fuse, keeping the 100 by arithmetic. `context` marks the three surveyed islands: the same stacked `bar` draws them, read-only and left out of `getData()`.',
+      uses: ['edit.stack.cut()', 'edit.stack.edge()', 'edit.stack.merge()', 'context'],
       code: `const penguins = await plotData("penguins");
 const species = ["Adelie", "Chinstrap", "Gentoo"];
 const islands = ["Biscoe", "Dream", "Torgersen", "new island"];
@@ -575,13 +555,11 @@ const fill = { field: "species", scale: { scheme: "observable10" }, legend: { an
 mount(Elicit({
   width: 440, height: 320,
   margins: { top: 40, right: 12, bottom: 28, left: 50 },
-  schema: { data: fields, history: { context: true, fields } },   //! the surveyed islands are given
-  data: { data: [{ island: "new island", species: "Adelie", count: 100 }], history: seen },
+  schema: fields,
+  data: [...seen, { island: "new island", species: "Adelie", count: 100 }],
+  context: (d) => d.island !== "new island",              //! the surveyed islands are given
   axes: { x: {}, y: { title: "penguins →" } },
   marks: [
-    bar({ table: "history", stack: true, channels: {
-      x: { field: "island" }, y: { field: "count" }, fill,
-    } }),
     bar({
       stack: true,
       channels: {
@@ -647,23 +625,22 @@ mount(Elicit({
       title: 'Paint the second year',
       question: 'Sanitary reforms reached the army hospitals in spring 1855. How many soldiers do you think died of disease each month from April 1855 to March 1856?',
       try: 'Press on the right half and sweep the pointer across the months; each bar takes the height of the pointer as you pass over it.',
-      why: '`move({ pick: "sweep" })` on the bar re-targets the month under the pointer on every drag event, so one stroke paints a whole year. The first year is a `context: true` table drawn by a grey `barY`: read-only, and left out of `getData()`, so only your year is reported. `snap` rounds to 25 deaths.',
-      uses: ['move({ pick: "sweep" })', 'context table', 'snap()', 'clamp()'],
+      why: '`move({ pick: "sweep" })` on the bar re-targets the month under the pointer on every drag event, so one stroke paints a whole year. `context` marks the first year: the same `barY` draws it grey, read-only and left out of `getData()`, so only your year is reported. `snap` rounds to 25 deaths.',
+      uses: ['move({ pick: "sweep" })', 'context', 'snap()', 'clamp()'],
       code: `const raw = await plotData("observablehq__plot-crimean-war-bary", "crimean-war.csv");
 const month = d3.utcFormat("%Y-%m");
 const fields = {
   month:  { type: "ordinal", domain: raw.map((d) => month(d.date)) },
   deaths: { type: "quantitative", domain: [0, 3000] },
 };
+const given = (d) => d.month < month(raw[12].date);       // the first year
 
 mount(Elicit({
   width: 460, height: 280,
   margins: { top: 16, right: 12, bottom: 24, left: 56 },
-  schema: { data: fields, history: { context: true, fields } },   //! the first year is history
-  data: {
-    data: raw.slice(12).map((d) => ({ month: month(d.date), deaths: 600 })),
-    history: raw.slice(0, 12).map((d) => ({ month: month(d.date), deaths: d.disease })),
-  },
+  schema: fields,
+  data: raw.map((d, i) => ({ month: month(d.date), deaths: i < 12 ? d.disease : 600 })),
+  context: given,                                          //! the first year is history
   constraints: [
     clamp({ field: "deaths", min: 0, max: 3000 }),
     snap({ field: "deaths", step: 25 }),
@@ -673,12 +650,10 @@ mount(Elicit({
     y: { grid: true, title: "disease deaths →" },
   },
   marks: [
-    barY({ table: "history", fill: "#94a3b8", channels: {
-      x: { field: "month" }, y: { field: "deaths" },
-    } }),
-    barY({ fill: "#4269d0", channels: {
+    barY({ channels: {
       x: { field: "month" },
       y: { field: "deaths", edit: move({ pick: "sweep" }) },   //! one stroke paints many months
+      fill: { fn: (d) => (given(d) ? "#94a3b8" : "#4269d0") },
     } }),
   ],
 }))`,
@@ -777,11 +752,11 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-vertical-bars-rotated-labels',
   status: 'full',
-  verdict: 'The 20 most valuable brands as `barY`, values shown in billions; the rotated tick labels are a `text` mark turned with `angle`.',
+  verdict: 'The 20 most valuable brands as `barY`, values shown in billions, with the tick labels turned by the axis’s `labelAngle`.',
   needs: [],
   prep: ['prep-window', 'prep-calculate'],
   gaps: [
-    'An axis has no label angle (`tickRotate`), so the x axis draws only ticks and a `text` mark draws the labels under it. Note `angle: 30`: a mark’s `angle` is in math degrees (counter-clockwise), the opposite sign of Plot’s `tickRotate: -30`.',
+    '`labelAngle: 30` is in math degrees (counter-clockwise), the opposite sign of Plot’s `tickRotate: -30`.',
     'The top-20 sort and limit (`sort: {x: "y", reverse: true, limit: 20}`) and the division by 1,000 are done in JS.',
   ],
   recreation: {
@@ -791,20 +766,17 @@ const top = brands.slice().sort((a, b) => b.value - a.value).slice(0, 20)
 
 mount(Elicit({
   width: 460, height: 340,
-  margins: { top: 20, right: 12, bottom: 70, left: 52 },
+  margins: { top: 20, right: 12, bottom: 10, left: 52 },
   data: top,
   schema: {
     name:  { type: "categorical", domain: top.map((d) => d.name) },
     value: { type: "quantitative", domain: [0, 220] },
   },
-  axes: { x: { tickFormat: () => "" },
+  axes: { x: { labelAngle: 30 },                         //! the axis turns its own labels
           y: { grid: true, ticks: 5, title: "Market value (US dollars, billions) →" } },
   marks: [
     barY({ fill: "steelblue", channels: { x: { field: "name" }, y: { field: "value" } } }),
     ruleY({ stroke: "#1f2937", channels: { y: { datum: 0 } } }),
-    // Tick labels, rotated: anchored just under the axis, turned by -30 degrees.
-    text({ angle: 30, textAnchor: "end", lineAnchor: "middle", fontSize: 10, dy: 8,
-      channels: { x: { field: "name" }, y: { value: 250 }, text: { field: "name" } } }),
   ],
 }))`,
   },
@@ -1032,8 +1004,8 @@ mount(Elicit({
       title: 'Add the next quarters',
       question: 'How many job vacancies (thousands) do you expect in each of the next four quarters?',
       try: 'Click above an empty quarter on the right to add a bar there, drag it to adjust, alt-click a bar to remove it.',
-      why: '`create()` mints a row from a click, inverting the pointer through both scales, so the click sets the quarter and the value at once. The observed quarters are a `context: true` table drawn by a grey `barY`, so they are read-only and never reported. `unique` keeps one bar per quarter, and a `constraints.custom` gate refuses a bar on a quarter the record already holds.',
-      uses: ['create()', 'remove()', 'move()', 'unique()', 'context table', 'constraints.custom'],
+      why: '`create()` mints a row from a click, inverting the pointer through both scales, so the click sets the quarter and the value at once. `context: true` makes the observed quarters context rows: the same `barY` draws them grey, read-only and never reported. `unique` keeps one bar per quarter, and since the record is rows of the same table, it also refuses a bar on a quarter the record already holds.',
+      uses: ['create()', 'remove()', 'move()', 'unique()', 'context'],
       code: `const all = await plotData("observablehq__plot-ordinal-bar-chart", "vacancies.csv");
 const rows = all.slice(118, 127);
 const quarter = d3.utcMonth.every(3);
@@ -1051,22 +1023,19 @@ const fields = {
 mount(Elicit({
   width: 460, height: 280,
   margins: { top: 16, right: 12, bottom: 28, left: 50 },
-  schema: { data: fields, history: { context: true, fields } },   //! the observed quarters are given
-  data: { data: [], history: record },
+  schema: fields,
+  data: record,
+  context: true,                                            //! the observed quarters are given
   constraints: [
-    unique({ field: "quarter", max: 1 }),                   //! one bar per quarter
-    constraints.custom(({ data }) => data.every((d) => d.quarter > last)),   //! only after the record
+    unique({ field: "quarter", max: 1 }),                   //! one bar per quarter, none on the record
   ],
   axes: { x: { tickFormat: q, fontSize: 9 }, y: { grid: true, title: "vacancies (thousands) →" } },
   marks: [
-    barY({ table: "history", fill: "#94a3b8", channels: {
-      x: { field: "quarter" }, y: { field: "vacancies" },
-    } }),
     barY({
-      fill: "#1f2937",
       channels: {
         x: { field: "quarter" },
         y: { field: "vacancies", edit: move() },
+        fill: { fn: (d) => (d.quarter <= last ? "#94a3b8" : "#1f2937") },
       },
       edits: [
         create({ when: when.noAlt }),                       //! click empty space to add a bar
@@ -1119,8 +1088,8 @@ mount(Elicit({
       title: 'Fill the missing year',
       question: 'The 2018 figure is missing. What was the world’s population (millions) in 2018?',
       try: 'Drag the blue bar up or down within the shaded band.',
-      why: 'The six known years are a `context: true` table, so the elicited table holds one row, 2018, and `getData()` reports only your answer. It must lie between its neighbours: a `clamp` holds it there, and a `guides.region` shades the same band so the rule is visible before you hit it.',
-      uses: ['move()', 'context table', 'clamp()', 'guides.region()'],
+      why: '`context: (d) => d.year !== 2018` marks the six known years, so `getData()` reports one row, 2018: your answer. It must lie between its neighbours: a `clamp` holds it there, and a `guides.region` shades the same band so the rule is visible before you hit it.',
+      uses: ['move()', 'context', 'clamp()', 'guides.region()'],
       code: `const known = [
   { year: 2014, population: 7295.3 }, { year: 2015, population: 7379.8 },
   { year: 2016, population: 7464.0 }, { year: 2017, population: 7547.9 },
@@ -1134,18 +1103,17 @@ const fields = {
 mount(Elicit({
   width: 460, height: 300,
   margins: { top: 16, right: 12, bottom: 28, left: 54 },
-  schema: { data: fields, history: { context: true, fields } },   //! the known years are given
-  data: { data: [{ year: 2018, population: 7547.9 }], history: known },
+  schema: fields,
+  data: [...known, { year: 2018, population: 7547.9 }],
+  context: (d) => d.year !== 2018,                            //! the known years are given
   constraints: [clamp({ field: "population", min: 7547.9, max: 7713.5 })],   //! between its neighbours
   guides: [guides.region({ y: [7547.9, 7713.5], fill: "#4269d0", opacity: 0.1 })],
   axes: { x: {}, y: { grid: true, title: "population (millions) →" } },
   marks: [
-    barY({ table: "history", fill: "#94a3b8", channels: {
-      x: { field: "year" }, y: { field: "population" },
-    } }),
-    barY({ fill: "#4269d0", channels: {
+    barY({ channels: {
       x: { field: "year" },
       y: { field: "population", edit: move() },               //! only 2018 moves
+      fill: { fn: (d) => (d.year === 2018 ? "#4269d0" : "#94a3b8") },
     } }),
   ],
 }))`,
@@ -1372,7 +1340,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-binned-box-plot',
   status: 'full',
-  verdict: 'Box plots of diamond price per half-carat bin, composed from `ruleY` whiskers, a `barY` span for the quartiles and a `tickY` median; the outliers are a read-only context table drawn by `point`.',
+  verdict: 'Box plots of diamond price per half-carat bin, composed from `ruleY` whiskers, a `barY` span for the quartiles and a `tickY` median; the outliers are read-only context rows drawn by `point`.',
   needs: [],
   prep: ['prep-bin', 'prep-aggregate'],
   gaps: [
@@ -1398,17 +1366,15 @@ const price = { type: "quantitative", domain: [0, 19000] };
 mount(Elicit({
   width: 470, height: 340,
   margins: { top: 16, right: 12, bottom: 34, left: 56 },
-  schema: {
-    data: { bin: bins, lo: price, q1: price, median: price, q3: price, hi: price },
-    outliers: { context: true, fields: { bin: bins, price } },
-  },
-  data: { data, outliers },
+  schema: { bin: bins, lo: price, q1: price, median: price, q3: price, hi: price, price },
+  data: [...data, ...outliers],
+  context: (d) => d.price != null,     // the outliers fill only \`price\`
   axes: { x: { title: "Carats →" }, y: { grid: true, title: "Price →" } },
   marks: [
     ruleY({ stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "lo" }, y2: { field: "hi" } } }),
     barY({ fill: "#cbd5e1", channels: { x: { field: "bin" }, y1: { field: "q1" }, y2: { field: "q3" } } }),
     tickY({ stroke: "#1f2937", strokeWidth: 2, channels: { x: { field: "bin" }, y: { field: "median" } } }),
-    point({ table: "outliers", size: 1.5, fill: "none", stroke: "#1f2937", strokeWidth: 0.6,
+    point({ size: 1.5, fill: "none", stroke: "#1f2937", strokeWidth: 0.6,
       channels: { x: { field: "bin" }, y: { field: "price" } } }),
     ruleY({ stroke: "#1f2937", channels: { y: { datum: 0 } } }),
   ],
@@ -1419,37 +1385,41 @@ mount(Elicit({
       title: 'Draw the next box',
       question: 'The grey box shows diamond prices for 1.5–2.0 carat stones. Where do you think the whiskers, quartiles and median lie for 2.0–2.5 carat stones?',
       try: 'Drag the box’s top or bottom edge, the median line, or a whisker end. Each moves on its own.',
-      why: 'A box is five fields of one row. Each field is drawn by its own `tickY` carrying `move()`, so a drag on one handle writes one column, and the box and whisker re-derive from them. `ordering` keeps the five in order whichever one you drag. The reference box is a `context: true` table: drawn, read-only, never reported.',
-      uses: ['move()', 'ordering()', 'context table', 'clamp()'],
+      why: 'A box is five fields of one row. Each field is drawn by its own `tickY` carrying `move()`, so a drag on one handle writes one column, and the box and whisker re-derive from them. `ordering` keeps the five in order whichever one you drag. `context` marks the reference box: the same marks draw it, read-only and never reported.',
+      uses: ['move()', 'ordering()', 'context', 'clamp()'],
       code: `const fields = ["lo", "q1", "median", "q3", "hi"];
 const q = { type: "quantitative", domain: [0, 20000] };
 const box = { bin: { type: "ordinal", domain: ["1.5–2.0", "2.0–2.5"] },
               lo: q, q1: q, median: q, q3: q, hi: q };
-// The whisker, the box and the median, over one table.
-const glyph = (table, fill) => [
-  ruleY({ table, stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "lo" }, y2: { field: "hi" } } }),
-  barY({ table, fill, stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "q1" }, y2: { field: "q3" } } }),
-  tickY({ table, stroke: "#1f2937", strokeWidth: 2, channels: { x: { field: "bin" }, y: { field: "median" } } }),
+const mine = (d) => d.bin === "2.0–2.5";
+// The whisker, the box and the median, over every row.
+const glyph = [
+  ruleY({ stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "lo" }, y2: { field: "hi" } } }),
+  barY({ stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "q1" }, y2: { field: "q3" },
+    fill: { fn: (d) => (mine(d) ? "#93c5fd" : "#e2e8f0") } } }),
+  tickY({ stroke: "#1f2937", strokeWidth: 2, channels: { x: { field: "bin" }, y: { field: "median" } } }),
 ];
-const handle = (field, inset = 0) => tickY({ stroke: "#1f2937", strokeWidth: 3, inset, channels: {
-  x: { field: "bin" }, y: { field, edit: move() } } });
+// A handle per column, drawn on your box only.
+const handle = (field, inset = 0) => tickY({ strokeWidth: 3, inset, channels: {
+  x: { field: "bin" }, y: { field, edit: move() },
+  stroke: { fn: (d) => (mine(d) ? "#1f2937" : "none") } } });
 
 mount(Elicit({
   width: 400, height: 320,
   margins: { top: 16, right: 16, bottom: 36, left: 56 },
-  schema: { data: box, history: { context: true, fields: box } },    //! the reference box is given
-  data: {
-    data: [{ bin: "2.0–2.5", lo: 6000, q1: 9000, median: 12000, q3: 15000, hi: 18000 }],
-    history: [{ bin: "1.5–2.0", lo: 3200, q1: 7400, median: 10400, q3: 13600, hi: 18800 }],
-  },
+  schema: box,
+  data: [
+    { bin: "1.5–2.0", lo: 3200, q1: 7400, median: 10400, q3: 13600, hi: 18800 },
+    { bin: "2.0–2.5", lo: 6000, q1: 9000, median: 12000, q3: 15000, hi: 18000 },
+  ],
+  context: (d) => !mine(d),                                //! the reference box is given
   constraints: [
     clamp({ field: fields, min: 0, max: 20000 }),
     ordering({ field: fields }),                            //! lo ≤ q1 ≤ median ≤ q3 ≤ hi
   ],
   axes: { x: { title: "carats" }, y: { grid: true, tickFormat: "$~s", title: "price →" } },
   marks: [
-    ...glyph("history", "#e2e8f0"),
-    ...glyph("data", "#93c5fd"),
+    ...glyph,
     handle("q1"), handle("q3"), handle("median"),           //! one tick per column
     handle("lo", 30), handle("hi", 30),
   ],
@@ -1460,27 +1430,32 @@ mount(Elicit({
       question: 'Where is the typical price of a 2.0–2.5 carat diamond, and how widely do prices spread around it?',
       try: 'Drag the median line: the whole box and its whiskers come with it. Then drag any edge or whisker end on its own to reshape the spread.',
       why: '`follow({ lead: "median" })` moves the four other columns by the same amount whenever the median moves, so you place the centre first without undoing the spread. Dragging an edge writes only that column, and `ordering` keeps the five in order.',
-      uses: ['follow()', 'ordering()', 'move()', 'context table'],
+      uses: ['follow()', 'ordering()', 'move()', 'context'],
       code: `const fields = ["lo", "q1", "median", "q3", "hi"];
 const q = { type: "quantitative", domain: [0, 20000] };
 const box = { bin: { type: "ordinal", domain: ["1.5–2.0", "2.0–2.5"] },
               lo: q, q1: q, median: q, q3: q, hi: q };
-const glyph = (table, fill) => [
-  ruleY({ table, stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "lo" }, y2: { field: "hi" } } }),
-  barY({ table, fill, stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "q1" }, y2: { field: "q3" } } }),
-  tickY({ table, stroke: "#1f2937", strokeWidth: 2, channels: { x: { field: "bin" }, y: { field: "median" } } }),
+const mine = (d) => d.bin === "2.0–2.5";
+const glyph = [
+  ruleY({ stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "lo" }, y2: { field: "hi" } } }),
+  barY({ stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "q1" }, y2: { field: "q3" },
+    fill: { fn: (d) => (mine(d) ? "#93c5fd" : "#e2e8f0") } } }),
+  tickY({ stroke: "#1f2937", strokeWidth: 2, channels: { x: { field: "bin" }, y: { field: "median" } } }),
 ];
-const handle = (field, inset = 0, strokeWidth = 3) => tickY({ stroke: "#1f2937", strokeWidth, inset, channels: {
-  x: { field: "bin" }, y: { field, edit: move() } } });
+// A handle per column, drawn on your box only.
+const handle = (field, inset = 0, strokeWidth = 3) => tickY({ strokeWidth, inset, channels: {
+  x: { field: "bin" }, y: { field, edit: move() },
+  stroke: { fn: (d) => (mine(d) ? "#1f2937" : "none") } } });
 
 mount(Elicit({
   width: 400, height: 320,
   margins: { top: 16, right: 16, bottom: 36, left: 56 },
-  schema: { data: box, history: { context: true, fields: box } },
-  data: {
-    data: [{ bin: "2.0–2.5", lo: 2000, q1: 4000, median: 6000, q3: 8000, hi: 10000 }],
-    history: [{ bin: "1.5–2.0", lo: 3200, q1: 7400, median: 10400, q3: 13600, hi: 18800 }],
-  },
+  schema: box,
+  data: [
+    { bin: "1.5–2.0", lo: 3200, q1: 7400, median: 10400, q3: 13600, hi: 18800 },
+    { bin: "2.0–2.5", lo: 2000, q1: 4000, median: 6000, q3: 8000, hi: 10000 },
+  ],
+  context: (d) => !mine(d),
   constraints: [
     follow({ field: ["lo", "q1", "q3", "hi"], lead: "median" }),   //! the box rides with the median
     ordering({ field: fields }),
@@ -1488,8 +1463,7 @@ mount(Elicit({
   ],
   axes: { x: { title: "carats" }, y: { grid: true, tickFormat: "$~s", title: "price →" } },
   marks: [
-    ...glyph("history", "#e2e8f0"),
-    ...glyph("data", "#93c5fd"),
+    ...glyph,
     handle("q1"), handle("q3"), handle("lo", 30), handle("hi", 30),
     handle("median", 0, 5),                                 //! grab the centre
   ],
@@ -1505,22 +1479,27 @@ mount(Elicit({
 const q = { type: "quantitative", domain: [0, 20000] };
 const box = { bin: { type: "ordinal", domain: ["1.5–2.0", "2.0–2.5"] },
               lo: q, q1: q, median: q, q3: q, hi: q };
-const glyph = (table, fill) => [
-  ruleY({ table, stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "lo" }, y2: { field: "hi" } } }),
-  barY({ table, fill, stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "q1" }, y2: { field: "q3" } } }),
-  tickY({ table, stroke: "#1f2937", strokeWidth: 2, channels: { x: { field: "bin" }, y: { field: "median" } } }),
+const mine = (d) => d.bin === "2.0–2.5";
+const glyph = [
+  ruleY({ stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "lo" }, y2: { field: "hi" } } }),
+  barY({ stroke: "#1f2937", channels: { x: { field: "bin" }, y1: { field: "q1" }, y2: { field: "q3" },
+    fill: { fn: (d) => (mine(d) ? "#93c5fd" : "#e2e8f0") } } }),
+  tickY({ stroke: "#1f2937", strokeWidth: 2, channels: { x: { field: "bin" }, y: { field: "median" } } }),
 ];
-const handle = (field, inset = 0, strokeWidth = 3) => tickY({ stroke: "#1f2937", strokeWidth, inset, channels: {
-  x: { field: "bin" }, y: { field, edit: move() } } });
+// A handle per column, drawn on your box only.
+const handle = (field, inset = 0, strokeWidth = 3) => tickY({ strokeWidth, inset, channels: {
+  x: { field: "bin" }, y: { field, edit: move() },
+  stroke: { fn: (d) => (mine(d) ? "#1f2937" : "none") } } });
 
 mount(Elicit({
   width: 400, height: 320,
   margins: { top: 16, right: 16, bottom: 36, left: 56 },
-  schema: { data: box, history: { context: true, fields: box } },
-  data: {
-    data: [{ bin: "2.0–2.5", lo: 8000, q1: 11000, median: 13000, q3: 15000, hi: 18000 }],
-    history: [{ bin: "1.5–2.0", lo: 3200, q1: 7400, median: 10400, q3: 13600, hi: 18800 }],
-  },
+  schema: box,
+  data: [
+    { bin: "1.5–2.0", lo: 3200, q1: 7400, median: 10400, q3: 13600, hi: 18800 },
+    { bin: "2.0–2.5", lo: 8000, q1: 11000, median: 13000, q3: 15000, hi: 18000 },
+  ],
+  context: (d) => !mine(d),
   constraints: [
     follow({ field: ["lo", "q1", "q3", "hi"], lead: "median" }),
     symmetric({ field: ["q1", "q3"], about: "median" }),    //! quartiles mirror each other
@@ -1530,8 +1509,7 @@ mount(Elicit({
   ],
   axes: { x: { title: "carats" }, y: { grid: true, tickFormat: "$~s", title: "price →" } },
   marks: [
-    ...glyph("history", "#e2e8f0"),
-    ...glyph("data", "#93c5fd"),
+    ...glyph,
     handle("q1"), handle("q3"), handle("lo", 30), handle("hi", 30),
     handle("median", 0, 5),
   ],
@@ -1952,8 +1930,8 @@ mount(Elicit({
       title: 'Colour the decades',
       question: 'How warm will each coming decade be, relative to the 1961–1990 average (°C)?',
       try: 'Click one of the three wide stripes on the right, then drag the handle on the colour ramp below.',
-      why: 'A colour cannot be dragged, so the value is set on its key: `edit.select()` makes a decade the chart’s selection and `edit.legend.value()` turns the ramp into a slider that writes that row’s `anomaly`. The observed years are a `context: true` table drawn by the same `rect`, so they are read-only and `getData()` holds only your three decades.',
-      uses: ['edit.select()', 'edit.legend.value()', 'context table'],
+      why: 'A colour cannot be dragged, so the value is set on its key: `edit.select()` makes a decade the chart’s selection and `edit.legend.value()` turns the ramp into a slider that writes that row’s `anomaly`. `context` marks the observed years: the same `rect` draws them, read-only, so `getData()` holds only your three decades.',
+      uses: ['edit.select()', 'edit.legend.value()', 'context'],
       code: `const raw = await plotData("observablehq__plot-warming-stripes", "hadcrut-annual.txt", { type: "text" });
 const observed = raw.trim().split(/\\n/g).map((line) => line.split(/\\s+/g))
   .map(([year, anomaly]) => ({ start: +year, end: +year + 1, anomaly: +anomaly }))
@@ -1969,19 +1947,17 @@ const fill = { field: "anomaly", scale: { type: "diverging", scheme: "RdBu", rev
 mount(Elicit({
   width: 460, height: 170,
   margins: { top: 8, right: 10, bottom: 70, left: 10 },
-  schema: { data: fields, history: { context: true, fields } },   //! the record is given
-  data: {
-    data: [0, 10, 20].map((k) => ({ start: last + k, end: last + k + 10, anomaly: 0 })),
-    history: observed,
-  },
+  schema: fields,
+  data: [...observed, ...[0, 10, 20].map((k) => ({ start: last + k, end: last + k + 10, anomaly: 0 }))],
+  context: (d) => d.end <= last,                            //! the record is given
   axes: { x: { tickFormat: "d" }, y: false },
   marks: [
     rect({
-      stroke: "#fff", strokeWidth: 1,
-      channels: { x1: { field: "start" }, x2: { field: "end" }, fill },
+      strokeWidth: 1,
+      channels: { x1: { field: "start" }, x2: { field: "end" }, fill,
+                  stroke: { fn: (d) => (d.end > last ? "#fff" : "none") } },   // outline your decades
       edits: [edit.select()],                                 //! click a decade to pick it
     }),
-    rect({ table: "history", channels: { x1: { field: "start" }, x2: { field: "end" }, fill } }),
     legendColor({ anchor: "bottom", title: "anomaly (°C)",
                   edit: edit.legend.value() }),                //! the ramp sets its value
   ],

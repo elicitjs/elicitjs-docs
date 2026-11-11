@@ -5,25 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>ElicitJS gallery study</title>
   <meta name="description" content="Every Vega-Lite and Observable Plot gallery example, recreated in ElicitJS where possible, with live elicitation interfaces for each.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&display=swap">
   <link rel="stylesheet" href="assets/site.css">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%234f46e5'/%3E%3Ccircle cx='11' cy='20' r='4' fill='white'/%3E%3Ccircle cx='21' cy='11' r='4' fill='%23fde68a'/%3E%3C/svg%3E">
 </head>
 <body>
-  <aside id="sidebar">
-    <div class="brand">
-      <a href="#/">ElicitJS <span>gallery study</span></a>
+  <header id="topbar">
+    <button id="menu" type="button" aria-label="Toggle navigation">☰</button>
+    <a class="brand" href="#/">ElicitJS <span>gallery study</span></a>
+    <div class="libswitch" role="group" aria-label="Gallery library">
+      <a href="#/gallery/vl" data-lib="vl">Vega-Lite</a>
+      <a href="#/gallery/plot" data-lib="plot">Observable Plot</a>
     </div>
-    <input id="search" type="search" placeholder="Filter examples…" aria-label="Filter examples">
-    <div class="filters" role="group" aria-label="Filter by outcome">
-      <button type="button" data-filter="all">All</button>
-      <button type="button" data-filter="full">Recreated</button>
-      <button type="button" data-filter="partial">Partly</button>
-      <button type="button" data-filter="none">Not supported</button>
-    </div>
-    <nav id="nav"></nav>
-  </aside>
-  <button id="menu" type="button" aria-label="Toggle navigation">☰</button>
-  <main id="main"><p class="muted" style="padding:2rem">Loading…</p></main>
+    <nav class="toplinks" aria-label="Study pages">
+      <a href="#/" data-page="overview">Overview</a>
+      <a href="#/analysis" data-page="analysis">Analysis</a>
+      <a href="#/beyond" data-page="beyond">Beyond</a>
+    </nav>
+  </header>
+  <div id="shell">
+    <aside id="sidebar"><nav id="nav"></nav></aside>
+    <main id="main"><p class="muted" style="padding:2rem">Loading…</p></main>
+  </div>
 
   <script src="vendor/elicit-bundle.js"></script>
   <script src="vendor/originals-bundle.js"></script>

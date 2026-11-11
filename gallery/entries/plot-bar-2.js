@@ -677,7 +677,7 @@ GALLERY.add({
   prep: ['prep-reshape'],
   gaps: [
     'The notebook’s disease picker is an Observable input; the recreation shows measles.',
-    'The sqrt PuRd colour scale is a d3 scale handed to the channel (`scale: d3.scaleSequentialSqrt(…)`), since `purd` is not one of ElicitJS’s named schemes.',
+    'The colour scale is a d3 scale handed to the channel (`scale: d3.scaleSequentialSqrt(…)`): `scheme: "purd"` names the colours, but a sequential colour scale is linear, and this one is a square root.',
     'The vaccine label sits at the top of the rule rather than below the frame.',
   ],
   recreation: {
@@ -722,34 +722,29 @@ mount(Elicit({
       title: 'Place the vaccine',
       question: 'Looking at measles cases by state, in which year do you think the vaccine was introduced?',
       try: 'Drag the black line to the year you think the vaccine arrived.',
-      why: 'The observed cases are a context table, so the heatmap draws from them, shows a tip on hover, and can never be edited or reported. The dataset is one row, `{ year }`, and `move()` on a `ruleX` writes it; `snap` lands it on whole years.',
-      uses: ['ruleX', 'move()', 'snap()', 'context table', 'tip'],
+      why: 'The observed cases are context rows, so the heatmap draws them, shows a tip on hover, and never edits or reports them. They fill their own columns (`start`, `end`, `s`, `cases`). Your answer is one row, `{ year }`, and `move()` on a `ruleX` writes it; `snap` lands it on whole years.',
+      uses: ['ruleX', 'move()', 'snap()', 'context', 'tip'],
       code: `const raw = await plotData("plot-impact-of-vaccines", "vaccines.json");
 const measles = raw.find((d) => d.title === "Measles").data.values.data
   .filter((d) => d[2] != null)
-  .map(([year, s, cases]) => ({ year, next: year + 1, s, cases }));
+  .map(([year, s, cases]) => ({ start: year, end: year + 1, s, cases }));
 mount(Elicit({
   width: 480, height: 420,
   margins: { top: 26, right: 10, bottom: 10, left: 10 },
   axes: { x: { anchor: "top", tickFormat: (d) => String(d) }, y: false },
   schema: {
-    data: { year: { type: "quantitative", domain: [1928, 2003] } },
-    observed: { //! the heatmap is context: drawn, read-only, never reported
-      context: true,
-      fields: {
-        year: { type: "quantitative" }, next: { type: "quantitative" },
-        s: { type: "ordinal", domain: d3.range(51) }, cases: { type: "quantitative" },
-      },
-    },
+    year: { type: "quantitative", domain: [1928, 2003] },
+    start: { type: "quantitative" }, end: { type: "quantitative" },
+    s: { type: "ordinal", domain: d3.range(51) }, cases: { type: "quantitative" },
   },
-  data: { data: [{ year: 1940 }], observed: measles },
+  data: [...measles, { year: 1940 }],
+  context: (d) => d.cases != null, //! the heatmap is context: drawn, read-only, never reported
   constraints: [snap({ field: "year", step: 1 })],
   marks: [
     rect({
-      table: "observed",
-      tip: (d) => d.year + ": " + d.cases.toFixed(1) + " cases per 100,000",
+      tip: (d) => d.start + ": " + d.cases.toFixed(1) + " cases per 100,000",
       channels: {
-        x1: { field: "year" }, x2: { field: "next" },
+        x1: { field: "start" }, x2: { field: "end" },
         y: { field: "s", scale: { padding: 0 } },
         fill: { field: "cases", scale: d3.scaleSequentialSqrt(d3.interpolatePuRd).domain([0, d3.max(measles, (d) => d.cases)]) },
       },
@@ -1153,31 +1148,29 @@ mount(Elicit({
       title: 'Box the swimmers',
       question: 'The heatmap shows every Olympic athlete. Where do you think half of the swimmers fall in weight and height?',
       try: 'Drag the box to move it; drag an edge or a corner to resize it.',
-      why: 'The athletes are a context table, drawn by their own `rect` and never reported; the dataset is one row of four extents. `brushRect()` gives that one `rect` body, edge and corner handles, each writing the extents it touches.',
-      uses: ['brushRect()', 'context table'],
+      why: 'The athletes are context rows that fill their own columns (`w1`, `w2`, `h1`, `h2`, `n`), drawn by their own `rect` and never reported; your answer is one row of four extents. `brushRect()` gives its `rect` body, edge and corner handles, each writing the extents it touches.',
+      uses: ['brushRect()', 'context'],
       code: `const olympians = (await plotData("olympians")).filter((d) => d.weight != null && d.height != null);
 const xe = d3.range(30, 172, 4), ye = d3.range(1.3, 2.25, 0.04);
 const cells = d3.flatRollup(olympians, (v) => v.length,
   (d) => d3.bisectRight(xe, d.weight) - 1, (d) => d3.bisectRight(ye, d.height) - 1)
   .filter(([i, j]) => i >= 0 && j >= 0 && xe[i] + 4 <= 170 && ye[j] + 0.04 <= 2.2 + 1e-9)
-  .map(([i, j, n]) => ({ x1: xe[i], x2: xe[i] + 4, y1: ye[j], y2: ye[j] + 0.04, n }));
+  .map(([i, j, n]) => ({ w1: xe[i], w2: xe[i] + 4, h1: ye[j], h2: ye[j] + 0.04, n }));
 const extent = (lo, hi) => ({ type: "quantitative", domain: [lo, hi] });
 mount(Elicit({
   width: 460, height: 380,
   margins: { top: 16, right: 16, bottom: 30, left: 40 },
   schema: {
-    data: { x1: extent(30, 170), x2: extent(30, 170), y1: extent(1.3, 2.2), y2: extent(1.3, 2.2) },
-    athletes: { //! every athlete: drawn, read-only, never reported
-      context: true,
-      fields: { x1: extent(30, 170), x2: extent(30, 170), y1: extent(1.3, 2.2), y2: extent(1.3, 2.2), n: { type: "quantitative" } },
-    },
+    x1: extent(30, 170), x2: extent(30, 170), y1: extent(1.3, 2.2), y2: extent(1.3, 2.2),
+    w1: extent(30, 170), w2: extent(30, 170), h1: extent(1.3, 2.2), h2: extent(1.3, 2.2),
+    n: { type: "quantitative" },
   },
-  data: { data: [{ x1: 60, x2: 80, y1: 1.7, y2: 1.85 }], athletes: cells },
+  data: [...cells, { x1: 60, x2: 80, y1: 1.7, y2: 1.85 }],
+  context: (d) => d.n != null, //! every athlete: drawn, read-only, never reported
   marks: [
     rect({
-      table: "athletes",
       channels: {
-        x1: { field: "x1" }, x2: { field: "x2" }, y1: { field: "y1" }, y2: { field: "y2" },
+        x1: { field: "w1" }, x2: { field: "w2" }, y1: { field: "h1" }, y2: { field: "h2" },
         fill: { field: "n", scale: d3.scaleSequential(d3.interpolateGreys).domain([0, d3.max(cells, (d) => d.n) * 1.4]) },
       },
     }),
@@ -1267,7 +1260,7 @@ GALLERY.add({
   verdict: 'Carat and price binned into 100 thresholds each in JavaScript; a `rect` per non-empty 2-D bin on a symlog BuPu ramp.',
   needs: [],
   prep: ['prep-bin', 'prep-aggregate'],
-  gaps: ['The symlog BuPu colour scale is a d3 scale handed to the channel, since `bupu` is not one of ElicitJS’s named schemes.'],
+  gaps: ['The colour scale is a d3 scale handed to the channel: `scheme: "bupu"` names the colours, but a sequential colour scale is linear, and this one is symlog.'],
   recreation: {
     code: `const diamonds = await plotData("diamonds");
 const xe = d3.ticks(...d3.extent(diamonds, (d) => d.carat), 100);
@@ -1302,25 +1295,28 @@ mount(Elicit({
       title: 'Claim the cells',
       question: 'Where on a carat × price grid do you think most diamonds sell? Pick up to eight cells.',
       try: 'Click a cell to claim it; click it again to give it back.',
-      why: '`toggle()` over BOTH `x` and `y` treats a (carat, price) pair as one slot: a click mints a row there, a second click drops it. `count({ max: 8 })` turns the picks into a budget, so the reader has to choose. The empty grid is a context table: drawn, but never part of the answer.',
-      uses: ['toggle()', 'count()', 'context table'],
+      why: '`toggle()` over BOTH `x` and `y` treats a (carat, price) pair as one slot: a click mints a row there, a second click drops it. `count` turns the picks into a budget of eight, so the reader has to choose. The empty grid is context rows with their own columns: drawn, but never part of the answer.',
+      uses: ['toggle()', 'count()', 'context'],
       code: `const carats = ["0–0.5", "0.5–1", "1–1.5", "1.5–2", "2–2.5", "2.5+"];
 const prices = ["< $1k", "$1–2.5k", "$2.5–5k", "$5–7.5k", "$7.5–10k", "$10–15k", "> $15k"];
-const fields = {
-  carat: { type: "ordinal", domain: carats },
-  price: { type: "ordinal", domain: prices },
-};
+// The grid fills its own columns, so a click never lands on a grid row.
+const cells = d3.cross(carats, prices).map(([gridCarat, gridPrice]) => ({ gridCarat, gridPrice }));
 mount(Elicit({
   width: 460, height: 360,
   margins: { top: 16, right: 16, bottom: 40, left: 72 },
   axes: { x: { title: "carat" }, y: { title: "price" } },
-  schema: { data: fields, grid: { context: true, fields } }, //! the empty grid is context, never reported
-  data: { data: [], grid: d3.cross(carats, prices).map(([carat, price]) => ({ carat, price })) },
-  constraints: [count({ max: 8, strategy: "reject" })], //! eight cells to spend
+  schema: {
+    carat: { type: "ordinal", domain: carats }, gridCarat: { type: "ordinal", domain: carats },
+    price: { type: "ordinal", domain: prices }, gridPrice: { type: "ordinal", domain: prices },
+  },
+  data: cells,
+  context: true, //! the empty grid is context, never reported
+  // count() also counts the grid's rows, so allow eight more.
+  constraints: [count({ max: cells.length + 8, strategy: "reject" })], //! eight cells to spend
   marks: [
     rect({
-      table: "grid", fill: "#f1f5f9", stroke: "white", strokeWidth: 2,
-      channels: { x: { field: "carat", scale: { padding: 0 } }, y: { field: "price", scale: { padding: 0 } } },
+      fill: "#f1f5f9", stroke: "white", strokeWidth: 2,
+      channels: { x: { field: "gridCarat", scale: { padding: 0 } }, y: { field: "gridPrice", scale: { padding: 0 } } },
     }),
     rect({
       fill: "#8c6bb1", stroke: "white", strokeWidth: 2,
@@ -1338,35 +1334,35 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-stacked-waffles',
   status: 'partial',
-  verdict: 'Each (weight class, sex) count becomes its own `waffleY` column of 10-athlete cells on a count axis; faceting is not covered by this study, so the classes sit side by side on one band axis, and the diverging layout (women up, men down) is not drawn.',
-  needs: ['facet', 'stack-offset'],
+  verdict: 'Each (weight class, sex) count is a `waffleY` block of 10-athlete cells on a count axis, with the class on x and the sex on `xOffset`; the diverging layout (women up, men down) is not drawn.',
+  needs: ['stack-offset'],
   prep: ['prep-aggregate', 'prep-bin'],
   gaps: [
-    'Plot facets by weight class (`fx`) and stacks women above zero and men below it; a waffle here only grows up from a baseline and does not stack, so the two sexes sit side by side in their own columns.',
-    'The facet is emulated with one band per (class, sex); only the women’s band is labelled with the class.',
+    'Plot stacks women above zero and men below it; a waffle here only grows up from a baseline and does not stack, so the two sexes sit side by side in each class.',
+    'Plot facets by weight class (`fx`); here the class is the x band and `xOffset` nests the sexes inside it.',
   ],
   recreation: {
     code: `const olympians = (await plotData("olympians")).filter((d) => d.weight != null);
 const classes = d3.range(30, 180, 10).filter((w) => olympians.some((d) => Math.floor(d.weight / 10) * 10 === w));
 const rows = d3.flatRollup(olympians, (v) => v.length, (d) => Math.floor(d.weight / 10) * 10, (d) => d.sex)
-  .map(([w, sex, n]) => ({ slot: w + " " + sex, sex, n }));
-const slots = classes.flatMap((w) => [w + " female", w + " male"]);
+  .map(([w, sex, n]) => ({ w, sex, n }));
 mount(Elicit({
   width: 480, height: 320,
   margins: { top: 34, right: 10, bottom: 30, left: 40 },
   data: rows,
   schema: {
-    slot: { type: "ordinal", domain: slots },
+    w: { type: "ordinal", domain: classes },
     sex: { type: "categorical", domain: ["female", "male"] },
     n: { type: "quantitative", domain: [0, Math.ceil(d3.max(rows, (d) => d.n) / 10) * 10] }, // whole cells
   },
-  axes: { x: { tickFormat: (s) => (s.endsWith("female") ? s.split(" ")[0] : "") }, count: true },
+  axes: { count: true },
   marks: [
     waffleY({
       unit: 10, // one cell is ten athletes
       gap: 0.5, showEmpty: false,
       channels: {
-        x: { field: "slot", scale: { padding: 0.08 } },
+        x: { field: "w", scale: { padding: 0.08 } },
+        xOffset: { field: "sex" }, //! a block per sex inside each weight class
         count: { field: "n" },
         fill: { field: "sex", legend: { anchor: "top" } },
       },
@@ -1569,38 +1565,34 @@ mount(Elicit({
       title: 'Mark the crash days',
       question: 'On which trading days of March 2020 do you think the Dow fell by more than 5%?',
       try: 'Click a day to mark it; click it again to clear it.',
-      why: 'The month’s days are a context table, drawn with their dates but never reported, so the dataset starts empty. `toggle()` over `x` (week) and `y` (weekday) treats each day as a slot: a click mints a row there or drops the one already there, so the answer is exactly the set of days you marked.',
-      uses: ['toggle()', 'context table'],
+      why: 'The month’s days are context rows with their own columns, drawn with their dates but never reported, so the answer starts empty. `toggle()` over `x` (week) and `y` (weekday) treats each day as a slot: a click mints a row there or drops the one already there, so the answer is exactly the set of days you marked.',
+      uses: ['toggle()', 'context'],
       code: `const days = d3.utcDays(new Date(Date.UTC(2020, 2, 1)), new Date(Date.UTC(2020, 3, 1)))
   .filter((d) => d.getUTCDay() > 0 && d.getUTCDay() < 6);
 const week = (d) => d3.utcWeek.count(d3.utcYear(d), d);
 const weeks = [...new Set(days.map(week))];
 const names = ["Mon", "Tue", "Wed", "Thu", "Fri"];
-const fields = {
-  week: { type: "ordinal", domain: weeks },
-  day: { type: "ordinal", domain: [1, 2, 3, 4, 5] },
-};
-const cell = { x: { field: "week", scale: { padding: 0 } }, y: { field: "day", scale: { padding: 0, reverse: true } } };
+const weekday = { type: "ordinal", domain: [1, 2, 3, 4, 5] };
+// The month's days fill their own columns, so a click never lands on one of them.
+const cell = (x, y) => ({ x: { field: x, scale: { padding: 0 } }, y: { field: y, scale: { padding: 0, reverse: true } } });
 mount(Elicit({
   width: 420, height: 300,
   margins: { top: 16, right: 10, bottom: 10, left: 40 },
   axes: { x: false, y: { tickFormat: (k) => names[k - 1] } },
   schema: {
-    data: fields,
-    month: { context: true, fields: { ...fields, date: { type: "quantitative" } } }, //! the month is drawn, not elicited
+    week: { type: "ordinal", domain: weeks }, day: weekday,
+    dayWeek: { type: "ordinal", domain: weeks }, weekday, date: { type: "quantitative" },
   },
-  data: {
-    data: [],
-    month: days.map((d) => ({ week: week(d), day: d.getUTCDay(), date: d.getUTCDate() })),
-  },
+  data: days.map((d) => ({ dayWeek: week(d), weekday: d.getUTCDay(), date: d.getUTCDate() })),
+  context: true, //! the month is drawn, not elicited
   marks: [
-    rect({ table: "month", fill: "#f1f5f9", stroke: "white", strokeWidth: 2, channels: cell }),
+    rect({ fill: "#f1f5f9", stroke: "white", strokeWidth: 2, channels: cell("dayWeek", "weekday") }),
     rect({
       fill: "#c51b7d", stroke: "white", strokeWidth: 2,
-      channels: cell,
+      channels: cell("week", "day"),
       edits: [toggle({ channels: ["x", "y"] })], //! a (week, weekday) cell is one slot
     }),
-    text({ table: "month", fontSize: 12, channels: { ...cell, text: { field: "date" } } }),
+    text({ fontSize: 12, channels: { ...cell("dayWeek", "weekday"), text: { field: "date" } } }),
   ],
 }));`,
     },
@@ -1663,8 +1655,8 @@ mount(Elicit({
       title: 'Span the slide',
       question: 'In 2008, which stretch of weeks do you think was the Dow’s steepest fall?',
       try: 'Drag the band sideways, or drag either end to widen or narrow it.',
-      why: 'The calendar is a context table, drawn behind the question and never reported, and the dataset is one row: a start and an end week. `brushSpan()` on `x1`/`x2` moves the band from its body and either end from an edge, and `ordering` keeps the start before the end.',
-      uses: ['brushSpan()', 'ordering()', 'context table'],
+      why: 'The calendar is context rows with their own columns, drawn behind the question and never reported, and your answer is one row: a start and an end week. `brushSpan()` on `x1`/`x2` moves the band from its body and either end from an edge, and `ordering` keeps the start before the end.',
+      uses: ['brushSpan()', 'ordering()', 'context'],
       code: `const days = d3.utcDays(new Date(Date.UTC(2008, 0, 1)), new Date(Date.UTC(2009, 0, 1)))
   .filter((d) => d.getUTCDay() > 0 && d.getUTCDay() < 6);
 const week = (d) => d3.utcWeek.count(d3.utcYear(d), d);
@@ -1673,27 +1665,21 @@ mount(Elicit({
   margins: { top: 10, right: 10, bottom: 30, left: 10 },
   axes: { x: { title: "week of 2008" }, y: false },
   schema: {
-    data: {
-      start: { type: "quantitative", domain: [0, 53] },
-      end: { type: "quantitative", domain: [0, 53] },
-    },
-    calendar: { //! the year's calendar: drawn, read-only, never reported
-      context: true,
-      fields: {
-        start: { type: "quantitative", domain: [0, 53] }, end: { type: "quantitative", domain: [0, 53] },
-        day: { type: "ordinal", domain: [1, 2, 3, 4, 5] },
-      },
-    },
+    start: { type: "quantitative", domain: [0, 53] }, end: { type: "quantitative", domain: [0, 53] },
+    // The calendar's days fill their own columns.
+    w1: { type: "quantitative", domain: [0, 53] }, w2: { type: "quantitative", domain: [0, 53] },
+    day: { type: "ordinal", domain: [1, 2, 3, 4, 5] },
   },
-  data: {
-    data: [{ start: 20, end: 30 }],
-    calendar: days.map((d) => ({ start: week(d), end: week(d) + 1, day: d.getUTCDay() })),
-  },
+  data: [
+    ...days.map((d) => ({ w1: week(d), w2: week(d) + 1, day: d.getUTCDay() })),
+    { start: 20, end: 30 },
+  ],
+  context: (d) => d.day != null, //! the year's calendar: drawn, read-only, never reported
   constraints: [ordering({ field: ["start", "end"] })], //! a stretch starts before it ends
   marks: [
     rect({
-      table: "calendar", fill: "#e2e8f0", stroke: "white",
-      channels: { x1: { field: "start" }, x2: { field: "end" }, y: { field: "day", scale: { padding: 0 } } },
+      fill: "#e2e8f0", stroke: "white",
+      channels: { x1: { field: "w1" }, x2: { field: "w2" }, y: { field: "day", scale: { padding: 0 } } },
     }),
     rect({
       fill: "#c51b7d", fillOpacity: 0.45, stroke: "#c51b7d", strokeWidth: 2,

@@ -209,8 +209,8 @@ mount(Elicit({
       title: 'Where is the line?',
       question: 'Without looking it up: at what PM2.5 level do you think air becomes hazardous?',
       try: 'Drag the dashed line up or down.',
-      why: 'The threshold is the elicited quantity here, so it is a one-row table drawn by `ruleY` with `move()` on `y`. The daily readings sit in a `context` table drawn by an inert `barY`: you see them, but `getData()` holds only your answer.',
-      uses: ['ruleY', 'move()', 'context table'],
+      why: 'The threshold is the elicited quantity here, so it is a one-row table drawn by `ruleY` with `move()` on `y`. The daily readings are `context` rows drawn by an inert `barY`: you see them, but `getData()` holds only your answer.',
+      uses: ['ruleY', 'move()', 'context'],
       code: `const pm = [54.8, 112.1, 63.6, 37.6, 79.7, 137.9, 120.1, 103.3, 394.8, 199.5,
   72.3, 51.1, 112.0, 174.5, 130.5].map((Value, i) => ({ Day: i + 1, Value }));
 
@@ -218,19 +218,15 @@ mount(Elicit({
   width: 420, height: 280,
   margins: { top: 12, right: 12, bottom: 32, left: 44 },
   schema: {
-    data: { threshold: { type: "quantitative", domain: [0, 400] } },
-    days: {
-      context: true,                                         //! read-only backdrop
-      fields: {
-        Day:   { type: "ordinal", domain: pm.map((d) => d.Day) },
-        Value: { type: "quantitative", domain: [0, 400] },
-      },
-    },
+    Day:       { type: "ordinal", domain: pm.map((d) => d.Day) },
+    Value:     { type: "quantitative", domain: [0, 400] },
+    threshold: { type: "quantitative", domain: [0, 400] },
   },
-  data: { data: [{ threshold: 150 }], days: pm },            //! one answer
+  data: [...pm, { threshold: 150 }],                         //! one answer
+  context: (d) => d.Day != null,                             //! read-only backdrop
   axes: { x: { title: "Day" } },
   marks: [
-    barY({ table: "days", fill: "#cbd5e1", channels: { x: { field: "Day" }, y: { field: "Value" } } }),
+    barY({ fill: "#cbd5e1", channels: { x: { field: "Day" }, y: { field: "Value" } } }),
     ruleY({
       stroke: "#e45755", strokeWidth: 3, strokeDash: "6 4",
       channels: { y: { field: "threshold", edit: move() } }, //! drag the threshold
@@ -413,8 +409,8 @@ mount(Elicit({
       title: 'Guess the mean',
       question: 'Here is the shape of all IMDB ratings. Where is the average rating?',
       try: 'Drag the red line left or right.',
-      why: 'The guess is a one-row table drawn by `ruleX`; `move()` on `x` writes it. The histogram is a `context` table under it, drawn by the original\'s own `rectY` but read-only, so `getData()` holds only your answer.',
-      uses: ['ruleX', 'move()', 'context table'],
+      why: 'The guess is a one-row table drawn by `ruleX`; `move()` on `x` writes it. The histogram is `context` rows under it, drawn by the original\'s own `rectY` but read-only, so `getData()` holds only your answer.',
+      uses: ['ruleX', 'move()', 'context'],
       code: `const movies = await vegaData("movies.json");
 const ratings = movies.map((d) => d["IMDB Rating"]).filter((v) => v != null);
 const bins = d3.bin().domain([1, 10]).thresholds(d3.range(1, 10.5, 0.5))(ratings)
@@ -424,20 +420,16 @@ mount(Elicit({
   width: 420, height: 260,
   margins: { top: 12, right: 12, bottom: 32, left: 16 },
   schema: {
-    data: { mean: { type: "quantitative", domain: [1, 10] } },
-    bins: {
-      context: true,                                         //! the histogram is given
-      fields: {
-        lo:    { type: "quantitative", domain: [1, 10] },
-        hi:    { type: "quantitative", domain: [1, 10] },
-        count: { type: "quantitative", domain: [0, 600] },
-      },
-    },
+    lo:    { type: "quantitative", domain: [1, 10] },
+    hi:    { type: "quantitative", domain: [1, 10] },
+    count: { type: "quantitative", domain: [0, 600] },
+    mean:  { type: "quantitative", domain: [1, 10] },
   },
-  data: { data: [{ mean: 5 }], bins },                       //! one answer
+  data: [...bins, { mean: 5 }],                              //! one answer
+  context: (d) => d.count != null,                           //! the histogram is given
   axes: { x: { title: "IMDB Rating" }, y: false },
   marks: [
-    rectY({ table: "bins", fill: "#cbd5e1", stroke: "white",
+    rectY({ fill: "#cbd5e1", stroke: "white",
             channels: { x1: { field: "lo" }, x2: { field: "hi" }, y: { field: "count" } } }),
     ruleX({
       stroke: "red", strokeWidth: 5,
@@ -474,8 +466,8 @@ mount(Elicit({
       title: 'Mean, give or take',
       question: 'Where is the average IMDB rating, and how far either side of your guess could it be?',
       try: 'Drag the red line to move your guess and its band together; drag either edge of the band to widen or narrow it on both sides.',
-      why: '`follow` carries `lo` and `hi` with the mean, and `symmetric({ about: "mean" })` mirrors whichever edge you drag, so the answer is always "mean ± margin". The histogram is a `context` table under it.',
-      uses: ['follow()', 'symmetric()', 'ordering()', 'ruleX', 'context table'],
+      why: '`follow` carries `lo` and `hi` with the mean, and `symmetric({ about: "mean" })` mirrors whichever edge you drag, so the answer is always "mean ± margin". The histogram is `context` rows under it, with columns of their own.',
+      uses: ['follow()', 'symmetric()', 'ordering()', 'ruleX', 'context'],
       code: `const movies = await vegaData("movies.json");
 const ratings = movies.map((d) => d["IMDB Rating"]).filter((v) => v != null);
 const bins = d3.bin().domain([1, 10]).thresholds(d3.range(1, 10.5, 0.5))(ratings)
@@ -485,11 +477,9 @@ const rating = { type: "quantitative", domain: [1, 10] };
 mount(Elicit({
   width: 420, height: 260,
   margins: { top: 12, right: 12, bottom: 32, left: 16 },
-  schema: {
-    data: { lo: rating, mean: rating, hi: rating },
-    bins: { context: true, fields: { x0: rating, x1: rating, count: { type: "quantitative", domain: [0, 600] } } },
-  },
-  data: { data: [{ lo: 4, mean: 5, hi: 6 }], bins },
+  schema: { lo: rating, mean: rating, hi: rating, x0: rating, x1: rating, count: { type: "quantitative", domain: [0, 600] } },
+  data: [...bins, { lo: 4, mean: 5, hi: 6 }],
+  context: (d) => d.count != null,                           //! the histogram is given
   constraints: [
     follow({ field: ["lo", "hi"], lead: "mean" }),           //! the band rides on the mean
     symmetric({ field: ["lo", "hi"], about: "mean" }),       //! one edge mirrors the other
@@ -498,7 +488,7 @@ mount(Elicit({
   ],
   axes: { x: { title: "IMDB Rating" }, y: false },
   marks: [
-    rectY({ table: "bins", fill: "#cbd5e1", stroke: "white",
+    rectY({ fill: "#cbd5e1", stroke: "white",
             channels: { x1: { field: "x0" }, x2: { field: "x1" }, y: { field: "count" } } }),
     rectY({ fill: "#e45755", fillOpacity: 0.15, channels: { x1: { field: "lo" }, x2: { field: "hi" } } }),
     ruleX({ stroke: "#e45755", strokeWidth: 2, channels: { x: { field: "lo", edit: move() } } }), //! drag an edge
@@ -513,7 +503,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-layer_falkensee',
   status: 'full',
-  verdict: 'Falkensee\'s population as a line with points, over the two historical periods as a colour-encoded `rectY` layer with a legend, drawn from a read-only `context` table.',
+  verdict: 'Falkensee\'s population as a line with points, over the two historical periods as a colour-encoded `rectY` layer with a legend, drawn from read-only `context` rows.',
   needs: [],
   prep: ['prep-calculate'],
   gaps: [
@@ -538,24 +528,18 @@ mount(Elicit({
   width: 460, height: 280,
   margins: { top: 12, right: 12, bottom: 32, left: 60 },
   schema: {
-    data: {
-      year:       { type: "quantitative", domain: [1875, 2014] },
-      population: { type: "quantitative", domain: [0, 45000] },
-    },
-    // The second dataset of the original: drawn, never elicited.
-    periods: {
-      context: true,
-      fields: {
-        start: { type: "quantitative" }, end: { type: "quantitative" },
-        event: { type: "categorical", domain: periods.map((d) => d.event) },
-      },
-    },
+    year:       { type: "quantitative", domain: [1875, 2014] },
+    population: { type: "quantitative", domain: [0, 45000] },
+    start: { type: "quantitative" }, end: { type: "quantitative" },
+    event: { type: "categorical", domain: periods.map((d) => d.event) },
   },
-  data: { data: pop, periods },
+  data: [...periods, ...pop],
+  // The second dataset of the original: drawn, never elicited.
+  context: (d) => d.event != null,
   axes: { x: { tickFormat: "d", title: "year (year)" }, y: { title: "population" } },
   marks: [
     rectY({
-      table: "periods", fillOpacity: 0.5,
+      fillOpacity: 0.5,
       channels: {
         x1: { field: "start" }, x2: { field: "end" },
         fill: { field: "event", scale: { range: ["#f58518", "#4c78a8"] }, legend: { title: "event", labelWidth: 110 } },
@@ -606,8 +590,8 @@ mount(Elicit({
       title: 'Mark the boom',
       question: 'Over which years do you think Falkensee grew fastest?',
       try: 'Drag the shaded band, or either of its edges, to cover the boom.',
-      why: 'The answer is an interval, so it is a one-row `rectY` with `x1`/`x2` fields. `brushSpan` moves an edge when you grab near one and the whole band when you grab its body; `ordering` keeps start before end. The population line is a `context` table, so it stays out of `getData()`.',
-      uses: ['brushSpan()', 'ordering()', 'rectY', 'context table'],
+      why: 'The answer is an interval, so it is a one-row `rectY` with `x1`/`x2` fields. `brushSpan` moves an edge when you grab near one and the whole band when you grab its body; `ordering` keeps start before end. The population line is `context`, so it stays out of `getData()`.',
+      uses: ['brushSpan()', 'ordering()', 'rectY', 'context'],
       code: `const pop = [[1875, 1309], [1890, 1558], [1910, 4512], [1925, 8180], [1933, 15915],
   [1939, 24824], [1946, 28275], [1950, 29189], [1964, 29881], [1971, 26007],
   [1981, 24029], [1989, 22307], [1993, 22242], [1995, 24273], [1997, 27393],
@@ -618,23 +602,17 @@ mount(Elicit({
   width: 460, height: 280,
   margins: { top: 12, right: 12, bottom: 32, left: 48 },
   schema: {
-    data: {
-      start: { type: "quantitative", domain: [1875, 2014] },
-      end:   { type: "quantitative", domain: [1875, 2014] },
-    },
-    history: {
-      context: true,                                         //! the record, read-only
-      fields: {
-        year:       { type: "quantitative", domain: [1875, 2014] },
-        population: { type: "quantitative", domain: [0, 45000] },
-      },
-    },
+    year:       { type: "quantitative", domain: [1875, 2014] },
+    population: { type: "quantitative", domain: [0, 45000] },
+    start:      { type: "quantitative", domain: [1875, 2014] },
+    end:        { type: "quantitative", domain: [1875, 2014] },
   },
-  data: { data: [{ start: 1950, end: 1970 }], history: pop },
+  data: [...pop, { start: 1950, end: 1970 }],
+  context: (d) => d.population != null,                      //! the record, read-only
   constraints: [ ordering({ field: ["start", "end"] }) ],    //! start stays before end
   axes: { x: { tickFormat: "d" }, y: { tickFormat: "~s" } },
   marks: [
-    lineY({ table: "history", stroke: "#333", strokeWidth: 2,
+    lineY({ stroke: "#333", strokeWidth: 2,
             channels: { x: { field: "year" }, y: { field: "population" } } }),
     rectY({
       fill: "#e45755", fillOpacity: 0.25, stroke: "#e45755",
@@ -650,7 +628,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-layer_likert',
   status: 'full',
-  verdict: 'Rating counts per question as sized circles over a 1–5 scale, with each question\'s median as a black tick and its two anchor words beside the row, the medians and anchors drawn from a second, read-only `context` table as in the original.',
+  verdict: 'Rating counts per question as sized circles over a 1–5 scale, with each question\'s median as a black tick and its two anchor words beside the row, the medians and anchors drawn from read-only `context` rows, the original\'s second dataset.',
   needs: [],
   prep: ['prep-aggregate', 'prep-reshape'],
   gaps: [],
@@ -678,22 +656,15 @@ mount(Elicit({
   margins: { top: 10, right: 60, bottom: 26, left: 170 },
   title: "Questionnaire Ratings",
   schema: {
-    data: {
-      name:  { type: "categorical", domain: names.slice().reverse() },
-      value: { type: "quantitative", domain: [0, 6] },
-      count: { type: "quantitative", domain: [0, 16] },
-    },
-    // The medians and the anchor words: the original's second dataset.
-    questions: {
-      context: true,
-      fields: {
-        name: { type: "categorical", domain: names.slice().reverse() },
-        median: { type: "quantitative", domain: [0, 6] },
-        lo: { type: "categorical" }, hi: { type: "categorical" },
-      },
-    },
+    name:   { type: "categorical", domain: names.slice().reverse() },
+    value:  { type: "quantitative", domain: [0, 6] },
+    count:  { type: "quantitative", domain: [0, 16] },
+    median: { type: "quantitative", domain: [0, 6] },
+    lo: { type: "categorical" }, hi: { type: "categorical" },
   },
-  data: { data: counts, questions: qs.map(([name, median, lo, hi]) => ({ name, median, lo, hi })) },
+  data: [...qs.map(([name, median, lo, hi]) => ({ name, median, lo, hi })), ...counts],
+  // The medians and the anchor words: the original's second dataset.
+  context: (d) => d.median != null,
   axes: {
     x: { tickValues: [1, 2, 3, 4, 5] },
     // Offset the question labels to leave room for the anchor words.
@@ -708,11 +679,11 @@ mount(Elicit({
         size: { field: "count", scale: { type: "sqrt", range: [2, 11] }, legend: { title: "Number of Ratings", labelWidth: 80 } },
       },
     }),
-    tickX({ table: "questions", stroke: "black", strokeWidth: 2, length: 16,
+    tickX({ stroke: "black", strokeWidth: 2, length: 16,
             channels: { x: { field: "median" }, y: { field: "name" } } }),
-    text({ table: "questions", fontSize: 11, fill: "#333", textAnchor: "end", dx: -4,
+    text({ fontSize: 11, fill: "#333", textAnchor: "end", dx: -4,
            channels: { x: { datum: 0 }, y: { field: "name" }, text: { field: "lo" } } }),
-    text({ table: "questions", fontSize: 11, fill: "#333", textAnchor: "start", dx: 4,
+    text({ fontSize: 11, fill: "#333", textAnchor: "start", dx: 4,
            channels: { x: { datum: 6 }, y: { field: "name" }, text: { field: "hi" } } }),
   ],
 }));`,
@@ -722,8 +693,8 @@ mount(Elicit({
       title: 'Predict the medians',
       question: 'Sixteen participants rated a gesture-based table editor on these seven items. What do you think the median rating was for each?',
       try: 'Drag each tick along its row; it snaps to half points.',
-      why: '`move()` on `x` writes one median per question, and `snap({ step: 0.5 })` keeps it to the values a median of 16 ratings can take. The anchor words sit in a `context` table, so they stay out of `getData()`.',
-      uses: ['tickX', 'move()', 'snap()', 'context table'],
+      why: '`move()` on `x` writes one median per question, and `snap({ step: 0.5 })` keeps it to the values a median of 16 ratings can take. The anchor words are `context` rows, so they stay out of `getData()`.',
+      uses: ['tickX', 'move()', 'snap()', 'context'],
       code: `const qs = [
   ["Identify Errors:", "Easy", "Hard"], ["Fix Errors:", "Easy", "Hard"],
   ["Easier to Fix:", "Toolbar", "Gesture"], ["Faster to Fix:", "Toolbar", "Gesture"],
@@ -736,28 +707,24 @@ mount(Elicit({
   width: 460, height: 260,
   margins: { top: 10, right: 60, bottom: 26, left: 170 },
   schema: {
-    data: {
-      name:   { type: "categorical", domain: names.slice().reverse() },
-      median: { type: "quantitative", domain: [1, 5] },
-    },
-    anchors: {
-      context: true,                                         //! the anchor words, read-only
-      fields: { name: { type: "categorical" }, lo: { type: "categorical" }, hi: { type: "categorical" } },
-    },
+    name:   { type: "categorical", domain: names.slice().reverse() },
+    median: { type: "quantitative", domain: [1, 5] },
+    lo: { type: "categorical" }, hi: { type: "categorical" },
   },
-  data: {
-    data: names.map((name) => ({ name, median: 3 })),
-    anchors: qs.map(([name, lo, hi]) => ({ name, lo, hi })),
-  },
+  data: [
+    ...qs.map(([name, lo, hi]) => ({ name, lo, hi })),
+    ...names.map((name) => ({ name, median: 3 })),
+  ],
+  context: (d) => d.lo != null,                              //! the anchor words, read-only
   constraints: [ snap({ step: 0.5 }), clamp({ min: 1, max: 5 }) ], //! medians of 16 ratings
   axes: {
     x: { tickValues: [1, 2, 3, 4, 5] },
     y: { fontSize: 11, transform: ({ base }) => ({ x: base.x - 50 }) },
   },
   marks: [
-    text({ table: "anchors", fontSize: 11, fill: "#64748b", textAnchor: "end", dx: -4,
+    text({ fontSize: 11, fill: "#64748b", textAnchor: "end", dx: -4,
            channels: { x: { datum: 1 }, y: { field: "name" }, text: { field: "lo" } } }),
-    text({ table: "anchors", fontSize: 11, fill: "#64748b", textAnchor: "start", dx: 4,
+    text({ fontSize: 11, fill: "#64748b", textAnchor: "start", dx: 4,
            channels: { x: { datum: 5 }, y: { field: "name" }, text: { field: "hi" } } }),
     tickX({
       stroke: "black", strokeWidth: 3,
@@ -792,7 +759,6 @@ GALLERY.add({
   prep: [],
   gaps: [
     'The two-panel `vconcat` becomes one chart; the arrows and their captions are a `guides.custom` under the axis.',
-    'The zero gridline is a `guides.rule` instead of a conditional grid colour.',
   ],
   recreation: {
     code: `const rows = [
@@ -814,9 +780,8 @@ mount(Elicit({
     lo:      { type: "quantitative", domain: [-3, 3] },
     hi:      { type: "quantitative", domain: [-3, 3] },
   },
-  axes: { x: { grid: true } },
+  axes: { x: { grid: { zero: { stroke: "#666" } } } },          //! the gridline at 0, darker
   guides: [
-    guides.rule({ x: 0, stroke: "#666", strokeDash: "none", strokeWidth: 1 }),
     // The second panel of the original: two arrows saying which side favours which tool.
     guides.custom(({ scales, height }) => {
       const y = height + 38, x = (v) => scales.x.encode(v);
@@ -1166,8 +1131,8 @@ mount(Elicit({
       title: 'Interval for 2050',
       question: 'Give a range you are 80% sure will contain each country\'s 2050 life expectancy.',
       try: 'Drag either end of a band to stretch it, or its middle to slide it.',
-      why: 'An interval is two fields, so `barX` spans `x1`/`x2` and `brushSpan` resizes it at either edge or moves it whole. The 2000 values are the original\'s pale dots, drawn from a read-only `context` table.',
-      uses: ['brushSpan()', 'barX', 'context table'],
+      why: 'An interval is two fields, so `barX` spans `x1`/`x2` and `brushSpan` resizes it at either edge or moves it whole. The 2000 values are the original\'s pale dots, drawn from read-only `context` rows.',
+      uses: ['brushSpan()', 'barX', 'context'],
       code: `const now = [
   { country: "Brazil", life_expect: 71.0 }, { country: "China", life_expect: 72.0 },
   { country: "India", life_expect: 62.9 }, { country: "Indonesia", life_expect: 68.6 },
@@ -1180,16 +1145,11 @@ mount(Elicit({
   width: 440, height: 220,
   margins: { top: 10, right: 16, bottom: 32, left: 100 },
   schema: {
-    data: {
-      country: { type: "categorical", domain: countries.slice().reverse() },
-      lo: years, hi: years,
-    },
-    y2000: { context: true, fields: { country: { type: "categorical" }, life_expect: years } }, //! 2000, for reference
+    country: { type: "categorical", domain: countries.slice().reverse() },
+    lo: years, hi: years, life_expect: years,
   },
-  data: {
-    data: now.map((d) => ({ country: d.country, lo: d.life_expect, hi: d.life_expect + 6 })),
-    y2000: now,
-  },
+  data: [...now, ...now.map((d) => ({ country: d.country, lo: d.life_expect, hi: d.life_expect + 6 }))],
+  context: (d) => d.life_expect != null,                    //! 2000, for reference
   axes: { x: { title: "Life Expectancy in 2050 (years)" } },
   marks: [
     barX({
@@ -1197,7 +1157,7 @@ mount(Elicit({
       channels: { y: { field: "country" }, x1: { field: "lo" }, x2: { field: "hi" } },
       edits: [ brushSpan({ channels: ["x1", "x2"], edgeInset: 10 }) ], //! resize or slide the interval
     }),
-    point({ table: "y2000", fill: "#e6959c", size: 5, channels: { y: { field: "country" }, x: { field: "life_expect" } } }),
+    point({ fill: "#e6959c", size: 5, channels: { y: { field: "country" }, x: { field: "life_expect" } } }),
   ],
 }));`,
     },
@@ -1326,7 +1286,6 @@ GALLERY.add({
   prep: ['prep-aggregate', 'prep-calculate'],
   gaps: [
     'Precipitation is multiplied into the temperature range in JavaScript; the right axis places ticks at the scaled positions and labels them in precipitation units.',
-    'An axis `fill` colours its tick labels along with its title, where the original colours only the title.',
   ],
   recreation: {
     code: `const rows = (await vegaData("weather.csv")).filter((d) => d.location === "Seattle");
@@ -1349,9 +1308,9 @@ mount(Elicit({
     rain:  { type: "quantitative", domain: [0, 30] },
   },
   elements: [
-    axisY({ title: "Avg. Temperature (°C)", stroke: "#85C5A6", fill: "#4d9a74" }),
+    axisY({ title: "Avg. Temperature (°C)", stroke: "#85C5A6", titleFill: "#4d9a74" }), //! colour the title alone
     // The second axis: ticks at the scaled positions, labelled in the original units.
-    axisY({ anchor: "right", title: "Precipitation (inches)", fill: "#5b85a8", tickValues: [0, 1, 2, 3, 4, 5, 6].map((v) => v * k),
+    axisY({ anchor: "right", title: "Precipitation (inches)", titleFill: "#5b85a8", tickValues: [0, 1, 2, 3, 4, 5, 6].map((v) => v * k),
             tickFormat: (v) => String(v / k), stroke: "#85A9C5" }),
   ],
   marks: [
@@ -1519,7 +1478,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-wheat_wages',
   status: 'full',
-  verdict: 'Playfair\'s wheat-and-wages chart: five-year wheat price bars, the wages area with its line, faint rules every fifty years, and the monarchs\' reigns as a strip of black and white boxes with their names, drawn from a read-only `context` table as in the original.',
+  verdict: 'Playfair\'s wheat-and-wages chart: five-year wheat price bars, the wages area with its line, faint rules every fifty years, and the monarchs\' reigns as a strip of black and white boxes with their names, drawn from read-only `context` rows as in the original.',
   needs: [],
   prep: ['prep-calculate'],
   gaps: [
@@ -1540,17 +1499,14 @@ mount(Elicit({
   margins: { top: 10, right: 10, bottom: 26, left: 30 },
   schema: {
     // The last two years have a wheat price and no wage: the wage line stops there.
-    data: { year, end: year, wheat: value, wages: value },
-    monarchs: {
-      context: true,
-      fields: {
-        name: { type: "categorical" }, start: year, end: year, mid: year,
-        index: { type: "quantitative" }, commonwealth: { type: "categorical" },
-        offset: value, labelY: value,
-      },
-    },
+    year, end: year, wheat: value, wages: value,
+    // A reign has a start and an end too: \`end\` is shared by both kinds of row.
+    name: { type: "categorical" }, start: year, mid: year,
+    index: { type: "quantitative" }, commonwealth: { type: "categorical" },
+    offset: value, labelY: value,
   },
-  data: { data: wheat, monarchs },
+  data: [...monarchs, ...wheat],
+  context: (d) => d.name != null,                // the reigns: drawn, never elicited
   axes: { x: { tickFormat: "d", ticks: 5 } },
   guides: [
     ...[1600, 1650, 1700, 1750, 1800].map((x) => guides.rule({ x, stroke: "#000", strokeDash: "none", strokeWidth: 0.6, opacity: 0.5 })),
@@ -1561,14 +1517,14 @@ mount(Elicit({
     lineY({ stroke: "#000", opacity: 0.7, channels: { x: { field: "year" }, y: { field: "wages" } } }),
     lineY({ stroke: "#EE8182", dy: -2, channels: { x: { field: "year" }, y: { field: "wages" } } }),
     rect({
-      table: "monarchs", stroke: "#000",
+      stroke: "#000",
       channels: {
         x1: { field: "start" }, x2: { field: "end" }, y1: { datum: 95 }, y2: { field: "offset" },
         fill: { fn: (d) => (d.commonwealth ? "white" : "black") },
       },
     }),
     text({
-      table: "monarchs", fontSize: 7, dy: 14,
+      fontSize: 7, dy: 14,
       channels: { x: { field: "mid" }, y: { field: "labelY" }, text: { field: "name" } },
     }),
   ],
@@ -1579,8 +1535,8 @@ mount(Elicit({
       title: 'Plot the wages',
       question: 'Weekly wages up to 1700 are shown. Where were they in the eighteenth century?',
       try: 'Click the chart to add a wage point; drag a point to adjust it.',
-      why: 'The seeded wages are `lock`ed. `create()` mints a row at the clicked year and wage, `move()` adjusts it, and the line joins every row in year order, so each click extends the curve. The wheat prices are a `context` table behind it.',
-      uses: ['create()', 'move()', 'lock', 'lineY', 'context table'],
+      why: 'The seeded wages are `lock`ed. `create()` mints a row at the clicked year and wage, `move()` adjusts it, and the line joins every row in year order, so each click extends the curve. The wheat prices are `context` rows behind it, with columns of their own.',
+      uses: ['create()', 'move()', 'lock', 'lineY', 'context'],
       code: `const wheat = (await vegaData("wheat.json")).map((d) => ({ year: +d.year, end: +d.year + 5, wheat: d.wheat, wages: d.wages }));
 const year = { type: "quantitative", domain: [1565, 1825] };
 const value = { type: "quantitative", domain: [0, 100] };
@@ -1588,19 +1544,17 @@ const value = { type: "quantitative", domain: [0, 100] };
 mount(Elicit({
   width: 480, height: 240,
   margins: { top: 10, right: 10, bottom: 26, left: 30 },
-  schema: {
-    data: { year, wages: value },
-    prices: { context: true, fields: { year, end: year, wheat: value } }, //! wheat prices, for context
-  },
-  data: {
-    data: wheat.filter((d) => d.year <= 1700).map(({ year, wages }) => ({ year, wages })),
-    prices: wheat.map(({ year, end, wheat }) => ({ year, end, wheat })),
-  },
+  schema: { year, wages: value, start: year, end: year, wheat: value },
+  data: [
+    ...wheat.map(({ year, end, wheat }) => ({ start: year, end, wheat })),
+    ...wheat.filter((d) => d.year <= 1700).map(({ year, wages }) => ({ year, wages })),
+  ],
+  context: (d) => d.wheat != null,                           //! wheat prices, for context
   lock: "seed",                                              //! wages to 1700 are given
   axes: { x: { tickFormat: "d", ticks: 5 } },
   guides: [ guides.region({ x: [1700, 1825], fill: "#a4cedb", opacity: 0.25 }) ],
   marks: [
-    rectY({ table: "prices", fill: "#ddd", channels: { x1: { field: "year" }, x2: { field: "end" }, y: { field: "wheat" } } }),
+    rectY({ fill: "#ddd", channels: { x1: { field: "start" }, x2: { field: "end" }, y: { field: "wheat" } } }),
     lineY({ stroke: "#EE8182", strokeWidth: 2, channels: { x: { field: "year" }, y: { field: "wages" } } }),
     point({
       fill: "#EE8182", size: 4,
@@ -1910,7 +1864,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-geo_rule',
   status: 'full',
-  verdict: 'Every route out of Seattle as a straight line to its destination airport, over grey airports (a read-only `context` table) and states on Albers USA.',
+  verdict: 'Every route out of Seattle as a straight line to its destination airport, over grey airports (read-only `context` rows) and states on Albers USA.',
   needs: [],
   prep: ['prep-geo', 'prep-lookup', 'prep-calculate'],
   gaps: [],
@@ -1928,16 +1882,15 @@ mount(Elicit({
   margins: { top: 4, right: 4, bottom: 4, left: 4 },
   projection: { type: "albers-usa", domain: states },
   schema: {
-    data: {
-      destination: { type: "categorical" },
-      coordinates: { type: "categorical" },
-    },
-    airports: { context: true, fields: { iata: { type: "categorical" }, lon: { type: "quantitative" }, lat: { type: "quantitative" } } },
+    destination: { type: "categorical" },
+    coordinates: { type: "categorical" },
+    iata: { type: "categorical" }, lon: { type: "quantitative" }, lat: { type: "quantitative" },
   },
-  data: { data: routes, airports: airports.map((d) => ({ iata: d.iata, lon: d.longitude, lat: d.latitude })) },
+  data: [...airports.map((d) => ({ iata: d.iata, lon: d.longitude, lat: d.latitude })), ...routes],
+  context: (d) => d.iata != null,     // the airports: drawn, never elicited
   marks: [
     geoBasemap({ geojson: states, fill: "lightgray", stroke: "white" }),
-    geoPoint({ table: "airports", size: 0.8, fill: "gray", channels: { lon: { field: "lon" }, lat: { field: "lat" } } }),
+    geoPoint({ size: 0.8, fill: "gray", channels: { lon: { field: "lon" }, lat: { field: "lat" } } }),
     geoLine({ stroke: "#4c78a8", strokeWidth: 1, showVertices: false, channels: { coordinates: { field: "coordinates", scale: null } } }),
   ],
 }));`,
@@ -2060,7 +2013,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-geo_line',
   status: 'full',
-  verdict: 'An eight-airport itinerary from Seattle to New York as one line through the airports in order, over grey airports (a read-only `context` table) and states.',
+  verdict: 'An eight-airport itinerary from Seattle to New York as one line through the airports in order, over grey airports (read-only `context` rows) and states.',
   needs: [],
   prep: ['prep-geo', 'prep-lookup'],
   gaps: [],
@@ -2077,17 +2030,17 @@ mount(Elicit({
   margins: { top: 4, right: 4, bottom: 4, left: 4 },
   projection: { type: "albers-usa", domain: states },
   schema: {
-    data: {
-      airport: { type: "categorical" },
-      order: { type: "quantitative" },
-      lon: { type: "quantitative" }, lat: { type: "quantitative" },
-    },
-    airports: { context: true, fields: { iata: { type: "categorical" }, lon: { type: "quantitative" }, lat: { type: "quantitative" } } },
+    airport: { type: "categorical" },
+    order: { type: "quantitative" },
+    lon: { type: "quantitative" }, lat: { type: "quantitative" },
+    // The airports keep the file's own column names, so the itinerary line skips them.
+    iata: { type: "categorical" }, longitude: { type: "quantitative" }, latitude: { type: "quantitative" },
   },
-  data: { data: trip, airports: airports.map((d) => ({ iata: d.iata, lon: d.longitude, lat: d.latitude })) },
+  data: [...airports.map(({ iata, longitude, latitude }) => ({ iata, longitude, latitude })), ...trip],
+  context: (d) => d.iata != null,     // the airports: drawn, never elicited
   marks: [
     geoBasemap({ geojson: states, fill: "#eee", stroke: "white" }),
-    geoPoint({ table: "airports", size: 0.8, fill: "gray", channels: { lon: { field: "lon" }, lat: { field: "lat" } } }),
+    geoPoint({ size: 0.8, fill: "gray", channels: { lon: { field: "longitude" }, lat: { field: "latitude" } } }),
     geoLine({
       stroke: "#4c78a8", strokeWidth: 2,
       channels: { lon: { field: "lon" }, lat: { field: "lat" }, order: { field: "order" } },
@@ -2100,8 +2053,8 @@ mount(Elicit({
       title: 'Draw the flight',
       question: 'A nonstop flight leaves Seattle for New York. Draw the path you think it flies.',
       try: 'Press near Seattle and drag across the map to New York.',
-      why: '`edit.geo.draw()` turns a freehand drag into one row holding a list of `[lon, lat]` vertices, inverted through the projection — so the answer is a route on the globe, not a pixel scribble. The two airports are a `context` table, drawn but never reported.',
-      uses: ['edit.geo.draw()', 'geoLine', 'context table'],
+      why: '`edit.geo.draw()` turns a freehand drag into one row holding a list of `[lon, lat]` vertices, inverted through the projection — so the answer is a route on the globe, not a pixel scribble. The two airports are `context` rows, drawn but never reported.',
+      uses: ['edit.geo.draw()', 'geoLine', 'context'],
       code: `const us = await vegaData("us-10m.json");
 const states = topojson.feature(us, us.objects.states);
 
@@ -2110,17 +2063,15 @@ mount(Elicit({
   margins: { top: 4, right: 4, bottom: 4, left: 4 },
   projection: { type: "albers-usa", domain: states },
   schema: {
-    data: { coordinates: { type: "categorical" } },
-    ends: { context: true, fields: { name: { type: "categorical" }, lon: { type: "quantitative" }, lat: { type: "quantitative" } } },
+    coordinates: { type: "categorical" },
+    name: { type: "categorical" }, lon: { type: "quantitative" }, lat: { type: "quantitative" },
   },
-  data: {
-    data: [],
-    ends: [{ name: "SEA", lon: -122.31, lat: 47.45 }, { name: "JFK", lon: -73.78, lat: 40.64 }],
-  },
+  data: [{ name: "SEA", lon: -122.31, lat: 47.45 }, { name: "JFK", lon: -73.78, lat: 40.64 }],
+  context: true,                                              //! the two airports, never reported
   marks: [
     geoBasemap({ geojson: states, fill: "#eee", stroke: "white" }),
-    geoPoint({ table: "ends", size: 5, fill: "#1e293b", channels: { lon: { field: "lon" }, lat: { field: "lat" } } }),
-    geoText({ table: "ends", fontSize: 11, fill: "#1e293b", dy: -9,
+    geoPoint({ size: 5, fill: "#1e293b", channels: { lon: { field: "lon" }, lat: { field: "lat" } } }),
+    geoText({ fontSize: 11, fill: "#1e293b", dy: -9,
               channels: { lon: { field: "lon" }, lat: { field: "lat" }, text: { field: "name" } } }),
     geoLine({
       stroke: "#e45755", strokeWidth: 2.5, showVertices: false,
@@ -2196,17 +2147,16 @@ mount(Elicit({
   margins: { top: 4, right: 4, bottom: 4, left: 4 },
   projection: { type: "mercator", domain: london },
   schema: {
-    data: {
-      line: { type: "categorical", domain: lines },
-      coordinates: { type: "categorical" },
-    },
-    // The borough labels: the original's second dataset, drawn and never elicited.
-    centroids: { context: true, fields: { name: { type: "categorical" }, cx: { type: "quantitative" }, cy: { type: "quantitative" } } },
+    line: { type: "categorical", domain: lines },
+    coordinates: { type: "categorical" },
+    name: { type: "categorical" }, cx: { type: "quantitative" }, cy: { type: "quantitative" },
   },
-  data: { data: segments, centroids: centroids.map((d) => ({ ...d, name: d.name.split(" ")[0] })) },
+  data: [...centroids.map((d) => ({ ...d, name: d.name.split(" ")[0] })), ...segments],
+  // The borough labels: the original's second dataset, drawn and never elicited.
+  context: (d) => d.name != null,
   marks: [
     geoBasemap({ geojson: london, fill: "#eee", stroke: "white", strokeWidth: 2 }),
-    geoText({ table: "centroids", fontSize: 7, fill: "#000", opacity: 0.6,
+    geoText({ fontSize: 7, fill: "#000", opacity: 0.6,
               channels: { lon: { field: "cx" }, lat: { field: "cy" }, text: { field: "name" } } }),
     geoLine({
       strokeWidth: 2, showVertices: false,
@@ -2542,8 +2492,8 @@ GALLERY.add({
 GALLERY.add({
   id: 'vl-interactive_splom',
   status: 'none',
-  verdict: 'A 3×3 scatterplot matrix with a shared brush that recolours every panel and pan/zoom bound to the scales. Multiple views, and the selections linked across them, are not covered by this study; a single panel can now zoom with `edit.axis.zoom()`.',
-  needs: ['concat', 'selection'],
+  verdict: 'A 3×3 scatterplot matrix with a shared brush that recolours every panel and pan/zoom bound to the scales. Multiple views, and the selections and domains linked across them, are not covered by this study; a single panel can zoom and pan with `edit.axis.zoom()` and `edit.axis.pan()`.',
+  needs: ['concat', 'selection', 'zoom'],
   prep: [],
   gaps: [],
   alternative: 'A single scatter of horsepower against fuel economy with `brushRect`: "Draw a box around the cars you would call efficient and powerful."',

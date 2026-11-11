@@ -430,34 +430,30 @@ mount(Elicit({
       title: 'Draw Amazon',
       question: "You see four tech stocks. Draw Amazon's share price from 2000 to 2010.",
       try: 'Press and drag left to right to draw; drag over your line again to reshape it.',
-      why: '`edit.line.draw()` lays a point down in each sample column the pointer crosses, so one stroke draws the whole line. The four known stocks sit in a `context: true` table, drawn by the same halo and colour marks as the recreation, so they stay readable under your stroke and never enter `getData()`.',
-      uses: ['edit.line.draw()', 'context table'],
-      code: `const rows = (await vegaData('stocks.csv'))
-  .map((d) => ({ symbol: d.symbol, date: new Date(d.date), price: d.price }));
-const others = rows.filter((d) => d.symbol !== 'AMZN');
+      why: '`edit.line.draw()` lays a point down in each sample column the pointer crosses, so one stroke draws the whole line. The four known stocks are `context`, drawn by the same halo and colour marks as the recreation, so they stay readable under your stroke and never enter `getData()`. They fill their own `close` column, so only those two marks draw them.',
+      uses: ['edit.line.draw()', 'context'],
+      code: `const others = (await vegaData('stocks.csv'))
+  .filter((d) => d.symbol !== 'AMZN')
+  .map((d) => ({ symbol: d.symbol, date: new Date(d.date), close: d.price }));
 
 mount(Elicit({
   width: 440, height: 280,
   margins: { top: 12, right: 16, bottom: 32, left: 52 },
-  data: { data: [], history: others },
+  data: others,
   schema: {
-    data: {
-      s:     { type: 'categorical' },
-      date:  { type: 'temporal', domain: [new Date(2000, 0, 1), new Date(2010, 2, 1)] },
-      price: { type: 'quantitative', domain: [0, 800] },
-    },
-    history: { context: true, fields: {                         //! the known stocks: drawn, never reported
-      symbol: { type: 'categorical', domain: ['AAPL', 'GOOG', 'IBM', 'MSFT'] },
-      date:   { type: 'temporal' },
-      price:  { type: 'quantitative' },
-    } },
+    s:      { type: 'categorical' },
+    symbol: { type: 'categorical', domain: ['AAPL', 'GOOG', 'IBM', 'MSFT'] },
+    date:   { type: 'temporal', domain: [new Date(2000, 0, 1), new Date(2010, 2, 1)] },
+    price:  { type: 'quantitative', domain: [0, 800] },          // your line
+    close:  { type: 'quantitative' },                            // the known stocks
   },
+  context: true,                                                 //! the known stocks: drawn, never reported
   axes: { x: { title: 'date' }, y: { grid: true, title: 'price' } },
   marks: [
-    lineY({ table: 'history', stroke: 'white', strokeWidth: 4,
-            channels: { x: { field: 'date' }, y: { field: 'price' }, series: { field: 'symbol' } } }),
-    lineY({ table: 'history', strokeWidth: 1.5, opacity: 0.7,
-            channels: { x: { field: 'date' }, y: { field: 'price' },
+    lineY({ stroke: 'white', strokeWidth: 4,
+            channels: { x: { field: 'date' }, y: { field: 'close' }, series: { field: 'symbol' } } }),
+    lineY({ strokeWidth: 1.5, opacity: 0.7,
+            channels: { x: { field: 'date' }, y: { field: 'close' },
                         stroke: { field: 'symbol', legend: { labelWidth: 40 } } } }),
     lineY({
       stroke: '#e8833a', strokeWidth: 3, handleSize: 2.5,
@@ -640,36 +636,34 @@ mount(Elicit({
       title: 'Trace the record',
       question: "Draw Google's all-time-high closing price as it stood at each month.",
       try: 'Sweep along the faint price line. Try dipping: the record line refuses to fall.',
-      why: 'A running maximum can only rise, and `monotonic()` holds that for every edit: dip a point and its neighbours are pushed back up to meet it. The monthly price sits in a `context: true` table, so only the derived record is elicited.',
-      uses: ['monotonic()', 'edit.line.sweep()', 'context table'],
+      why: 'A running maximum can only rise, and `monotonic()` holds that for every edit: dip a point and its neighbours are pushed back up to meet it. The monthly price is `context`, so only the derived record is elicited. The price rows carry a `symbol` and yours do not, so `series` keeps them on separate lines.',
+      uses: ['monotonic()', 'edit.line.sweep()', 'context'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
-  .map((d) => ({ date: new Date(d.date), price: d.price }));
+  .map((d) => ({ symbol: d.symbol, date: new Date(d.date), price: d.price }));
 // One row per month, starting flat at the first close.
 const data = goog.filter((d, i) => i % 2 === 0).map((d) => ({ date: d.date, high: 100 }));
 
 mount(Elicit({
   width: 440, height: 280,
   margins: { top: 12, right: 16, bottom: 32, left: 56 },
-  data: { data, history: goog },
+  data: [...goog, ...data],
   schema: {
-    data: {
-      date: { type: 'temporal' },
-      high: { type: 'quantitative', domain: [0, 800] },
-    },
-    history: { context: true, fields: {                         //! the monthly price, as reference
-      date:  { type: 'temporal' },
-      price: { type: 'quantitative' },
-    } },
+    symbol: { type: 'categorical' },
+    date:   { type: 'temporal' },
+    price:  { type: 'quantitative' },                            // the monthly price
+    high:   { type: 'quantitative', domain: [0, 800] },          // your record
   },
+  context: (d) => d.price != null,                               //! the monthly price, as reference
   constraints: [monotonic({ field: 'high', along: 'date' })],  //! a record can only rise
   axes: { x: { title: 'date' }, y: { grid: true, title: 'price' } },
   marks: [
-    lineY({ table: 'history', stroke: '#94a3b8', strokeWidth: 1.5,
-            channels: { x: { field: 'date' }, y: { field: 'price' } } }),
+    lineY({ stroke: '#94a3b8', strokeWidth: 1.5,
+            channels: { x: { field: 'date' }, y: { field: 'price' }, series: { field: 'symbol' } } }),
     lineY({
       curve: 'monotoneX', strokeWidth: 2.5, stroke: '#4f46e5', handleSize: 2.5,
       channels: {
+        series: { field: 'symbol' },                             // the price rows are a line of their own
         x: { field: 'date' },
         y: { field: 'high', edit: edit.line.sweep() },        //! paint the record
       },
@@ -682,13 +676,13 @@ mount(Elicit({
 
 GALLERY.add({
   id: 'vl-line_conditional_axis',
-  status: 'partial',
-  verdict: 'The 2006-2007 Google line draws and the solid-versus-dashed grid is a rule per tick, but the axis is the point of the example: two-line labels and long January ticks are not expressible.',
-  needs: ['axis-custom'],
+  status: 'full',
+  verdict: 'The 2006-2007 Google line with Vega-Lite’s conditional axis: per-tick functions give each January a long tick and a solid gridline, and a `\\n` in its label puts the year under the month.',
+  needs: [],
   prep: ['prep-calculate'],
   gaps: [
-    'Tick labels are one line ("Jan 2007" on January, the month otherwise) rather than a month line over a year line.',
-    'The conditional grid is a `guides.rule()` per tick (solid on January, `strokeDash: "2 2"` otherwise); tick length and tick dash cannot be set per tick.',
+    'Vega-Lite left-aligns each label at its tick (`labelAlign: "left"`); here labels are centred on the tick.',
+    'The ticks are solid; Vega-Lite dashes the short ones too (`tickDash`).',
   ],
   recreation: {
     code: `const goog = (await vegaData('stocks.csv'))
@@ -708,13 +702,13 @@ mount(Elicit({
   axes: {
     x: {
       tickValues: ticks,
-      tickFormat: (d) => d3.timeFormat(d.getMonth() === 0 ? '%b %Y' : '%b')(d),
+      // Per-tick functions: a long tick and a year line on January only.
+      tickFormat: (d) => d3.timeFormat(d.getMonth() === 0 ? '%b\\n%Y' : '%b')(d), //! the year on a second line
+      tickSize: (d) => (d.getMonth() === 0 ? 30 : 7),       //! a long tick on January
+      grid: { stroke: '#cbd5e1', strokeDash: (d) => (d.getMonth() === 0 ? null : '2 2') }, //! solid on January
     },
     y: { grid: true, title: 'price' },
   },
-  guides: ticks.map((d) => guides.rule({                      // solid on January, dashed otherwise
-    x: d, stroke: '#cbd5e1', strokeDash: d.getMonth() === 0 ? 'none' : '2 2',
-  })),
   marks: [
     lineY({
       channels: { x: { field: 'date' }, y: { field: 'price' } },
@@ -748,13 +742,13 @@ mount(Elicit({
   axes: {
     x: {
       tickValues: ticks,
-      tickFormat: (d) => d3.timeFormat(d.getMonth() === 0 ? '%b %Y' : '%b')(d),
+      // Per-tick functions: a long tick and a year line on January only.
+      tickFormat: (d) => d3.timeFormat(d.getMonth() === 0 ? '%b\\n%Y' : '%b')(d), //! the year on a second line
+      tickSize: (d) => (d.getMonth() === 0 ? 30 : 7),       //! a long tick on January
+      grid: { stroke: '#cbd5e1', strokeDash: (d) => (d.getMonth() === 0 ? null : '2 2') }, //! solid on January
     },
     y: { grid: true, title: 'price' },
   },
-  guides: ticks.map((d) => guides.rule({                      // solid on January, dashed otherwise
-    x: d, stroke: '#cbd5e1', strokeDash: d.getMonth() === 0 ? 'none' : '2 2',
-  })),
   marks: [
     lineY({
       handleSize: 3,
@@ -956,8 +950,8 @@ mount(Elicit({
       title: 'Draw a widening band',
       question: "Give a range you are 80% sure holds Google's month-end price for each month of 2010.",
       try: 'Drag the upper and lower edges of each month apart.',
-      why: 'A trail whose width grows is how a forecast fans out. Here the width IS the answer: `areaY` with a `y1`/`y2` pair draws the band and gives each edge a handle, and `ordering()` stops an edge crossing the other. The observed price is a `context: true` table.',
-      uses: ['areaY', 'move()', 'ordering()', 'context table'],
+      why: 'A trail whose width grows is how a forecast fans out. Here the width IS the answer: `areaY` with a `y1`/`y2` pair draws the band and gives each edge a handle, and `ordering()` stops an edge crossing the other. The observed price is `context`, in its own `price` column.',
+      uses: ['areaY', 'move()', 'ordering()', 'context'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
   .map((d) => ({ date: new Date(d.date), price: d.price }))
@@ -969,19 +963,18 @@ const data = d3.range(3, 12).map((m) => ({ date: new Date(2010, m, 1), lo: last 
 mount(Elicit({
   width: 440, height: 280,
   margins: { top: 12, right: 16, bottom: 32, left: 56 },
-  data: { data, history: goog },
+  data: [...goog, ...data],
   schema: {
-    data: {
-      date: { type: 'temporal', domain: [new Date(2008, 6, 1), new Date(2010, 11, 1)] },
-      lo:   { type: 'quantitative', domain: [0, 1000] },
-      hi:   { type: 'quantitative', domain: [0, 1000] },
-    },
-    history: { context: true, fields: { date: { type: 'temporal' }, price: { type: 'quantitative' } } },
+    date:  { type: 'temporal', domain: [new Date(2008, 6, 1), new Date(2010, 11, 1)] },
+    price: { type: 'quantitative' },
+    lo:    { type: 'quantitative', domain: [0, 1000] },
+    hi:    { type: 'quantitative', domain: [0, 1000] },
   },
+  context: (d) => d.price != null,                             // the observed price, read-only
   constraints: [ordering({ field: ['lo', 'hi'] })],          //! low stays below high
   axes: { x: { title: 'date' }, y: { grid: true, title: 'price' } },
   marks: [
-    lineY({ table: 'history', stroke: '#4c78a8', strokeWidth: 2,
+    lineY({ stroke: '#4c78a8', strokeWidth: 2,
             channels: { x: { field: 'date' }, y: { field: 'price' } } }),
     areaY({
       fill: '#e8833a', stroke: '#e8833a', handleSize: 3,
@@ -999,7 +992,7 @@ mount(Elicit({
       question: "Paint the range you are 80% sure holds Google's month-end price through 2010.",
       try: 'Sweep along the top edge to paint the high end, then along the bottom edge for the low end.',
       why: 'An `edit.line.sweep()` on each of `y1` and `y2` paints whichever edge is nearer at drag-start, so one stroke shapes a whole side of the band. `ordering()` keeps the low edge under the high one as you paint.',
-      uses: ['areaY', 'edit.line.sweep()', 'ordering()', 'context table'],
+      uses: ['areaY', 'edit.line.sweep()', 'ordering()', 'context'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
   .map((d) => ({ date: new Date(d.date), price: d.price }))
@@ -1012,19 +1005,18 @@ const data = d3.timeDays(new Date(2010, 3, 1), new Date(2010, 11, 2), 15)
 mount(Elicit({
   width: 440, height: 280,
   margins: { top: 12, right: 16, bottom: 32, left: 56 },
-  data: { data, history: goog },
+  data: [...goog, ...data],
   schema: {
-    data: {
-      date: { type: 'temporal', domain: [new Date(2008, 6, 1), new Date(2010, 11, 1)] },
-      lo:   { type: 'quantitative', domain: [0, 1000] },
-      hi:   { type: 'quantitative', domain: [0, 1000] },
-    },
-    history: { context: true, fields: { date: { type: 'temporal' }, price: { type: 'quantitative' } } },
+    date:  { type: 'temporal', domain: [new Date(2008, 6, 1), new Date(2010, 11, 1)] },
+    price: { type: 'quantitative' },
+    lo:    { type: 'quantitative', domain: [0, 1000] },
+    hi:    { type: 'quantitative', domain: [0, 1000] },
   },
+  context: (d) => d.price != null,
   constraints: [ordering({ field: ['lo', 'hi'] })],
   axes: { x: { title: 'date' }, y: { grid: true, title: 'price' } },
   marks: [
-    lineY({ table: 'history', stroke: '#4c78a8', strokeWidth: 2,
+    lineY({ stroke: '#4c78a8', strokeWidth: 2,
             channels: { x: { field: 'date' }, y: { field: 'price' } } }),
     areaY({
       fill: '#e8833a', stroke: '#e8833a', handleSize: 2.5,
@@ -1239,13 +1231,13 @@ mount(Elicit({
       title: 'Draw the 2020s',
       question: 'Draw the yearly CO2 concentration you expect through the 2020s.',
       try: 'Sweep the 2020s line across the decade. It cannot go down.',
-      why: 'The 2020s are the only elicited rows, seeded flat at the 2020 level; the earlier decades sit in a `context: true` table drawn by a second `lineY` on the same colour encoding. `monotonic()` reflects the belief that concentration only rises year to year.',
-      uses: ['edit.line.sweep()', 'monotonic()', 'context table'],
+      why: 'The 2020s are the only elicited rows, seeded flat at the 2020 level. The earlier decades are `context`: rows of the same table that fill their own `ppm` column, drawn by a second `lineY` on the same colour encoding and left out of your answer. `monotonic()` reflects the belief that concentration only rises year to year, judged per decade.',
+      uses: ['edit.line.sweep()', 'monotonic()', 'context'],
       code: `const co2 = await vegaData('co2-concentration.csv');
 // Annual means for each decade, so a decade is ten points.
 const past = d3.flatRollup(co2, (v) => d3.mean(v, (d) => d.CO2), (d) => d.Date.getUTCFullYear())
   .filter(([year]) => year >= 1960 && year < 2020)
-  .map(([year, co2]) => ({ decade: String(Math.floor(year / 10) * 10) + 's', t: year % 10, co2 }));
+  .map(([year, ppm]) => ({ decade: String(Math.floor(year / 10) * 10) + 's', t: year % 10, ppm }));
 const next = d3.range(10).map((t) => ({ decade: '2020s', t, co2: 412 }));
 const decades = ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
 const colour = { field: 'decade', scale: { scheme: 'magma', reverse: true } };
@@ -1253,24 +1245,18 @@ const colour = { field: 'decade', scale: { scheme: 'magma', reverse: true } };
 mount(Elicit({
   width: 460, height: 300,
   margins: { top: 12, right: 60, bottom: 32, left: 54 },
-  data: { data: next, history: past },
+  data: [...past, ...next],
   schema: {
-    data: {
-      decade: { type: 'ordinal', domain: decades },
-      t:      { type: 'quantitative', domain: [0, 9] },
-      co2:    { type: 'quantitative', domain: [310, 460] },
-    },
-    history: { context: true, fields: {                        //! the past decades, read-only
-      decade: { type: 'ordinal', domain: decades },
-      t:      { type: 'quantitative' },
-      co2:    { type: 'quantitative' },
-    } },
+    decade: { type: 'ordinal', domain: decades },
+    t:      { type: 'quantitative', domain: [0, 9] },
+    co2:    { type: 'quantitative', domain: [310, 460] },
+    ppm:    { type: 'quantitative' },
   },
-  constraints: [monotonic({ field: 'co2', along: 't' })],     //! no year falls below the last
+  context: (d) => d.ppm != null,                             //! the past decades, read-only
+  constraints: [monotonic({ field: 'co2', along: 't', series: 'decade' })], //! no year falls below the last
   axes: { x: { title: 'Year into Decade' }, y: { grid: true, title: 'CO2 concentration in ppm' } },
   marks: [
-    lineY({ table: 'history',
-            channels: { x: { field: 't' }, y: { field: 'co2' }, stroke: { ...colour, legend: { labelWidth: 36 } } } }),
+    lineY({ channels: { x: { field: 't' }, y: { field: 'ppm' }, stroke: { ...colour, legend: { labelWidth: 36 } } } }),
     lineY({
       handleSize: 3,
       channels: {
@@ -1404,22 +1390,23 @@ mount(Elicit({
       title: 'Draw the derivative',
       question: 'Here is sin(x). Draw its slope at every x, then check it against cos(x).',
       try: 'Sweep across the flat line to draw it, then press Reveal.',
-      why: 'The slope is a quantity derived from the curve you see, so the elicited rows are the slope alone, seeded at zero, and sin(x) sits in a `context: true` table. `stage: 0` freezes the slope on Reveal, and the answer is a guide that only draws at stage 1.',
-      uses: ['edit.line.sweep()', 'context table', 'stage', 'guides.custom()'],
+      why: 'The slope is a quantity derived from the curve you see, so the elicited rows are the slope alone, seeded at zero. The sin(x) rows are `context` and fill their own `sin` column, so only the first `lineY` draws them. `stage: 0` freezes the slope on Reveal, and the answer is a guide that only draws at stage 1.',
+      uses: ['edit.line.sweep()', 'context', 'stage', 'guides.custom()'],
       code: `const xs = d3.range(0, 12.6, 0.5);
-const sin = xs.map((x) => ({ fn: 'sin(x)', x, value: Math.sin(x) }));
+const given = xs.map((x) => ({ fn: 'sin(x)', x, sin: Math.sin(x) }));
 const slope = xs.map((x) => ({ fn: 'slope', x, value: 0 }));  // yours, flat at zero
-const fields = {
-  fn:    { type: 'categorical', domain: ['sin(x)', 'slope'] },
-  x:     { type: 'quantitative', domain: [0, 12.5] },
-  value: { type: 'quantitative', domain: [-1.5, 1.5] },
-};
 
 const chart = mount(Elicit({
   width: 400, height: 220,
   margins: { top: 12, right: 16, bottom: 32, left: 36 },
-  data: { data: slope, given: sin },
-  schema: { data: fields, given: { context: true, fields } },  //! the function is given, read-only
+  data: [...given, ...slope],
+  schema: {
+    fn:    { type: 'categorical', domain: ['sin(x)', 'slope'] },
+    x:     { type: 'quantitative', domain: [0, 12.5] },
+    sin:   { type: 'quantitative', domain: [-1.5, 1.5] },
+    value: { type: 'quantitative', domain: [-1.5, 1.5] },
+  },
+  context: (d) => d.fn === 'sin(x)',                           //! the function is given, read-only
   axes: { x: { title: 'x' }, y: { grid: true } },
   guides: [
     guides.custom(({ scales, stage }) => stage < 1 ? [] : [{    //! cos(x), after the reveal
@@ -1428,8 +1415,8 @@ const chart = mount(Elicit({
     }]),
   ],
   marks: [
-    lineY({ table: 'given', curve: 'catmullRom',
-            channels: { x: { field: 'x' }, y: { field: 'value' }, stroke: { field: 'fn' } } }),
+    lineY({ curve: 'catmullRom',
+            channels: { x: { field: 'x' }, y: { field: 'sin' }, stroke: { field: 'fn' } } }),
     lineY({
       handleSize: 3, curve: 'catmullRom',
       channels: {
@@ -1773,34 +1760,37 @@ mount(Elicit({
       title: 'Draw the decade trend',
       question: 'Are older films rated above or below the average film? Draw the mean rating delta for each decade.',
       try: 'Sweep across the decades; zero is the overall average.',
-      why: 'The residual is a derived quantity, and so is its decade mean, so the elicited rows are nine decades seeded at zero. The films are a `context: true` table behind them, and `guides.rule()` marks the average every residual is measured from.',
-      uses: ['edit.line.sweep()', 'guides.rule()', 'context table'],
+      why: 'The residual is a derived quantity, and so is its decade mean, so the elicited rows are nine decades seeded at zero. The films are `context` rows behind them, in their own columns and their own `series`, so your line runs past them unbroken. `guides.rule()` marks the average every residual is measured from.',
+      uses: ['edit.line.sweep()', 'guides.rule()', 'context'],
       code: `const movies = (await vegaData('movies.json'))
   .map((d) => ({ date: new Date(d['Release Date']), rating: d['IMDB Rating'] }))
   .filter((d) => d.rating != null && d.date.getFullYear() >= 1930 && d.date.getFullYear() <= 2019);
 const mean = d3.mean(movies, (d) => d.rating);
-const films = movies.map((d) => ({ year: d.date.getFullYear() + d.date.getMonth() / 12, delta: d.rating - mean }));
+const films = movies.map((d) => ({
+  source: 'films', year: d.date.getFullYear() + d.date.getMonth() / 12, residual: d.rating - mean }));
 const data = d3.range(1930, 2020, 10).map((decade) => ({ decade: decade + 5, delta: 0 }));
 
 mount(Elicit({
   width: 460, height: 280,
   margins: { top: 12, right: 16, bottom: 32, left: 36 },
-  data: { data, films },
+  data: [...films, ...data],
   schema: {
-    data: {
-      decade: { type: 'quantitative', domain: [1930, 2020] },
-      delta:  { type: 'quantitative', domain: [-5, 3] },
-    },
-    films: { context: true, fields: { year: { type: 'quantitative' }, delta: { type: 'quantitative' } } },
+    source:   { type: 'categorical' },
+    year:     { type: 'quantitative' },                        // the films
+    residual: { type: 'quantitative' },
+    decade:   { type: 'quantitative', domain: [1930, 2020] },  // yours
+    delta:    { type: 'quantitative', domain: [-5, 3] },
   },
+  context: (d) => d.source === 'films',                        // the films: drawn, never reported
   axes: { x: { title: 'Release year', tickFormat: 'd' }, y: { grid: true } },
   guides: [guides.rule({ y: 0, stroke: '#334155', label: 'average film' })], //! residuals are measured from here
   marks: [
-    point({ table: 'films', size: 1.5, fill: '#94a3b8', opacity: 0.35,   // the films, as context
-            channels: { x: { field: 'year' }, y: { field: 'delta' } } }),
+    point({ size: 1.5, fill: '#94a3b8', opacity: 0.35,
+            channels: { x: { field: 'year' }, y: { field: 'residual' } } }),
     lineY({
       stroke: '#e8833a', strokeWidth: 3, handleSize: 4,
       channels: {
+        series: { field: 'source' },                           // the films are not part of your line
         x: { field: 'decade' },
         y: { field: 'delta', edit: edit.line.sweep() },       //! one decade per column
       },
@@ -2168,33 +2158,29 @@ mount(Elicit({
       title: 'Sketch a Gentoo',
       question: 'Here are typical Adelie and Chinstrap profiles. Sketch a typical Gentoo penguin across the four measures.',
       try: 'Drag each of the four orange points up or down.',
-      why: 'Normalising every measure to its own min/max is what lets one y channel carry four units, so the elicited row is four normalised values. The other species sit in a `context: true` table, and `move()` on `y` keeps each point on its axis.',
-      uses: ['move()', 'clamp()', 'context table'],
+      why: 'Normalising every measure to its own min/max is what lets one y channel carry four units, so the elicited row is four normalised values. The other species are `context` rows with their own `profile` column, and `move()` on `y` keeps each point on its axis.',
+      uses: ['move()', 'clamp()', 'context'],
       code: `const keys = ['Beak Depth (mm)', 'Beak Length (mm)', 'Body Mass (g)', 'Flipper Length (mm)'];
 const penguins = (await vegaData('penguins.json')).filter((d) => d['Beak Length (mm)']);
 const ext = Object.fromEntries(keys.map((k) => [k, d3.extent(penguins, (d) => d[k])]));
 const norm = (k, v) => (v - ext[k][0]) / (ext[k][1] - ext[k][0]);
 // The known species' mean profiles, as reference rows.
 const others = ['Adelie', 'Chinstrap'].flatMap((species) => keys.map((key) => ({
-  species, measure: key, norm: norm(key, d3.mean(penguins.filter((d) => d.Species === species), (d) => d[key])),
+  species, measure: key, profile: norm(key, d3.mean(penguins.filter((d) => d.Species === species), (d) => d[key])),
 })));
 const data = keys.map((measure) => ({ measure, norm: 0.5 }));
 
 mount(Elicit({
   width: 480, height: 300,
   margins: { top: 12, right: 24, bottom: 28, left: 40 },
-  data: { data, others },
+  data: [...others, ...data],
   schema: {
-    data: {
-      measure: { type: 'categorical', domain: keys },
-      norm:    { type: 'quantitative', domain: [0, 1] },
-    },
-    others: { context: true, fields: {                          //! the known species, read-only
-      species: { type: 'categorical', domain: ['Adelie', 'Chinstrap'] },
-      measure: { type: 'categorical', domain: keys },
-      norm:    { type: 'quantitative' },
-    } },
+    species: { type: 'categorical', domain: ['Adelie', 'Chinstrap'] },
+    measure: { type: 'categorical', domain: keys },
+    profile: { type: 'quantitative' },                           // the known species
+    norm:    { type: 'quantitative', domain: [0, 1] },           // yours
   },
+  context: (d) => d.species != null,                             //! the known species, read-only
   constraints: [clamp({ min: 0, max: 1 })],
   axes: { x: { title: false }, y: false },
   guides: [
@@ -2208,13 +2194,16 @@ mount(Elicit({
     })),
   ],
   marks: [
-    lineY({ table: 'others', strokeWidth: 2,
-            channels: { x: { field: 'measure' }, y: { field: 'norm' },
+    lineY({ strokeWidth: 2,
+            channels: { x: { field: 'measure' }, y: { field: 'profile' },
                         stroke: { field: 'species', scale: { range: ['#4c78a8', '#72b7b2'] },
                                   legend: { anchor: 'bottom', labelWidth: 60 } } } }),
     lineY({
       stroke: '#e8833a', strokeWidth: 3, handleSize: 6,
-      channels: { x: { field: 'measure' }, y: { field: 'norm', edit: move() } }, //! one value per axis
+      channels: {
+        series: { field: 'species' },                            // the known species are lines of their own
+        x: { field: 'measure' }, y: { field: 'norm', edit: move() }, //! one value per axis
+      },
     }),
   ],
 }));`,
@@ -2324,28 +2313,27 @@ mount(Elicit({
       title: 'Draw the mean',
       question: "Each column is one year of Google's monthly closes. Draw the line through each year's average.",
       try: 'Press and drag left to right through the columns; drag over your line to adjust it.',
-      why: '`edit.line.draw()` starts from an empty dataset and lays one point per sample (here each year) as the pointer crosses its column. The monthly closes are a `context: true` table drawn by the recreation\'s `point` mark, so the only rows elicited are the seven yearly means.',
-      uses: ['edit.line.draw()', 'context table'],
+      why: '`edit.line.draw()` starts from an empty dataset and lays one point per sample (here each year) as the pointer crosses its column. The monthly closes are `context`, in their own `close` column, drawn by the recreation\'s `point` mark, so the only rows elicited are the seven yearly means.',
+      uses: ['edit.line.draw()', 'context'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
-  .map((d) => ({ year: new Date(d.date).getFullYear(), price: d.price }));
+  .map((d) => ({ year: new Date(d.date).getFullYear(), close: d.price }));
 
 mount(Elicit({
   width: 400, height: 280,
   margins: { top: 12, right: 16, bottom: 32, left: 56 },
-  data: { data: [], closes: goog },
+  data: goog,
   schema: {
-    data: {
-      s:     { type: 'categorical' },
-      year:  { type: 'quantitative', domain: [2004, 2010] },
-      price: { type: 'quantitative', domain: [0, 800] },
-    },
-    closes: { context: true, fields: { year: { type: 'quantitative' }, price: { type: 'quantitative' } } },
+    s:     { type: 'categorical' },
+    year:  { type: 'quantitative', domain: [2004, 2010] },
+    price: { type: 'quantitative', domain: [0, 800] },           // your yearly means
+    close: { type: 'quantitative' },                             // the monthly closes
   },
+  context: true,                                                 //! the monthly closes, read-only
   axes: { x: { title: 'date (year)', tickFormat: 'd' }, y: { grid: true, title: 'price' } },
   marks: [
-    point({ table: 'closes', size: 3, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.35, //! the monthly closes, read-only
-            channels: { x: { field: 'year' }, y: { field: 'price' } } }),
+    point({ size: 3, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.35,
+            channels: { x: { field: 'year' }, y: { field: 'close' } } }),
     lineY({
       stroke: '#e8833a', strokeWidth: 3, handleSize: 4,
       channels: { series: { field: 's' }, x: { field: 'year' }, y: { field: 'price' } },
@@ -2359,26 +2347,26 @@ mount(Elicit({
       question: "For each year, where was Google's average close, and what range held most of its months?",
       try: 'Drag a dot on the line: its band travels with it. Drag a band edge to widen or narrow that side alone.',
       why: '`follow()` moves `lo` and `hi` by however far `mean` moved, so the range rides along with the average, while an edge dragged on its own stays independent. `ordering()` keeps `lo <= mean <= hi` whichever you drag.',
-      uses: ['move()', 'follow()', 'ordering()', 'context table'],
+      uses: ['move()', 'follow()', 'ordering()', 'context'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
-  .map((d) => ({ year: new Date(d.date).getFullYear(), price: d.price }));
+  .map((d) => ({ symbol: d.symbol, year: new Date(d.date).getFullYear(), price: d.price }));
 // A neutral start: every year at $300, give or take $100.
 const data = d3.range(2004, 2011).map((year) => ({ year, lo: 200, mean: 300, hi: 400 }));
 
 mount(Elicit({
   width: 400, height: 280,
   margins: { top: 12, right: 16, bottom: 32, left: 56 },
-  data: { data, closes: goog },
+  data: [...goog, ...data],
   schema: {
-    data: {
-      year: { type: 'quantitative', domain: [2004, 2010] },
-      lo:   { type: 'quantitative', domain: [0, 800] },
-      mean: { type: 'quantitative', domain: [0, 800] },
-      hi:   { type: 'quantitative', domain: [0, 800] },
-    },
-    closes: { context: true, fields: { year: { type: 'quantitative' }, price: { type: 'quantitative' } } },
+    symbol: { type: 'categorical' },
+    year:   { type: 'quantitative', domain: [2004, 2010] },
+    price:  { type: 'quantitative' },                            // the monthly closes
+    lo:     { type: 'quantitative', domain: [0, 800] },
+    mean:   { type: 'quantitative', domain: [0, 800] },
+    hi:     { type: 'quantitative', domain: [0, 800] },
   },
+  context: (d) => d.price != null,                               // the monthly closes, read-only
   constraints: [
     follow({ field: ['lo', 'hi'], lead: 'mean' }),           //! the range moves with the mean
     ordering({ field: ['lo', 'mean', 'hi'] }),               //! lo <= mean <= hi
@@ -2386,11 +2374,12 @@ mount(Elicit({
   ],
   axes: { x: { title: 'date (year)', tickFormat: 'd' }, y: { grid: true, title: 'price' } },
   marks: [
-    point({ table: 'closes', size: 3, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.35,
+    point({ size: 3, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.35,
             channels: { x: { field: 'year' }, y: { field: 'price' } } }),
     areaY({
       fill: '#e8833a', fillOpacity: 0.25, handleSize: 3.5,
       channels: {
+        series: { field: 'symbol' },                             // the closes carry a symbol, your rows do not
         x:  { field: 'year' },
         y1: { field: 'lo', edit: move({ channels: ['y1'] }) },
         y2: { field: 'hi', edit: move({ channels: ['y2'] }) },
@@ -2398,7 +2387,7 @@ mount(Elicit({
     }),
     lineY({
       stroke: '#e8833a', strokeWidth: 2.5, handleSize: 5,
-      channels: { x: { field: 'year' }, y: { field: 'mean', edit: move() } }, //! drag the mean
+      channels: { series: { field: 'symbol' }, x: { field: 'year' }, y: { field: 'mean', edit: move() } }, //! drag the mean
     }),
   ],
 }));`,
@@ -2411,22 +2400,22 @@ mount(Elicit({
       uses: ['move()', 'follow()', 'symmetric()', 'ordering()'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
-  .map((d) => ({ year: new Date(d.date).getFullYear(), price: d.price }));
+  .map((d) => ({ symbol: d.symbol, year: new Date(d.date).getFullYear(), price: d.price }));
 const data = d3.range(2004, 2011).map((year) => ({ year, lo: 250, mean: 300, hi: 350 }));
 
 mount(Elicit({
   width: 400, height: 280,
   margins: { top: 12, right: 16, bottom: 32, left: 56 },
-  data: { data, closes: goog },
+  data: [...goog, ...data],
   schema: {
-    data: {
-      year: { type: 'quantitative', domain: [2004, 2010] },
-      lo:   { type: 'quantitative', domain: [0, 800] },
-      mean: { type: 'quantitative', domain: [0, 800] },
-      hi:   { type: 'quantitative', domain: [0, 800] },
-    },
-    closes: { context: true, fields: { year: { type: 'quantitative' }, price: { type: 'quantitative' } } },
+    symbol: { type: 'categorical' },
+    year:   { type: 'quantitative', domain: [2004, 2010] },
+    price:  { type: 'quantitative' },                            // the monthly closes
+    lo:     { type: 'quantitative', domain: [0, 800] },
+    mean:   { type: 'quantitative', domain: [0, 800] },
+    hi:     { type: 'quantitative', domain: [0, 800] },
   },
+  context: (d) => d.price != null,                               // the monthly closes, read-only
   constraints: [
     follow({ field: ['lo', 'hi'], lead: 'mean' }),
     symmetric({ field: ['lo', 'hi'], about: 'mean' }),       //! the low edge mirrors the high one
@@ -2435,11 +2424,12 @@ mount(Elicit({
   ],
   axes: { x: { title: 'date (year)', tickFormat: 'd' }, y: { grid: true, title: 'price' } },
   marks: [
-    point({ table: 'closes', size: 3, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.35,
+    point({ size: 3, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.35,
             channels: { x: { field: 'year' }, y: { field: 'price' } } }),
     areaY({
       fill: '#e8833a', fillOpacity: 0.25, handleSize: 3,
       channels: {
+        series: { field: 'symbol' },                             // the closes carry a symbol, your rows do not
         x:  { field: 'year' },
         y1: { field: 'lo' },
         y2: { field: 'hi', edit: move({ channels: ['y2'] }) }, //! set the spread
@@ -2447,7 +2437,7 @@ mount(Elicit({
     }),
     lineY({
       stroke: '#e8833a', strokeWidth: 2.5, handleSize: 5,
-      channels: { x: { field: 'year' }, y: { field: 'mean', edit: move() } },
+      channels: { series: { field: 'symbol' }, x: { field: 'year' }, y: { field: 'mean', edit: move() } },
     }),
   ],
 }));`,
@@ -2492,28 +2482,27 @@ mount(Elicit({
       title: 'Click the seasons',
       question: "Seattle's daily highs for 2015 are shown. Where does the smoothed seasonal curve run?",
       try: 'Click to drop points on your curve, left to right or in any order; drag one to adjust it.',
-      why: '`edit.line.anchor()` adds one point per click to the nearest line, and a domain-ordered line sorts it into place, so you build the curve knot by knot. `move()` on both axes lets you drag a knot afterwards. The daily highs are a `context: true` table.',
-      uses: ['edit.line.anchor()', 'move()', 'context table'],
+      why: '`edit.line.anchor()` adds one point per click to the nearest line, and a domain-ordered line sorts it into place, so you build the curve knot by knot. `move()` on both axes lets you drag a knot afterwards. The daily highs are `context`, in their own `high` column.',
+      uses: ['edit.line.anchor()', 'move()', 'context'],
       code: `const days = (await vegaData('seattle-weather.csv'))
   .filter((d) => d.date.getUTCFullYear() === 2015)
-  .map((d) => ({ date: d.date, temp: d.temp_max }));
+  .map((d) => ({ date: d.date, high: d.temp_max }));
 
 mount(Elicit({
   width: 420, height: 300,
   margins: { top: 12, right: 16, bottom: 32, left: 48 },
-  data: { data: [], days },
+  data: days,
   schema: {
-    data: {
-      s:    { type: 'categorical' },
-      date: { type: 'temporal', domain: [new Date(Date.UTC(2015, 0, 1)), new Date(Date.UTC(2015, 11, 31))] },
-      temp: { type: 'quantitative', domain: [-5, 40] },
-    },
-    days: { context: true, fields: { date: { type: 'temporal' }, temp: { type: 'quantitative' } } },
+    s:    { type: 'categorical' },
+    date: { type: 'temporal', domain: [new Date(Date.UTC(2015, 0, 1)), new Date(Date.UTC(2015, 11, 31))] },
+    temp: { type: 'quantitative', domain: [-5, 40] },            // your curve
+    high: { type: 'quantitative' },                              // the daily highs
   },
+  context: true,                                                 //! the daily highs, read-only
   axes: { x: { title: 'Date' }, y: { grid: true, title: 'Max Temperature and Rolling Mean' } },
   marks: [
-    point({ table: 'days', size: 2, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.4, //! the daily highs, read-only
-            channels: { x: { field: 'date' }, y: { field: 'temp' } } }),
+    point({ size: 2, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.4,
+            channels: { x: { field: 'date' }, y: { field: 'high' } } }),
     lineY({
       stroke: 'red', strokeWidth: 3, handleSize: 4, curve: 'monotoneX',
       channels: { series: { field: 's' }, x: { field: 'date' }, y: { field: 'temp' } },
@@ -2541,27 +2530,28 @@ const chart = mount(Elicit({
   width: 420, height: 300,
   margins: { top: 12, right: 16, bottom: 32, left: 48 },
   stageLabels: ['typical', 'range'],
-  data: { data, days },
+  data: [...days.map((d) => ({ source: 'daily', ...d })), ...data],
   schema: {
-    data: {
-      date: { type: 'temporal', domain: [new Date(Date.UTC(2015, 0, 1)), new Date(Date.UTC(2015, 11, 31))] },
-      lo:   { type: 'quantitative', domain: [-5, 40] },
-      mean: { type: 'quantitative', domain: [-5, 40] },
-      hi:   { type: 'quantitative', domain: [-5, 40] },
-    },
-    days: { context: true, fields: { date: { type: 'temporal' }, temp: { type: 'quantitative' } } },
+    source: { type: 'categorical' },
+    date:   { type: 'temporal', domain: [new Date(Date.UTC(2015, 0, 1)), new Date(Date.UTC(2015, 11, 31))] },
+    temp:   { type: 'quantitative' },                            // the daily highs
+    lo:     { type: 'quantitative', domain: [-5, 40] },
+    mean:   { type: 'quantitative', domain: [-5, 40] },
+    hi:     { type: 'quantitative', domain: [-5, 40] },
   },
+  context: (d) => d.source === 'daily',                          // the daily highs, read-only
   constraints: [
     follow({ field: ['lo', 'hi'], lead: 'mean' }),           //! the band rides on the mean
     ordering({ field: ['lo', 'mean', 'hi'] }),
   ],
   axes: { x: { title: 'Date' }, y: { grid: true, title: 'Max Temperature' } },
   marks: [
-    point({ table: 'days', size: 2, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.4,
+    point({ size: 2, fill: 'none', stroke: '#4c78a8', strokeOpacity: 0.4,
             channels: { x: { field: 'date' }, y: { field: 'temp' } } }),
     areaY({
       fill: 'red', fillOpacity: 0.15, stroke: 'red', handleSize: 2.5, curve: 'monotoneX',
       channels: {
+        series: { field: 'source' },                             // the daily highs are not part of your band
         x:  { field: 'date' },
         y1: { field: 'lo', edit: edit.line.sweep({ stage: 1 }) }, //! then paint the low edge
         y2: { field: 'hi', edit: edit.line.sweep({ stage: 1 }) }, //! and the high edge
@@ -2569,7 +2559,7 @@ const chart = mount(Elicit({
     }),
     lineY({
       stroke: 'red', strokeWidth: 3, handleSize: 4.5, curve: 'monotoneX',
-      channels: { x: { field: 'date' }, y: { field: 'mean', edit: move({ stage: 0 }) } }, //! first the typical high
+      channels: { series: { field: 'source' }, x: { field: 'date' }, y: { field: 'mean', edit: move({ stage: 0 }) } }, //! first the typical high
     }),
   ],
 }));
@@ -2620,40 +2610,38 @@ mount(Elicit({
       title: 'Set each typical rate',
       question: 'Square Crossfilter stalls now and then. Where is the MEDIAN frame rate of each system?',
       try: 'Drag each horizontal line up or down, then press Reveal.',
-      why: 'On a log axis the eye overweights the dips, which is exactly what makes this a hard estimate. `ruleY` with `move()` on `y` inverts the pointer through the same log scale, so the answer is in frames per second. The traces are a `context: true` table, and each median is a `guides.rule()` whose `y` is a function of the stage.',
-      uses: ['ruleY', 'move()', 'stage', 'context table', 'guides.rule()'],
+      why: 'On a log axis the eye overweights the dips, which is exactly what makes this a hard estimate. `ruleY` with `move()` on `y` inverts the pointer through the same log scale, so the answer is in frames per second. The traces are `context` rows in their own columns, and each median is a `guides.rule()` whose `y` is a function of the stage.',
+      uses: ['ruleY', 'move()', 'stage', 'context', 'guides.rule()'],
       code: `const falcon = [16.82,19.76,16.08,19.58,16.42,16.2,16.02,15.94,16.28,16.12,16.16,16.12,16.14,16.1,16.2,16.26,19.36,19.7,15.94,19.14,16.2,16.12,19.52,19.7,16.2,20.98,16.3,16.42,16.82,16.5,16.56,16.18,16.08,16.24,16.04,16.3,19.4,15.7,16.24,15.92,16.26,16.22,16.52,16.46,16.36,15.72,16.06,15.96,16.48,16.6,16.24,16.94,16.22,15.96,15.9,16.48,16.32,15.76,16,16.18,16.22,15.8,16.14,16.3,16.36,16.26,15.96,15.94,16.54,16.14,16.26,16.2,15.9,16.08,16.08,15.7,15.66,16.14,23.1,16.6,16.42,16.02,15.62,16.36,15.72,15.92,15.56,16.34,22.82,15.66,15.56,16,16,15.82,16.4,16.46,16.06,16.24,15.8,16.16,16.36,19.7,16.1,16.14,15.82,16.44,16.14,16.02,15.86,16.06,16.02,15.92,15.82,16.58,15.88,16.58,15.7,19.38,19.24,16,15.98,15.96,16.2,15.98,16.34,16.32,16.26,15.92,15.54,16.14,16.46,16.34,15.82,19.72,15.76,16.5,15.72,16.08,16.44,16.2,15.96,16,16.1,19.32,16.1,16.18,15.96,22.64,15.9,16.28,16.1,15.92,16.08,16.26,15.9,15.82,15.7,15.98,16.38,16.04,19.42,15.94,16.16,15.96,16.26,15.78,15.88,15.98,16.06,16.12,23.02,15.62,15.92,16.06,14.78,16.26,19.52,16.32,16.6,16.22,19.74,19.46,15.94,15.84,16.1,16.46,16.18,16.1,15.94,16.06,15.86,15.82,16.04,16.18,15.82,17.3,15.94,15.74,15.72,15.68,15.62,15.6,16.04,15.5,15.6,19.44,15.96,16.24,16.04,16.24];
 const square = [24.2,17.9,15.8,58.4,151,2523.1,245.3,136,72.3,55.7,42.4,37.7,30.1,30.1,21.8,20.6,21.8,17.6,18.2,21,941.7,177.4,2821.8,359.2,318,217.1,126,69,57.8,45.3,35.6,29.1,23.8,44.2,17.7,17.7,15.7,27.8,22.8,3853.6,91.6,181.4,476.3,265.9,254.6,2583.2,124.8,73.2,56.4,48.7,41.6,21.1,20.3,21.3,18.3,17.1,19.5,828.2,162.2,217.9,205.5,197.6,2249.8,103.1,71.7,57.6,41.4,34.5,22,20.5,21.7,18.3,17.3,19.4,666.8,214.9,212.3,125.8,67.7,56.1,45.8,38.3,33,35.4,22.7,19.4,19.9,24.1,19.3,21.3,3508.7,204.1,125.4,65.3,60.8,44.1,36.3,30.5,28.6,16.5,18.6,23.7,22.3,17.6,19.2,448.8,124.4,66.6,53.5,51,45.2,28.4,29.2,26.7,25.9,18.1,17.6,20.1,25.2,3332,67.5,53.6,56.6,39.9,27.6,29.6,33.5,17.2,18.8,25.2,16.7,16.9,240.2,52.4,42.1,33.9,28,28.6,17.3,20,21,22.8,16.7,19.2,175.4,43.5,34.7,29.7,34.9,25.8,17.3,22.6,17.6,17.2,19.2,111.8,35.4,27.6,25.4,21.9,18.6,18.1,21.2,17.9,17,80.6,29.8,30.1,16,26.8,17.5,22.3,16.8,22.4,77.4,31,29.7,28.7,26,16.9,15.8,19,52.6,25.2,16.7,17.9,21,19.8,18.8,46.5,17.5,16.8,18.3,18.3,14.9,41,18.3,17.3,17,17.5,32.3,22.6,16.6,17.9,25.6,17.5,20.3,25.2,18.6,17.7];
 const systems = ['Falcon', 'Square Crossfilter (3M)'];
 const colour = ['#4c78a8', '#f58518'];
-const traces = [['Falcon', falcon], ['Square Crossfilter (3M)', square]].flatMap(([system, ms]) =>
-  ms.map((v, i) => ({ system, row: i + 1, fps: 1000 / v })));
-const median = systems.map((s) => d3.median(traces.filter((d) => d.system === s), (d) => d.fps));
+const traces = [['Falcon', falcon], ['Square Crossfilter (3M)', square]].flatMap(([trace, ms]) =>
+  ms.map((v, i) => ({ trace, row: i + 1, frameFps: 1000 / v })));
+const median = systems.map((s) => d3.median(traces.filter((d) => d.trace === s), (d) => d.frameFps));
 const data = [{ system: 'Falcon', fps: 3 }, { system: 'Square Crossfilter (3M)', fps: 8 }]; // apart, so both show
 
 const chart = mount(Elicit({
   width: 440, height: 240,
   margins: { top: 12, right: 16, bottom: 32, left: 40 },
-  data: { data, traces },
+  data: [...traces, ...data],
   schema: {
-    data: {
-      system: { type: 'categorical', domain: systems },
-      fps:    { type: 'quantitative', domain: [0.2, 80] },
-    },
-    traces: { context: true, fields: {
-      system: { type: 'categorical', domain: systems },
-      row:    { type: 'quantitative', domain: [1, 209] },
-      fps:    { type: 'quantitative' },
-    } },
+    trace:    { type: 'categorical', domain: systems },          // the traces
+    row:      { type: 'quantitative', domain: [1, 209] },
+    frameFps: { type: 'quantitative' },
+    system:   { type: 'categorical', domain: systems },          // yours
+    fps:      { type: 'quantitative', domain: [0.2, 80] },
   },
+  context: (d) => d.trace != null,                               // the traces, read-only
   axes: { x: false, y: { tickValues: [0.5, 1, 2, 5, 10, 20, 50], tickFormat: '~g', grid: true } },
   guides: systems.map((s, k) => guides.rule({                  //! the answer, after Reveal
     y: ({ stage }) => (stage < 1 ? undefined : median[k]),
     stroke: colour[k], strokeWidth: 2, strokeDash: '5 4',
   })),
   marks: [
-    lineY({ table: 'traces', strokeWidth: 1, opacity: 0.6,
-            channels: { x: { field: 'row' }, y: { field: 'fps', scale: 'log' }, stroke: { field: 'system' } } }),
+    lineY({ strokeWidth: 1, opacity: 0.6,
+            channels: { x: { field: 'row' }, y: { field: 'frameFps', scale: 'log' },
+                        stroke: { field: 'trace', scale: { range: colour } } } }),
     ruleY({
       strokeWidth: 4,
       channels: {
@@ -2710,8 +2698,8 @@ mount(Elicit({
       title: 'Fit the reference line',
       question: 'If this sample were normal, its Q-Q points would lie on a straight line. Draw that line.',
       try: 'Drag the middle handle to set the level, an end handle to set the tilt.',
-      why: 'On a normal Q-Q plot the reference line\'s height at 0 is the mean and its slope is the standard deviation, so dragging a `trend` elicits both. `edit.trend.intercept()` and `edit.trend.slope()` claim separate handles; the Q-Q points are a `context: true` table.',
-      uses: ['trend', 'edit.trend.intercept()', 'edit.trend.slope()', 'context table'],
+      why: 'On a normal Q-Q plot the reference line\'s height at 0 is the mean and its slope is the standard deviation, so dragging a `trend` elicits both. `edit.trend.intercept()` and `edit.trend.slope()` claim separate handles; the Q-Q points are `context` rows, drawn behind the line and never reported.',
+      uses: ['trend', 'edit.trend.intercept()', 'edit.trend.slope()', 'context'],
       code: `const u = (await vegaData('normal-2d.json')).map((d) => d.u).sort(d3.ascending);
 const erfinv = (x) => {
   let w = -Math.log((1 - x) * (1 + x)), p;
@@ -2726,23 +2714,24 @@ const qq = d3.range(0.005, 1, 0.01).map((p) => ({ x: Math.SQRT2 * erfinv(2 * p -
 mount(Elicit({
   width: 320, height: 300,
   margins: { top: 12, right: 16, bottom: 32, left: 40 },
-  data: { data: [{ mean: 0.3, sd: 0 }], qq },                  // a flat, off-centre start
+  data: [...qq, { mean: 0.3, sd: 0 }],                         // a flat, off-centre start
+  context: (d) => d.x != null,                                  //! the Q-Q points: drawn, never reported
   schema: {
-    data: {
-      x:    { type: 'quantitative', domain: [-3, 3] },
-      y:    { type: 'quantitative', domain: [-0.6, 0.6] },
-      mean: { type: 'quantitative' },
-      sd:   { type: 'quantitative' },
-    },
-    qq: { context: true, fields: { x: { type: 'quantitative' }, y: { type: 'quantitative' } } },
+    x:    { type: 'quantitative', domain: [-3, 3] },
+    y:    { type: 'quantitative', domain: [-0.6, 0.6] },
+    mean: { type: 'quantitative' },
+    sd:   { type: 'quantitative' },
   },
   axes: { x: { title: 'normal quantile', grid: true }, y: { grid: true }, origin: false },
   guides: [
-    guides.custom(({ data }) => [{ type: 'text', x: 8, y: 14, fontSize: 12, fill: '#334155',
-      text: 'mean ' + data[0].mean.toFixed(2) + '   sd ' + data[0].sd.toFixed(2) }]),
+    guides.custom(({ data }) => {
+      const fit = data.find((d) => d.mean != null);
+      return [{ type: 'text', x: 8, y: 14, fontSize: 12, fill: '#334155',
+        text: 'mean ' + fit.mean.toFixed(2) + '   sd ' + fit.sd.toFixed(2) }];
+    }),
   ],
   marks: [
-    point({ table: 'qq', size: 3, fill: 'none', stroke: '#4c78a8', channels: { x: { field: 'x' }, y: { field: 'y' } } }),
+    point({ size: 3, fill: 'none', stroke: '#4c78a8', channels: { x: { field: 'x' }, y: { field: 'y' } } }),
     trend({
       stroke: '#e8833a',
       channels: {
@@ -2796,8 +2785,8 @@ mount(Elicit({
       title: 'Line and uncertainty',
       question: 'How does a film\'s IMDB rating rise with its Rotten Tomatoes score, and how sure are you?',
       try: 'Drag the line\'s handles to set the relationship, then the band\'s handles to widen or narrow your uncertainty.',
-      why: 'The belief is one row of four parameters. `trend` writes the intercept and slope, `trendBand` draws every line within your spreads and, with `handles: true`, writes the spreads too. A sample of films sits behind in a `context: true` table.',
-      uses: ['trend', 'trendBand', 'edit.trend.intercept()', 'edit.trend.slope()', 'edit.trend.interceptSpread()', 'edit.trend.slopeSpread()', 'context table'],
+      why: 'The belief is one row of four parameters. `trend` writes the intercept and slope, `trendBand` draws every line within your spreads and, with `handles: true`, writes the spreads too. A sample of films sits behind as `context` rows.',
+      uses: ['trend', 'trendBand', 'edit.trend.intercept()', 'edit.trend.slope()', 'edit.trend.interceptSpread()', 'edit.trend.slopeSpread()', 'context'],
       code: `const films = (await vegaData('movies.json'))
   .filter((d) => d['Rotten Tomatoes Rating'] != null && d['IMDB Rating'] != null)
   .filter((d, i) => i % 8 === 0)                              // a sample, as context
@@ -2806,22 +2795,20 @@ mount(Elicit({
 mount(Elicit({
   width: 400, height: 300,
   margins: { top: 12, right: 16, bottom: 32, left: 36 },
-  data: { data: [{ intercept: 5, slope: 0.01, aSd: 0.6, bSd: 0.01 }], films },
+  data: [...films, { intercept: 5, slope: 0.01, aSd: 0.6, bSd: 0.01 }],
+  context: (d) => d.x != null,                                  //! the films: drawn, never reported
   schema: {
-    data: {
-      x:         { type: 'quantitative', domain: [0, 100] },
-      y:         { type: 'quantitative', domain: [0, 10] },
-      intercept: { type: 'quantitative' },
-      slope:     { type: 'quantitative' },
-      aSd:       { type: 'quantitative' },
-      bSd:       { type: 'quantitative' },
-    },
-    films: { context: true, fields: { x: { type: 'quantitative' }, y: { type: 'quantitative' } } },
+    x:         { type: 'quantitative', domain: [0, 100] },
+    y:         { type: 'quantitative', domain: [0, 10] },
+    intercept: { type: 'quantitative' },
+    slope:     { type: 'quantitative' },
+    aSd:       { type: 'quantitative' },
+    bSd:       { type: 'quantitative' },
   },
   constraints: [clamp({ field: 'aSd', min: 0, max: 5 }), clamp({ field: 'bSd', min: 0, max: 0.1 })],
   axes: { x: { title: 'Rotten Tomatoes Rating', grid: true }, y: { grid: true }, origin: false },
   marks: [
-    point({ table: 'films', size: 2, fill: '#94a3b8', opacity: 0.6, channels: { x: { field: 'x' }, y: { field: 'y' } } }),
+    point({ size: 2, fill: '#94a3b8', opacity: 0.6, channels: { x: { field: 'x' }, y: { field: 'y' } } }),
     trendBand({
       fill: 'firebrick', handles: true, grip: 'probe',
       channels: {
@@ -2888,31 +2875,31 @@ mount(Elicit({
       title: 'Sketch the curve',
       question: 'A straight line may not be right. Sketch how the typical IMDB rating changes across Rotten Tomatoes scores.',
       try: 'Sweep along the flat line through the cloud. Hold Shift and drag near one point to fine-tune it alone.',
-      why: 'A smoother is just a line with free values, so it is eleven seeded knots you `edit.line.sweep()`. With Shift held, `when.shift` hands the drag to `move({ pick: "nearest" })` instead, which moves only the closest knot. The films are a `context: true` table.',
-      uses: ['edit.line.sweep()', 'move({ pick: "nearest" })', 'when.shift', 'context table'],
+      why: 'A smoother is just a line with free values, so it is eleven seeded knots you `edit.line.sweep()`. With Shift held, `when.shift` hands the drag to `move({ pick: "nearest" })` instead, which moves only the closest knot. The films are `context` rows with their own `rating` column and their own `series`, so the smoother runs past them unbroken.',
+      uses: ['edit.line.sweep()', 'move({ pick: "nearest" })', 'when.shift', 'context'],
       code: `const films = (await vegaData('movies.json'))
   .filter((d) => d['Rotten Tomatoes Rating'] != null && d['IMDB Rating'] != null)
   .filter((d, i) => i % 6 === 0)
-  .map((d) => ({ rt: d['Rotten Tomatoes Rating'], imdb: d['IMDB Rating'] }));
+  .map((d) => ({ source: 'films', rt: d['Rotten Tomatoes Rating'], rating: d['IMDB Rating'] }));
 const data = d3.range(0, 101, 10).map((rt) => ({ rt, imdb: 6.3 }));   // flat at the mean
 
 mount(Elicit({
   width: 400, height: 300,
   margins: { top: 12, right: 16, bottom: 32, left: 36 },
-  data: { data, films },
+  data: [...films, ...data],
   schema: {
-    data: {
-      rt:   { type: 'quantitative', domain: [0, 100] },
-      imdb: { type: 'quantitative', domain: [0, 10] },
-    },
-    films: { context: true, fields: { rt: { type: 'quantitative' }, imdb: { type: 'quantitative' } } },
+    source: { type: 'categorical' },
+    rt:     { type: 'quantitative', domain: [0, 100] },
+    rating: { type: 'quantitative' },                            // each film
+    imdb:   { type: 'quantitative', domain: [0, 10] },           // your smoother
   },
+  context: (d) => d.source === 'films',                          // the films, read-only
   axes: { x: { title: 'Rotten Tomatoes Rating', grid: true }, y: { grid: true } },
   marks: [
-    point({ table: 'films', size: 2, fill: '#94a3b8', opacity: 0.6, channels: { x: { field: 'rt' }, y: { field: 'imdb' } } }),
+    point({ size: 2, fill: '#94a3b8', opacity: 0.6, channels: { x: { field: 'rt' }, y: { field: 'rating' } } }),
     lineY({
       stroke: 'firebrick', strokeWidth: 3, handleSize: 4, curve: 'monotoneX',
-      channels: { x: { field: 'rt' }, y: { field: 'imdb' } },
+      channels: { series: { field: 'source' }, x: { field: 'rt' }, y: { field: 'imdb' } },
       edits: [
         edit.line.sweep({ channels: ['y'], when: when.noShift }),   //! sweep the whole curve
         move({ channels: ['y'], pick: 'nearest', when: when.shift }), //! shift-drag one knot
@@ -2999,7 +2986,7 @@ btn.onclick = () => chart.nextStage();`,
 GALLERY.add({
   id: 'vl-ternary',
   status: 'full',
-  verdict: 'The barycentric transform is JS; the cities are `point` and `text` marks with a tooltip, and the coloured regions, dashed grid and corner labels are `areaY`, `lineY` and `text` marks over three context tables.',
+  verdict: 'The barycentric transform is JS; the cities are `point` and `text` marks with a tooltip, and the coloured regions, dashed grid and corner labels are `areaY`, `lineY` and `text` marks over context rows.',
   prep: ['prep-calculate'],
   gaps: [
     'Each region is an `areaY` band between its lower and upper edge (every triangle here is x-monotone), where VL draws a closed, filled line.',
@@ -3035,9 +3022,9 @@ const regions = [
 const gridLines = d3.range(1, 10).flatMap((k) => {
   const f = k / 10;
   return [[[f, 0], [f / 2, f * 0.866]], [[1 - f, 0], [1 - f / 2, f * 0.866]], [[f / 2, f * 0.866], [1 - f / 2, f * 0.866]]];
-}).flatMap((pts, line) => pts.map(([x, y]) => ({ line, x, y })));
-const corners = [{ label: 'High 100%', x: -0.05, y: -0.05 }, { label: 'Low 100%', x: 1.05, y: -0.05 },
-  { label: 'Medium 100%', x: 0.5, y: 0.888 }];
+}).flatMap((pts, line) => pts.map(([x, y]) => ({ line, x, gy: y })));
+const corners = [{ label: 'High 100%', x: -0.05, ly: -0.05 }, { label: 'Low 100%', x: 1.05, ly: -0.05 },
+  { label: 'Medium 100%', x: 0.5, ly: 0.888 }];
 const pct = d3.format('.0%');
 
 mount(Elicit({
@@ -3045,30 +3032,31 @@ mount(Elicit({
   margins: { top: 24, right: 16, bottom: 24, left: 16 },
   title: 'Population Distribution by Socioeconomic Level',
   subtitle: 'in fictional cities',
-  data: { data, regions, gridLines, corners },
+  data: [...regions, ...gridLines, ...corners, ...data],
   schema: {
-    data: {
-      city:   { type: 'categorical' },
-      total:  { type: 'quantitative' },
-      h:      { type: 'quantitative' }, m: { type: 'quantitative' }, l: { type: 'quantitative' },
-      colour: { type: 'categorical' },
-      x:      { type: 'quantitative', domain: [-0.1, 1.1] },
-      y:      { type: 'quantitative', domain: [-0.08, 0.95] },
-    },
-    regions: { context: true, fields: { fill: { type: 'categorical' }, x: { type: 'quantitative' },
-                                        y1: { type: 'quantitative' }, y2: { type: 'quantitative' } } },
-    gridLines: { context: true, fields: { line: { type: 'categorical' }, x: { type: 'quantitative' }, y: { type: 'quantitative' } } },
-    corners: { context: true, fields: { label: { type: 'categorical' }, x: { type: 'quantitative' }, y: { type: 'quantitative' } } },
+    city:   { type: 'categorical' },
+    total:  { type: 'quantitative' },
+    h:      { type: 'quantitative' }, m: { type: 'quantitative' }, l: { type: 'quantitative' },
+    colour: { type: 'categorical' },
+    x:      { type: 'quantitative', domain: [-0.1, 1.1] },
+    y:      { type: 'quantitative', domain: [-0.08, 0.95] },
+    fill:   { type: 'categorical' },                              // the regions
+    y1:     { type: 'quantitative' }, y2: { type: 'quantitative' },
+    line:   { type: 'categorical' },                              // the grid lines
+    gy:     { type: 'quantitative' },
+    label:  { type: 'categorical' },                              // the corner labels
+    ly:     { type: 'quantitative' },
   },
+  context: (d) => d.city == null,                                 // everything but the cities
   axes: false,
   marks: [
-    areaY({ table: 'regions', fillOpacity: 0.65, strokeWidth: 0.2,
+    areaY({ fillOpacity: 0.65, strokeWidth: 0.2,
             channels: { x: { field: 'x' }, y1: { field: 'y1' }, y2: { field: 'y2' }, series: { field: 'fill' },
                         fill: { field: 'fill', scale: null }, stroke: { field: 'fill', scale: null } } }),
-    lineY({ table: 'gridLines', stroke: '#696969', strokeWidth: 0.6, strokeDash: '2 2',
-            channels: { x: { field: 'x' }, y: { field: 'y' }, series: { field: 'line' } } }),
-    text({ table: 'corners', fontSize: 12, dy: -6,
-           channels: { x: { field: 'x' }, y: { field: 'y' }, text: { field: 'label' } } }),
+    lineY({ stroke: '#696969', strokeWidth: 0.6, strokeDash: '2 2',
+            channels: { x: { field: 'x' }, y: { field: 'gy' }, series: { field: 'line' } } }),
+    text({ fontSize: 12, dy: -6,
+           channels: { x: { field: 'x' }, y: { field: 'ly' }, text: { field: 'label' } } }),
     point({
       stroke: '#000', strokeWidth: 1.5,
       tip: (d) => [d.city, 'High ' + pct(d.h), 'Medium ' + pct(d.m), 'Low ' + pct(d.l)],

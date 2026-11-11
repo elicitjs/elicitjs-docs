@@ -301,7 +301,7 @@ GALLERY.beyond({
   title: 'Several futures',
   question: 'Sketch three different ways unemployment could go between now and 2035.',
   try: 'Double-click in the future to start a new line at that level, then drag across it to reshape it. Alt-click a line to delete it.',
-  why: 'The observed years are `lock`ed, so they are context, not answers. `edit.line.newSeries()` mints a whole new series of anchors on double-click, at the years you list in `samples`, `move({ pick: "sweep" })` reshapes the series under the pointer, and a `custom` constraint caps the number of futures at three.',
+  why: 'The observed years are `context`: drawn and read-only, and left out of `getData()`, so the answer is the futures alone. `edit.line.newSeries()` mints a whole new series of anchors on double-click, at the years you list in `samples`, `move({ pick: "sweep" })` reshapes the series under the pointer, and a `custom` constraint caps the number of futures at three.',
   whyNot: 'Both can draw a spaghetti plot of scenarios you already computed. Neither can add a series, and neither can keep the past fixed while the future is drawn.',
   code: `const past = [5.3, 4.9, 4.4, 3.9, 3.7, 8.1, 5.4, 3.6, 3.6, 4.0, 4.2]
   .map((y, i) => ({ s: "observed", year: 2015 + i, rate: y }));
@@ -309,7 +309,7 @@ mount(Elicit({
   width: 460, height: 280,
   margins: { top: 14, right: 16, bottom: 28, left: 36 },
   data: past,
-  lock: (d) => d.s === "observed", //! the past is given
+  context: (d) => d.s === "observed", //! the past is given, never reported
   schema: {
     s:    { type: "categorical" },
     year: { type: "quantitative", domain: [2015, 2035] },

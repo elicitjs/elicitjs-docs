@@ -29,6 +29,7 @@
   const md = (s) => esc(s || '')
     .replace(/`([^`]+)`/g, '<code>$1</code>')
     .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+    .replace(/(^|[\s(])_([^_\s][^_]*?)_(?=[\s.,;:!?)]|$)/g, '$1<i>$2</i>')
     .replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
 
   // ------------------------------------------------------------ catalog
@@ -293,56 +294,71 @@
     return panel;
   }
 
-  // ------------------------------------------------------------ sidebar
+  // ------------------------------------------------------------ routes + sidebar
+  // #/                      overview          #/gallery/<lib>[/<section>]  gallery grid
+  // #/analysis, #/beyond    study pages       #/<id>                       one example
   const nav = $('#nav');
-  const search = $('#search');
-  const filterBtns = document.querySelectorAll('[data-filter]');
-  let filter = 'all';
-  try { filter = localStorage.getItem('gallery-filter') || 'all'; } catch { /* storage blocked */ }
+  const slug = (s) => String(s).toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const sectionsOf = (lib) => [...new Set(all.filter((e) => e.lib === lib).map((e) => e.section))];
+  const store = {
+    get(k, d) { try { return localStorage.getItem(k) || d; } catch { return d; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage blocked */ } },
+  };
+  let currentLib = store.get('gallery-lib', 'vl') === 'plot' ? 'plot' : 'vl';
+  let filter = store.get('gallery-filter', 'all');
+  let query = '';
 
-  function buildNav() {
-    const q = (search.value || '').toLowerCase().trim();
+  function parseRoute() {
+    const parts = location.hash.replace(/^#\/?/, '').split('/');
+    if (!parts[0]) return { page: 'overview' };
+    if (parts[0] === 'analysis' || parts[0] === 'beyond') return { page: parts[0] };
+    if (parts[0] === 'gallery') return { page: 'gallery', lib: parts[1] === 'plot' ? 'plot' : 'vl', section: parts[2] || null };
+    return { page: 'entry', id: decodeURIComponent(parts.join('/')) };
+  }
+
+  function navItem(href, label, active, count, attrs = {}) {
+    return h('a', { href, class: 'nav-item' + (active ? ' active' : ''), ...attrs },
+      h('span', { class: 'nav-label' }, label), count != null ? h('span', { class: 'n' }, count) : null);
+  }
+
+  function buildNav(r) {
     nav.innerHTML = '';
-    const top = h('div', { class: 'nav-top' },
-      h('a', { href: '#/', class: 'nav-link' }, 'Overview'),
-      h('a', { href: '#/analysis', class: 'nav-link' }, 'Outcome analysis'),
-      h('a', { href: '#/beyond', class: 'nav-link' }, 'Beyond the two libraries'));
-    nav.append(top);
-    for (const lib of ['vl', 'plot']) {
-      const items = all.filter((e) => e.lib === lib)
-        .filter((e) => filter === 'all' || statusOf(e) === filter)
-        .filter((e) => !q || (e.title + ' ' + e.section + ' ' + e.ref).toLowerCase().includes(q));
-      if (!items.length) continue;
-      nav.append(h('div', { class: 'nav-lib' }, LIB[lib]));
-      const sections = [...new Set(items.map((e) => e.section))];
-      for (const s of sections) {
-        const group = h('details', { class: 'nav-sec', open: !!q || filter !== 'all' || null },
-          h('summary', {}, s, h('span', { class: 'n' }, items.filter((e) => e.section === s).length)));
-        for (const e of items.filter((x) => x.section === s)) {
-          group.append(h('a', { href: `#/${e.id}`, class: 'nav-item', 'data-id': e.id },
-            h('span', { class: `dot s-${statusOf(e)}`, title: STATUS[statusOf(e)].label }), e.title));
-        }
-        nav.append(group);
+    const entry = r.page === 'entry' ? byId[r.id] : null;
+    nav.append(h('div', { class: 'nav-group' },
+      h('div', { class: 'nav-head' }, 'Study'),
+      navItem('#/', 'Overview', r.page === 'overview'),
+      navItem('#/analysis', 'Outcome analysis', r.page === 'analysis'),
+      navItem('#/beyond', 'Beyond the two libraries', r.page === 'beyond')));
+    const lib = currentLib;
+    const list = all.filter((e) => e.lib === lib);
+    const g = h('div', { class: 'nav-group' },
+      h('div', { class: 'nav-head' }, `${LIB[lib]} chart types`),
+      navItem(`#/gallery/${lib}`, 'All examples', r.page === 'gallery' && !r.section, list.length));
+    for (const s of sectionsOf(lib)) {
+      const items = list.filter((e) => e.section === s);
+      const on = entry ? entry.section === s : r.page === 'gallery' && r.section === slug(s);
+      g.append(navItem(`#/gallery/${lib}/${slug(s)}`, s, on, items.length, { 'data-sec': slug(s) }));
+      if (entry && entry.section === s) {
+        g.append(h('div', { class: 'nav-sub' }, ...items.map((x) =>
+          h('a', { href: `#/${x.id}`, class: 'nav-subitem' + (x.id === entry.id ? ' active' : '') },
+            h('span', { class: `dot s-${statusOf(x)}`, title: STATUS[statusOf(x)].label }), x.title))));
       }
     }
-    markActive();
+    nav.append(g);
+    nav.append(h('div', { class: 'nav-legend' }, ...['full', 'partial', 'none'].map((k) =>
+      h('span', {}, h('span', { class: `dot s-${k}` }), STATUS[k].label))));
+    // Keep the current example in view in a long section list.
+    const act = nav.querySelector('.nav-subitem.active');
+    if (act) act.scrollIntoView({ block: 'nearest' });
   }
-  function markActive() {
-    const id = location.hash.replace(/^#\//, '');
-    nav.querySelectorAll('.nav-item, .nav-link').forEach((a) => a.classList.toggle('active', a.getAttribute('href') === `#/${id}`));
-    const act = nav.querySelector('.nav-item.active');
-    if (act) { const d = act.closest('details'); if (d) d.open = true; }
+
+  function updateTopbar(r) {
+    const libPage = r.page === 'gallery' || r.page === 'entry';
+    document.querySelectorAll('.libswitch [data-lib]').forEach((a) =>
+      a.classList.toggle('on', libPage && a.dataset.lib === currentLib));
+    document.querySelectorAll('.toplinks [data-page]').forEach((a) =>
+      a.classList.toggle('on', a.dataset.page === r.page));
   }
-  search.addEventListener('input', buildNav);
-  filterBtns.forEach((b) => {
-    b.classList.toggle('on', b.dataset.filter === filter);
-    b.addEventListener('click', () => {
-      filter = b.dataset.filter;
-      try { localStorage.setItem('gallery-filter', filter); } catch { /* storage blocked */ }
-      filterBtns.forEach((x) => x.classList.toggle('on', x === b));
-      buildNav();
-    });
-  });
 
   // ------------------------------------------------------------ pages
   const main = $('#main');
@@ -412,118 +428,269 @@
     return h('span', { class: 'chip', title: f ? f.description : key }, f ? f.label : key);
   }
 
+  // ------------------------------------------------------------ gallery grid
+  const thumbUrl = (e) => (e.lib === 'vl' ? `https://vega.github.io/vega-lite/examples/${e.ref}.svg` : e.thumbnail || null);
+  let spy = null; // stops the scroll listener that tracks the visible section
+
+  function exampleCard(e) {
+    const s = statusOf(e);
+    const n = (e.interfaces || []).length;
+    const src = thumbUrl(e);
+    const fallback = () => h('div', { class: 'ex-noimg' }, e.title);
+    const thumb = h('div', { class: `ex-thumb ex-thumb-${e.lib}` },
+      src ? h('img', { src, alt: '', loading: 'lazy', decoding: 'async', onerror: (ev) => ev.target.replaceWith(fallback()) }) : fallback());
+    return h('a', { href: `#/${e.id}`, class: 'ex', title: e.title },
+      thumb,
+      h('div', { class: 'ex-meta' },
+        h('div', { class: 'ex-title' }, e.title),
+        h('div', { class: 'ex-sub' },
+          h('span', { class: `dot s-${s}` }), STATUS[s].label,
+          n ? h('span', { class: 'ex-n' }, `${n} interface${n > 1 ? 's' : ''}`) : null)));
+  }
+
+  function scrollToSection(sec) {
+    const el = sec && document.getElementById(`sec-${sec}`);
+    if (el) el.scrollIntoView({ block: 'start' }); else window.scrollTo(0, 0);
+  }
+
+  function pageGallery(r) {
+    const lib = r.lib;
+    const list = all.filter((e) => e.lib === lib);
+    const c = counts(list);
+    main.classList.add('wide');
+    main.append(h('header', { class: 'page-head' },
+      h('div', { class: 'eyebrow' }, 'Gallery'),
+      h('h1', {}, `${LIB[lib]} examples`),
+      h('p', { class: 'lead' }, `Every example in the ${LIB[lib]} gallery. Open one to see the original beside its ElicitJS recreation, with each elicitation interface in its own tab.`),
+      h('div', { class: 'head-stats' }, statBar(list),
+        h('span', { class: 'muted small' }, `${list.length} examples · ${c.full} recreated · ${c.partial} partly · ${c.none} not supported${c.todo ? ` · ${c.todo} pending` : ''}`))));
+
+    const shown = h('span', { class: 'optbar-count' });
+    const body = h('div', { class: 'ex-sections' });
+    const chips = h('div', { class: 'seg', role: 'group', 'aria-label': 'Filter by outcome' });
+    const FILTERS = [['all', 'All'], ['full', 'Recreated'], ['partial', 'Partly'], ['none', 'Not supported']];
+    const render = () => {
+      body.innerHTML = '';
+      const q = query.toLowerCase().trim();
+      const items = list
+        .filter((e) => filter === 'all' || statusOf(e) === filter)
+        .filter((e) => !q || (e.title + ' ' + e.section + ' ' + e.ref).toLowerCase().includes(q));
+      shown.textContent = items.length === list.length ? `${list.length} examples` : `${items.length} of ${list.length}`;
+      for (const s of sectionsOf(lib)) {
+        const sec = items.filter((e) => e.section === s);
+        if (!sec.length) continue;
+        body.append(h('section', { class: 'ex-section', id: `sec-${slug(s)}`, 'data-sec': slug(s) },
+          h('h2', {}, s, h('small', {}, ` ${sec.length}`)),
+          h('div', { class: 'ex-grid' }, ...sec.map(exampleCard))));
+      }
+      if (!items.length) body.append(h('p', { class: 'placeholder' }, 'No examples match this filter.'));
+      watchSections();
+    };
+    FILTERS.forEach(([k, label]) => chips.append(h('button', {
+      type: 'button', class: filter === k ? 'on' : null,
+      onclick: (ev) => {
+        filter = k; store.set('gallery-filter', k);
+        chips.querySelectorAll('button').forEach((b) => b.classList.toggle('on', b === ev.currentTarget));
+        render();
+      },
+    }, label)));
+    const input = h('input', {
+      type: 'search', class: 'optbar-search', placeholder: 'Filter examples…', 'aria-label': 'Filter examples',
+      oninput: (ev) => { query = ev.target.value; render(); },
+    });
+    input.value = query;
+    main.append(h('div', { class: 'optbar' }, input, chips, shown), body);
+    render();
+    if (r.section) requestAnimationFrame(() => scrollToSection(r.section));
+  }
+
+  // Highlight the sidebar's section as its cards scroll past: the last section
+  // whose heading has reached the sticky bars.
+  function watchSections() {
+    if (spy) spy();
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const bar = main.querySelector('.optbar');
+      const line = (bar ? bar.getBoundingClientRect().bottom : 0) + 24;
+      const secs = [...main.querySelectorAll('.ex-section')];
+      if (!secs.length) return;
+      const atTop = secs[0].getBoundingClientRect().top > line;
+      let cur = secs[0];
+      for (const el of secs) if (el.getBoundingClientRect().top <= line) cur = el;
+      nav.querySelectorAll('.nav-item[data-sec]').forEach((a) => a.classList.toggle('active', !atTop && a.dataset.sec === cur.dataset.sec));
+      const allLink = nav.querySelector(`.nav-item[href="#/gallery/${currentLib}"]`);
+      if (allLink) allLink.classList.toggle('active', atTop);
+    };
+    const onScroll = () => { if (!frame) frame = requestAnimationFrame(update); };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    spy = () => { window.removeEventListener('scroll', onScroll); if (frame) cancelAnimationFrame(frame); spy = null; };
+    onScroll();
+  }
+
+  // ------------------------------------------------------------ one example
+  // Top to bottom:
+  //   header   breadcrumbs, title, outcome, the one-line verdict
+  //   panels   original | ElicitJS, each: head / intro / chart / code. The
+  //            ElicitJS panel has one tab per view (the recreation first, then
+  //            each interface); its intro is the view's title, question and
+  //            gesture, so you read what is asked before you answer it.
+  //   details  what is missing and why (the example), and how the active
+  //            interface works plus its live getData() (the view).
   async function pageEntry(id) {
     const e = byId[id];
     if (!e) { main.append(h('h1', {}, 'Not found'), h('p', {}, id)); return; }
     const s = statusOf(e);
-    const idx = all.indexOf(e);
-    const prev = all[idx - 1], next = all[idx + 1];
-    main.append(h('header', { class: 'page-head' },
-      h('div', { class: 'eyebrow' }, `${LIB[e.lib]} · ${e.section}`),
-      h('h1', {}, e.title, ' ', badge(e)),
-      e.catalog.description ? h('p', { class: 'muted', html: md(e.catalog.description) }) : null,
-      e.verdict ? h('p', { class: 'lead', html: md(e.verdict) }) : null,
-      h('div', { class: 'pager' },
-        prev ? h('a', { href: `#/${prev.id}` }, '← ', prev.title) : h('span'),
-        h('a', { href: e.url, target: '_blank', rel: 'noopener' }, 'Original ↗'),
-        next ? h('a', { href: `#/${next.id}` }, next.title, ' →') : h('span'))));
+    const libList = all.filter((x) => x.lib === e.lib);
+    const idx = libList.indexOf(e);
+    const prev = libList[idx - 1], next = libList[idx + 1];
+    main.classList.add('wide');
 
-    // Side by side: original | ElicitJS
+    main.append(h('header', { class: 'ex-head' },
+      h('div', { class: 'crumbs' },
+        h('a', { href: `#/gallery/${e.lib}` }, LIB[e.lib]), h('span', { class: 'sep' }, '/'),
+        h('a', { href: `#/gallery/${e.lib}/${slug(e.section)}` }, e.section)),
+      h('div', { class: 'ex-titlerow' },
+        h('h1', {}, e.title), badge(e),
+        h('div', { class: 'pager-btns' },
+          prev ? h('a', { class: 'btn', href: `#/${prev.id}`, title: prev.title }, '← Previous') : h('span', { class: 'btn disabled' }, '← Previous'),
+          next ? h('a', { class: 'btn', href: `#/${next.id}`, title: next.title }, 'Next →') : h('span', { class: 'btn disabled' }, 'Next →'))),
+      e.verdict ? h('p', { class: 'ex-verdict', html: md(e.verdict) }) : null));
+
+    // ---- panels
     const cmp = h('div', { class: 'compare' });
     const origHost = h('div', { class: 'chart-host' });
-    const origCol = h('div', { class: 'col' }, h('h2', {}, 'Original ', h('small', {}, LIB[e.lib])), origHost);
-    const elCol = h('div', { class: 'col' }, h('h2', {}, 'ElicitJS ', h('small', {}, s === 'none' ? 'not supported' : 'recreation')));
-    cmp.append(origCol, elCol);
+    const origCode = e.lib === 'vl'
+      ? codeView(JSON.stringify(window.VL_SPECS[e.ref], null, 2), { lang: 'json', title: 'Vega-Lite spec' })
+      : window.PLOT_NOTEBOOKS[e.ref] ? codeView(window.PLOT_NOTEBOOKS[e.ref].code, { title: 'Plot code' }) : h('div');
+    const origIntro = h('div', { class: 'intro' });
+    if (e.catalog.description) {
+      const d = h('p', { class: 'intro-desc', title: 'Click to expand', html: md(e.catalog.description) });
+      d.addEventListener('click', () => d.classList.toggle('open'));
+      origIntro.append(d);
+    }
+    cmp.append(h('section', { class: 'panel' },
+      h('div', { class: 'panel-head' },
+        h('span', { class: 'panel-title' }, 'Original'), h('span', { class: 'panel-sub' }, LIB[e.lib]),
+        h('a', { class: 'panel-link', href: e.url, target: '_blank', rel: 'noopener' }, 'Open in gallery ↗')),
+      origIntro, origHost, origCode));
+    const rightPanel = h('section', { class: 'panel' });
+    cmp.append(rightPanel);
     main.append(cmp);
 
-    // Original render + code
     const origBlock = { id: `${id}:original`, kind: 'original', state: 'pending' };
     blocks.push(origBlock);
     const origP = (e.lib === 'vl' ? renderVl(e.ref, origHost) : renderPlot(e.ref, origHost)).then((r) => {
       origBlock.state = r.error ? 'error' : 'ok'; origBlock.error = r.error;
       if (r.error && e.thumbnail) origHost.append(h('img', { src: e.thumbnail, alt: e.title, class: 'thumb' }));
     });
-    if (e.lib === 'vl') {
-      origCol.append(codeView(JSON.stringify(window.VL_SPECS[e.ref], null, 2), { lang: 'json', title: 'Vega-Lite spec', open: false }));
-    } else if (window.PLOT_NOTEBOOKS[e.ref]) {
-      origCol.append(codeView(window.PLOT_NOTEBOOKS[e.ref].code, { title: 'Plot code', open: false }));
-    }
 
-    // Recreation
+    // ---- details: the example (left) and the active view (right)
+    const details = h('section', { class: 'notes' });
+    const about = h('div', { class: 'note-col' }, h('h3', { class: 'note-h' }, s === 'none' ? 'Why ElicitJS can’t draw it' : 'How the recreation differs'));
+    const facts = h('dl', { class: 'facts' });
+    if ((e.needs || []).length) facts.append(h('dt', {}, s === 'none' ? 'Needs' : 'Missing'), h('dd', {}, ...e.needs.map(featureChip)));
+    if ((e.prep || []).length) facts.append(h('dt', {}, 'Computed outside the spec'), h('dd', {}, ...e.prep.map(featureChip)));
+    if (facts.childNodes.length) about.append(facts);
+    if ((e.gaps || []).length) about.append(h('div', { class: 'note-sub' }, 'Differences from the original'), h('ul', { class: 'gap-list' }, ...e.gaps.map((g) => h('li', { html: md(g) }))));
+    if (s !== 'todo' && !(e.interfaces || []).length && e.alternative) about.append(h('div', { class: 'note-sub' }, 'What ElicitJS can ask instead'), h('p', { class: 'small', html: md(e.alternative) }));
+    if (s === 'todo') about.append(h('p', { class: 'muted' }, 'This example has not been analysed yet.'));
+    else if (about.childNodes.length === 1) about.append(h('p', { class: 'muted small' }, 'No notable differences: the recreation matches the original.'));
+    details.append(about);
+    const viewCol = h('div', { class: 'note-col note-view' });
+
     const rec = G.entries[id] && G.entries[id].recreation;
-    let recP = Promise.resolve();
-    if (s === 'todo') {
-      elCol.append(h('div', { class: 'placeholder' }, 'This example has not been analysed yet.'));
-    } else if (rec) {
-      const host = h('div', { class: 'chart-host' });
-      elCol.append(host);
-      const blk = { id: `${id}:recreation`, kind: 'recreation', state: 'pending' };
-      blocks.push(blk);
-      recP = runElicit(rec.code, host).then((r) => {
-        Object.assign(blk, { state: r.error ? 'error' : 'ok', error: r.error, warnings: r.warnings, chart: r.chart });
-        if (r.warnings.length) host.append(h('div', { class: 'warn' }, r.warnings.join('\n')));
-      });
-      elCol.append(codeView(rec.code, { title: 'ElicitJS spec', open: false }));
-    } else {
-      elCol.append(h('div', { class: 'placeholder none' },
-        h('b', {}, 'No ElicitJS recreation.'), ' ', e.verdict ? '' : 'See below for why.'));
-    }
-
-    // Gaps / needs
-    const gapBox = h('div', { class: 'gaps' });
-    if ((e.needs || []).length || (e.gaps || []).length || (e.prep || []).length) {
-      if ((e.needs || []).length) gapBox.append(h('div', {}, h('b', {}, s === 'none' ? 'Needs: ' : 'Missing: '), ...e.needs.map(featureChip)));
-      if ((e.prep || []).length) gapBox.append(h('div', {}, h('b', {}, 'Computed outside the spec: '), ...e.prep.map(featureChip)));
-      if ((e.gaps || []).length) gapBox.append(h('ul', {}, ...e.gaps.map((g) => h('li', { html: md(g) }))));
-      main.append(gapBox);
-    }
-
-    // Interfaces
     const ifs = e.interfaces || [];
-    if (ifs.length) {
-      main.append(h('h2', { class: 'ifs-title' }, 'Elicitation interfaces',
-        h('small', {}, ` ${ifs.length} way${ifs.length > 1 ? 's' : ''} to ask a question with this chart`)));
+    const views = [];
+    if (rec) views.push({ key: 'rec', label: 'Recreation', code: rec.code, rec: true });
+    ifs.forEach((iface, i) => views.push({ key: `iface-${i}`, label: iface.title || `Interface ${i + 1}`, code: iface.code, iface, i }));
+
+    const runs = [];
+    if (!views.length) {
+      rightPanel.append(h('div', { class: 'panel-head' }, h('span', { class: 'panel-title' }, 'ElicitJS'),
+        h('span', { class: 'panel-sub' }, s === 'todo' ? 'not yet analysed' : 'not supported')),
+      h('div', { class: s === 'todo' ? 'placeholder' : 'placeholder none' },
+        s === 'todo' ? 'This example has not been analysed yet.' : h('span', {}, h('b', {}, 'No ElicitJS recreation. '), 'The notes below say why.')));
+    } else {
+      details.append(viewCol);
       const tabs = h('div', { class: 'tabs', role: 'tablist' });
+      const intros = h('div', { class: 'intro-stack' });
       const panes = h('div', { class: 'panes' });
-      main.append(tabs, panes);
-      ifs.forEach((iface, i) => {
-        const pane = h('div', { class: 'pane', role: 'tabpanel', hidden: i ? true : null });
-        const tab = h('button', {
-          class: 'tab' + (i ? '' : ' on'), role: 'tab', type: 'button',
-          onclick: () => {
-            tabs.querySelectorAll('.tab').forEach((t) => t.classList.toggle('on', t === tab));
-            panes.querySelectorAll('.pane').forEach((p) => (p.hidden = p !== pane));
-          },
-        }, iface.title);
-        tabs.append(tab); panes.append(pane);
-        if (iface.question) pane.append(h('p', { class: 'question' }, h('span', { class: 'qmark' }, 'Q'), iface.question));
-        const row = h('div', { class: 'iface' });
+      const codeArea = h('div', { class: 'code-area' });
+      rightPanel.append(h('div', { class: 'panel-head tabs-head' }, h('span', { class: 'panel-title' }, 'ElicitJS'), tabs), intros, panes, codeArea);
+      const select = (k) => views.forEach((v, j) => {
+        v.tab.classList.toggle('on', j === k); v.tab.setAttribute('aria-selected', j === k ? 'true' : 'false');
+        v.intro.hidden = v.pane.hidden = v.note.hidden = v.codeEl.hidden = j !== k;
+      });
+      views.forEach((v, k) => {
+        if (k === 1 && views[0].rec) tabs.append(h('span', { class: 'tab-sep', 'aria-hidden': 'true' }));
+        v.tab = h('button', {
+          class: 'tab', role: 'tab', type: 'button', 'data-view': v.rec ? 'rec' : 'iface',
+          'data-iface': v.iface ? v.i : null, onclick: () => select(k),
+        }, v.label);
+        tabs.append(v.tab);
+
+        // above the chart: what this view is, and what to do
+        v.intro = h('div', { class: 'intro' });
+        if (v.rec) {
+          v.intro.append(h('div', { class: 'intro-title' }, 'Recreation'),
+            h('p', { class: 'intro-text' }, 'The original chart drawn with ordinary ElicitJS marks.' +
+              (ifs.length ? ` The ${ifs.length === 1 ? 'next tab turns' : `other ${ifs.length} tabs turn`} it into a question you answer by editing the chart.` : '')));
+        } else {
+          const f = v.iface;
+          v.intro.append(h('div', { class: 'intro-title' }, f.title || 'Interface', h('span', { class: 'intro-count' }, `Interface ${v.i + 1} of ${ifs.length}`)));
+          if (f.question) v.intro.append(h('p', { class: 'question' }, h('span', { class: 'qmark' }, 'Q'), h('span', { html: md(f.question) })));
+          if (f.try) v.intro.append(h('p', { class: 'try', html: '<b>Try</b> ' + md(f.try) }));
+        }
+        intros.append(v.intro);
+
         const host = h('div', { class: 'chart-host' });
-        const left = h('div', { class: 'col' }, host);
-        if (iface.try) left.append(h('p', { class: 'try', html: '<b>Try:</b> ' + md(iface.try) }));
-        const right = h('div', { class: 'col' });
-        row.append(left, right); pane.append(row);
-        if (iface.why) right.append(h('div', { class: 'why', html: md(iface.why) }));
-        if ((iface.uses || []).length) right.append(h('div', { class: 'uses' }, h('b', {}, 'Uses '), ...iface.uses.map((u) => h('code', {}, u))));
-        const blk = { id: `${id}:iface:${i}`, kind: 'interface', state: 'pending', title: iface.title };
+        v.pane = h('div', { class: 'pane', role: 'tabpanel' }, host);
+        panes.append(v.pane);
+        v.codeEl = codeView(v.code, { title: 'ElicitJS spec' });
+        codeArea.append(v.codeEl);
+
+        // below everything: how it works, and what it returns
+        v.note = h('div', { class: 'note-pane' });
+        const dataSlot = h('div', { class: 'data-slot' });
+        if (v.rec) {
+          v.note.append(h('h3', { class: 'note-h' }, ifs.length ? 'Questions this chart can ask' : 'Interfaces'));
+          if (ifs.length) {
+            v.note.append(h('ol', { class: 'iface-list' }, ...ifs.map((f, i) => h('li', {},
+              h('button', { type: 'button', class: 'linklike', onclick: () => select(views.findIndex((x) => x.iface === f)) }, f.title || `Interface ${i + 1}`),
+              f.question ? h('div', { class: 'small muted', html: md(f.question) }) : null))));
+          } else {
+            v.note.append(h('p', { class: 'muted small' }, 'No elicitation interface for this example.'));
+          }
+        } else {
+          const f = v.iface;
+          v.note.append(h('h3', { class: 'note-h' }, 'How it works'));
+          if (f.why) v.note.append(h('div', { class: 'why', html: md(f.why) }));
+          if ((f.uses || []).length) v.note.append(h('div', { class: 'uses' }, h('b', {}, 'Uses '), ...f.uses.map((u) => h('code', {}, u))));
+          v.note.append(dataSlot);
+        }
+        viewCol.append(v.note);
+
+        const blk = v.rec
+          ? { id: `${id}:recreation`, kind: 'recreation', state: 'pending' }
+          : { id: `${id}:iface:${v.i}`, kind: 'interface', state: 'pending', title: v.iface.title };
         blocks.push(blk);
         const run = () => {
-          host.innerHTML = '';
-          right.querySelectorAll('.data').forEach((d) => d.remove());
-          return runElicit(iface.code, host).then((r) => {
+          host.innerHTML = ''; dataSlot.innerHTML = '';
+          return runElicit(v.code, host).then((r) => {
             Object.assign(blk, { state: r.error ? 'error' : 'ok', error: r.error, warnings: r.warnings, chart: r.chart });
             if (r.warnings.length) host.append(h('div', { class: 'warn' }, r.warnings.join('\n')));
-            if (r.chart && r.chart.getData) right.append(dataPanel(r.chart));
+            if (!v.rec && r.chart && r.chart.getData) dataSlot.append(dataPanel(r.chart));
           });
         };
-        left.append(h('button', { class: 'reset', type: 'button', onclick: run }, 'Reset'));
+        if (!v.rec) v.pane.append(h('div', { class: 'pane-foot' }, h('button', { class: 'reset', type: 'button', onclick: run }, '↺ Reset')));
         blk.promise = run();
-        pane.append(codeView(iface.code, { title: 'ElicitJS spec' }));
+        runs.push(blk.promise);
       });
-    } else if (s !== 'todo') {
-      if (e.alternative) main.append(h('p', { class: 'muted', html: md(e.alternative) }));
+      select(0);
     }
-    await Promise.all([origP, recP, ...blocks.map((b) => b.promise)]);
+    main.append(h('h2', { class: 'details-title' }, 'Details'), details);
+    await Promise.all([origP, ...runs]);
   }
 
   function pageAnalysis() {
@@ -632,20 +799,35 @@
 
   // ------------------------------------------------------------ router
   let routeToken = 0;
+  let shown = null; // the route currently rendered
   async function route() {
     const token = ++routeToken;
+    const r = parseRoute();
+    const lib = r.page === 'gallery' ? r.lib : r.page === 'entry' && byId[r.id] ? byId[r.id].lib : null;
+    if (lib) { currentLib = lib; store.set('gallery-lib', lib); }
+    buildNav(r);
+    updateTopbar(r);
+    document.body.classList.remove('nav-open');
+    // Within one library's gallery, a section link only scrolls.
+    if (shown && shown.page === 'gallery' && r.page === 'gallery' && shown.lib === r.lib) {
+      shown = r; window.GALLERY_STATE.route = location.hash;
+      scrollToSection(r.section);
+      return;
+    }
+    shown = r;
     disposeRuntimes();
+    if (spy) spy();
     blocks.length = 0;
     window.GALLERY_STATE = { route: location.hash, done: false, blocks };
     main.innerHTML = '';
-    main.scrollTop = 0; window.scrollTo(0, 0);
-    const id = location.hash.replace(/^#\/?/, '');
-    markActive();
+    main.className = '';
+    window.scrollTo(0, 0);
     try {
-      if (!id) pageOverview();
-      else if (id === 'analysis') pageAnalysis();
-      else if (id === 'beyond') await pageBeyond();
-      else await pageEntry(id);
+      if (r.page === 'overview') pageOverview();
+      else if (r.page === 'analysis') pageAnalysis();
+      else if (r.page === 'beyond') await pageBeyond();
+      else if (r.page === 'gallery') pageGallery(r);
+      else await pageEntry(r.id);
     } catch (err) {
       main.append(h('div', { class: 'err' }, String(err && err.stack || err)));
     }
@@ -654,8 +836,6 @@
   }
   window.addEventListener('hashchange', route);
   $('#menu')?.addEventListener('click', () => document.body.classList.toggle('nav-open'));
-  nav.addEventListener('click', (ev) => { if (ev.target.closest('a')) document.body.classList.remove('nav-open'); });
 
-  buildNav();
   route();
 })();

@@ -82,30 +82,31 @@ mount(Elicit({
       title: 'Drag to forecast',
       question: 'What will each product line sell next year?',
       try: 'Drag the top of a bar. The dark tick is last year.',
-      why: '`move()` on `y` writes the forecast. Last year\'s values are a `context` table drawn as `tickY`, so they stay fixed and out of `getData()`; `clamp` keeps every forecast on the axis.',
-      uses: ['move()', 'clamp()', 'context table', 'tickY'],
+      why: '`move()` on `y` writes the forecast. Last year\'s values are `context` rows with a `last` column of their own, drawn as `tickY`, so they stay fixed and out of `getData()`; `clamp` keeps every forecast on the axis.',
+      uses: ['move()', 'clamp()', 'context', 'tickY'],
       code: `const lastYear = [
   { a: "A", b: 28 }, { a: "B", b: 55 }, { a: "C", b: 43 },
   { a: "D", b: 91 }, { a: "E", b: 81 }, { a: "F", b: 53 },
   { a: "G", b: 19 }, { a: "H", b: 87 }, { a: "I", b: 52 },
 ];
-const fields = {
-  a: { type: "categorical", domain: lastYear.map((d) => d.a) },
-  b: { type: "quantitative", domain: [0, 120] },
-};
 mount(Elicit({
   width: 420, height: 260,
   margins: { top: 14, right: 12, bottom: 30, left: 40 },
-  schema: { data: fields, lastYear: { context: true, fields } },     //! last year, drawn but never elicited
-  data: { data: lastYear.map((d) => ({ ...d })), lastYear },
+  schema: {
+    a: { type: "categorical", domain: lastYear.map((d) => d.a) },
+    b: { type: "quantitative", domain: [0, 120] },
+    last: { type: "quantitative", domain: [0, 120] },
+  },
+  data: [...lastYear.map(({ a, b }) => ({ a, last: b })), ...lastYear.map((d) => ({ ...d }))],
+  context: (d) => d.last != null,                                //! last year, drawn but never elicited
   constraints: [ clamp({ min: 0, max: 120 }) ],                  //! forecasts stay on the axis
   marks: [
     barY({
       fill: "#4C78A8", fillOpacity: 0.55,
       channels: { x: { field: "a" }, y: { field: "b", edit: move() } },  //! dragging the top writes \`b\`
     }),
-    tickY({ table: "lastYear", stroke: "#1f2937", strokeWidth: 2,
-      channels: { x: { field: "a" }, y: { field: "b" } } }),
+    tickY({ stroke: "#1f2937", strokeWidth: 2,
+      channels: { x: { field: "a" }, y: { field: "last" } } }),
   ],
 }))`,
 
@@ -578,8 +579,8 @@ mount(Elicit({
       title: 'Sweep a band',
       question: 'Unemployment through 2007 is shown. Between what low and high do you think it ran over 2008 and 2009?',
       try: 'Sweep along the top edge of the goldenrod band to raise or lower it, along the bottom edge to set the low.',
-      why: 'Each month is a row with a `lo` and a `hi`, and `edit.line.sweep()` on both `y1` and `y2` paints whichever edge is nearer the pointer at press. `ordering` keeps every low under its high. The record is a `context` table: drawn as a plain area, read-only, and left out of `getData()`.',
-      uses: ['edit.line.sweep()', 'ordering()', 'context table'],
+      why: 'Each month is a row with a `lo` and a `hi`, and `edit.line.sweep()` on both `y1` and `y2` paints whichever edge is nearer the pointer at press. `ordering` keeps every low under its high. The record is `context`: rows with a `count` and no `lo`/`hi`, drawn as a plain area, read-only, and left out of `getData()`.',
+      uses: ['edit.line.sweep()', 'ordering()', 'context'],
       code: `const raw = await vegaData("unemployment-across-industries.json");
 const cut = new Date("2008-01-01");
 const totals = d3.rollups(raw, (v) => d3.sum(v, (d) => d.count), (d) => d.date)
@@ -590,23 +591,22 @@ const record = totals.filter((d) => d.date < cut);
 const last = record.at(-1).count;
 const ahead = totals.filter((d) => d.date >= cut)
   .map((d) => ({ date: d.date, lo: last * 0.85, hi: last * 1.15 }));    // a flat, wide prior
-const dates = { type: "temporal", domain: d3.extent(totals, (d) => d.date) };
 mount(Elicit({
   width: 440, height: 260,
   margins: { top: 12, right: 14, bottom: 30, left: 66 },
 
   schema: {
-    data: { date: dates,
-            lo: { type: "quantitative", domain: [0, 18000] },
-            hi: { type: "quantitative", domain: [0, 18000] } },
-    record: { context: true, fields: { date: dates,                     //! the record: drawn, never elicited
-              count: { type: "quantitative", domain: [0, 18000] } } },
+    date: { type: "temporal", domain: d3.extent(totals, (d) => d.date) },
+    count: { type: "quantitative", domain: [0, 18000] },
+    lo: { type: "quantitative", domain: [0, 18000] },
+    hi: { type: "quantitative", domain: [0, 18000] },
   },
-  data: { data: ahead, record },
+  data: [...record, ...ahead],
+  context: (d) => d.date < cut,                                         //! the record: drawn, never elicited
   constraints: [ ordering({ field: ["lo", "hi"] }) ],                   //! a low never passes its high
   axes: { x: { tickFormat: d3.timeFormat("%Y") }, y: { title: "unemployed (thousands)" } },
   marks: [
-    areaY({ table: "record", fill: "#4c78a8", fillOpacity: 0.8,
+    areaY({ fill: "#4c78a8", fillOpacity: 0.8,
       channels: { x: { field: "date" }, y: { field: "count" } } }),
     areaY({
       fill: "goldenrod", fillOpacity: 0.35, stroke: "goldenrod", handles: "hit",
@@ -697,12 +697,12 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-selection_translate_scatterplot_drag',
   status: 'full',
-  verdict: 'The sized-circle scatter opens on the original\'s 75–150 hp × 20–40 mpg window, and `edit.axis.zoom()` on both axes gives the wheel zoom that `bind: "scales"` provides. Dragging the plot to pan is out of scope.',
+  verdict: 'The sized-circle scatter opens on the original\'s 75–150 hp × 20–40 mpg window, and `edit.axis.zoom()` with `edit.axis.pan()` on both axes gives the wheel zoom and drag pan that `bind: "scales"` provides.',
   needs: [],
   prep: ['prep-calculate'],
   gaps: [
-    'Every car is loaded; the schema declares the full range (the zoom-out ceiling) and `el.setDomain` opens on the original window. `clip: true` hides the cars outside it, as Vega-Lite clips them.',
-    'The wheel zooms each axis about the pointer, and every zoom is undoable; dragging to pan, which `bind: "scales"` also gives, is out of scope.',
+    'Every car is loaded; the schema declares the full range and `el.setDomain` opens on the original window. The cars outside the window are clipped, as Vega-Lite clips them.',
+    'Zoom and pan stop at the declared domain (0–240 hp, 0–50 mpg), where Vega-Lite pans without limit. Every zoom and every pan is undoable.',
   ],
   recreation: {
     code: `const cars = (await vegaData("cars.json"))
@@ -711,7 +711,6 @@ GALLERY.add({
 const el = Elicit({
   width: 430, height: 300,
   margins: { top: 12, right: 12, bottom: 36, left: 50 },
-  clip: true,
   data: cars,
   schema: {
     hp: { type: "quantitative", domain: [0, 240] },
@@ -719,8 +718,8 @@ const el = Elicit({
     cyl: { type: "quantitative", domain: [0, 8] },
   },
   axes: {
-    x: { title: "Horsepower", edit: edit.axis.zoom() },
-    y: { title: "Miles_per_Gallon", edit: edit.axis.zoom() },
+    x: { title: "Horsepower", edits: [edit.axis.zoom(), edit.axis.pan()] },
+    y: { title: "Miles_per_Gallon", edits: [edit.axis.zoom(), edit.axis.pan()] },
   },
   marks: [
     point({
@@ -771,31 +770,30 @@ mount(Elicit({
     {
       title: 'Zoom in, then place',
       question: 'Where would a 1982 Honda Civic sit among these cars? Zoom in to place it precisely.',
-      try: 'Scroll over the plot to zoom, then drag the red dot. Scroll the other way to see the whole field.',
-      why: '`edit.axis.zoom()` on each axis zooms the domain about the pointer, and `move()` inverts through the zoomed scale, so the closer you zoom the finer the answer. The other cars are a `context` table, so they frame the guess and stay out of `getData()`.',
-      uses: ['edit.axis.zoom()', 'move()', 'context table'],
+      try: 'Scroll over the plot to zoom and drag the empty plot to pan, then drag the red dot. Scroll the other way to see the whole field.',
+      why: '`edit.axis.zoom()` zooms each axis about the pointer and `edit.axis.pan()` slides it as you drag the plot. A press on the red dot still reaches its `move()`, which inverts through the zoomed scale, so the closer you zoom the finer the answer. The other cars are `context` rows, with columns of their own, so they frame the guess and stay out of `getData()`.',
+      uses: ['edit.axis.zoom()', 'edit.axis.pan()', 'move()', 'context'],
       code: `const seen = (await vegaData("cars.json"))
   .filter((d) => d.Horsepower != null && d.Miles_per_Gallon != null)
-  .map((d) => ({ hp: d.Horsepower, mpg: d.Miles_per_Gallon, cyl: d.Cylinders }));
-const fields = {
-  hp: { type: "quantitative", domain: [0, 240] },
-  mpg: { type: "quantitative", domain: [0, 50] },
-  cyl: { type: "quantitative", domain: [0, 8] },
-};
+  .map((d) => ({ Horsepower: d.Horsepower, Miles_per_Gallon: d.Miles_per_Gallon, Cylinders: d.Cylinders }));
+const hp = { type: "quantitative", domain: [0, 240] };
+const mpg = { type: "quantitative", domain: [0, 50] };
+const cyl = { type: "quantitative", domain: [0, 8] };
 mount(Elicit({
   width: 430, height: 300,
   margins: { top: 12, right: 14, bottom: 36, left: 50 },
-  clip: true,
-  schema: { data: fields, seen: { context: true, fields } },            //! the record frames the guess
-  data: { data: [{ hp: 120, mpg: 25, cyl: 4 }], seen },
+  schema: { hp, mpg, cyl, Horsepower: hp, Miles_per_Gallon: mpg, Cylinders: cyl },
+  data: [...seen, { hp: 120, mpg: 25, cyl: 4 }],
+  context: (d) => d.Horsepower != null,                                  //! the record frames the guess
   axes: {
-    x: { title: "Horsepower", edit: edit.axis.zoom() },                  //! the wheel zooms about the pointer
-    y: { title: "Miles_per_Gallon", edit: edit.axis.zoom() },
+    x: { title: "Horsepower", edits: [edit.axis.zoom(), edit.axis.pan()] },  //! scroll to zoom, drag to pan
+    y: { title: "Miles_per_Gallon", edits: [edit.axis.zoom(), edit.axis.pan()] },
   },
   marks: [
     point({
-      table: "seen", fill: "#4c78a8", fillOpacity: 0.35,
-      channels: { x: { field: "hp" }, y: { field: "mpg" }, size: { field: "cyl", scale: { type: "sqrt", range: [0, 8] } } },
+      fill: "#4c78a8", fillOpacity: 0.35,
+      channels: { x: { field: "Horsepower" }, y: { field: "Miles_per_Gallon" },
+                  size: { field: "Cylinders", scale: { type: "sqrt", range: [0, 8] } } },
     }),
     point({
       fill: "#e45756", stroke: "#fff", strokeWidth: 1.5, size: 7,
@@ -856,8 +854,8 @@ mount(Elicit({
       title: 'Fit the trend',
       question: 'Among 4-cylinder cars from 1977, how fast does mileage fall as horsepower rises?',
       try: 'Drag the left handle to move the line, either end handle to tilt it.',
-      why: 'The sliders picked a subset to look at; here that subset is the question. `trend` draws `mpg = intercept + slope × hp`, and the two edits write those parameters. The cars are a `context` table, grey with the asked-about group in colour, and stay out of `getData()`.',
-      uses: ['trend', 'edit.trend.intercept()', 'edit.trend.slope()', 'context table'],
+      why: 'The sliders picked a subset to look at; here that subset is the question. `trend` draws `mpg = intercept + slope × hp`, and the two edits write those parameters. The cars are `context` rows, grey with the asked-about group in colour, and stay out of `getData()`.',
+      uses: ['trend', 'edit.trend.intercept()', 'edit.trend.slope()', 'context'],
       code: `const cars = (await vegaData("cars.json"))
   .filter((d) => d.Horsepower != null && d.Miles_per_Gallon != null)
   .map((d) => {
@@ -865,22 +863,22 @@ mount(Elicit({
     return { hp: d.Horsepower, mpg: d.Miles_per_Gallon, group: match ? "4-cyl 1977" : "other", r: match ? 4.5 : 2.5 };
   })
   .sort((a, b) => a.r - b.r);
-const hp = { type: "quantitative", domain: [40, 240] };
-const mpg = { type: "quantitative", domain: [0, 50] };
 mount(Elicit({
   width: 430, height: 300,
   margins: { top: 12, right: 14, bottom: 36, left: 50 },
   axes: { origin: false, x: { title: "Horsepower" }, y: { title: "mpg" } },
   schema: {
-    data: { hp, mpg, intercept: { type: "quantitative" }, slope: { type: "quantitative" } },
-    cars: { context: true, fields: { hp, mpg,                          //! the cars: drawn, never elicited
-      group: { type: "categorical", domain: ["4-cyl 1977", "other"] },
-      r: { type: "quantitative", domain: [2.5, 4.5] } } },
+    hp: { type: "quantitative", domain: [40, 240] },
+    mpg: { type: "quantitative", domain: [0, 50] },
+    group: { type: "categorical", domain: ["4-cyl 1977", "other"] },
+    r: { type: "quantitative", domain: [2.5, 4.5] },
+    intercept: { type: "quantitative" }, slope: { type: "quantitative" },
   },
-  data: { data: [{ intercept: 30, slope: 0 }], cars },
+  data: [...cars, { intercept: 30, slope: 0 }],
+  context: (d) => d.hp != null,                                        //! the cars: drawn, never elicited
   marks: [
     point({
-      table: "cars", opacity: 0.8,
+      opacity: 0.8,
       channels: { x: { field: "hp" }, y: { field: "mpg" }, size: { field: "r", scale: null },
                   fill: { field: "group", scale: { range: ["#4c78a8", "#d4d4d4"] } } },
     }),
@@ -1241,7 +1239,7 @@ GALLERY.add({
   needs: ['selection'],
   prep: ['prep-calculate', 'prep-reshape'],
   gaps: [
-    'The pivot is a `d3.rollup` into one row per date; a `ruleX` over it is invisible until `effects.hovered` lifts it to 0.3, and its `tip` lists the five prices. The long rows the lines draw are a `context` table beside it.',
+    'The pivot is a `d3.rollup` into one row per date; a `ruleX` over it is invisible until `effects.hovered` lifts it to 0.3, and its `tip` lists the five prices. The long rows the lines draw are `context` rows beside it, with a `day` column of their own so the rules skip them.',
     'The rules carry `select()` only so they are pointer-active (the hovered effect needs that); a click selects a date and writes nothing.',
     'No points on the lines at the hovered date: that is a hover-driven filter on another layer.',
   ],
@@ -1249,25 +1247,26 @@ GALLERY.add({
     code: `const parse = d3.timeParse("%b %d %Y");
 const symbols = ["AAPL", "AMZN", "GOOG", "IBM", "MSFT"];
 const rows = (await vegaData("stocks.csv"))
-  .map((d) => ({ symbol: d.symbol, date: parse(d.date), price: d.price }));
+  .map((d) => ({ symbol: d.symbol, day: parse(d.date), price: d.price }));
 // The pivot: one row per date, one column per stock.
-const wide = d3.rollups(rows, (v) => Object.fromEntries(v.map((d) => [d.symbol, d.price])), (d) => +d.date)
+const wide = d3.rollups(rows, (v) => Object.fromEntries(v.map((d) => [d.symbol, d.price])), (d) => +d.day)
   .map(([t, prices]) => ({ date: new Date(t), ...prices }));
-const date = { type: "temporal", domain: d3.extent(rows, (d) => d.date) };
+const date = { type: "temporal", domain: d3.extent(rows, (d) => d.day) };
 const price = { type: "quantitative", domain: [0, 800] };
 mount(Elicit({
   width: 400, height: 300,
   margins: { top: 12, right: 12, bottom: 30, left: 40 },
   schema: {
-    data: { date, ...Object.fromEntries(symbols.map((s) => [s, price])) },
-    prices: { context: true, fields: { symbol: { type: "categorical", domain: symbols }, date, price } },
+    date, day: date, price, symbol: { type: "categorical", domain: symbols },
+    ...Object.fromEntries(symbols.map((s) => [s, price])),
   },
-  data: { data: wide, prices: rows },
+  data: [...rows, ...wide],
+  context: (d) => d.symbol != null,          // the long rows the lines draw
   legends: { stroke: { labelWidth: 40 } },   // room for the ticker symbols
   effects: { hovered: { opacity: 0.3, outline: false }, selected: false },
   marks: [
-    lineY({ table: "prices", strokeWidth: 2,
-      channels: { x: { field: "date" }, y: { field: "price" }, stroke: { field: "symbol" } } }),
+    lineY({ strokeWidth: 2,
+      channels: { x: { field: "day" }, y: { field: "price" }, stroke: { field: "symbol" } } }),
     ruleX({ stroke: "black", strokeWidth: 3, opacity: 0, tip: symbols,
 
       channels: { x: { field: "date" } }, edits: [ select() ] }),
@@ -1280,13 +1279,13 @@ mount(Elicit({
       title: 'Draw the missing stock',
       question: 'Four stocks are shown. Draw how you think IBM\'s price moved from 2000 to 2010.',
       try: 'Press near the left edge and drag across the chart. Draw again to replace it.',
-      why: '`edit.line.draw()` turns one drag into a line, one row per year in `samples`, so IBM is the only thing in `getData()`. `count({ max: 11 })` keeps the newest eleven rows, which makes a second drawing replace the first. The four real stocks are a `context` table: drawn, read-only, never elicited.',
-      uses: ['edit.line.draw()', 'count()', 'context table'],
+      why: '`edit.line.draw()` turns one drag into a line, one row per year in `samples`, so IBM is the only thing in `getData()`. A second drawing rewrites the same eleven years, and `count` caps the table at the stocks plus eleven. The four real stocks are `context` rows with columns of their own (`yr`, `close`): drawn, read-only, never elicited.',
+      uses: ['edit.line.draw()', 'count()', 'context'],
       code: `const parse = d3.timeParse("%b %d %Y");
 const stocks = (await vegaData("stocks.csv"))
   .map((d) => ({ symbol: d.symbol, date: parse(d.date), price: d.price }))
   .filter((d) => d.symbol !== "IBM" && d.date.getMonth() === 0)
-  .map((d) => ({ symbol: d.symbol, year: d.date.getFullYear(), price: d.price }));
+  .map((d) => ({ symbol: d.symbol, yr: d.date.getFullYear(), close: d.price }));
 const year = { type: "quantitative", domain: [2000, 2010] };
 const price = { type: "quantitative", domain: [0, 800] };
 const isLast = (d, i, rows) => !rows[i + 1] || rows[i + 1].symbol !== d.symbol;
@@ -1294,23 +1293,24 @@ mount(Elicit({
   width: 400, height: 300,
   margins: { top: 12, right: 44, bottom: 30, left: 54 },
   schema: {
-    data: { year, price },
-    stocks: { context: true, fields: { year, price,                   //! the four known stocks: context only
-      symbol: { type: "categorical", domain: ["AAPL", "AMZN", "GOOG", "IBM", "MSFT"] } } },
+    year, price, yr: year, close: price,
+    symbol: { type: "categorical", domain: ["AAPL", "AMZN", "GOOG", "IBM", "MSFT"] },
   },
-  data: { data: [], stocks },
-  constraints: [ count({ max: 11 }) ],                              //! a new drawing replaces the old
+  data: stocks,
+  context: true,                                                    //! the four known stocks: context only
+  // count() counts the context rows too; "reject" keeps it from dropping them.
+  constraints: [ count({ max: stocks.length + 11, strategy: "reject" }) ],  //! one line of eleven years
   axes: { x: { tickFormat: "d" }, y: { title: "price" } },
 
   marks: [
     lineY({
-      table: "stocks", strokeWidth: 2, opacity: 0.7,
-      channels: { x: { field: "year" }, y: { field: "price" },
+      strokeWidth: 2, opacity: 0.7,
+      channels: { x: { field: "yr" }, y: { field: "close" },
                   stroke: { field: "symbol", scale: { scheme: "tableau10" } } },
     }),
     text({
-      table: "stocks", fontSize: 11, textAnchor: "start", dx: 5, dy: 4,
-      channels: { x: { field: "year" }, y: { field: "price" },
+      fontSize: 11, textAnchor: "start", dx: 5, dy: 4,
+      channels: { x: { field: "yr" }, y: { field: "close" },
                   text: { fn: (d, i, rows) => (isLast(d, i, rows) ? d.symbol : "") },
                   fill: { field: "symbol", scale: { scheme: "tableau10" } } },
     }),
@@ -1740,38 +1740,39 @@ mount(Elicit({
       title: 'Type a make',
       question: 'Which car maker do you think got the best mileage for its horsepower in this era?',
       try: 'Double-click the note, type a make (try "honda" or "ford"), press Enter.',
-      why: 'The search box becomes the answer: `editText()` on a `sticker` writes what you type into `make`. A `guides.custom` reads it and rings every car whose name matches — the original\'s regex filter, so you can check your guess against the cloud. The cars themselves are a faint `context` table whose `tip` names any car you hover.',
-      uses: ['editText()', 'sticker', 'guides.custom', 'context table', 'tip'],
+      why: 'The search box becomes the answer: `editText()` on a `sticker` writes what you type into `make`. A `guides.custom` reads it and rings every car whose name matches — the original\'s regex filter, so you can check your guess against the cloud. The cars themselves are faint `context` rows, with columns of their own, whose `tip` names any car you hover.',
+      uses: ['editText()', 'sticker', 'guides.custom', 'context', 'tip'],
       code: `const cars = (await vegaData("cars.json"))
   .filter((d) => d.Horsepower != null && d.Miles_per_Gallon != null)
-  .map((d) => ({ hp: d.Horsepower, mpg: d.Miles_per_Gallon, name: d.Name }));
+  .map((d) => ({ Horsepower: d.Horsepower, Miles_per_Gallon: d.Miles_per_Gallon, name: d.Name }));
 const hp = { type: "quantitative", domain: [0, 240] };
 const mpg = { type: "quantitative", domain: [0, 50] };
 mount(Elicit({
   width: 430, height: 300,
   margins: { top: 12, right: 12, bottom: 36, left: 50 },
   schema: {
-    data: { hp, mpg, make: { type: "categorical", open: true } },
-    cars: { context: true, fields: { hp, mpg, name: { type: "categorical" } } },
+    hp, mpg, make: { type: "categorical", open: true },
+    Horsepower: hp, Miles_per_Gallon: mpg, name: { type: "categorical" },
   },
-  // One row: the answer, pinned near the top right of the plot.
-  data: { data: [{ hp: 200, mpg: 44, make: "" }], cars },
+  // The cars, then one row: the answer, pinned near the top right of the plot.
+  data: [...cars, { hp: 200, mpg: 44, make: "" }],
+  context: (d) => d.name != null,                               // the cars: drawn, never elicited
   axes: { x: { title: "Horsepower" }, y: { title: "mpg" } },
   guides: [
     guides.custom(({ scales, data }) => {                       //! highlights every car your text matches
-      const q = (data[0].make || "").trim().toLowerCase();
+      const q = (data.find((d) => d.name == null).make || "").trim().toLowerCase();
       const hint = { type: "text", x: scales.x.encode(200), y: scales.y.encode(44) - 26, textAnchor: "middle",
                      fontSize: 10, fill: "#64748b", text: "your answer (double-click)" };
       return [hint, ...cars.filter((d) => !q || d.name.toLowerCase().includes(q)).map((d) => ({
-        type: "circle", cx: scales.x.encode(d.hp), cy: scales.y.encode(d.mpg), r: 3,
+        type: "circle", cx: scales.x.encode(d.Horsepower), cy: scales.y.encode(d.Miles_per_Gallon), r: 3,
         fill: "none", stroke: "#4c78a8", strokeWidth: 1.5, opacity: 0.85, background: true,
       }))];
     }),
   ],
   marks: [
-    point({ table: "cars", fill: "none", stroke: "#4c78a8", strokeWidth: 1.5, size: 3, opacity: 0.1,
+    point({ fill: "none", stroke: "#4c78a8", strokeWidth: 1.5, size: 3, opacity: 0.1,
       tip: ["name"],                                              //! hover a car for its name
-      channels: { x: { field: "hp" }, y: { field: "mpg" } } }),
+      channels: { x: { field: "Horsepower" }, y: { field: "Miles_per_Gallon" } } }),
 
     sticker({
       fill: "#fff", stroke: "#94a3b8", minWidth: 110, radius: 4,
@@ -1821,25 +1822,24 @@ mount(Elicit({
     {
       title: 'Hover, then commit',
       question: 'Where would a typical 2024 full-size pickup truck sit among these cars?',
-      try: 'Move over the chart to preview a spot, click to commit it.',
-      why: 'The hover IS the gesture: `create({ pick: "probe" })` draws a tentative dot under the pointer — the original\'s coral highlight, but for a value you have not given yet — and a click commits it. `count({ max: 1 })` keeps only the newest, so probing again changes your answer.',
-      uses: ['create({ pick: "probe" })', 'count()', 'context table'],
+      try: 'Move over the chart to preview a spot, click to commit it. Press Reset to start again.',
+      why: 'The hover IS the gesture: `create({ pick: "probe" })` draws a tentative dot under the pointer — the original\'s coral highlight, but for a value you have not given yet — and a click commits it. `count` caps you at one dot. The 1970s cars are `context` rows with columns of their own, so the coral mark skips them.',
+      uses: ['create({ pick: "probe" })', 'count()', 'context'],
       code: `const cars = (await vegaData("cars.json"))
   .filter((d) => d.Horsepower != null && d.Miles_per_Gallon != null)
-  .map((d) => ({ hp: d.Horsepower, mpg: d.Miles_per_Gallon }));
-const fields = {
-  hp: { type: "quantitative", domain: [0, 450] },
-  mpg: { type: "quantitative", domain: [0, 50] },
-};
+  .map((d) => ({ Horsepower: d.Horsepower, Miles_per_Gallon: d.Miles_per_Gallon }));
+const hp = { type: "quantitative", domain: [0, 450] };
+const mpg = { type: "quantitative", domain: [0, 50] };
 mount(Elicit({
   width: 430, height: 300,
   margins: { top: 12, right: 12, bottom: 36, left: 50 },
-  schema: { data: fields, cars: { context: true, fields } },          //! the 1970s cars are context
-  data: { data: [], cars },
+  schema: { hp, mpg, Horsepower: hp, Miles_per_Gallon: mpg },
+  data: cars,
+  context: true,                                               //! the 1970s cars are context
   axes: { x: { title: "Horsepower" }, y: { title: "mpg" } },
   marks: [
-    point({ table: "cars", fill: "grey", opacity: 0.5, size: 3.5,
-      channels: { x: { field: "hp" }, y: { field: "mpg" } } }),
+    point({ fill: "grey", opacity: 0.5, size: 3.5,
+      channels: { x: { field: "Horsepower" }, y: { field: "Miles_per_Gallon" } } }),
 
     point({
       fill: "coral", stroke: "white", strokeWidth: 1.5, size: 8,
@@ -1847,7 +1847,8 @@ mount(Elicit({
       edits: [ create({ pick: "probe", advance: false }) ],     //! hover previews, click commits
     }),
   ],
-  constraints: [ count({ max: 1 }) ],                          //! a new click replaces the old answer
+  // count() counts the context rows too; "reject" keeps it from dropping them.
+  constraints: [ count({ max: cars.length + 1, strategy: "reject" }) ],  //! one answer
 }))`,
     },
   ],
@@ -2042,10 +2043,10 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-interactive_overview_detail',
   status: 'none',
-  verdict: 'An S&P 500 area chart whose x domain is set by brushing a small overview area below it. Either area alone is an ordinary `areaY`, and the detail view alone can zoom with `edit.axis.zoom()`; the overview linked to it is a second view, and multiple views are not covered by this study.',
+  verdict: 'An S&P 500 area chart whose x domain is set by brushing a small overview area below it. Either area alone is an ordinary `areaY`, and the detail view alone can zoom and pan with `edit.axis.zoom()` and `edit.axis.pan()`; the overview whose brush sets its domain is a second view, and multiple views are not covered by this study.',
   needs: ['concat', 'zoom', 'selection'],
   gaps: [
-    'The detail view could zoom with `edit.axis.zoom()` on its own x axis (the wheel), but nothing links it to a brushed overview, and dragging to pan is out of scope.',
+    'The detail view can zoom with the wheel and pan by dragging (`edit.axis.zoom()` and `edit.axis.pan()` on its x axis), but no brush in an overview can set its domain.',
   ],
   alternative: 'The brushed window can be the answer: `brushSpan()` on a `rect` over the S&P 500 area (drawn by `guides.custom`) writes the stretch a reader would call a bear market, as the `vl-interactive_area_brush` interface does for unemployment.',
 });

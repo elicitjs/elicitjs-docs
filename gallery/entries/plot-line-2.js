@@ -718,8 +718,6 @@ GALLERY.add({
   prep: ['prep-reshape', 'prep-stack', 'prep-calculate'],
   gaps: [
     'ElicitJS has no `bump-x` curve, so each ribbon is sampled at 25 points along a smoothstep between its two columns.',
-    'The PRGn colours are passed as an explicit `range`: `scheme` does not know `PRGn`.',
-    'The age names are not bold (the text mark has no font-weight option).',
   ],
   recreation: {
     code: `const wide = d3.csvParse(\`age,population,wealth
@@ -763,7 +761,7 @@ mount(Elicit({
       channels: {
         x: { field: "t" }, y1: { field: "y1" }, y2: { field: "y2" },
         series: { field: "age" },
-        fill: { field: "age", scale: { range: [...d3.schemePRGn[4]].reverse() } },
+        fill: { field: "age", scale: { scheme: "PRGn", reverse: true } },
       },
     }),
     // Labels read only the end rows: an empty string draws nothing.
@@ -775,7 +773,7 @@ mount(Elicit({
       channels: { x: { field: "t" }, y: { field: "mid" } },
     }),
     text({
-      fontSize: 11, fill: "white", textAnchor: "start", dx: 8,
+      fontSize: 11, fontWeight: "bold", fill: "white", textAnchor: "start", dx: 8,
       text: (d) => (d.t === 0 ? d.age : ""),
       channels: { x: { field: "t" }, y: { field: "mid" } },
     }),
@@ -906,33 +904,34 @@ mount(Elicit({
       title: 'Sweep a density',
       question: 'Gentoo penguins are the largest species. How do you think their culmen lengths are distributed?',
       try: 'Sweep across the chart to draw the Gentoo curve. The grey curves are the other two species, for reference.',
-      why: 'A `move({ pick: "sweep" })` on `y` paints every bin the pointer crosses, so a distribution is one stroke. Adelie and Chinstrap live in a context table, drawn by a second `lineY` with `table: "history"`: read-only, out of the sweep\'s reach, and absent from `getData()`.',
-      uses: ['move({ pick: "sweep" })', 'context table', 'clamp()'],
+      why: 'A `move({ pick: "sweep" })` on `y` paints every bin the pointer crosses, so a distribution is one stroke. `context` marks the Adelie and Chinstrap rows, drawn by a second `lineY` from their own `bin` column: read-only, out of the sweep\'s reach, and absent from `getData()`.',
+      uses: ['move({ pick: "sweep" })', 'context', 'clamp()'],
       code: `const penguins = await plotData("penguins");
 const bin = d3.bin().domain([32, 60]).thresholds(d3.range(34, 60, 2));
-const share = (species) => {
+const share = (species, at = "x") => {
   const v = penguins.filter((d) => d.species === species).map((d) => d.culmen_length_mm);
-  return bin(v).map((b) => ({ species, x: (b.x0 + b.x1) / 2, share: b.length / v.length }));
-};
-const fields = {
-  species: { type: "categorical", domain: ["Adelie", "Chinstrap", "Gentoo"] },
-  x:       { type: "quantitative", domain: [32, 60] },
-  share:   { type: "quantitative", domain: [0, 0.4] },
+  return bin(v).map((b) => ({ species, [at]: (b.x0 + b.x1) / 2, share: b.length / v.length }));
 };
 
 mount(Elicit({
   width: 480, height: 260,
   margins: { top: 16, right: 16, bottom: 34, left: 48 },
-  schema: { data: fields, history: { context: true, fields } },     //! the other species are context
-  data: {
-    data: share("Gentoo").map((d) => ({ ...d, share: 0.07 })),       // a flat prior
-    history: [...share("Adelie"), ...share("Chinstrap")],
+  schema: {
+    species: { type: "categorical", domain: ["Adelie", "Chinstrap", "Gentoo"] },
+    x:       { type: "quantitative", domain: [32, 60] },
+    share:   { type: "quantitative", domain: [0, 0.4] },
+    bin:     { type: "quantitative", domain: [32, 60] },        // the other species' own x column
   },
+  data: [
+    ...share("Adelie", "bin"), ...share("Chinstrap", "bin"),
+    ...share("Gentoo").map((d) => ({ ...d, share: 0.07 })),          // a flat prior
+  ],
+  context: (d) => d.species !== "Gentoo",                            //! the other species are context
   constraints: [ clamp({ field: "share", min: 0, max: 0.4 }) ],
   axes: { x: { title: "culmen length (mm) →" }, y: { title: "share of birds", tickFormat: ".0%", grid: true } },
   marks: [
-    lineY({ table: "history", curve: "natural",
-      channels: { x: { field: "x" }, y: { field: "share" }, series: { field: "species" },
+    lineY({ curve: "natural",
+      channels: { x: { field: "bin" }, y: { field: "share" }, series: { field: "species" },
                   stroke: { field: "species", scale: { range: ["#bbb", "#999", "#e15759"] } } } }),
     lineY({ curve: "natural", stroke: "#e15759", handleSize: 3,
       channels: {
@@ -947,39 +946,36 @@ mount(Elicit({
       title: 'Sweep a band',
       question: 'How sure are you about the Gentoo distribution? Mark the lowest and highest share you find plausible for each culmen length.',
       try: 'Sweep near the top edge to raise or lower it across the bins you cross; sweep near the bottom edge to move that one.',
-      why: 'Each bin is one row with a `lo` and a `hi`. `edit.line.sweep()` on both `y1` and `y2` of the `areaY` paints whichever edge is nearest where the drag starts, so one stroke shapes a whole edge of the band. `ordering` keeps the band from turning inside out, and the Adelie and Chinstrap curves sit in a context table.',
-      uses: ['edit.line.sweep()', 'ordering()', 'context table'],
+      why: 'Each bin is one row with a `lo` and a `hi`. `edit.line.sweep()` on both `y1` and `y2` of the `areaY` paints whichever edge is nearest where the drag starts, so one stroke shapes a whole edge of the band. `ordering` keeps the band from turning inside out, and the Adelie and Chinstrap curves are `context` rows.',
+      uses: ['edit.line.sweep()', 'ordering()', 'context'],
       code: `const penguins = await plotData("penguins");
 const bin = d3.bin().domain([32, 60]).thresholds(d3.range(34, 60, 2));
-const share = (species) => {
+const share = (species, at = "x") => {
   const v = penguins.filter((d) => d.species === species).map((d) => d.culmen_length_mm);
-  return bin(v).map((b) => ({ species, x: (b.x0 + b.x1) / 2, share: b.length / v.length }));
+  return bin(v).map((b) => ({ species, [at]: (b.x0 + b.x1) / 2, share: b.length / v.length }));
 };
 
 mount(Elicit({
   width: 480, height: 260,
   margins: { top: 16, right: 16, bottom: 34, left: 48 },
   schema: {
-    data: {
-      x:  { type: "quantitative", domain: [32, 60] },
-      lo: { type: "quantitative", domain: [0, 0.4] },
-      hi: { type: "quantitative", domain: [0, 0.4] },
-    },
-    history: { context: true, fields: {
-      species: { type: "categorical", domain: ["Adelie", "Chinstrap"] },
-      x:       { type: "quantitative" },
-      share:   { type: "quantitative" },
-    } },
+    x:  { type: "quantitative", domain: [32, 60] },
+    lo: { type: "quantitative", domain: [0, 0.4] },
+    hi: { type: "quantitative", domain: [0, 0.4] },
+    species: { type: "categorical", domain: ["Adelie", "Chinstrap"] }, // the other species' own columns
+    bin:     { type: "quantitative", domain: [32, 60] },
+    share:   { type: "quantitative" },
   },
-  data: {
-    data: share("Gentoo").map(({ x }) => ({ x, lo: 0.02, hi: 0.12 })), // a wide, flat start
-    history: [...share("Adelie"), ...share("Chinstrap")],
-  },
+  data: [
+    ...share("Adelie", "bin"), ...share("Chinstrap", "bin"),
+    ...share("Gentoo").map(({ x }) => ({ x, lo: 0.02, hi: 0.12 })), // a wide, flat start
+  ],
+  context: (d) => d.species != null,                                 //! the other species are context
   constraints: [ ordering({ field: ["lo", "hi"] }) ],                //! the band can't turn inside out
   axes: { x: { title: "culmen length (mm) →" }, y: { title: "share of birds", tickFormat: ".0%", grid: true } },
   marks: [
-    lineY({ table: "history", curve: "natural",
-      channels: { x: { field: "x" }, y: { field: "share" }, series: { field: "species" },
+    lineY({ curve: "natural",
+      channels: { x: { field: "bin" }, y: { field: "share" }, series: { field: "species" },
                   stroke: { field: "species", scale: { range: ["#bbb", "#999"] } } } }),
     areaY({ curve: "natural", fill: "#e15759", fillOpacity: 0.3, stroke: "#e15759",
       channels: {
@@ -1240,8 +1236,8 @@ mount(Elicit({
       title: 'Brush the climb',
       question: 'US unemployment climbed steeply in the late 2000s. Over which months do you think it was rising?',
       try: 'Drag the band\'s edges to set its start and end, or drag its middle to slide the whole span.',
-      why: 'The answer is one row with a `start` and an `end`. `brushSpan` on the `rect`\'s `x1`/`x2` reads an edge drag as one endpoint and a body drag as both, through the time scale. Total unemployment is a context table drawn by an `areaY` with `table: "history"`, so it informs the answer without being part of `getData()`.',
-      uses: ['brushSpan()', 'context table'],
+      why: 'The answer is one row with a `start` and an `end`. `brushSpan` on the `rect`\'s `x1`/`x2` reads an edge drag as one endpoint and a body drag as both, through the time scale. Total unemployment is `context`, drawn by an `areaY` from its own `date` and `n` columns, so it informs the answer without being part of `getData()`.',
+      uses: ['brushSpan()', 'context'],
       code: `const industries = await plotData("industries");
 const total = d3.flatRollup(industries, (v) => d3.sum(v, (d) => d.unemployed), (d) => +d.date)
   .map(([t, n]) => ({ date: new Date(t), n }));
@@ -1251,22 +1247,16 @@ mount(Elicit({
   width: 480, height: 240,
   margins: { top: 16, right: 16, bottom: 28, left: 16 },
   schema: {
-    data: {
-      start: { type: "temporal", domain: span },
-      end:   { type: "temporal", domain: span },
-    },
-    history: { context: true, fields: {                               //! context, not data
-      date: { type: "temporal", domain: span },
-      n:    { type: "quantitative", domain: [0, d3.max(total, (d) => d.n) * 1.05] },
-    } },
+    start: { type: "temporal", domain: span },
+    end:   { type: "temporal", domain: span },
+    date:  { type: "temporal", domain: span },
+    n:     { type: "quantitative", domain: [0, d3.max(total, (d) => d.n) * 1.05] },
   },
-  data: {
-    data: [ { start: new Date("2003-01-01"), end: new Date("2005-01-01") } ],
-    history: total,
-  },
+  data: [...total, { start: new Date("2003-01-01"), end: new Date("2005-01-01") }],
+  context: (d) => d.date != null,                                     //! the record is context, not data
   axes: { x: {}, y: false },
   marks: [
-    areaY({ table: "history", fill: "#333", fillOpacity: 0.85, stroke: "none",
+    areaY({ fill: "#333", fillOpacity: 0.85, stroke: "none",
       channels: { x: { field: "date" }, y: { field: "n" } } }),
     rectY({
       fill: "#e15759", fillOpacity: 0.3, stroke: "#e15759",
@@ -1672,27 +1662,31 @@ GALLERY.add({
   needs: [],
   prep: ['prep-calculate'],
   gaps: [
-    'Plot filters the grey layer with a `filter` option; here the known rows are a second, read-only context table that the grey area draws.',
+    'Plot filters the grey layer with a `filter` option; here the known rows are repeated as `context` rows with their own columns, which the grey area draws.',
   ],
   recreation: {
     code: `const aapl = await plotData("aapl");
 // January–March of every year is missing.
 const rows = aapl.map((d) => ({ Date: d.Date, Close: d.Date.getUTCMonth() < 3 ? null : d.Close }));
-const fields = {
-  Date:  { type: "temporal" },
-  Close: { type: "quantitative", domain: [0, 200] },
-};
+// The known rows again, in columns of their own: the grey layer.
+const known = rows.filter((d) => d.Close != null).map((d) => ({ day: d.Date, price: d.Close }));
 
 mount(Elicit({
   width: 480, height: 280,
   margins: { top: 22, right: 16, bottom: 28, left: 48 },
-  schema: { data: fields, known: { context: true, fields } },
-  data: { data: rows, known: rows.filter((d) => d.Close != null) },
+  schema: {
+    Date:  { type: "temporal" },
+    Close: { type: "quantitative", domain: [0, 200] },
+    day:   { type: "temporal" },
+    price: { type: "quantitative", domain: [0, 200] },
+  },
+  data: [...known, ...rows],
+  context: (d) => d.day != null,
   axes: { x: {}, y: { title: "Daily close ($)", grid: true } },
   marks: [
     // Grey: the known rows only, so the area interpolates across the gaps.
-    areaY({ table: "known", fill: "#ccc", fillOpacity: 1, stroke: "none",
-      channels: { x: { field: "Date" }, y: { field: "Close" } } }),
+    areaY({ fill: "#ccc", fillOpacity: 1, stroke: "none",
+      channels: { x: { field: "day" }, y: { field: "price" } } }),
     // Blue: every row; a missing value breaks the area there.
     areaY({ fill: "steelblue", fillOpacity: 1, stroke: "none",
       channels: { x: { field: "Date" }, y: { field: "Close" } } }),
@@ -1705,8 +1699,8 @@ mount(Elicit({
       title: 'Fill the gaps',
       question: 'Apple\'s monthly closing prices for January to March are missing every year. What do you think they were?',
       try: 'Sweep across a gap to draw the missing months. The rest of the record is fixed.',
-      why: '`edit.line.sweep()` repaints each month the pointer crosses. The gaps start on the straight line between their known neighbours, which is the grey area\'s answer: the grey layer is a context table of the known months only, so it keeps showing that interpolation under whatever you draw. A `lock` predicate leaves only the missing months open, so a careless stroke cannot rewrite the record.',
-      uses: ['edit.line.sweep()', 'lock', 'context table'],
+      why: '`edit.line.sweep()` repaints each month the pointer crosses. The gaps start on the straight line between their known neighbours, which is the grey area\'s answer: the grey layer draws the known months again as `context` rows with their own columns, so it keeps showing that interpolation under whatever you draw. A `lock` predicate leaves only the missing months open, so a careless stroke cannot rewrite the record.',
+      uses: ['edit.line.sweep()', 'lock', 'context'],
       code: `const aapl = await plotData("aapl");
 const monthly = d3.flatRollup(aapl, (v) => d3.mean(v, (d) => d.Close),
   (d) => d.Date.getUTCFullYear() + d.Date.getUTCMonth() / 12)
@@ -1720,24 +1714,22 @@ mount(Elicit({
   width: 480, height: 280,
   margins: { top: 22, right: 16, bottom: 28, left: 48 },
   schema: {
-    data: {
-      t:       { type: "quantitative", domain: [2013.33, 2018.4] },
-      close:   { type: "quantitative", domain: [0, 200] },
-      missing: { type: "categorical", domain: [true, false] },
-    },
-    known: { context: true, fields: {
-      t: { type: "quantitative" }, close: { type: "quantitative" }, missing: { type: "categorical" },
-    } },
+    t:       { type: "quantitative", domain: [2013.33, 2018.4] },
+    close:   { type: "quantitative", domain: [0, 200] },
+    missing: { type: "categorical", domain: [true, false] },
+    knownT:     { type: "quantitative" },                      // the grey layer's own columns
+    knownClose: { type: "quantitative" },
   },
-  data: {
-    data: monthly.map((d) => (d.missing ? { ...d, close: Math.round(interp(d.t)) } : d)),
-    known,                                                         //! the interpolation, as context
-  },
+  data: [
+    ...known.map((d) => ({ knownT: d.t, knownClose: d.close })),
+    ...monthly.map((d) => (d.missing ? { ...d, close: Math.round(interp(d.t)) } : d)),
+  ],
+  context: (d) => d.knownT != null,                                //! the interpolation, as context
   lock: (d) => !d.missing,                                         //! only the gaps are open
   axes: { x: { tickFormat: "d" }, y: { title: "Monthly close ($)", grid: true } },
   marks: [
-    areaY({ table: "known", fill: "#ccc", fillOpacity: 1, stroke: "none",
-      channels: { x: { field: "t" }, y: { field: "close" } } }),
+    areaY({ fill: "#ccc", fillOpacity: 1, stroke: "none",
+      channels: { x: { field: "knownT" }, y: { field: "knownClose" } } }),
     areaY({ fill: "steelblue", fillOpacity: 0.35, stroke: "none",
       channels: { x: { field: "t" }, y: { field: "close" } } }),
     lineY({ stroke: "steelblue", handleSize: 2.5,
@@ -1856,7 +1848,6 @@ GALLERY.add({
   needs: [],
   prep: ['prep-calculate'],
   gaps: [
-    'The middle values have no white halo behind them (text has no stroke-behind option), so a line can run through a number.',
     'The label dodge is computed in JavaScript before `Elicit`.',
   ],
   recreation: {
@@ -1888,7 +1879,7 @@ mount(Elicit({
     lineY({ stroke: "#222", strokeWidth: 1,
       channels: { x: { field: "year" }, y: { field: "survival" }, series: { field: "name" } } }),
     text({
-      fontSize: 9, fill: "#222", text: label,
+      fontSize: 9, fill: "#222", text: label, stroke: "white", strokeWidth: 3, //! a halo: no line runs through a number
       textAnchor: (d) => (d.year === "5 Year" ? "end" : d.year === "20 Year" ? "start" : "middle"),
       dx: (d) => (d.year === "5 Year" ? -3 : d.year === "20 Year" ? 3 : 0),
       channels: { x: { field: "year" }, y: { field: "ly" } },

@@ -1221,7 +1221,6 @@ GALLERY.add({
   needs: [],
   prep: ['prep-geo'],
   gaps: [
-    'No white halo behind the labels (Plot’s `stroke: "white"` on text draws one).',
     'Centroids are spherical (`d3.geoCentroid`) rather than Plot’s planar `centroid`.',
   ],
   recreation: {
@@ -1237,7 +1236,7 @@ mount(Elicit({
   schema: { name: { type: 'categorical' }, lon: { type: 'quantitative' }, lat: { type: 'quantitative' } },
   marks: [
     geoBasemap({ geojson: topojson.mesh(us, us.objects.states), fill: 'none', stroke: '#333', strokeWidth: 0.6 }),
-    geoText({ fontSize: 7, fill: '#111',
+    geoText({ fontSize: 7, fill: '#111', stroke: 'white', strokeWidth: 2.5, //! Plot’s white halo
       channels: { lon: { field: 'lon' }, lat: { field: 'lat' }, text: { field: 'name' } } }),
   ],
 }));`,
@@ -1340,7 +1339,7 @@ GALLERY.add({
   verdict: 'County and state meshes, plus a dot and a label at the centroid of every county whose name starts with V.',
   needs: [],
   prep: ['prep-geo', 'prep-calculate'],
-  gaps: ['No white halo behind the labels.', 'Centroids are spherical (`d3.geoCentroid`).'],
+  gaps: ['Centroids are spherical (`d3.geoCentroid`).'],
   recreation: {
     code: `const us = await plotData('observablehq__plot-v-counties', 'us-counties-10m.json');
 const vs = topojson.feature(us, us.objects.counties).features
@@ -1357,7 +1356,7 @@ mount(Elicit({
     geoBasemap({ geojson: topojson.mesh(us, us.objects.counties), fill: 'none', stroke: '#333', strokeWidth: 0.1 }),
     geoBasemap({ geojson: topojson.mesh(us, us.objects.states), fill: 'none', stroke: '#333', strokeWidth: 0.5 }),
     geoPoint({ size: 3, fill: '#111', stroke: 'white', channels: { lon: { field: 'lon' }, lat: { field: 'lat' } } }),
-    geoText({ fontSize: 8, dx: 6, textAnchor: 'start', fill: '#111',
+    geoText({ fontSize: 8, dx: 6, textAnchor: 'start', fill: '#111', stroke: 'white', strokeWidth: 2.5,
       channels: { lon: { field: 'lon' }, lat: { field: 'lat' }, text: { field: 'name' } } }),
   ],
 }));`,
@@ -2451,23 +2450,25 @@ mount(Elicit({
       uses: ['shape', 'edit.line.draw()', 'path'],
       code: `const rand = d3.randomLcg(42);
 const field = (x, y) => Math.sin(2.2 * x + 1.3 * Math.cos(1.7 * y)) * 1.2;   // a smooth stand-in field, in radians
-const arrows = d3.range(500).map(() => { const x = 2 * rand(), y = 2 * rand(); return { x, y, angle: field(x, y) * 180 / Math.PI }; });
+// The arrows fill their own ax/ay columns, so the drawn path never runs through them.
+const arrows = d3.range(500).map(() => { const ax = 2 * rand(), ay = 2 * rand(); return { ax, ay, angle: field(ax, ay) * 180 / Math.PI }; });
 
 mount(Elicit({
   width: 400, height: 400,
   margins: { top: 6, right: 6, bottom: 6, left: 6 },
   axes: false,
   schema: {
-    data:   { leaf: { type: 'categorical' },                       // one series per drawn path
-              x: { type: 'quantitative', domain: [0, 2] }, y: { type: 'quantitative', domain: [0, 2] } },
-    arrows: { context: true,                                       //! the field: read-only context rows
-              fields: { x: { type: 'quantitative' }, y: { type: 'quantitative' }, angle: { type: 'quantitative' } } },
+    leaf:  { type: 'categorical' },                                // one series per drawn path
+    x:     { type: 'quantitative', domain: [0, 2] }, y: { type: 'quantitative', domain: [0, 2] },
+    ax:    { type: 'quantitative' }, ay: { type: 'quantitative' }, angle: { type: 'quantitative' },
   },
-  data: { data: [], arrows },
+  data: arrows,
+  context: true,                                                   //! the field: read-only context rows
+  guides: [guides.custom(({ scales }) =>                           // the start point
+    [{ type: 'circle', r: 5, fill: '#16a34a', cx: scales.x.encode(0.05), cy: scales.y.encode(1) }])],
   marks: [
-    shape({ table: 'arrows', path: 'M-10,0L10,0M6,-4L10,0L6,4', size: 5, fill: 'none', stroke: '#bbb',
-      channels: { x: { field: 'x' }, y: { field: 'y' }, angle: { field: 'angle', scale: null } } }),
-    point({ size: 5, fill: '#16a34a', channels: { x: { datum: 0.05 }, y: { datum: 1 } } }),
+    shape({ path: 'M-10,0L10,0M6,-4L10,0L6,4', size: 5, fill: 'none', stroke: '#bbb',
+      channels: { x: { field: 'ax' }, y: { field: 'ay' }, angle: { field: 'angle', scale: null } } }),
     path({ stroke: '#16a34a', strokeWidth: 3,
       channels: { series: { field: 'leaf' }, x: { field: 'x' }, y: { field: 'y' } },
       edits: [edit.line.draw({ series: 'leaf', minDist: 6 })] }),    //! one drag = one streamline
@@ -2511,7 +2512,7 @@ mount(Elicit({
   marks: [
     link({ curve: 'bezier', sourceSide: 'right', targetSide: 'left', inset: 0, stroke: '#555', strokeOpacity: 0.4, strokeWidth: 1.5 }),
     point({ size: 2.5, fill: '#555', channels: { x: { field: 'x' }, y: { field: 'y' } } }),
-    text({ fontSize: 9, channels: { x: { field: 'x' }, y: { field: 'y' }, text: { field: 'name' },
+    text({ fontSize: 9, stroke: 'white', strokeWidth: 3, channels: { x: { field: 'x' }, y: { field: 'y' }, text: { field: 'name' },
       textAnchor: { fn: d => d.leaf ? 'start' : 'end' }, dx: { fn: d => d.leaf ? 6 : -6 } } }),
   ],
 }));`,
@@ -2574,7 +2575,6 @@ GALLERY.add({
   prep: ['prep-reshape', 'prep-calculate'],
   gaps: [
     'No cluster transform: `d3.stratify` + `d3.cluster` (sorted by `node.height`, like `treeSort: "node:height"`) produce the positions.',
-    'No white halo behind labels (`textStroke`).',
     'The long root → vis link swings out past the left edge: a pinned-side bezier spanning most of the height overshoots where Plot’s `bump-x` does not.',
     'Shorter than the original (1,700px vs 2,400px).',
   ],
@@ -2602,7 +2602,7 @@ mount(Elicit({
   marks: [
     link({ curve: 'bezier', sourceSide: 'right', targetSide: 'left', inset: 0, stroke: '#555', strokeOpacity: 0.4, strokeWidth: 1.5 }),
     point({ size: 2.5, fill: '#555', channels: { x: { field: 'x' }, y: { field: 'y' } } }),
-    text({ fontSize: 9, channels: { x: { field: 'x' }, y: { field: 'y' }, text: { field: 'name' },
+    text({ fontSize: 9, stroke: 'white', strokeWidth: 3, channels: { x: { field: 'x' }, y: { field: 'y' }, text: { field: 'name' },
       textAnchor: { fn: d => d.leaf ? 'start' : 'end' }, dx: { fn: d => d.leaf ? 6 : -6 } } }),
   ],
 }));`,

@@ -327,48 +327,34 @@ mount(Elicit({
 // ------------------------------------------------------------------ vl-bar_grouped
 GALLERY.add({
   id: 'vl-bar_grouped',
-  status: 'partial',
-  verdict: 'Drawn as `rect`s on a quantitative x with hand-computed group offsets; there is no `xOffset` channel, so the category axis is faked with tick values.',
-  needs: ['band-offset'],
-  prep: ['prep-calculate'],
-  gaps: [
-    'No `xOffset`: each bar\'s x span is computed in JS (category index + group slot).',
-    'The x axis is a numeric axis with `tickValues` at category centres and a label formatter, not a band axis.',
-  ],
-  recreation: { code: `const rows = [
+  status: 'full',
+  verdict: 'A `barY` over a band x of categories with `xOffset: { field: "group" }`, which splits each category into one sub-band per group, coloured by group.',
+  needs: [],
+  prep: [],
+  gaps: [],
+  recreation: { code: `const data = [
   { category: "A", group: "x", value: 0.1 }, { category: "A", group: "y", value: 0.6 },
   { category: "A", group: "z", value: 0.9 }, { category: "B", group: "x", value: 0.7 },
   { category: "B", group: "y", value: 0.2 }, { category: "B", group: "z", value: 1.1 },
   { category: "C", group: "x", value: 0.6 }, { category: "C", group: "y", value: 0.1 },
   { category: "C", group: "z", value: 0.2 },
 ];
-const cats = ["A", "B", "C"], groups = ["x", "y", "z"];
-// The xOffset by hand: category band [c, c+1], 10% padding, three equal slots.
-const data = rows.map((d) => {
-  const lo = cats.indexOf(d.category) + 0.05 + groups.indexOf(d.group) * 0.3;
-  return { ...d, lo, hi: lo + 0.3 };
-});
 mount(Elicit({
   width: 300, height: 260,
   margins: { top: 12, right: 12, bottom: 38, left: 48 },
   data,
   schema: {
-    category: { type: "categorical", domain: cats },
-    group: { type: "categorical", domain: groups },
+    category: { type: "categorical", domain: ["A", "B", "C"] },
+    group: { type: "categorical", domain: ["x", "y", "z"] },
     value: { type: "quantitative", domain: [0, 1.2] },
-    lo: { type: "quantitative", domain: [0, 3] },
-    hi: { type: "quantitative", domain: [0, 3] },
   },
-  axes: {
-    x: { tickValues: [0.5, 1.5, 2.5], tickFormat: (v) => cats[Math.floor(v)], title: "category" },
-    y: { title: "value" },
-  },
-  legends: { fill: { labelWidth: 30 } },
+  axes: { x: { title: "category" }, y: { title: "value" } },
   marks: [
-    rect({ channels: {
-      x1: { field: "lo" }, x2: { field: "hi" },
+    barY({ channels: {
+      x: { field: "category" },
+      xOffset: { field: "group" }, //! one sub-band per group inside each category
       y: { field: "value" },
-      fill: { field: "group" },
+      fill: { field: "group", legend: { anchor: "right", labelWidth: 30 } },
     } }),
   ],
 }))` },
@@ -380,10 +366,7 @@ mount(Elicit({
       why: 'Three `move()` edits share the mark, each with its own `stage` and a `when` that only claims rows of one group, so the form walks the reader through the groups in order.',
       uses: ['move()', 'stage', 'when'],
       code: `const cats = ["A", "B", "C"], groups = ["x", "y", "z"];
-const data = cats.flatMap((category, c) => groups.map((group, g) => {
-  const lo = c + 0.05 + g * 0.3;
-  return { category, group, value: 0.5, lo, hi: lo + 0.3 };
-}));
+const data = cats.flatMap((category) => groups.map((group) => ({ category, group, value: 0.5 })));
 const chart = Elicit({
   width: 300, height: 260,
   margins: { top: 12, right: 12, bottom: 30, left: 36 },
@@ -394,17 +377,14 @@ const chart = Elicit({
     category: { type: "categorical", domain: cats },
     group: { type: "categorical", domain: groups },
     value: { type: "quantitative", domain: [0, 1.2] },
-    lo: { type: "quantitative", domain: [0, 3] },
-    hi: { type: "quantitative", domain: [0, 3] },
   },
-  axes: { x: { tickValues: [0.5, 1.5, 2.5], tickFormat: (v) => cats[Math.floor(v)] } },
-  legends: { fill: { labelWidth: 30 } },
   marks: [
-    rect({
+    barY({
       channels: {
-        x1: { field: "lo" }, x2: { field: "hi" },
+        x: { field: "category" },
+        xOffset: { field: "group" },
         y: { field: "value" },
-        fill: { field: "group" },
+        fill: { field: "group", legend: { anchor: "right", labelWidth: 30 } },
       },
       edits: groups.map((g, stage) => move({ //! one drag edit per group…
         channels: ["y"], stage, //! …live only in its stage
@@ -425,56 +405,76 @@ chart.on("stage", show); show();
 controls.append(next, label);
 mount(controls);`,
     },
+    {
+      title: 'Spend twelve tokens',
+      question: 'You have 12 tokens. Drop them on the groups you expect to be largest, in any category.',
+      try: 'Click a ring to drop a token there; click a token to take it back.',
+      why: '`create()` inverts the click through both `x` and `xOffset`, so one click names a category AND a group, and the token stacks in that sub-slot. `count({ max: 12 })` caps the budget.',
+      uses: ['create()', 'remove()', 'count()', 'xOffset'],
+      code: `mount(Elicit({
+  width: 300, height: 240,
+  margins: { top: 12, right: 12, bottom: 30, left: 12 },
+  data: [],
+  schema: {
+    category: { type: "categorical", domain: ["A", "B", "C"] },
+    group: { type: "categorical", domain: ["x", "y", "z"] },
+  },
+  constraints: [count({ max: 12 })], //! the token budget
+  marks: [
+    dotStackY({
+      size: 6,
+      channels: {
+        x: { field: "category" },
+        xOffset: { field: "group" }, //! each category holds one column per group
+        fill: { field: "group", legend: { anchor: "top", labelWidth: 30 } },
+      },
+      edits: [create(), remove()], //! a click names the category and the group
+    }),
+  ],
+}))`,
+    },
   ],
 });
 
 // ------------------------------------------------------------------ vl-bar_grouped_repeated
 GALLERY.add({
   id: 'vl-bar_grouped_repeated',
-  status: 'partial',
-  verdict: 'The repeated layer is folded into two rows per genre and drawn as one `rect` mark with hand-computed offsets; there is no `repeat` or `xOffset`.',
-  needs: ['band-offset', 'text-layout'],
-  prep: ['prep-aggregate', 'prep-reshape', 'prep-calculate'],
+  status: 'full',
+  verdict: 'The repeated layer is folded into two rows per genre and drawn as one `barY` with `xOffset` on the folded column; the genre names are turned by the axis’s `labelAngle`.',
+  needs: [],
+  prep: ['prep-aggregate', 'prep-reshape'],
   gaps: [
-    'No `repeat: { layer }`: the two gross columns are folded into a `Gross` column in JS.',
-    'No `xOffset`: side-by-side positions are computed in JS on a numeric x axis; genre labels come from `tickValues` and a formatter, cut to three letters because tick labels cannot be rotated.',
+    'No `repeat: { layer }`: the two gross columns are folded into a `Gross` column in JS, which `xOffset` then splits.',
     'Gross is shown in $bn rather than dollars; the y title says so.',
   ],
   recreation: { code: `const movies = await vegaData("movies.json");
 // Vega-Lite sorts the missing genre ("null") first.
 const genres = ["null", ...[...new Set(movies.map((d) => d["Major Genre"]).filter((g) => g != null))].sort()];
 const kinds = ["Worldwide Gross", "US Gross"];
-// Fold the two columns into rows, and place each in its half of the genre band.
-const data = genres.flatMap((genre, i) => {
+// Fold the two columns into rows: one per (genre, kind).
+const data = genres.flatMap((genre) => {
   const rows = movies.filter((d) => String(d["Major Genre"]) === genre);
-  return kinds.map((Gross, k) => ({
-    genre, Gross,
-    total: d3.sum(rows, (d) => d[Gross]) / 1e9,
-    lo: i + 0.05 + k * 0.45, hi: i + 0.5 + k * 0.45,
-  }));
+  return kinds.map((Gross) => ({ genre, Gross, total: d3.sum(rows, (d) => d[Gross]) / 1e9 }));
 });
 mount(Elicit({
   width: 460, height: 300,
-  margins: { top: 12, right: 12, bottom: 42, left: 48 },
+  margins: { top: 12, right: 12, bottom: 12, left: 48 },
   data,
   schema: {
     genre: { type: "categorical", domain: genres },
     Gross: { type: "categorical", domain: kinds },
     total: { type: "quantitative", domain: [0, 70] },
-    lo: { type: "quantitative", domain: [0, genres.length] },
-    hi: { type: "quantitative", domain: [0, genres.length] },
   },
   axes: {
-    x: { tickValues: genres.map((_, i) => i + 0.5), fontSize: 9,
-         tickFormat: (v) => genres[Math.floor(v)].slice(0, 3), title: "Major Genre" },
+    x: { fontSize: 9, labelAngle: 90, title: "Major Genre" }, //! full names, read bottom to top
     y: { title: "Total Gross ($bn)" },
   },
-  legends: { fill: { title: "Gross", labelWidth: 110 } },
   marks: [
-    rect({ channels: {
-      x1: { field: "lo" }, x2: { field: "hi" },
+    barY({ channels: {
+      x: { field: "genre" },
+      xOffset: { field: "Gross" }, //! the folded column splits each genre's band
       y: { field: "total" },
-      fill: { field: "Gross" },
+      fill: { field: "Gross", legend: { anchor: "top", title: "Gross", labelWidth: 110 } },
     } }),
   ],
 }))` },
@@ -483,14 +483,13 @@ mount(Elicit({
       title: 'US share, capped',
       question: 'For each genre, how much of the worldwide gross ($bn) do you think came from the US box office?',
       try: 'Drag an orange bar. It cannot rise above the blue worldwide bar beside it.',
-      why: 'Both columns live on one row, drawn by two marks. Only the US mark carries `move()`, and `ordering({ field: ["us", "ww"], strategy: "block" })` rejects any proposal where the part exceeds the whole.',
-      uses: ['move()', 'ordering()'],
+      why: 'Both columns live on one row, drawn by two marks. Each pins its sub-band with `xOffset: { datum }`, so the pair shares a genre band without a folded column. Only the US mark carries `move()`, and `ordering({ field: ["us", "ww"], strategy: "block" })` rejects any proposal where the part exceeds the whole.',
+      uses: ['move()', 'ordering()', 'xOffset'],
       code: `const movies = await vegaData("movies.json");
 const genres = ["Action", "Adventure", "Comedy", "Drama", "Horror", "Musical"];
-const data = genres.map((genre, i) => {
+const data = genres.map((genre) => {
   const ww = d3.sum(movies.filter((d) => d["Major Genre"] === genre), (d) => d["Worldwide Gross"]) / 1e9;
-  return { genre, ww: +ww.toFixed(1), us: +(ww / 2).toFixed(1),
-           a: i + 0.05, b: i + 0.5, c: i + 0.95 };
+  return { genre, ww: +ww.toFixed(1), us: +(ww / 2).toFixed(1) };
 });
 mount(Elicit({
   width: 420, height: 280,
@@ -500,22 +499,18 @@ mount(Elicit({
     genre: { type: "categorical", domain: genres },
     ww: { type: "quantitative", domain: [0, 70] },
     us: { type: "quantitative", domain: [0, 70] },
-    a: { type: "quantitative", domain: [0, 6] },
-    b: { type: "quantitative", domain: [0, 6] },
-    c: { type: "quantitative", domain: [0, 6] },
   },
   constraints: [
     ordering({ field: ["us", "ww"], strategy: "block" }), //! the US part never exceeds the world total
     clamp({ field: "us", min: 0 }),
   ],
-  axes: {
-    x: { tickValues: genres.map((_, i) => i + 0.5), tickFormat: (v) => genres[Math.floor(v)] },
-    y: { title: "gross ($bn)" },
-  },
+  axes: { y: { title: "gross ($bn)" } },
   marks: [
-    rect({ fill: "#4c78a8", channels: { x1: { field: "a" }, x2: { field: "b" }, y: { field: "ww" } } }),
-    rect({ fill: "#f58518",
-      channels: { x1: { field: "b" }, x2: { field: "c" }, y: { field: "us", edit: move() } } }), //! only the US column is editable
+    barY({ fill: "#4c78a8",
+      channels: { x: { field: "genre" }, xOffset: { datum: "worldwide" }, y: { field: "ww" } } }),
+    barY({ fill: "#f58518",
+      channels: { x: { field: "genre" }, xOffset: { datum: "US" }, //! each mark pins its own sub-band
+                  y: { field: "us", edit: move() } } }), //! only the US column is editable
   ],
 }))`,
     },
@@ -609,26 +604,19 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-stacked_bar_count_corner_radius_mark',
   status: 'full',
-  verdict: 'The stack is computed in JS and drawn with `rect` spans, whose `rx` gives the rounded corners.',
+  verdict: 'A stacked `barY` of the monthly weather counts, with `rx` rounding the corners.',
   needs: [],
-  prep: ['prep-calculate', 'prep-aggregate', 'prep-stack'],
+  prep: ['prep-calculate', 'prep-aggregate'],
   gaps: [
     '`rx` rounds all four corners of each segment; Vega-Lite rounds only the top two.',
-    '`bar({ stack: true })` has no corner radius, so the stack offsets are computed by hand for `rect`.',
   ],
   recreation: { code: `const wx = await vegaData("seattle-weather.csv");
 const months = d3.range(12).map((m) => d3.utcFormat("%b")(new Date(Date.UTC(2000, m, 1))));
 const types = ["drizzle", "fog", "rain", "snow", "sun"];
-// Count, then stack by hand (last type at the bottom, as in Vega-Lite).
-const data = months.flatMap((month, m) => {
-  let acc = 0;
-  return [...types].reverse().map((weather) => {
-    const n = wx.filter((d) => d.date.getUTCMonth() === m && d.weather === weather).length;
-    const row = { month, weather, lo: acc, hi: acc + n };
-    acc += n;
-    return row;
-  });
-});
+// Count per (month, weather); the last type first, so it stacks at the bottom as in Vega-Lite.
+const data = months.flatMap((month, m) => [...types].reverse().map((weather) => ({
+  month, weather, n: wx.filter((d) => d.date.getUTCMonth() === m && d.weather === weather).length,
+})));
 mount(Elicit({
   width: 420, height: 280,
   margins: { top: 12, right: 12, bottom: 40, left: 50 },
@@ -636,18 +624,16 @@ mount(Elicit({
   schema: {
     month: { type: "ordinal", domain: months },
     weather: { type: "categorical", domain: types },
-    lo: { type: "quantitative", domain: [0, 125] },
-    hi: { type: "quantitative", domain: [0, 125] },
+    n: { type: "quantitative", domain: [0, 125] },
   },
   axes: { x: { title: "date (month)" }, y: { title: "Count of Records" } },
   legends: { fill: { labelWidth: 60 } },
   marks: [
-    rect({
-      rx: 3,
+    barY({
+      stack: true, rx: 3, strokeWidth: 0,              //! a stacked bar takes a corner radius
       channels: {
-        x: { field: "month" },
-        y1: { field: "lo" }, y2: { field: "hi" },
-        fill: { field: "weather" },
+        x: { field: "month" }, y: { field: "n" },
+        series: { field: "weather" }, fill: { field: "weather" },
       },
     }),
   ],
@@ -1504,10 +1490,10 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-bar_negative',
   status: 'full',
-  verdict: 'A `barY` whose bars hang from zero on a domain that spans it, with a black `rule` drawn at zero in place of the conditional grid colour.',
+  verdict: 'A `barY` whose bars hang from zero on a domain that spans it, with the grid’s `zero` line drawn black, as the conditional grid colour does.',
   needs: [],
   prep: [],
-  gaps: ['The zero line is a `ruleY` mark rather than a conditionally coloured gridline; the axis domain line and ticks stay on.'],
+  gaps: [],
   recreation: { code: `const data = [
   { a: "A", b: -28 }, { a: "B", b: 55 }, { a: "C", b: -33 },
   { a: "D", b: 91 }, { a: "E", b: 81 }, { a: "F", b: 53 },
@@ -1521,10 +1507,10 @@ mount(Elicit({
     a: { type: "categorical", domain: data.map((d) => d.a) },
     b: { type: "quantitative", domain: [-40, 100] },
   },
-  axes: { x: { title: "a" }, y: { grid: true, title: "b" } },
+  // The gridline at 0 is black, the rest grey: the grid's zero line.
+  axes: { x: { title: "a" }, y: { grid: { zero: { stroke: "black" } }, title: "b" } },
   marks: [
     barY({ fill: "#4c78a8", channels: { x: { field: "a" }, y: { field: "b" } } }),
-    ruleY({ stroke: "black", channels: { y: { datum: 0 } } }),
   ],
 }))` },
   interfaces: [
@@ -1568,7 +1554,7 @@ GALLERY.add({
   verdict: 'A horizontal `barX` with a `text` layer whose anchor and offset are `{ fn }` channels of the sign, like the `align`/`dx` expressions.',
   needs: [],
   prep: [],
-  gaps: ['The zero line is a `ruleX` mark rather than a conditionally coloured gridline; the scale padding is a slightly wider domain.'],
+  gaps: ['The scale padding is a slightly wider domain.'],
   recreation: { code: `const data = [
   { a: "A", b: -28 }, { a: "B", b: 55 }, { a: "C", b: -33 },
   { a: "D", b: 91 }, { a: "E", b: 81 }, { a: "F", b: 53 },
@@ -1582,10 +1568,9 @@ mount(Elicit({
     a: { type: "categorical", domain: data.map((d) => d.a).reverse() },
     b: { type: "quantitative", domain: [-50, 110] },
   },
-  axes: { x: { grid: true, title: "b" }, y: { title: "a" } },
+  axes: { x: { grid: { zero: { stroke: "black" } }, title: "b" }, y: { title: "a" } }, //! a black gridline at 0
   marks: [
     barX({ fill: "#4c78a8", channels: { y: { field: "a" }, x: { field: "b" } } }),
-    ruleX({ stroke: "black", channels: { x: { datum: 0 } } }),
     text({ fontSize: 10,
       channels: {
         y: { field: "a" }, x: { field: "b" }, text: { field: "b" },
@@ -1637,32 +1622,37 @@ mount(Elicit({
 // ------------------------------------------------------------------ vl-bar_axis_space_saving
 GALLERY.add({
   id: 'vl-bar_axis_space_saving',
-  status: 'partial',
-  verdict: 'Half-height rounded `rectX` bars with the origin names drawn above them by a `text` mark; the y axis itself is hidden because its labels cannot be moved inside the plot.',
-  needs: ['axis-custom'],
+  status: 'full',
+  verdict: 'Half-height rounded `rectX` bars under a space-saving y axis: its labels sit inside the plot above each bar (a negative `tickPadding` with `labelAlign: "start"` and `labelOffset`), its gridlines run between the bands, and its title sits at the top left.',
+  needs: [],
   prep: ['prep-aggregate'],
   gaps: [
-    'The space-saving labels are a `text` mark, not axis labels with a negative `labelPadding`/`labelOffset`.',
-    'No gridlines at the band boundaries (`bandPosition: 0`) and no axis title placed at the top left.',
-    'Bars are centred in their band rather than offset 5 px down (`yOffset`), and `rx` rounds both ends (`cornerRadiusEnd` rounds only the far end).',
+    'Bars are centred in their band rather than offset 5 px down (`yOffset`), so the labels sit 3 px higher (`labelOffset: -18` for `-15`) to clear them; `rx` rounds both ends (`cornerRadiusEnd` rounds only the far end).',
   ],
   recreation: { code: `const cars = await vegaData("cars.json");
 const origins = ["Europe", "Japan", "USA"];
 const data = origins.map((Origin) => ({ Origin, n: cars.filter((d) => d.Origin === Origin).length }));
 mount(Elicit({
-  width: 400, height: 3 * 50 + 34,
-  margins: { top: 4, right: 12, bottom: 30, left: 6 },
+  width: 400, height: 3 * 50 + 50,
+  margins: { top: 20, right: 12, bottom: 30, left: 6 },
   data,
   schema: {
     Origin: { type: "categorical", domain: [...origins].reverse() },
     n: { type: "quantitative", domain: [0, 260] },
   },
-  axes: { x: { title: "Number of Cars" }, y: false },
+  theme: { panel: { stroke: "#dddddd" } },                    // Vega-Lite's view frame
+  axes: {
+    x: { title: "Number of Cars" },
+    y: {
+      line: false, tickSize: 0,                               // domain: false, ticks: false
+      tickPadding: -5, labelAlign: "start", labelOffset: -18, //! the labels move inside the plot, above each bar
+      title: "Origin", titleAngle: 0, titleAnchor: "end", titleFontWeight: "bold", // a flat title at the top left
+      grid: { bandPosition: 0 },                              //! gridlines between the bands
+    },
+  },
   marks: [
     rectX({ rx: 2, fill: "#4c78a8",
-      channels: { y: { field: "Origin" }, x: { field: "n" }, height: { value: 25 } } }),
-    text({ fontSize: 11, textAnchor: "start", dx: 5, dy: -19,
-      channels: { y: { field: "Origin" }, x: { value: 0 }, text: { field: "Origin" } } }),
+      channels: { y: { field: "Origin", scale: { padding: 0 } }, x: { field: "n" }, height: { value: 25 } } }),
   ],
 }))` },
   interfaces: [

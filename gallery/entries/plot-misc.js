@@ -3,7 +3,7 @@
 
 GALLERY.defineFeatures({
   'crosshair': { label: 'Pointer readouts', description: 'Annotation that follows the pointer: crosshair rules with axis readouts, a `pointer`-filtered mark (Plot `crosshair`, `pointerX`). Now covered by `guides.crosshair()` and `guides.custom(build, { tracksPointer: true })`.' },
-  'layer-data': { label: 'Layers over other data', description: 'A mark that draws rows of a second, read-only dataset beside the elicited one (a reference series, tick labels, a basemap of points). Now covered by context tables (`{ context: true, fields }` and a mark’s `table`).' },
+  'layer-data': { label: 'Layers over other data', description: 'A mark that draws rows of a second, read-only dataset beside the elicited one (a reference series, tick labels, a basemap of points). Now covered by context rows: the reference rows sit in the elicited table, each filling its own columns, and `context` keeps them out of the answer.' },
 });
 GALLERY.defineFeatures({
   'prep-delaunay': { label: 'Delaunay / Voronoi', description: 'Triangulation, hull or Voronoi edges computed with `d3.Delaunay` and drawn as ordinary marks.' },
@@ -472,28 +472,29 @@ mount(Elicit({
       title: 'Draw the 160 m line',
       question: 'The 100–140 m contours are drawn. Where do you think the 160 m contour runs?',
       try: 'Press and drag to trace a closed line. Draw again to add another ring.',
-      why: '`edit.line.draw()` turns a freehand stroke into rows of a new series, sampled every `minDist` pixels, so a hand-drawn ring is data in the same shape as a traced one. The given contours are a context table drawn by a second `path`, so `getData()` holds only your rings.',
-      uses: ['edit.line.draw()', 'context table'],
+      why: '`edit.line.draw()` turns a freehand stroke into rows of a new series, sampled every `minDist` pixels, so a hand-drawn ring is data in the same shape as a traced one. The given contours are context rows in their own `gx`/`gy` columns, drawn by a second `path`, so `getData()` holds only your rings.',
+      uses: ['edit.line.draw()', 'context'],
       code: `const volcano = await plotData('observablehq__plot-volcano-raster', 'volcano.json');
 const { width: w, height: h, values } = volcano;
 const contours = d3.contours().size([w, h]).thresholds([100, 120, 140])(values);
 const given = [];
 contours.forEach(({ value, coordinates }) =>
   coordinates.forEach((polygon, p) => polygon.forEach((ring, r) =>
-    ring.filter((_, k) => k % 3 === 0).forEach(([x, y]) => given.push({ ring: value + ':' + p + ':' + r, x, y })))));
+    ring.filter((_, k) => k % 3 === 0).forEach(([gx, gy]) => given.push({ contour: value + ':' + p + ':' + r, gx, gy })))));
 const x = { type: 'quantitative', domain: [0, w] }, y = { type: 'quantitative', domain: [0, h] };
 mount(Elicit({
   width: 440, height: 330,
   margins: { top: 10, right: 10, bottom: 24, left: 30 },
   schema: {
-    data: { ring: { type: 'quantitative' }, x, y },
-    given: { context: true, fields: { ring: { type: 'categorical' }, x, y } },  //! the given contours are context
+    ring: { type: 'quantitative' }, x, y,                    // your rings
+    contour: { type: 'categorical' }, gx: x, gy: y,          // the given contours
   },
-  data: { data: [], given },
+  data: given,
+  context: true,                                            //! the given contours are context
   marks: [
     path({
-      table: 'given', stroke: '#9ca3af', strokeWidth: 1.5,
-      channels: { series: { field: 'ring' }, x: { field: 'x' }, y: { field: 'y' } },
+      stroke: '#9ca3af', strokeWidth: 1.5,
+      channels: { series: { field: 'contour' }, x: { field: 'gx' }, y: { field: 'gy' } },
     }),
     path({
       stroke: '#e8590c', strokeWidth: 1.5, handles: 'hit',  // draw aims at the handles
@@ -544,7 +545,7 @@ GALLERY.add({
   verdict: 'A projected 2-D density of store locations under state borders: 2-D density is out of scope for an elicitation library.',
   needs: ['density-2d', 'projection', 'topojson'],
   prep: [],
-  gaps: ['Density fill, state mesh, nation outline and 3,000 dots are four layers over three datasets; the borders and dots could be context tables, the density could not.'],
+  gaps: ['Density fill, state mesh, nation outline and 3,000 dots are four layers over three datasets; the borders and dots could be context rows, the density could not.'],
   alternative: 'Place `geoPoint` pins where you think stores cluster, with `edit.geo.create()` and a `count({ max })` budget.',
 });
 
@@ -694,14 +695,11 @@ mount(Elicit({
 
 GALLERY.add({
   id: 'plot-ggplot2-style-axes',
-  status: 'partial',
-  verdict: 'The Apple close as a black `lineY` with white gridlines on grey: the theme sets the background and the grid stroke.',
-  needs: ['axis-custom'],
+  status: 'full',
+  verdict: 'The Apple close as a black `lineY` with white gridlines on a grey panel: `theme.panel` greys the plotting area alone, and the grid and axis tokens do the rest.',
+  needs: [],
   prep: [],
-  gaps: [
-    'There is no panel (frame) fill: `theme.background` paints the whole chart grey, margins included, where ggplot2 greys only the plotting panel.',
-    'A grey `guides.region` would paint the panel alone, but guides draw above the grid, so the white lines disappear under it.',
-  ],
+  gaps: [],
   recreation: {
     code: `const aapl = await plotData('aapl');
 mount(Elicit({
@@ -712,7 +710,11 @@ mount(Elicit({
     Close: { type: 'quantitative', domain: [50, 200] },
   },
   data: aapl.map(({ Date, Close }) => ({ Date, Close })),
-  theme: { background: '#eaeaea', grid: { stroke: '#ffffff', strokeWidth: 1 } },
+  theme: {
+    panel: { fill: '#eaeaea' },                            //! grey under the plot only, not the margins
+    grid: { stroke: '#ffffff', strokeWidth: 1 },
+    axis: { line: false, tickSize: 3 },
+  },
   axes: { x: { grid: true }, y: { grid: true } },
   marks: [
     lineY({
@@ -745,7 +747,7 @@ mount(Elicit({
   data: monthly.filter((d) => d.Date >= x0),
   lock: 'seed',                                            //! history is given
   constraints: [snap({ field: 'Date', step: 30.44 * 864e5, origin: +new Date('2017-12-31') })],  //! one point per month
-  theme: { background: '#eaeaea', grid: { stroke: '#ffffff', strokeWidth: 1 } },
+  theme: { panel: { fill: '#eaeaea' }, grid: { stroke: '#ffffff', strokeWidth: 1 }, axis: { line: false, tickSize: 3 } },
   axes: {
     x: { grid: true, ticks: 5, tickFormat: (d) => d3.utcFormat('%b %Y')(new Date(d)) },
     y: { grid: true },
@@ -768,12 +770,11 @@ mount(Elicit({
 
 GALLERY.add({
   id: 'plot-datawrapper-style-date-axis',
-  status: 'partial',
-  verdict: 'The Apple close with a tick and gridline every three months and a zero rule; the year-under-month labels collapse to one line.',
-  needs: ['axis-custom'],
+  status: 'full',
+  verdict: 'The Apple close with a tick and gridline every three months, the year on a second line under each January, and a zero rule.',
+  needs: [],
   prep: [],
   gaps: [
-    'Plot’s time ticks put the year on a second line under each January; an ElicitJS tick label is one line, so January shows the year instead of the month.',
     'The zero baseline is a `guides.rule` (a `rule` mark over the dataset would draw one per row).',
   ],
   recreation: {
@@ -790,7 +791,7 @@ mount(Elicit({
   axes: {
     x: {
       grid: true, tickValues: quarters, fontSize: 9,
-      tickFormat: (d) => (d.getUTCMonth() === 0 ? d3.utcFormat('%Y')(d) : d3.utcFormat('%b')(d)),
+      tickFormat: (d) => (d.getUTCMonth() === 0 ? d3.utcFormat('%b\\n%Y')(d) : d3.utcFormat('%b')(d)), //! the year on a second line
     },
   },
   guides: [guides.rule({ y: 0, stroke: 'currentColor', strokeDash: 'none', opacity: 1 })],
@@ -807,33 +808,32 @@ mount(Elicit({
       title: 'Date the bottom',
       question: 'After its 2015 peak, Apple slid for about a year. In which month do you think it bottomed out?',
       try: 'Drag the orange rule left or right.',
-      why: 'The answer is one row with one temporal column, so `ruleX` with `move()` on `x` is the whole instrument: the rule IS the date. The price series is a context table, drawn by the recreation’s `lineY` with `table: \'history\'`, so it never enters `getData()`.',
-      uses: ['move()', 'ruleX', 'context table'],
+      why: 'The answer is one row with one temporal column, so `ruleX` with `move()` on `x` is the whole instrument: the rule IS the date. The price series is `context`, drawn by the recreation’s `lineY` from its own `day` and `Close` columns, so it never enters `getData()`.',
+      uses: ['move()', 'ruleX', 'context'],
       code: `const aapl = await plotData('aapl');
 const quarters = d3.utcMonth.every(3).range(new Date('2013-07-01'), new Date('2018-06-01'));
 mount(Elicit({
   width: 470, height: 300,
   margins: { top: 14, right: 14, bottom: 26, left: 36 },
   schema: {
-    data: { Date: { type: 'temporal', domain: [new Date('2013-05-13'), new Date('2018-05-11')] } },
-    history: { context: true, fields: {                     //! the price is context, not an answer
-      Date: { type: 'temporal' },
-      Close: { type: 'quantitative', domain: [0, 200] },
-    } },
+    Date: { type: 'temporal', domain: [new Date('2013-05-13'), new Date('2018-05-11')] },  // your answer
+    day: { type: 'temporal' },                              // the price history
+    Close: { type: 'quantitative', domain: [0, 200] },
   },
-  data: {
-    data: [{ Date: new Date('2015-05-01') }],               //! one row: the date you pick
-    history: aapl.map(({ Date, Close }) => ({ Date, Close })),
-  },
+  data: [
+    ...aapl.map(({ Date, Close }) => ({ day: Date, Close })),
+    { Date: new Date('2015-05-01') },                       //! one row: the date you pick
+  ],
+  context: (d) => d.Close != null,                          //! the price is context, not an answer
   axes: {
     x: { grid: true, tickValues: quarters, fontSize: 9,
-         tickFormat: (d) => (d.getUTCMonth() === 0 ? d3.utcFormat('%Y')(d) : d3.utcFormat('%b')(d)) },
+         tickFormat: (d) => (d.getUTCMonth() === 0 ? d3.utcFormat('%b\\n%Y')(d) : d3.utcFormat('%b')(d)) },
   },
   guides: [guides.rule({ y: 0, stroke: 'currentColor', strokeDash: 'none', opacity: 1 })],
   marks: [
     lineY({
-      table: 'history', stroke: '#64748b', strokeWidth: 1.2,
-      channels: { x: { field: 'Date' }, y: { field: 'Close' } },
+      stroke: '#64748b', strokeWidth: 1.2,
+      channels: { x: { field: 'day' }, y: { field: 'Close' } },
     }),
     ruleX({
       stroke: '#e8590c', strokeWidth: 3,
@@ -848,37 +848,37 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-nyt-style-axes',
   status: 'full',
-  verdict: 'The Apple close in the NYT style: dotted gridlines with their labels inset above them, no y axis, and a dot at the end of the line. The grid and its labels are a `ruleY` and a `text` over a context table of ticks.',
+  verdict: 'The Apple close in the NYT style: dotted gridlines with their labels inset above them, no y axis, and a dot at the end of the line. The grid and its labels are a `ruleY` and a `text` over context rows of ticks.',
   needs: [],
   prep: [],
   gaps: [
-    'The y axis is off; its gridlines and labels are marks over a context table of tick values, so the dash and the inset are ordinary mark options.',
+    'The y axis is off; its gridlines and labels are marks over context rows of tick values, so the dash and the inset are ordinary mark options.',
     'Plot insets the x scale by 36 px to make room for the labels; here the `Date` domain starts a few months early instead.',
     'The end dot is a `point` whose `size` is a `{ fn }` that is zero for every row but the last.',
   ],
   recreation: {
     code: `const aapl = await plotData('aapl');
 // The grid: one row per tick, the top label with a dollar sign.
-const ticks = d3.range(0, 200, 20).map((Close, i, all) => ({ Close, label: (i === all.length - 1 ? '$' : '') + Close }));
+const ticks = d3.range(0, 200, 20).map((level, i, all) => ({ level, label: (i === all.length - 1 ? '$' : '') + level }));
 mount(Elicit({
   width: 470, height: 300,
   margins: { top: 14, right: 14, bottom: 26, left: 6 },
   schema: {
-    data: {
-      // Starts early to leave room for the inset labels.
-      Date: { type: 'temporal', domain: [new Date('2012-12-01'), new Date('2018-05-11')] },
-      Close: { type: 'quantitative', domain: [0, 200] },
-    },
-    ticks: { context: true, fields: { Close: { type: 'quantitative' }, label: { type: 'categorical' } } },
+    // Starts early to leave room for the inset labels.
+    Date: { type: 'temporal', domain: [new Date('2012-12-01'), new Date('2018-05-11')] },
+    Close: { type: 'quantitative', domain: [0, 200] },
+    level: { type: 'quantitative' }, label: { type: 'categorical' },
   },
-  data: { data: aapl.map(({ Date, Close }) => ({ Date, Close })), ticks },
+  // The ticks first, so the last row is still the last close.
+  data: [...ticks, ...aapl.map(({ Date, Close }) => ({ Date, Close }))],
+  context: (d) => d.label != null,
   axes: { x: { title: '' }, y: false },
   guides: [guides.rule({ y: 0, stroke: 'currentColor', strokeDash: 'none', opacity: 1 })],
   marks: [
-    ruleY({ table: 'ticks', stroke: 'currentColor', strokeDash: '0.75 2', channels: { y: { field: 'Close' } } }),
+    ruleY({ stroke: 'currentColor', strokeDash: '0.75 2', channels: { y: { field: 'level' } } }),
     text({
-      table: 'ticks', fontSize: 10, textAnchor: 'start', lineAnchor: 'bottom', dy: -4,
-      channels: { x: { value: 0 }, y: { field: 'Close' }, text: { field: 'label' } },
+      fontSize: 10, textAnchor: 'start', lineAnchor: 'bottom', dy: -4,
+      channels: { x: { value: 0 }, y: { field: 'level' }, text: { field: 'label' } },
     }),
     lineY({
       stroke: 'currentColor', strokeWidth: 1.5,
@@ -938,38 +938,37 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-data-based-axis',
   status: 'full',
-  verdict: 'The Apple line with its data-based y axis: each gridline starts, and each label sits, at the date the price first reached that value. Ticks are a context table drawn by a `ruleY` span and a `text` mark.',
+  verdict: 'The Apple line with its data-based y axis: each gridline starts, and each label sits, at the date the price first reached that value. Ticks are context rows drawn by a `ruleY` span and a `text` mark.',
   needs: [],
   prep: ['prep-calculate'],
   gaps: [
-    'The y axis is off; its ticks are rows of a context table (value, first date reached, last date), so the staggered grid is ordinary marks rather than an axis option.',
+    'The y axis is off; its ticks are context rows (value, first date reached, last date), so the staggered grid is ordinary marks rather than an axis option.',
   ],
   recreation: {
     code: `const aapl = await plotData('aapl');
 const end = aapl.at(-1).Date;
 // One tick per $20, placed at the first date the close reached it.
-const ticks = d3.range(0, 200, 20).map((Close) => ({ Close, Date: aapl.find((d) => d.Close >= Close)?.Date, end }))
-  .filter((d) => d.Date);
+const ticks = d3.range(0, 200, 20).map((level) => ({ level, reached: aapl.find((d) => d.Close >= level)?.Date, end }))
+  .filter((d) => d.reached);
 mount(Elicit({
   width: 470, height: 300,
   margins: { top: 14, right: 14, bottom: 26, left: 36 },
   schema: {
-    data: { Date: { type: 'temporal' }, Close: { type: 'quantitative', domain: [0, 200] } },
-    ticks: { context: true, fields: {
-      Close: { type: 'quantitative' }, Date: { type: 'temporal' }, end: { type: 'temporal' },
-    } },
+    Date: { type: 'temporal' }, Close: { type: 'quantitative', domain: [0, 200] },
+    level: { type: 'quantitative' }, reached: { type: 'temporal' }, end: { type: 'temporal' },
   },
-  data: { data: aapl.map(({ Date, Close }) => ({ Date, Close })), ticks },
+  data: [...ticks, ...aapl.map(({ Date, Close }) => ({ Date, Close }))],
+  context: (d) => d.level != null,
   axes: { y: false },
   guides: [guides.rule({ y: 0, stroke: 'currentColor', strokeDash: 'none', opacity: 1 })],
   marks: [
     ruleY({
-      table: 'ticks', stroke: 'currentColor', strokeOpacity: 0.1, strokeDash: 'none',
-      channels: { x1: { field: 'Date' }, x2: { field: 'end' }, y: { field: 'Close' } },
+      stroke: 'currentColor', strokeOpacity: 0.1, strokeDash: 'none',
+      channels: { x1: { field: 'reached' }, x2: { field: 'end' }, y: { field: 'level' } },
     }),
     text({
-      table: 'ticks', fontSize: 10, textAnchor: 'end', dx: -6,
-      channels: { x: { field: 'Date' }, y: { field: 'Close' }, text: { field: 'Close' } },
+      fontSize: 10, textAnchor: 'end', dx: -6,
+      channels: { x: { field: 'reached' }, y: { field: 'level' }, text: { field: 'level' } },
     }),
     lineY({
       stroke: 'currentColor', strokeWidth: 1.5,
@@ -983,29 +982,28 @@ mount(Elicit({
       title: 'Set the threshold',
       question: 'By the end of 2019, what is the highest price you think Apple will have closed at?',
       try: 'Drag the orange line up or down; the label follows it.',
-      why: 'The answer is a single value, so it is a one-row table: `ruleY` with `move()` on `y` sets it, and a `text` mark over the same row reads it back. `clamp()` stops it below the 2018 high, since the record can only rise. The price history is a context table drawn by a `lineY`.',
-      uses: ['move()', 'ruleY', 'clamp()', 'context table'],
+      why: 'The answer is a single value, so it is a one-row table: `ruleY` with `move()` on `y` sets it, and a `text` mark over the same row reads it back. `clamp()` stops it below the 2018 high, since the record can only rise. The price history is `context`, drawn by a `lineY`.',
+      uses: ['move()', 'ruleY', 'clamp()', 'context'],
       code: `const aapl = await plotData('aapl');
 mount(Elicit({
   width: 470, height: 300,
   margins: { top: 14, right: 14, bottom: 26, left: 36 },
   schema: {
-    data: {
-      Date: { type: 'temporal', domain: [new Date('2013-05-13'), new Date('2019-12-31')] },
-      high: { type: 'quantitative', domain: [0, 300] },
-    },
-    history: { context: true, fields: { Date: { type: 'temporal' }, Close: { type: 'quantitative' } } },
+    Date: { type: 'temporal', domain: [new Date('2013-05-13'), new Date('2019-12-31')] },
+    Close: { type: 'quantitative' },
+    high: { type: 'quantitative', domain: [0, 300] },
   },
-  data: {
+  data: [
+    ...aapl.map(({ Date, Close }) => ({ Date, Close })),
     // One row: the date the question is about, and your answer.
-    data: [{ Date: new Date('2019-12-31'), high: 200 }],
-    history: aapl.map(({ Date, Close }) => ({ Date, Close })),
-  },
+    { Date: new Date('2019-12-31'), high: 200 },
+  ],
+  context: (d) => d.Close != null,                          //! the price history is context
   constraints: [clamp({ field: 'high', min: 190.04 })],    //! no lower than the 2018 record
   axes: { y: { grid: true } },
   marks: [
     lineY({
-      table: 'history', stroke: '#64748b', strokeWidth: 1.2,
+      stroke: '#64748b', strokeWidth: 1.2,
       channels: { x: { field: 'Date' }, y: { field: 'Close' } },
     }),
     ruleY({
@@ -1060,27 +1058,24 @@ mount(Elicit({
       title: 'Brush the worst stretch',
       question: 'Over which months do you think Apple fell the furthest, from a high to the following low?',
       try: 'Drag the edges of the shaded band to the start and end of the slide, or drag its middle to move it.',
-      why: '`brushSpan()` on a `rect`’s `x1`/`x2` edits an interval in one gesture: grab an edge to move one end, the body to move both. The monthly minor ticks are what let you read the band to the month; the price is a context table, drawn by the recreation’s `lineY`.',
-      uses: ['brushSpan()', 'rect', 'context table'],
+      why: '`brushSpan()` on a `rect`’s `x1`/`x2` edits an interval in one gesture: grab an edge to move one end, the body to move both. The monthly minor ticks are what let you read the band to the month; the price is `context`, drawn by the recreation’s `lineY`.',
+      uses: ['brushSpan()', 'rect', 'context'],
       code: `const aapl = await plotData('aapl');
 const x0 = new Date('2013-05-01'), x1 = new Date('2018-06-01');
 mount(Elicit({
   width: 470, height: 300,
   margins: { top: 14, right: 14, bottom: 26, left: 36 },
   schema: {
-    data: {
-      start: { type: 'temporal', domain: [x0, x1] },
-      end: { type: 'temporal', domain: [x0, x1] },
-    },
-    history: { context: true, fields: {                     //! the price is context
-      Date: { type: 'temporal', domain: [x0, x1] },
-      Close: { type: 'quantitative', domain: [55, 195] },
-    } },
+    start: { type: 'temporal', domain: [x0, x1] },
+    end: { type: 'temporal', domain: [x0, x1] },
+    Date: { type: 'temporal', domain: [x0, x1] },
+    Close: { type: 'quantitative', domain: [55, 195] },
   },
-  data: {
-    data: [{ start: new Date('2014-01-01'), end: new Date('2014-07-01') }],
-    history: aapl.map(({ Date, Close }) => ({ Date, Close })),
-  },
+  data: [
+    ...aapl.map(({ Date, Close }) => ({ Date, Close })),
+    { start: new Date('2014-01-01'), end: new Date('2014-07-01') },
+  ],
+  context: (d) => d.Close != null,                          //! the price is context
   axes: false,
   elements: [
     axisX({ tickValues: d3.utcMonth.range(x0, x1), tickFormat: () => '', tickSize: 3 }),
@@ -1090,7 +1085,7 @@ mount(Elicit({
   ],
   marks: [
     lineY({
-      table: 'history', stroke: 'currentColor', strokeWidth: 1.2,
+      stroke: 'currentColor', strokeWidth: 1.2,
       channels: { x: { field: 'Date' }, y: { field: 'Close' } },
     }),
     rect({
@@ -1107,13 +1102,12 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-parcoords',
   status: 'partial',
-  verdict: 'Parallel coordinates the way Plot draws them: a `lineX` over tidy (car, dimension, normalized value) rows, one series per car, coloured by fuel economy, with each axis’s ticks drawn by a `text` mark over a context table. The “color by” select is missing.',
+  verdict: 'Parallel coordinates the way Plot draws them: a `lineX` over tidy (car, dimension, normalized value) rows, one series per car, coloured by fuel economy, with each axis’s ticks drawn by a `text` mark over context rows. The “color by” select is missing.',
   needs: ['input-widgets'],
   prep: ['prep-reshape', 'prep-calculate'],
   gaps: [
-    'Each dimension has its own scale, so its tick labels are a context table of (dimension, normalized value, label) rows, computed with `d3.scaleLinear().ticks(7)` as Plot does.',
+    'Each dimension has its own scale, so its tick labels are context rows with their own (dimension, normalized value, label) columns, computed with `d3.scaleLinear().ticks(7)` as Plot does.',
     'The “color by” select is not bound; the colour is fixed to economy.',
-    'The tick labels have no white halo: a `stroke` on `text` paints over the fill.',
   ],
   recreation: {
     code: `const cars = await plotData('observablehq__plot-parcoords', 'cars.csv');
@@ -1127,26 +1121,22 @@ const points = cars.flatMap((car, index) => dims.filter((k) => car[k] != null).m
 })));
 // Each axis's ticks, in that dimension's own units.
 const ticks = dims.flatMap((k) => d3.scaleLinear(ext[k], [0, 1]).ticks(7)
-  .map((v) => ({ dimension: k, value: norm(k, v), label: d3.format(',')(v) })));
+  .map((v) => ({ tickDimension: k, tickValue: norm(k, v), label: d3.format(',')(v) })));
 // A band y axis runs bottom-up; reverse it so the first dimension is on top.
 const dimension = { type: 'categorical', domain: dims.slice().reverse() };
+const value = { type: 'quantitative', domain: [0, 1] };
 mount(Elicit({
   width: 470, height: 340,
   margins: { top: 10, right: 16, bottom: 10, left: 110 },
   schema: {
-    data: {
-      index: { type: 'categorical' }, dimension,
-      value: { type: 'quantitative', domain: [0, 1] },
-      economy: { type: 'quantitative' },
-    },
-    ticks: { context: true, fields: {
-      dimension, value: { type: 'quantitative', domain: [0, 1] }, label: { type: 'categorical' },
-    } },
+    index: { type: 'categorical' }, dimension, value, economy: { type: 'quantitative' },
+    tickDimension: dimension, tickValue: value, label: { type: 'categorical' },
   },
-  data: { data: points, ticks },
+  data: [...ticks, ...points],
+  context: (d) => d.label != null,
   axes: { x: false, y: { title: '' } },
   marks: [
-    ruleY({ table: 'ticks', stroke: '#d4d4d8', channels: { y: { field: 'dimension' } } }),
+    ruleY({ stroke: '#d4d4d8', channels: { y: { field: 'tickDimension' } } }),
     lineX({
       strokeWidth: 0.5, strokeOpacity: 0.5,
       channels: {
@@ -1156,10 +1146,10 @@ mount(Elicit({
                   legend: { anchor: 'top', title: 'economy (mpg)' } },
       },
     }),
-    // The per-axis tick labels: a text mark over the ticks table.
+    // The per-axis tick labels: a text mark over the tick rows.
     text({
-      table: 'ticks', fontSize: 9, fill: 'black',
-      channels: { x: { field: 'value' }, y: { field: 'dimension' }, text: { field: 'label' } },
+      fontSize: 9, fill: 'black', stroke: 'white', strokeWidth: 3, //! a stroke on text is a halo behind it
+      channels: { x: { field: 'tickValue' }, y: { field: 'tickDimension' }, text: { field: 'label' } },
     }),
   ],
 }));`,
@@ -1169,16 +1159,16 @@ mount(Elicit({
       title: 'Profile a car',
       question: 'Sketch a typical 1982 economy car: where does it sit on each dimension, relative to the 1970–82 fleet?',
       try: 'Drag each orange handle left or right along its axis. The grey lines are 30 cars from the data.',
-      why: 'Your car is seven rows of the elicited table, one per dimension, so a `lineX` draws it as one more polyline and a `point` mark over the same rows gives it handles. `move()` on `x` slides each along its own axis without changing which axis it is on. The fleet and the tick labels are context tables, read-only and absent from `getData()`.',
-      uses: ['move()', 'lineX', 'context table'],
+      why: 'Your car is seven rows of the elicited table, one per dimension, so a `lineX` draws it as one more polyline and a `point` mark over the same rows gives it handles. `move()` on `x` slides each along its own axis without changing which axis it is on. The fleet and the tick labels are context rows in columns of their own, read-only and absent from `getData()`.',
+      uses: ['move()', 'lineX', 'context'],
       code: `const cars = await plotData('observablehq__plot-parcoords', 'cars.csv');
 const dims = ['economy (mpg)', 'cylinders', 'displacement (cc)', 'power (hp)', 'weight (lb)', '0-60 mph (s)', 'year'];
 const ext = Object.fromEntries(dims.map((k) => [k, d3.extent(cars, (d) => d[k])]));
 const norm = (k, v) => (v - ext[k][0]) / (ext[k][1] - ext[k][0]);
 const sample = d3.range(0, cars.length, 14).map((i) => cars[i]).filter((car) => dims.every((k) => car[k] != null));
-const fleet = sample.flatMap((car, index) => dims.map((k) => ({ car: index, dimension: k, value: norm(k, car[k]) })));
+const fleet = sample.flatMap((car, index) => dims.map((k) => ({ car: index, carDimension: k, carValue: norm(k, car[k]) })));
 const ticks = dims.flatMap((k) => d3.scaleLinear(ext[k], [0, 1]).ticks(5)
-  .map((v) => ({ dimension: k, value: norm(k, v), label: d3.format(',')(v) })));
+  .map((v) => ({ tickDimension: k, tickValue: norm(k, v), label: d3.format(',')(v) })));
 // A band y axis runs bottom-up; reverse it so the first dimension is on top.
 const dimension = { type: 'categorical', domain: dims.slice().reverse() };
 const value = { type: 'quantitative', domain: [0, 1] };
@@ -1186,24 +1176,25 @@ mount(Elicit({
   width: 470, height: 340,
   margins: { top: 10, right: 16, bottom: 10, left: 110 },
   schema: {
-    data: { dimension, value },
-    fleet: { context: true, fields: { car: { type: 'categorical' }, dimension, value } },  //! the fleet is context
-    ticks: { context: true, fields: { dimension, value, label: { type: 'categorical' } } },
+    dimension, value,                                        // your car
+    car: { type: 'categorical' }, carDimension: dimension, carValue: value,  // the fleet
+    tickDimension: dimension, tickValue: value, label: { type: 'categorical' },  // the tick labels
   },
-  data: {
-    data: dims.map((k) => ({ dimension: k, value: 0.5 })),   // your car starts mid-range
-    fleet, ticks,
-  },
+  data: [
+    ...fleet, ...ticks,
+    ...dims.map((k) => ({ dimension: k, value: 0.5 })),       // your car starts mid-range
+  ],
+  context: (d) => d.value == null,                          //! the fleet and the ticks are context
   axes: { x: false, y: { title: '' } },
   marks: [
-    ruleY({ table: 'ticks', stroke: '#d4d4d8', channels: { y: { field: 'dimension' } } }),
+    ruleY({ stroke: '#d4d4d8', channels: { y: { field: 'tickDimension' } } }),
     lineX({
-      table: 'fleet', stroke: '#cbd5e1', strokeWidth: 1,
-      channels: { series: { field: 'car' }, y: { field: 'dimension' }, x: { field: 'value' } },
+      stroke: '#cbd5e1', strokeWidth: 1,
+      channels: { series: { field: 'car' }, y: { field: 'carDimension' }, x: { field: 'carValue' } },
     }),
     text({
-      table: 'ticks', fontSize: 9, fill: '#64748b',
-      channels: { x: { field: 'value' }, y: { field: 'dimension' }, text: { field: 'label' } },
+      fontSize: 9, fill: '#64748b',
+      channels: { x: { field: 'tickValue' }, y: { field: 'tickDimension' }, text: { field: 'label' } },
     }),
     lineX({
       stroke: '#e8590c', strokeWidth: 2,
@@ -1391,37 +1382,32 @@ mount(Elicit({
       title: 'Box each species',
       question: 'These penguins are unlabelled. Where do you think each of the three species sits?',
       try: 'Drag a box’s edges or corners to resize it, or its middle to move it.',
-      why: 'Each species’ region is one row with four columns, so `brushRect()` edits all four extents of a `rect` at once: edges, corners or the body. The penguins are a context table drawn by a `point` mark, so the answer is only the three boxes.',
-      uses: ['brushRect()', 'rect', 'context table'],
+      why: 'Each species’ region is one row with four columns, so `brushRect()` edits all four extents of a `rect` at once: edges, corners or the body. The penguins are `context`, drawn by a `point` mark, so the answer is only the three boxes.',
+      uses: ['brushRect()', 'rect', 'context'],
       code: `const penguins = (await plotData('penguins'))
   .filter((d) => Number.isFinite(d.culmen_depth_mm) && Number.isFinite(d.culmen_length_mm));
 mount(Elicit({
   width: 460, height: 360,
   margins: { top: 14, right: 96, bottom: 30, left: 36 },
   schema: {
-    data: {
-      species: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] },
-      x1: { type: 'quantitative', domain: [13, 21.5] }, x2: { type: 'quantitative', domain: [13, 21.5] },
-      y1: { type: 'quantitative', domain: [32, 60] }, y2: { type: 'quantitative', domain: [32, 60] },
-    },
-    birds: { context: true, fields: {                       //! the penguins are context
-      culmen_depth_mm: { type: 'quantitative' }, culmen_length_mm: { type: 'quantitative' },
-    } },
+    species: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] },
+    x1: { type: 'quantitative', domain: [13, 21.5] }, x2: { type: 'quantitative', domain: [13, 21.5] },
+    y1: { type: 'quantitative', domain: [32, 60] }, y2: { type: 'quantitative', domain: [32, 60] },
+    culmen_depth_mm: { type: 'quantitative' }, culmen_length_mm: { type: 'quantitative' },
   },
-  data: {
+  data: [
+    ...penguins.map(({ culmen_depth_mm, culmen_length_mm }) => ({ culmen_depth_mm, culmen_length_mm })),
     // Three boxes, stacked at the left to start.
-    data: [
-      { species: 'Adelie', x1: 13.5, x2: 15, y1: 52, y2: 58 },
-      { species: 'Chinstrap', x1: 13.5, x2: 15, y1: 44, y2: 50 },
-      { species: 'Gentoo', x1: 13.5, x2: 15, y1: 36, y2: 42 },
-    ],
-    birds: penguins.map(({ culmen_depth_mm, culmen_length_mm }) => ({ culmen_depth_mm, culmen_length_mm })),
-  },
+    { species: 'Adelie', x1: 13.5, x2: 15, y1: 52, y2: 58 },
+    { species: 'Chinstrap', x1: 13.5, x2: 15, y1: 44, y2: 50 },
+    { species: 'Gentoo', x1: 13.5, x2: 15, y1: 36, y2: 42 },
+  ],
+  context: (d) => d.culmen_depth_mm != null,                //! the penguins are context
   axes: { x: { title: 'culmen_depth_mm →' }, y: { title: '↑ culmen_length_mm' } },
   legends: { fill: { anchor: 'right' } },
   marks: [
     point({
-      table: 'birds', size: 2, fill: '#64748b',
+      size: 2, fill: '#64748b',
       channels: { x: { field: 'culmen_depth_mm' }, y: { field: 'culmen_length_mm' } },
     }),
     rect({
@@ -1524,32 +1510,32 @@ mount(Elicit({
       title: 'Place the averages',
       question: 'Where do you think the average female and the average male Olympian sit, by weight and height?',
       try: 'Drag anywhere: the nearer of the two large dots follows the pointer, and the crosshair reads out its weight and height. The small dots are 400 athletes from the data.',
-      why: '`move()` with `pick: \'nearest\'` grabs the closest editable mark from empty space, so a drag anywhere moves one of your two guesses. The athletes are a context table drawn by their own `point` mark, so they are never in the running. `guide: true` draws the catchment ring; `guides.crosshair()` reads out where you are.',
-      uses: ['move()', 'pick: nearest', 'context table', 'guides.crosshair()'],
+      why: '`move()` with `pick: \'nearest\'` grabs the closest editable mark from empty space, so a drag anywhere moves one of your two guesses. The athletes are `context`, drawn by their own `point` mark from their own columns, so they are never in the running. `guide: true` draws the catchment ring; `guides.crosshair()` reads out where you are.',
+      uses: ['move()', 'pick: nearest', 'context', 'guides.crosshair()'],
       code: `const olympians = (await plotData('olympians'))
   .filter((d) => Number.isFinite(d.weight) && Number.isFinite(d.height));
-const fields = {
-  weight: { type: 'quantitative', domain: [25, 175] },
-  height: { type: 'quantitative', domain: [1.2, 2.25] },
-  sex: { type: 'categorical', domain: ['female', 'male'] },
-};
+const weight = { type: 'quantitative', domain: [25, 175] };
+const height = { type: 'quantitative', domain: [1.2, 2.25] };
 mount(Elicit({
   width: 460, height: 360,
   margins: { top: 14, right: 14, bottom: 30, left: 36 },
-  schema: { data: fields, athletes: { context: true, fields } },  //! the athletes are context
-  data: {
-    data: [
-      { weight: 120, height: 1.4, sex: 'female' },
-      { weight: 150, height: 1.4, sex: 'male' },
-    ],
-    athletes: olympians.filter((_, i) => i % 27 === 0).map(({ weight, height, sex }) => ({ weight, height, sex })),
+  schema: {
+    weight, height, sex: { type: 'categorical', domain: ['female', 'male'] },
+    athleteWeight: weight, athleteHeight: height,
   },
+  data: [
+    ...olympians.filter((_, i) => i % 27 === 0)
+      .map(({ weight, height, sex }) => ({ athleteWeight: weight, athleteHeight: height, sex })),
+    { weight: 120, height: 1.4, sex: 'female' },
+    { weight: 150, height: 1.4, sex: 'male' },
+  ],
+  context: (d) => d.athleteWeight != null,                  //! the athletes are context
   axes: { x: { title: 'weight →' }, y: { title: '↑ height' } },
   guides: [guides.crosshair({ format: '.2~f' })],           //! read off weight and height
   marks: [
     point({
-      table: 'athletes', fill: 'none', size: 2.5,
-      channels: { x: { field: 'weight' }, y: { field: 'height' }, stroke: { field: 'sex', scale: { scheme: 'tableau10' } } },
+      fill: 'none', size: 2.5,
+      channels: { x: { field: 'athleteWeight' }, y: { field: 'athleteHeight' }, stroke: { field: 'sex', scale: { scheme: 'tableau10' } } },
     }),
     point({
       size: 8,
@@ -1682,7 +1668,6 @@ GALLERY.add({
   prep: [],
   gaps: [
     '`guides.crosshair()` takes one constant colour, so the sex-coloured, snapping crosshair is a 15-line `guides.custom` that finds the nearest bird itself.',
-    'The readouts have no white halo.',
   ],
   recreation: {
     code: `const penguins = (await plotData('penguins'))
@@ -1709,8 +1694,8 @@ mount(Elicit({
       return [
         { type: 'line', x1: x, x2: x, y1: y, y2: height, stroke: ink, strokeOpacity: 0.5 },
         { type: 'line', x1: 0, x2: x, y1: y, y2: y, stroke: ink, strokeOpacity: 0.5 },
-        { type: 'text', x, y: height - 4, text: String(d.culmen_length_mm), fill: ink, fontSize: 10, textAnchor: 'middle' },
-        { type: 'text', x: 4, y: y - 4, text: String(d.culmen_depth_mm), fill: ink, fontSize: 10 },
+        { type: 'text', x, y: height - 4, text: String(d.culmen_length_mm), fill: ink, fontSize: 10, textAnchor: 'middle', stroke: 'white', strokeWidth: 3 },
+        { type: 'text', x: 4, y: y - 4, text: String(d.culmen_depth_mm), fill: ink, fontSize: 10, stroke: 'white', strokeWidth: 3 },
       ];
     }, { tracksPointer: true }),
   ],
@@ -1730,31 +1715,34 @@ mount(Elicit({
       title: 'Sex the unknowns',
       question: 'Nine penguins were never sexed. From their bills, which do you think are female and which male?',
       try: 'Click near a large ring to cycle it through female, male and unknown. Sexed birds cannot change.',
-      why: '`cycle()` with `pick: \'nearest\'` steps the closest bird’s `sex` through the schema’s domain. The sexed birds are a context table drawn by their own `point` mark, so a click near the cluster always lands on one of the nine. Each answer is a value in the `sex` column.',
-      uses: ['cycle()', 'pick: nearest', 'context table'],
+      why: '`cycle()` with `pick: \'nearest\'` steps the closest bird’s `sex` through the schema’s domain. The sexed birds are `context`, drawn by their own `point` mark from their own columns, so a click near the cluster always lands on one of the nine. Each answer is a value in the `sex` column.',
+      uses: ['cycle()', 'pick: nearest', 'context'],
       code: `const penguins = (await plotData('penguins'))
   .filter((d) => Number.isFinite(d.culmen_length_mm) && Number.isFinite(d.culmen_depth_mm))
   .map((d) => ({ culmen_length_mm: d.culmen_length_mm, culmen_depth_mm: d.culmen_depth_mm, sex: d.sex || 'unknown' }));
-const fields = {
-  culmen_length_mm: { type: 'quantitative', domain: [32, 60] },
-  culmen_depth_mm: { type: 'quantitative', domain: [13, 21.5] },
-  sex: { type: 'categorical', domain: ['unknown', 'FEMALE', 'MALE'] },  //! the answers, in click order
-};
+const length = { type: 'quantitative', domain: [32, 60] };
+const depth = { type: 'quantitative', domain: [13, 21.5] };
 const sex = { field: 'sex', scale: { range: ['#9ca3af', '#4e79a7', '#f28e2b'] } };
 mount(Elicit({
   width: 460, height: 340,
   margins: { top: 14, right: 14, bottom: 30, left: 36 },
-  schema: { data: fields, sexed: { context: true, fields } },  //! sexed birds are context
-  data: {
-    data: penguins.filter((d) => d.sex === 'unknown'),
-    sexed: penguins.filter((d) => d.sex !== 'unknown'),
+  schema: {
+    culmen_length_mm: length, culmen_depth_mm: depth,
+    sex: { type: 'categorical', domain: ['unknown', 'FEMALE', 'MALE'] },  //! the answers, in click order
+    sexedLength: length, sexedDepth: depth,                 // the sexed birds' bills
   },
+  data: [
+    ...penguins.filter((d) => d.sex !== 'unknown')
+      .map((d) => ({ sexedLength: d.culmen_length_mm, sexedDepth: d.culmen_depth_mm, sex: d.sex })),
+    ...penguins.filter((d) => d.sex === 'unknown'),
+  ],
+  context: (d) => d.sexedLength != null,                    //! sexed birds are context
   axes: { x: { title: 'culmen_length_mm →' }, y: { title: '↑ culmen_depth_mm' } },
   legends: { stroke: { anchor: 'top' } },
   marks: [
     point({
-      table: 'sexed', fill: 'none', size: 3,
-      channels: { x: { field: 'culmen_length_mm' }, y: { field: 'culmen_depth_mm' }, stroke: sex },
+      fill: 'none', size: 3,
+      channels: { x: { field: 'sexedLength' }, y: { field: 'sexedDepth' }, stroke: sex },
     }),
     point({
       fill: 'none', size: 6, strokeWidth: 2.5,
@@ -1879,8 +1867,8 @@ mount(Elicit({
       title: 'Fit the trend',
       question: 'If you had to summarize 2013–2018 with one straight line, where would it start and how steep would it be?',
       try: 'Drag the left handle to set where the line starts, then the right handle to tilt it.',
-      why: 'A `trend` is two parameters, not rows of points: `edit.trend.intercept()` sets the value at the anchor (the start of 2013) and `edit.trend.slope()` tilts the line about it, so the answer is `{ intercept, slope }` in dollars and dollars per year. The price is a context table drawn by the recreation’s `lineY`.',
-      uses: ['trend', 'edit.trend.intercept()', 'edit.trend.slope()', 'context table'],
+      why: 'A `trend` is two parameters, not rows of points: `edit.trend.intercept()` sets the value at the anchor (the start of 2013) and `edit.trend.slope()` tilts the line about it, so the answer is `{ intercept, slope }` in dollars and dollars per year. The price is `context`, drawn by the recreation’s `lineY`.',
+      uses: ['trend', 'edit.trend.intercept()', 'edit.trend.slope()', 'context'],
       code: `const aapl = await plotData('aapl');
 // x is years since 2013, so the intercept is the price at the start of 2013.
 const yearsOf = (date) => (date - new Date('2013-01-01')) / (365.25 * 864e5);
@@ -1888,22 +1876,20 @@ mount(Elicit({
   width: 470, height: 300,
   margins: { top: 14, right: 14, bottom: 26, left: 36 },
   schema: {
-    data: {
-      x: { type: 'quantitative', domain: [0, 5.5] },
-      y: { type: 'quantitative', domain: [0, 220] },
-      intercept: { type: 'quantitative' },
-      slope: { type: 'quantitative' },
-    },
-    history: { context: true, fields: { x: { type: 'quantitative' }, y: { type: 'quantitative' } } },  //! the price is context
+    x: { type: 'quantitative', domain: [0, 5.5] },
+    y: { type: 'quantitative', domain: [0, 220] },
+    intercept: { type: 'quantitative' },
+    slope: { type: 'quantitative' },
   },
-  data: {
-    data: [{ intercept: 120, slope: 0 }],                   // a flat start
-    history: aapl.map((d) => ({ x: yearsOf(d.Date), y: d.Close })),
-  },
+  data: [
+    ...aapl.map((d) => ({ x: yearsOf(d.Date), y: d.Close })),
+    { intercept: 120, slope: 0 },                           // a flat start
+  ],
+  context: (d) => d.y != null,                              //! the price is context
   axes: { origin: false, x: { tickFormat: (d) => 2013 + d, ticks: 6 } },
   marks: [
     lineY({
-      table: 'history', stroke: '#94a3b8', strokeWidth: 1.2,
+      stroke: '#94a3b8', strokeWidth: 1.2,
       channels: { x: { field: 'x' }, y: { field: 'y' } },
     }),
     trend({
@@ -1957,34 +1943,25 @@ mount(Elicit({
       title: 'Add the missing line',
       question: 'Construction is missing. How do you think the number of unemployed construction workers moved from 2000 to 2010?',
       try: 'Double-click the chart to add a line, then sweep across it to shape it.',
-      why: '`edit.line.newSeries()` mints a whole series on a double-click, one row per quarter in `samples`, keyed by the schema’s next declared `industry`: Construction. The three given industries are a context table drawn by a second `lineY`, so the sweep (`move({ pick: \'sweep\' })`) can only paint yours.',
-      uses: ['edit.line.newSeries()', 'move({ pick: \'sweep\' })', 'context table', 'series'],
+      why: '`edit.line.newSeries()` mints a whole series on a double-click, one row per quarter in `samples`, keyed by the schema’s next declared `industry`: Construction. The three given industries are `context`, so the sweep (`move({ pick: \'sweep\' })`) can only paint yours.',
+      uses: ['edit.line.newSeries()', 'move({ pick: \'sweep\' })', 'context', 'series'],
       code: `const industries = await plotData('industries');
-const shown = ['Manufacturing', 'Wholesale and Retail Trade', 'Leisure and hospitality'];
+const shown = ['Wholesale and Retail Trade', 'Manufacturing', 'Leisure and hospitality'];
 const date = { type: 'temporal', domain: [new Date('2000-01-01'), new Date('2010-02-01')] };
 const unemployed = { type: 'quantitative', domain: [0, 2500] };
 mount(Elicit({
   width: 470, height: 320,
   margins: { top: 14, right: 14, bottom: 26, left: 40 },
   schema: {
-    data: { date, industry: { type: 'categorical', domain: ['Construction'] }, unemployed },  //! the line you add
-    history: { context: true, fields: { date, industry: { type: 'categorical' }, unemployed } },
+    date, unemployed,
+    industry: { type: 'categorical', domain: ['Construction', ...shown] },  //! Construction is the line you add
   },
-  data: {
-    data: [],
-    history: industries.filter((d) => shown.includes(d.industry))
-      .map(({ date, industry, unemployed }) => ({ date, industry, unemployed })),
-  },
+  data: industries.filter((d) => shown.includes(d.industry))
+    .map(({ date, industry, unemployed }) => ({ date, industry, unemployed })),
+  context: true,                                            //! the given industries are context
   marks: [
     lineY({
-      table: 'history', strokeWidth: 2,
-      channels: {
-        series: { field: 'industry' }, x: { field: 'date' }, y: { field: 'unemployed' },
-        stroke: { field: 'industry', scale: { scheme: 'tableau10' } },
-      },
-    }),
-    lineY({
-      strokeWidth: 2.5, handles: 'hit',                     // grabbable, not drawn
+      strokeWidth: 2, handles: 'hit',                       // grabbable, not drawn
       channels: {
         series: { field: 'industry' }, x: { field: 'date' },
         y: { field: 'unemployed', edit: move({ pick: 'sweep' }) },  //! sweep to shape it
@@ -2119,30 +2096,29 @@ mount(Elicit({
       title: 'Call the next high',
       question: 'When do you think Apple will next set a record close after May 2018, and at what price?',
       try: 'Drag the red dot anywhere to the right of the line; the readout follows it.',
-      why: 'The answer is one row with two columns, so `move()` on both `x` and `y` of a `point` sets the date and the price together, and a `text` mark over the same row is the readout Plot draws with `pointerX`. `clamp()` keeps the date after the data ends; the price history is a context table.',
-      uses: ['move()', 'clamp()', 'text', 'context table'],
+      why: 'The answer is one row with two columns, so `move()` on both `x` and `y` of a `point` sets the date and the price together, and a `text` mark over the same row is the readout Plot draws with `pointerX`. `clamp()` keeps the date after the data ends. The price history is `context`, in its own `day` and `price` columns.',
+      uses: ['move()', 'clamp()', 'text', 'context'],
       code: `const aapl = await plotData('aapl');
 const fmt = d3.utcFormat('%b %Y');
 mount(Elicit({
   width: 470, height: 260,
   margins: { top: 20, right: 40, bottom: 26, left: 10 },
   schema: {
-    data: {
-      Date: { type: 'temporal', domain: [new Date('2013-05-13'), new Date('2020-12-31')] },
-      Close: { type: 'quantitative', domain: [50, 300] },
-    },
-    history: { context: true, fields: { Date: { type: 'temporal' }, Close: { type: 'quantitative' } } },
+    Date: { type: 'temporal', domain: [new Date('2013-05-13'), new Date('2020-12-31')] },
+    Close: { type: 'quantitative', domain: [50, 300] },
+    day: { type: 'temporal' }, price: { type: 'quantitative' },  // the price history
   },
-  data: {
-    data: [{ Date: new Date('2019-06-01'), Close: 200 }],
-    history: aapl.map(({ Date, Close }) => ({ Date, Close })),
-  },
+  data: [
+    ...aapl.map(({ Date, Close }) => ({ day: Date, price: Close })),
+    { Date: new Date('2019-06-01'), Close: 200 },
+  ],
+  context: (d) => d.price != null,                          //! the price history is context
   constraints: [clamp({ field: 'Date', min: new Date('2018-05-14') })],  //! after the last close
   axes: { y: { anchor: 'right', grid: true, ticks: 5 } },
   marks: [
     lineY({
-      table: 'history', stroke: '#64748b', strokeWidth: 1.2,
-      channels: { x: { field: 'Date' }, y: { field: 'Close' } },
+      stroke: '#64748b', strokeWidth: 1.2,
+      channels: { x: { field: 'day' }, y: { field: 'price' } },
     }),
     point({
       fill: 'red', size: 6,
@@ -2232,7 +2208,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-static-annotations',
   status: 'full',
-  verdict: 'The Apple line carries two notes at the dates they describe: each is a `sticker` box over a context table of notes, joined to its day’s close by a short `ruleX` leader.',
+  verdict: 'The Apple line carries two notes at the dates they describe: each is a `sticker` box over context rows of notes, joined to its day’s close by a short `ruleX` leader.',
   needs: [],
   prep: [],
   gaps: [
@@ -2243,22 +2219,21 @@ GALLERY.add({
     code: `const aapl = await plotData('aapl');
 // Each note: the point it describes, and where its box sits (above the high, below the low).
 const notes = [
-  { Date: new Date('2015-02-23'), Close: 133, boxY: 153,
+  { noteDate: new Date('2015-02-23'), noteClose: 133, boxY: 153,
     note: 'Apple stock reaches a new high of $133 on Feb. 23, 2015. The release of the first Apple Watch, slated for April, is hotly anticipated.' },
-  { Date: new Date('2016-05-12'), Close: 90.34, boxY: 67,
+  { noteDate: new Date('2016-05-12'), noteClose: 90.34, boxY: 67,
     note: 'Apple stock drops 8% after the company misses Q2 revenue targets and reports declining iPhone sales. It reaches a two-year low of $90.34 on May 12.' },
 ];
 mount(Elicit({
   width: 470, height: 340,
   margins: { top: 14, right: 14, bottom: 26, left: 36 },
   schema: {
-    data: { Date: { type: 'temporal' }, Close: { type: 'quantitative', domain: [50, 200] } },
-    notes: { context: true, fields: {
-      Date: { type: 'temporal' }, Close: { type: 'quantitative' }, boxY: { type: 'quantitative' },
-      note: { type: 'categorical' },
-    } },
+    Date: { type: 'temporal' }, Close: { type: 'quantitative', domain: [50, 200] },
+    noteDate: { type: 'temporal' }, noteClose: { type: 'quantitative' }, boxY: { type: 'quantitative' },
+    note: { type: 'categorical' },
   },
-  data: { data: aapl.map(({ Date, Close }) => ({ Date, Close })), notes },
+  data: [...notes, ...aapl.map(({ Date, Close }) => ({ Date, Close }))],
+  context: (d) => d.note != null,
   axes: { y: { grid: true, title: '↑ Close' } },
   marks: [
     lineY({
@@ -2266,10 +2241,10 @@ mount(Elicit({
       channels: { x: { field: 'Date' }, y: { field: 'Close' } },
     }),
     // The leader, then the box: a sticker sizes its box to the wrapped text.
-    ruleX({ table: 'notes', stroke: '#9ca3af', channels: { x: { field: 'Date' }, y1: { field: 'Close' }, y2: { field: 'boxY' } } }),
+    ruleX({ stroke: '#9ca3af', channels: { x: { field: 'noteDate' }, y1: { field: 'noteClose' }, y2: { field: 'boxY' } } }),
     sticker({
-      table: 'notes', fill: 'white', stroke: '#9ca3af', fontSize: 10, maxWidth: 220,
-      channels: { x: { field: 'Date' }, y: { field: 'boxY' }, text: { field: 'note' } },
+      fill: 'white', stroke: '#9ca3af', fontSize: 10, maxWidth: 220,
+      channels: { x: { field: 'noteDate' }, y: { field: 'boxY' }, text: { field: 'note' } },
     }),
   ],
 }));`,
@@ -2279,8 +2254,8 @@ mount(Elicit({
       title: 'Write the note',
       question: 'Something happened to Apple in early 2016. What do you think it was, and when?',
       try: 'Drag the note to the moment you mean, then double-click it to write your explanation.',
-      why: 'The note is the one row of the elicited table: `editText()` on the `sticker` writes its `note` column and `move()` its `nx`/`ny` columns, so its position and its text are both data. The price is a context table, read-only and absent from `getData()`.',
-      uses: ['sticker', 'editText()', 'move()', 'context table'],
+      why: 'The note is the one row of the elicited table: `editText()` on the `sticker` writes its `note` column and `move()` its `nx`/`ny` columns, so its position and its text are both data. The price is `context`, read-only and absent from `getData()`.',
+      uses: ['sticker', 'editText()', 'move()', 'context'],
       code: `const aapl = await plotData('aapl');
 const weekly = d3.groups(aapl, (d) => +d3.utcWeek(d.Date)).map(([, rows]) => rows.at(-1))
   .map(({ Date, Close }) => ({ Date, Close }));
@@ -2288,21 +2263,17 @@ mount(Elicit({
   width: 470, height: 320,
   margins: { top: 14, right: 14, bottom: 26, left: 36 },
   schema: {
-    data: {
-      nx: { type: 'temporal', domain: [new Date('2013-05-01'), new Date('2018-06-01')] },
-      ny: { type: 'quantitative', domain: [50, 200] },
-      note: { type: 'categorical', open: true },
-    },
-    history: { context: true, fields: { Date: { type: 'temporal' }, Close: { type: 'quantitative' } } },  //! the price is context
+    nx: { type: 'temporal', domain: [new Date('2013-05-01'), new Date('2018-06-01')] },
+    ny: { type: 'quantitative', domain: [50, 200] },
+    note: { type: 'categorical', open: true },
+    Date: { type: 'temporal' }, Close: { type: 'quantitative' },
   },
-  data: {
-    data: [{ nx: new Date('2014-06-01'), ny: 170, note: 'Double-click to explain' }],
-    history: weekly,
-  },
+  data: [...weekly, { nx: new Date('2014-06-01'), ny: 170, note: 'Double-click to explain' }],
+  context: (d) => d.Close != null,                          //! the price is context
   axes: { y: { grid: true, title: '↑ Close' } },
   marks: [
     lineY({
-      table: 'history', stroke: 'currentColor', strokeWidth: 1.5,
+      stroke: 'currentColor', strokeWidth: 1.5,
       channels: { x: { field: 'Date' }, y: { field: 'Close' } },
     }),
     sticker({
@@ -2366,29 +2337,28 @@ mount(Elicit({
       title: 'Guess the sport',
       question: 'Six athletes with biographies, by weight and height. Which sport do you think each one competes in?',
       try: 'Click a dark dot to select it, then click a sport in the legend. Each sport is used once.',
-      why: '`edit.select()` picks the athlete and `edit.legend.category()` writes the swatch you click into that row’s `sport`, so the legend is the answer sheet. A `constraints.custom` rejects any answer that gives two athletes one sport; the grey crowd is a context table.',
-      uses: ['edit.select()', 'edit.legend.category()', 'constraints.custom()', 'context table'],
+      why: '`edit.select()` picks the athlete and `edit.legend.category()` writes the swatch you click into that row’s `sport`, so the legend is the answer sheet. A `constraints.custom` rejects any answer that gives two athletes one sport. The grey crowd is `context`, in columns of its own, so it has no `sport` to count.',
+      uses: ['edit.select()', 'edit.legend.category()', 'constraints.custom()', 'context'],
       code: `const olympians = (await plotData('olympians'))
   .filter((d) => Number.isFinite(d.weight) && Number.isFinite(d.height));
 const sports = ['gymnastics', 'athletics', 'rowing', 'tennis', 'volleyball', 'weightlifting'];
 // One athlete with a biography per sport, sport hidden.
 const six = sports.map((s) => olympians.find((d) => d.info && d.sport === s))
   .map(({ weight, height }) => ({ weight, height, sport: null }));
+const weight = { type: 'quantitative', domain: [25, 175] };
+const height = { type: 'quantitative', domain: [1.2, 2.25] };
 mount(Elicit({
   width: 460, height: 340,
   margins: { top: 14, right: 14, bottom: 30, left: 36 },
   schema: {
-    data: {
-      weight: { type: 'quantitative', domain: [25, 175] },
-      height: { type: 'quantitative', domain: [1.2, 2.25] },
-      sport: { type: 'categorical', domain: sports },
-    },
-    crowd: { context: true, fields: { weight: { type: 'quantitative' }, height: { type: 'quantitative' } } },
+    weight, height, sport: { type: 'categorical', domain: sports },
+    crowdWeight: weight, crowdHeight: height,               // the grey crowd
   },
-  data: {
-    data: six,
-    crowd: olympians.filter((_, i) => i % 6 === 0).map(({ weight, height }) => ({ weight, height })),
-  },
+  data: [
+    ...olympians.filter((_, i) => i % 6 === 0).map((d) => ({ crowdWeight: d.weight, crowdHeight: d.height })),
+    ...six,
+  ],
+  context: (d) => d.crowdWeight != null,                    //! the crowd is context
   // One athlete per sport. (\`unique()\` would count the unanswered nulls as one key.)
   constraints: [constraints.custom(({ data }) => {          //! one athlete per sport
     const named = data.map((d) => d.sport).filter((s) => s != null);
@@ -2399,8 +2369,8 @@ mount(Elicit({
   theme: { marks: { point: { fill: '#334155' } } },         // an unanswered athlete is dark
   marks: [
     point({
-      table: 'crowd', size: 1.5, fill: '#d4d4d8',
-      channels: { x: { field: 'weight' }, y: { field: 'height' } },
+      size: 1.5, fill: '#d4d4d8',
+      channels: { x: { field: 'crowdWeight' }, y: { field: 'crowdHeight' } },
     }),
     point({
       size: 7, stroke: '#fff', strokeWidth: 1.5,
@@ -2457,36 +2427,34 @@ mount(Elicit({
       title: 'Place four athletes',
       question: 'Where do you think a typical male gymnast, basketball player, rower and weightlifter sit by weight and height?',
       try: 'Drag each labelled dot to where you think that athlete sits.',
-      why: 'Each sport is one row; `move()` on `x` and `y` writes its weight and height, and a `text` mark over the same rows labels it, so the label travels with the dot. The crowd behind is a context table with a `tip` naming each athlete’s sport, so you can check your guesses against real rowers and gymnasts; a tip never blocks a drag.',
-      uses: ['move()', 'text', 'context table', 'tip'],
+      why: 'Each sport is one row; `move()` on `x` and `y` writes its weight and height, and a `text` mark over the same rows labels it, so the label travels with the dot. The crowd behind is `context`, in its own `crowdWeight`/`crowdHeight` columns, with a `tip` naming each athlete’s sport, so you can check your guesses against real rowers and gymnasts; a tip never blocks a drag.',
+      uses: ['move()', 'text', 'context', 'tip'],
       code: `const olympians = (await plotData('olympians'))
   .filter((d) => Number.isFinite(d.weight) && Number.isFinite(d.height) && d.sex === 'male');
 mount(Elicit({
   width: 460, height: 340,
   margins: { top: 14, right: 14, bottom: 30, left: 36 },
   schema: {
-    data: {
-      sport: { type: 'categorical' },
-      weight: { type: 'quantitative', domain: [25, 175] },
-      height: { type: 'quantitative', domain: [1.2, 2.25] },
-    },
-    crowd: { context: true, fields: {
-      name: { type: 'categorical' }, sport: { type: 'categorical' },
-      weight: { type: 'quantitative' }, height: { type: 'quantitative' },
-    } },
+    sport: { type: 'categorical' },
+    weight: { type: 'quantitative', domain: [25, 175] },
+    height: { type: 'quantitative', domain: [1.2, 2.25] },
+    name: { type: 'categorical' },
+    crowdWeight: { type: 'quantitative' }, crowdHeight: { type: 'quantitative' },  // the crowd
   },
-  data: {
+  data: [
+    ...olympians.filter((_, i) => i % 4 === 0)
+      .map(({ name, sport, weight, height }) => ({ name, sport, crowdWeight: weight, crowdHeight: height })),
     // All four start stacked in an empty corner.
-    data: ['gymnastics', 'basketball', 'rowing', 'weightlifting'].map((sport, i) =>
+    ...['gymnastics', 'basketball', 'rowing', 'weightlifting'].map((sport, i) =>
       ({ sport, weight: 150, height: 1.35 + i * 0.07 })),
-    crowd: olympians.filter((_, i) => i % 4 === 0).map(({ name, sport, weight, height }) => ({ name, sport, weight, height })),
-  },
+  ],
+  context: (d) => d.crowdWeight != null,                    //! the crowd is context
   axes: { x: { title: 'weight →' }, y: { title: '↑ height' } },
   marks: [
     point({
-      table: 'crowd', size: 2, fill: '#d4d4d8',
+      size: 2, fill: '#d4d4d8',
       tip: ['name', 'sport'],                               //! hover the crowd for a hint
-      channels: { x: { field: 'weight' }, y: { field: 'height' } },
+      channels: { x: { field: 'crowdWeight' }, y: { field: 'crowdHeight' } },
     }),
     point({
       size: 6, fill: '#f28e2b',

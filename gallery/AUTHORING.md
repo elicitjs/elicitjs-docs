@@ -131,6 +131,22 @@ genuinely supports more distinct questions). Each is a different *way to ask*:
 - **Seed the data so the interface starts in a meaningful state**: a neutral prior,
   the observed data with the part to predict missing or flattened, or the real
   data the reader corrects. Use `lock: 'seed'` when given rows must stay fixed.
+- **Reference rows that aren't part of the answer are `context`.** Put them in
+  `data` with the answer rows and mark them on the spec: `context: true` (every
+  seeded row) or a predicate (`context: (d) => d.year <= 2020`). They are drawn,
+  read-only, and left out of `getData()`. There is one table and one field map,
+  so:
+  - every mark over the table draws every row. When the context is drawn
+    differently (a grey record beside a coloured answer), give it its own
+    columns and its own mark with no edit; a mark draws nothing for a row that
+    leaves its columns empty;
+  - constraints see context rows. `count({ max })` counts them, so cap at
+    `context.length + N` with `strategy: 'reject'`; `maintainSum` needs the
+    context in another column; `monotonic` needs a `series` when they share one;
+  - a line breaks where a context row shares its x but has no value. A
+    context-only `series`, or `connect: 'sequence'`, keeps the answer whole;
+  - a guide's `data` includes context rows: find the answer row by its columns,
+    not by index.
 - **Vary the edits.** For a family of similar examples (all the bar charts), don't
   repeat the same `move()` interface ten times: spread the vocabulary — `move`,
   `slide`, `create`/`remove`, `brushSpan`/`brushRect`, `edit.stack.cut/edge/merge`,

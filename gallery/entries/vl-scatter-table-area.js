@@ -40,8 +40,8 @@ mount(Elicit({
       title: 'Draw the trend',
       question: 'For cars of this era, how many miles per gallon does each extra horsepower cost?',
       try: 'Drag the round handle at 100 hp up or down, then swing the line by either end.',
-      why: 'The cars sit in a `context` table, so they are drawn but never elicited. The dataset is one row, `{ intercept, slope }`, and `edit.trend.intercept()` and `edit.trend.slope()` each claim their own handle. `anchor: 100` puts the intercept handle at 100 hp, inside the data; the stored `intercept` is still the line\'s value at 0 hp.',
-      uses: ['trend()', 'edit.trend.intercept()', 'edit.trend.slope()', 'context table'],
+      why: 'The cars are `context` rows, so they are drawn but never elicited. The answer is one row, `{ intercept, slope }`, and `edit.trend.intercept()` and `edit.trend.slope()` each claim their own handle. `anchor: 100` puts the intercept handle at 100 hp, inside the data; the stored `intercept` is still the line\'s value at 0 hp.',
+      uses: ['trend()', 'edit.trend.intercept()', 'edit.trend.slope()', 'context'],
       code: `const cars = (await vegaData('cars.json'))
   .filter((d) => d.Horsepower != null && d.Miles_per_Gallon != null)
   .map((d) => ({ hp: d.Horsepower, mpg: d.Miles_per_Gallon }));
@@ -50,22 +50,17 @@ mount(Elicit({
   width: 420, height: 300,
   margins: { top: 10, right: 12, bottom: 36, left: 50 },
   schema: {
-    data: {
-      hp:  { type: 'quantitative', domain: [0, 240] },
-      mpg: { type: 'quantitative', domain: [0, 50] },
-      intercept: { type: 'quantitative' },
-      slope:     { type: 'quantitative' },
-    },
-    cars: { context: true, fields: {                         //! the observed cars: drawn, never elicited
-      hp:  { type: 'quantitative', domain: [0, 240] },
-      mpg: { type: 'quantitative', domain: [0, 50] },
-    } },
+    hp:  { type: 'quantitative', domain: [0, 240] },
+    mpg: { type: 'quantitative', domain: [0, 50] },
+    intercept: { type: 'quantitative' },
+    slope:     { type: 'quantitative' },
   },
-  data: { data: [{ intercept: 25, slope: 0 }], cars },       // a flat prior: "horsepower doesn't matter"
+  data: [...cars, { intercept: 25, slope: 0 }],             // a flat prior: "horsepower doesn't matter"
+  context: (d) => d.hp != null,                             //! the observed cars: drawn, never elicited
   axes: { origin: false, x: { title: 'Horsepower' }, y: { title: 'Miles_per_Gallon' } },
   marks: [
     point({
-      table: 'cars', size: 3, fill: 'none', stroke: '#94a3b8',
+      size: 3, fill: 'none', stroke: '#94a3b8',
       channels: { x: { field: 'hp' }, y: { field: 'mpg' } },
     }),
     trend({
@@ -84,27 +79,27 @@ mount(Elicit({
       title: 'Add next year\'s cars',
       question: 'Where would five cars from the 1983 model year sit on this chart?',
       try: 'Click empty space to add a car (up to five), drag one to move it, Alt-click to remove it.',
-      why: 'The 1970–82 cars sit in a `context` table, so they are read-only and left out of `getData()`: the answer is just the cars you place. `count({ max: 5, strategy: "reject" })` judges that table alone and refuses a sixth car.',
-      uses: ['create()', 'move()', 'remove()', 'count()', 'context table'],
+      why: 'The 1970–82 cars are `context` rows with columns of their own, so they are read-only and left out of `getData()`: the answer is just the cars you place. `count()` counts the context rows too, so its `max` is the record plus five, and `strategy: "reject"` refuses a sixth car.',
+      uses: ['create()', 'move()', 'remove()', 'count()', 'context'],
       code: `const seen = (await vegaData('cars.json'))
   .filter((d) => d.Horsepower != null && d.Miles_per_Gallon != null)
-  .map((d) => ({ hp: d.Horsepower, mpg: d.Miles_per_Gallon }));
-const fields = {
-  hp:  { type: 'quantitative', domain: [0, 240] },
-  mpg: { type: 'quantitative', domain: [0, 50] },
-};
+  .map((d) => ({ seenHp: d.Horsepower, seenMpg: d.Miles_per_Gallon }));
+const hp = { type: 'quantitative', domain: [0, 240] };
+const mpg = { type: 'quantitative', domain: [0, 50] };
 
 mount(Elicit({
   width: 420, height: 300,
   margins: { top: 10, right: 12, bottom: 36, left: 50 },
-  schema: { data: fields, seen: { context: true, fields } }, //! the record can't be dragged
-  data: { data: [], seen },
-  constraints: [ count({ max: 5, strategy: 'reject' }) ],    //! five cars, no more
+  schema: { hp, mpg, seenHp: hp, seenMpg: mpg },
+  data: seen,
+  context: true,                                             //! the record can't be dragged
+  // count() counts the context rows too: the record plus five new cars.
+  constraints: [ count({ max: seen.length + 5, strategy: 'reject' }) ], //! five cars, no more
   axes: { x: { title: 'Horsepower', grid: true }, y: { title: 'Miles_per_Gallon', grid: true } },
   marks: [
     point({
-      table: 'seen', size: 3, fill: 'none', stroke: '#a5b4c8', strokeWidth: 1.5,
-      channels: { x: { field: 'hp' }, y: { field: 'mpg' } },
+      size: 3, fill: 'none', stroke: '#a5b4c8', strokeWidth: 1.5,
+      channels: { x: { field: 'seenHp' }, y: { field: 'seenMpg' } },
     }),
     point({
       size: 7, fill: '#e45756', stroke: '#fff', strokeWidth: 1.5,
@@ -280,36 +275,34 @@ mount(Elicit({
       title: 'Classify the birds',
       question: 'Six penguins were measured but not identified. Which species is each one?',
       try: 'Click a grey star-shaped bird to step it through the species.',
-      why: '`cycle()` on `fill` steps the row\'s `species` through the schema domain on each click, and `symbol` re-derives from the same field. The measured population sits in a `context` table, so you classify against the clusters without being able to move them.',
-      uses: ['cycle()', 'shape()', 'context table'],
+      why: '`cycle()` on `fill` steps the row\'s `species` through the schema domain on each click, and `symbol` re-derives from the same field. The measured population is `context` rows with columns of their own, so you classify against the clusters without being able to move them.',
+      uses: ['cycle()', 'shape()', 'context'],
       code: `const tint = { Adelie: '#4e79a7', Chinstrap: '#f28e2b', Gentoo: '#e15759' };
 const all = (await vegaData('penguins.json'))
   .filter((d) => d['Flipper Length (mm)'] != null && d['Body Mass (g)'] != null)
-  .map((d) => ({ flipper: d['Flipper Length (mm)'], mass: d['Body Mass (g)'], known: d.Species }));
+  .map((d) => ({ popFlipper: d['Flipper Length (mm)'], popMass: d['Body Mass (g)'], known: d.Species }));
 // Six real birds with their species hidden.
 const mystery = [all[10], all[60], all[160], all[200], all[260], all[300]]
-  .map((d) => ({ flipper: d.flipper, mass: d.mass, species: '?' }));
-const axes = {
-  flipper: { type: 'quantitative', domain: [170, 235] },
-  mass:    { type: 'quantitative', domain: [2500, 6500] },
-};
+  .map((d) => ({ flipper: d.popFlipper, mass: d.popMass, species: '?' }));
+const flipper = { type: 'quantitative', domain: [170, 235] };
+const mass = { type: 'quantitative', domain: [2500, 6500] };
 
 mount(Elicit({
   width: 400, height: 300,
   margins: { top: 10, right: 12, bottom: 36, left: 64 },
   schema: {
-    data: { ...axes,
-      species: { type: 'categorical', domain: ['?', 'Adelie', 'Chinstrap', 'Gentoo'] } }, //! the answers a click steps through
-    population: { context: true, fields: { ...axes,
-      known: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] } } },
+    flipper, mass, popFlipper: flipper, popMass: mass,
+    species: { type: 'categorical', domain: ['?', 'Adelie', 'Chinstrap', 'Gentoo'] }, //! the answers a click steps through
+    known:   { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] },
   },
-  data: { data: mystery, population: all },
+  data: [...all, ...mystery],
+  context: (d) => d.known != null,                          //! the population is read-only
   axes: { x: { title: 'Flipper Length (mm)' }, y: { title: 'Body Mass (g)', tickFormat: ',' } },
   marks: [
     point({
-      table: 'population', size: 2.5, opacity: 0.25,
+      size: 2.5, opacity: 0.25,
       channels: {
-        x: { field: 'flipper' }, y: { field: 'mass' },
+        x: { field: 'popFlipper' }, y: { field: 'popMass' },
         fill: { field: 'known', scale: { range: [tint.Adelie, tint.Chinstrap, tint.Gentoo] } },
       },
     }),
@@ -332,8 +325,8 @@ mount(Elicit({
       title: 'Fence the Gentoos',
       question: 'Draw the box where you expect a newly measured Gentoo penguin to fall.',
       try: 'Drag an edge or corner to resize the box, or its body to move it.',
-      why: '`brushRect()` edits all four extents of one `rect` row: an edge resizes one side, a corner two, the body moves the box. The penguins are a `context` table, so the answer is that single row: a flipper range and a mass range.',
-      uses: ['brushRect()', 'rect()', 'context table'],
+      why: '`brushRect()` edits all four extents of one `rect` row: an edge resizes one side, a corner two, the body moves the box. The penguins are `context` rows, so the answer is that single row: a flipper range and a mass range.',
+      uses: ['brushRect()', 'rect()', 'context'],
       code: `const tint = { Adelie: '#4e79a7', Chinstrap: '#f28e2b', Gentoo: '#e15759' };
 const all = (await vegaData('penguins.json'))
   .filter((d) => d['Flipper Length (mm)'] != null && d['Body Mass (g)'] != null)
@@ -345,15 +338,16 @@ mount(Elicit({
   width: 400, height: 300,
   margins: { top: 10, right: 12, bottom: 36, left: 64 },
   schema: {
-    data: { f1: flip, f2: flip, m1: mass, m2: mass },
-    population: { context: true, fields: { flipper: flip, mass,
-      known: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] } } },
+    f1: flip, f2: flip, m1: mass, m2: mass,
+    flipper: flip, mass,
+    known: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] },
   },
-  data: { data: [{ f1: 195, f2: 210, m1: 3500, m2: 4500 }], population: all }, // start in the wrong place
+  data: [...all, { f1: 195, f2: 210, m1: 3500, m2: 4500 }], // start in the wrong place
+  context: (d) => d.known != null,                          //! the penguins are read-only
   axes: { x: { title: 'Flipper Length (mm)' }, y: { title: 'Body Mass (g)', tickFormat: ',' } },
   marks: [
     point({
-      table: 'population', size: 2.5, opacity: 0.5,
+      size: 2.5, opacity: 0.5,
       channels: {
         x: { field: 'flipper' }, y: { field: 'mass' },
         fill: { field: 'known', scale: { range: [tint.Adelie, tint.Chinstrap, tint.Gentoo] } },
@@ -496,13 +490,13 @@ mount(Elicit({
       title: 'Fill in the gaps',
       question: 'These films have an IMDB rating but no Rotten Tomatoes score. What would critics give them?',
       try: 'Drag each red dot up from the axis to your guess.',
-      why: 'The films missing a score sit at zero, the same convention the original uses. `move()` on `y` changes only the missing score and keeps the IMDB rating. The 200 complete films are a `context` table, so they frame the guess and stay out of `getData()`.',
-      uses: ['move()', 'context table'],
+      why: 'The films missing a score sit at zero, the same convention the original uses. `move()` on `y` changes only the missing score and keeps the IMDB rating. The 200 complete films are `context` rows with columns of their own, so they frame the guess and stay out of `getData()`.',
+      uses: ['move()', 'context'],
       code: `const all = await vegaData('movies.json');
 const known = all
   .filter((d) => d['IMDB Rating'] != null && d['Rotten Tomatoes Rating'] != null)
   .slice(0, 200)
-  .map((d) => ({ imdb: d['IMDB Rating'], rt: d['Rotten Tomatoes Rating'] }));
+  .map((d) => ({ knownImdb: d['IMDB Rating'], knownRt: d['Rotten Tomatoes Rating'] }));
 const gaps = ['Se7en', 'X2', 'Terminator 3: Rise of the Machines', "Harry Potter and the Sorcerer's Stone"]
   .map((t) => all.find((d) => d.Title === t))
   .map((d) => ({ title: d.Title.split(':')[0], imdb: d['IMDB Rating'], rt: 0 }));
@@ -512,16 +506,14 @@ const rt = { type: 'quantitative', domain: [0, 100] };
 mount(Elicit({
   width: 420, height: 300,
   margins: { top: 10, right: 12, bottom: 36, left: 50 },
-  schema: {
-    data: { title: { type: 'categorical' }, imdb, rt },
-    known: { context: true, fields: { imdb, rt } },          //! the complete films are context
-  },
-  data: { data: gaps, known },
+  schema: { title: { type: 'categorical' }, imdb, rt, knownImdb: imdb, knownRt: rt },
+  data: [...known, ...gaps],
+  context: (d) => d.knownImdb != null,                      //! the complete films are context
   axes: { x: { title: 'IMDB Rating', grid: true }, y: { title: 'Rotten Tomatoes Rating', grid: true } },
   marks: [
     point({
-      table: 'known', size: 3, fill: 'none', stroke: '#a5b4c8', strokeWidth: 1.2,
-      channels: { x: { field: 'imdb' }, y: { field: 'rt' } },
+      size: 3, fill: 'none', stroke: '#a5b4c8', strokeWidth: 1.2,
+      channels: { x: { field: 'knownImdb' }, y: { field: 'knownRt' } },
     }),
     point({
       size: 6, fill: '#e45756', stroke: '#fff', strokeWidth: 1.2,
@@ -574,26 +566,25 @@ mount(Elicit({
       title: 'Draw the frontier',
       question: 'At each horsepower, what is the best fuel economy an engineer could get?',
       try: 'Drag across the chart from left to right to draw the frontier; drag again to redraw part of it.',
-      why: '`edit.line.draw()` mints one row per `samples` column as the pointer crosses it, so a single stroke draws the curve. The cars are a `context` table drawn by the same filled `point`, so the drawing is the only data.',
-      uses: ['edit.line.draw()', 'context table'],
+      why: '`edit.line.draw()` mints one row per `samples` column as the pointer crosses it, so a single stroke draws the curve. The cars are `context` rows with columns of their own, drawn by the same filled `point`, so the drawing is the only data.',
+      uses: ['edit.line.draw()', 'context'],
       code: `const cars = (await vegaData('cars.json'))
   .filter((d) => d.Horsepower != null && d.Miles_per_Gallon != null)
-  .map((d) => ({ hp: d.Horsepower, mpg: d.Miles_per_Gallon }));
-const fields = {
-  hp:  { type: 'quantitative', domain: [40, 240] },
-  mpg: { type: 'quantitative', domain: [0, 50] },
-};
+  .map((d) => ({ carHp: d.Horsepower, carMpg: d.Miles_per_Gallon }));
+const hp = { type: 'quantitative', domain: [40, 240] };
+const mpg = { type: 'quantitative', domain: [0, 50] };
 
 mount(Elicit({
   width: 420, height: 300,
   margins: { top: 10, right: 12, bottom: 36, left: 50 },
-  schema: { data: fields, cars: { context: true, fields } }, //! the cars are drawn, not elicited
-  data: { data: [], cars },
+  schema: { hp, mpg, carHp: hp, carMpg: mpg },
+  data: cars,
+  context: true,                                             //! the cars are drawn, not elicited
   axes: { x: { title: 'Horsepower', grid: true }, y: { title: 'Miles_per_Gallon', grid: true } },
   marks: [
     point({
-      table: 'cars', fill: '#4c78a8', opacity: 0.35, size: 3,
-      channels: { x: { field: 'hp' }, y: { field: 'mpg' } },
+      fill: '#4c78a8', opacity: 0.35, size: 3,
+      channels: { x: { field: 'carHp' }, y: { field: 'carMpg' } },
     }),
     lineY({
       stroke: '#e45756', strokeWidth: 3, curve: 'monotoneX', handleSize: 3,
@@ -609,10 +600,10 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-circle_bubble_health_income',
   status: 'full',
-  verdict: 'The log-income bubble plot is reproduced, and `edit.axis.zoom()` on both axes gives the wheel zoom that `bind: "scales"` provides.',
+  verdict: 'The log-income bubble plot is reproduced, and `edit.axis.zoom()` with `edit.axis.pan()` on both axes gives the wheel zoom and drag pan that `bind: "scales"` provides.',
   needs: [],
   prep: ['prep-calculate'],
-  gaps: ['The wheel zooms each axis about the pointer (Shift-wheel too), every zoom is undoable, and `clip: true` hides the bubbles a zoom pushes outside the plot; dragging to pan, which `bind: "scales"` also gives, is out of scope.'],
+  gaps: ['Zoom and pan stop at the declared domains, so you cannot zoom out or pan past the full view; `bind: "scales"` has no such limit. Every zoom and pan is one undo step, and the plot clips the bubbles they push outside it.'],
   recreation: {
     code: `const countries = (await vegaData('gapminder-health-income.csv'))
   .map((d) => ({ income: d.income, health: d.health, population: d.population }));
@@ -623,7 +614,6 @@ const label = (v) => (/^[125]$/.test(String(+(v / 10 ** Math.floor(Math.log10(v)
 mount(Elicit({
   width: 460, height: 300,
   margins: { top: 10, right: 24, bottom: 36, left: 48 },
-  clip: true,                                               // a zoom hides bubbles outside the plot
   data: countries,
   schema: {
     income:     { type: 'quantitative', domain: [100, 1000000] },
@@ -631,8 +621,8 @@ mount(Elicit({
     population: { type: 'quantitative', domain: [0, 1.4e9] },
   },
   axes: {
-    x: { title: 'income', grid: true, tickFormat: label, edit: edit.axis.zoom() },
-    y: { title: 'health', grid: true, edit: edit.axis.zoom() },
+    x: { title: 'income', grid: true, tickFormat: label, edits: [edit.axis.zoom(), edit.axis.pan()] },
+    y: { title: 'health', grid: true, edits: [edit.axis.zoom(), edit.axis.pan()] },
   },
   marks: [
     point({
@@ -651,18 +641,18 @@ mount(Elicit({
     {
       title: 'Guess life expectancy',
       question: 'Given their income, how long do people live in Niger, India, Turkey, the United States and Qatar?',
-      try: 'Drag each red bubble up or down; its income is fixed. Wheel over an axis to zoom in on the crowd.',
-      why: '`move()` on `y` alone sets health and keeps income. The other 182 countries are a `context` table, so they frame the guess and stay out of `getData()`. `edit.axis.zoom()` on each axis zooms the domain about the pointer, so you can read a crowded stretch closely.',
-      uses: ['move()', 'context table', 'edit.axis.zoom()'],
+      try: 'Drag each red bubble up or down; its income is fixed. Wheel over the plot to zoom in on the crowd, and drag empty space to pan.',
+      why: '`move()` on `y` alone sets health and keeps income. The other 182 countries are `context` rows with columns of their own, so they frame the guess and stay out of `getData()`. `edit.axis.zoom()` and `edit.axis.pan()` on each axis zoom the domain about the pointer and slide it, so you can read a crowded stretch closely. A press on a red bubble still moves it.',
+      uses: ['move()', 'context', 'edit.axis.zoom()', 'edit.axis.pan()'],
       code: `const ask = ['Niger', 'India', 'Turkey', 'United States', 'Qatar'];
-const rows = (await vegaData('gapminder-health-income.csv'))
-  .map((d) => ({ country: d.country, income: d.income, health: d.health, population: d.population }));
-const fields = {
-  country:    { type: 'categorical' },
-  income:     { type: 'quantitative', domain: [100, 1000000] },
-  health:     { type: 'quantitative', domain: [45, 85] },
-  population: { type: 'quantitative', domain: [0, 1.4e9] },
-};
+const all = (await vegaData('gapminder-health-income.csv'));
+const given = all.filter((d) => !ask.includes(d.country))
+  .map((d) => ({ givenIncome: d.income, givenHealth: d.health, givenPop: d.population }));
+const asked = all.filter((d) => ask.includes(d.country))
+  .map((d) => ({ country: d.country, income: d.income, health: 65, population: d.population })); // a neutral 65
+const income = { type: 'quantitative', domain: [100, 1000000] };
+const health = { type: 'quantitative', domain: [45, 85] };
+const population = { type: 'quantitative', domain: [0, 1.4e9] };
 
 // Label only the 1s, 2s and 5s of each decade, however far you zoom.
 const label = (v) => (/^[125]$/.test(String(+(v / 10 ** Math.floor(Math.log10(v))).toFixed(6))) ? d3.format('~s')(v) : '');
@@ -670,22 +660,22 @@ const label = (v) => (/^[125]$/.test(String(+(v / 10 ** Math.floor(Math.log10(v)
 mount(Elicit({
   width: 460, height: 300,
   margins: { top: 10, right: 24, bottom: 36, left: 48 },
-  clip: true,                                               // a zoom hides bubbles outside the plot
-  schema: { data: fields, given: { context: true, fields } }, //! the other countries are context
-  data: {
-    data: rows.filter((d) => ask.includes(d.country)).map((d) => ({ ...d, health: 65 })), // a neutral 65
-    given: rows.filter((d) => !ask.includes(d.country)),
+  schema: {
+    country: { type: 'categorical' }, income, health, population,
+    givenIncome: income, givenHealth: health, givenPop: population,
   },
+  data: [...given, ...asked],
+  context: (d) => d.givenIncome != null,                    //! the other countries are context
   axes: {
-    x: { title: 'income', grid: true, tickFormat: label, edit: edit.axis.zoom() }, //! the wheel zooms about the pointer
-    y: { title: 'health', grid: true, edit: edit.axis.zoom() },
+    x: { title: 'income', grid: true, tickFormat: label, edits: [edit.axis.zoom(), edit.axis.pan()] }, //! wheel to zoom, drag to pan
+    y: { title: 'health', grid: true, edits: [edit.axis.zoom(), edit.axis.pan()] },
   },
   marks: [
     point({
-      table: 'given', fill: '#cbd5e1', opacity: 0.8,
+      fill: '#cbd5e1', opacity: 0.8,
       channels: {
-        x: { field: 'income', scale: 'log' }, y: { field: 'health' },
-        size: { field: 'population', scale: { type: 'sqrt', range: [1, 12] } },
+        x: { field: 'givenIncome', scale: 'log' }, y: { field: 'givenHealth' },
+        size: { field: 'givenPop', scale: { type: 'sqrt', range: [1, 12] } },
       },
     }),
     point({
@@ -791,40 +781,31 @@ mount(Elicit({
       title: 'Forecast the 2030s',
       question: 'In a typical year of the 2030s, how many people will each kind of disaster kill?',
       try: 'Drag a bubble in the 2030 column up to grow it, down to shrink it.',
-      why: 'The 1970–2017 record is a `context` table, so only the 2030 column moves and `getData()` holds just the forecast. `slide({ axis: "y" })` on `size` turns vertical drag distance into deaths, relative to where you grabbed, so the bubble never jumps when pressed.',
-      uses: ['slide()', 'context table'],
+      why: 'One `point` draws the record and the forecast. `context: (d) => d.year < 2030` marks the 1970–2017 record, so only the 2030 column moves and `getData()` holds just the forecast. `slide({ axis: "y" })` on `size` turns vertical drag distance into deaths, relative to where you grabbed, so the bubble never jumps when pressed.',
+      uses: ['slide()', 'context'],
       code: `const record = (await vegaData('disasters.csv'))
   .filter((d) => d.Entity !== 'All natural disasters' && d.Year >= 1970)
   .map((d) => ({ entity: d.Entity, year: d.Year, deaths: d.Deaths }));
 const kinds = [...new Set(record.map((d) => d.entity))].sort();
-const fields = {
-  entity: { type: 'categorical', domain: [...kinds].reverse() },
-  year:   { type: 'quantitative', domain: [1970, 2032] },
-  deaths: { type: 'quantitative', domain: [0, 500000] },
-};
 
 mount(Elicit({
   width: 480, height: 360,
   margins: { top: 10, right: 12, bottom: 30, left: 124 },
-  schema: { data: fields, record: { context: true, fields } }, //! the record is fixed
-  data: {
-    data: kinds.map((entity) => ({ entity, year: 2030, deaths: 20000 })),
-    record,
+  schema: {
+    entity: { type: 'categorical', domain: [...kinds].reverse() },
+    year:   { type: 'quantitative', domain: [1970, 2032] },
+    deaths: { type: 'quantitative', domain: [0, 500000] },
   },
+  data: [...record, ...kinds.map((entity) => ({ entity, year: 2030, deaths: 20000 }))],
+  context: (d) => d.year < 2030,                            //! the record is fixed
   axes: { x: { title: '', tickFormat: 'd' }, y: { title: '' } },
   guides: [ guides.region({ x: [2025, 2032], fill: '#fde68a', opacity: 0.35 }) ],
   marks: [
     point({
-      table: 'record', opacity: 0.8, stroke: '#000', strokeWidth: 1,
+      opacity: 0.8, stroke: '#000',
       channels: {
         x: { field: 'year' }, y: { field: 'entity' }, fill: { field: 'entity' },
-        size: { field: 'deaths', scale: { type: 'sqrt', range: [0, 24] } },
-      },
-    }),
-    point({
-      opacity: 0.8, stroke: '#000', strokeWidth: 1.5,
-      channels: {
-        x: { field: 'year' }, y: { field: 'entity' }, fill: { field: 'entity' },
+        strokeWidth: { fn: (d) => (d.year < 2030 ? 1 : 1.5) }, // the forecast is outlined heavier
         size: {
           field: 'deaths', scale: { type: 'sqrt', range: [0, 24] },
           edit: slide({ axis: 'y', extent: 200 }),          //! drag up to grow the 2030 bubble
@@ -1258,8 +1239,8 @@ mount(Elicit({
       title: 'Band the recession',
       question: 'For each quarter from mid-2008 to 2010, what range are you 80% sure covers the number of unemployed workers (thousands)?',
       try: 'Drag along the band\'s top edge to paint the high end, along its bottom edge to paint the low end.',
-      why: 'The band is one `areaY` with `edit.line.sweep()` on both `y1` and `y2`. A sweep locks onto the edge nearest the pointer at dragstart and paints only that edge, so one stroke sets every high (or every low) it crosses. `ordering()` keeps each low below its high. The record is a `context` table drawn by a second `areaY`.',
-      uses: ['edit.line.sweep()', 'areaY()', 'ordering()', 'context table'],
+      why: 'The band is one `areaY` with `edit.line.sweep()` on both `y1` and `y2`. A sweep locks onto the edge nearest the pointer at dragstart and paints only that edge, so one stroke sets every high (or every low) it crosses. `ordering()` keeps each low below its high. The record is `context` rows drawn by a second `areaY`.',
+      uses: ['edit.line.sweep()', 'areaY()', 'ordering()', 'context'],
       code: `const rows = await vegaData('unemployment-across-industries.json');
 const record = d3.rollups(rows, (v) => d3.sum(v, (d) => d.count),
                           (d) => d.year + (d.month - 1) / 12)
@@ -1273,19 +1254,14 @@ const workers = { type: 'quantitative', domain: [0, 20000] };
 mount(Elicit({
   width: 420, height: 240,
   margins: { top: 10, right: 12, bottom: 30, left: 68 },
-  schema: {
-    data: { t: time, lo: workers, hi: workers },
-    record: { context: true, fields: { t: time, count: workers } },
-  },
-  data: {
-    data: d3.range(2008.5, 2010.01, 0.25).map((t) => ({ t, lo: last * 0.9, hi: last * 1.1 })),
-    record,
-  },
+  schema: { t: time, count: workers, lo: workers, hi: workers },
+  data: [...record, ...d3.range(2008.5, 2010.01, 0.25).map((t) => ({ t, lo: last * 0.9, hi: last * 1.1 }))],
+  context: (d) => d.count != null,                          //! the record is given
   constraints: [ ordering({ field: ['lo', 'hi'] }) ],      //! the low end stays below the high end
   axes: { x: { title: '', tickFormat: 'd', ticks: 5 }, y: { title: 'count', grid: true, tickFormat: ',' } },
   marks: [
     areaY({
-      table: 'record', fill: '#4c78a8', fillOpacity: 1, stroke: 'none',
+      fill: '#4c78a8', fillOpacity: 1, stroke: 'none',
       channels: { x: { field: 't' }, y: { field: 'count' } },
     }),
     areaY({
@@ -1341,8 +1317,8 @@ mount(Elicit({
       title: 'Fan out 2010',
       question: 'Give a range you are 80% sure Google\'s monthly price will stay inside through 2010.',
       try: 'Drag the upper and lower handles of each month.',
-      why: 'The 2007–09 prices are a `context` table drawn with the original\'s gradient, so the dataset is just the twelve months you answer. Each row is a `lo`/`hi` pair: `y1` and `y2` each carry a `move()`, and `ordering()` keeps the low end below the high end whichever you drag.',
-      uses: ['areaY()', 'move()', 'ordering()', 'context table'],
+      why: 'The 2007–09 prices are `context` rows drawn with the original\'s gradient, so `getData()` is just the twelve months you answer. Each row is a `lo`/`hi` pair: `y1` and `y2` each carry a `move()`, and `ordering()` keeps the low end below the high end whichever you drag.',
+      uses: ['areaY()', 'move()', 'ordering()', 'context'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
   .map((d) => ({ date: new Date(d.date), price: d.price }))
@@ -1354,13 +1330,14 @@ const price = { type: 'quantitative', domain: [0, 1000] };
 mount(Elicit({
   width: 420, height: 260,
   margins: { top: 10, right: 12, bottom: 30, left: 62 },
-  schema: { data: { date, lo: price, hi: price }, history: { context: true, fields: { date, price } } },
-  data: { data: months.map((date) => ({ date, lo: 560, hi: 680 })), history: goog },
+  schema: { date, price, lo: price, hi: price },
+  data: [...goog, ...months.map((date) => ({ date, lo: 560, hi: 680 }))],
+  context: (d) => d.price != null,                          //! the record is given
   constraints: [ ordering({ field: ['lo', 'hi'] }) ],      //! low stays below high
   axes: { x: { title: '' }, y: { title: 'price', grid: true } },
   marks: [
     areaY({
-      table: 'history', stroke: 'darkgreen', strokeWidth: 1.5,
+      stroke: 'darkgreen', strokeWidth: 1.5,
       gradient: { stops: [[0, 'white'], [1, 'darkgreen']] },
       channels: { x: { field: 'date' }, y: { field: 'price' } },
     }),
@@ -1380,7 +1357,7 @@ mount(Elicit({
       question: 'Give a range you are 80% sure Google\'s monthly price will stay inside through 2010.',
       try: 'Drag along the fan\'s top edge to paint the high end, along its bottom edge to paint the low end.',
       why: 'The same question as a stroke rather than twenty-four handles: `edit.line.sweep()` on `y1` and `y2` locks onto the edge nearest the pointer at dragstart and paints only that edge across every month it crosses. The fan carries the original\'s white-to-green `gradient`, and `ordering()` keeps the low end below the high end.',
-      uses: ['edit.line.sweep()', 'gradient', 'ordering()', 'context table'],
+      uses: ['edit.line.sweep()', 'gradient', 'ordering()', 'context'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
   .map((d) => ({ date: new Date(d.date), price: d.price }))
@@ -1392,13 +1369,14 @@ const price = { type: 'quantitative', domain: [0, 1000] };
 mount(Elicit({
   width: 420, height: 260,
   margins: { top: 10, right: 12, bottom: 30, left: 62 },
-  schema: { data: { date, lo: price, hi: price }, history: { context: true, fields: { date, price } } },
-  data: { data: months.map((date) => ({ date, lo: 560, hi: 680 })), history: goog },
+  schema: { date, price, lo: price, hi: price },
+  data: [...goog, ...months.map((date) => ({ date, lo: 560, hi: 680 }))],
+  context: (d) => d.price != null,
   constraints: [ ordering({ field: ['lo', 'hi'] }) ],
   axes: { x: { title: '' }, y: { title: 'price', grid: true } },
   marks: [
     lineY({
-      table: 'history', stroke: 'darkgreen', strokeWidth: 1.5,
+      stroke: 'darkgreen', strokeWidth: 1.5,
       channels: { x: { field: 'date' }, y: { field: 'price' } },
     }),
     areaY({
@@ -1452,30 +1430,32 @@ mount(Elicit({
       title: 'Draw 2010',
       question: 'How will Google\'s monthly price move through 2010?',
       try: 'Drag across the empty months to draw the price; drag again to redraw part of it.',
-      why: '`edit.line.draw()` mints a row at each `samples` date the pointer crosses. The area and the points are views over the same rows, so they fill in behind your line. The 2007–09 record is a `context` table drawn by the same three marks, so `getData()` holds only your drawing.',
-      uses: ['edit.line.draw()', 'context table'],
+      why: '`edit.line.draw()` mints a row at each `samples` date the pointer crosses. The area and the points are views over the same rows, so they fill in behind your line. The 2007–09 record is `context` rows with a `close` column of their own, drawn by three marks in blue, so `getData()` holds only your drawing.',
+      uses: ['edit.line.draw()', 'context'],
       code: `const goog = (await vegaData('stocks.csv'))
   .filter((d) => d.symbol === 'GOOG')
-  .map((d) => ({ date: new Date(d.date), price: d.price }))
+  .map((d) => ({ date: new Date(d.date), close: d.price }))
   .filter((d) => d.date >= new Date(2007, 0, 1) && d.date < new Date(2010, 0, 1));
 const months = d3.timeMonth.range(new Date(2010, 0, 1), new Date(2011, 0, 1));
-const fields = {
-  date:  { type: 'temporal', domain: [new Date(2007, 0, 1), new Date(2010, 11, 1)] },
-  price: { type: 'quantitative', domain: [0, 1000] },
-};
+const price = { type: 'quantitative', domain: [0, 1000] };
+const past = { x: { field: 'date' }, y: { field: 'close' } };
 const xy = { x: { field: 'date' }, y: { field: 'price' } };
 
 mount(Elicit({
   width: 420, height: 260,
   margins: { top: 10, right: 12, bottom: 30, left: 62 },
-  schema: { data: fields, history: { context: true, fields } }, //! the record is given
-  data: { data: [], history: goog },
+  schema: {
+    date: { type: 'temporal', domain: [new Date(2007, 0, 1), new Date(2010, 11, 1)] },
+    price, close: price,
+  },
+  data: goog,
+  context: true,                                             //! the record is given
   axes: { x: { title: '' }, y: { title: 'price', grid: true } },
   guides: [ guides.region({ x: [months[0], months.at(-1)], fill: '#fde68a', opacity: 0.4 }) ],
   marks: [
-    areaY({ table: 'history', fill: '#4c78a8', fillOpacity: 0.5, stroke: 'none', channels: xy }),
-    lineY({ table: 'history', stroke: '#4c78a8', strokeWidth: 1.5, channels: xy }),
-    point({ table: 'history', fill: '#4c78a8', size: 2.5, channels: xy }),
+    areaY({ fill: '#4c78a8', fillOpacity: 0.5, stroke: 'none', channels: past }),
+    lineY({ stroke: '#4c78a8', strokeWidth: 1.5, channels: past }),
+    point({ fill: '#4c78a8', size: 2.5, channels: past }),
     areaY({ fill: '#e45756', fillOpacity: 0.3, stroke: 'none', channels: xy }),
     lineY({
       stroke: '#e45756', strokeWidth: 2, handleSize: 2.5, channels: xy,
@@ -1502,14 +1482,15 @@ const price = { type: 'quantitative', domain: [0, 1000] };
 mount(Elicit({
   width: 420, height: 260,
   margins: { top: 10, right: 12, bottom: 30, left: 62 },
-  schema: { data: { date, bad: price, good: price }, history: { context: true, fields: { date, price } } },
-  data: { data: months.map((date) => ({ date, bad: 560, good: 680 })), history: goog },
+  schema: { date, price, bad: price, good: price },
+  data: [...goog, ...months.map((date) => ({ date, bad: 560, good: 680 }))],
+  context: (d) => d.price != null,                          // the record is given
   constraints: [ ordering({ field: ['bad', 'good'] }) ],   //! the bad year stays below the good one
   axes: { x: { title: '' }, y: { title: 'price', grid: true } },
   marks: [
-    areaY({ table: 'history', fill: '#4c78a8', fillOpacity: 0.7, stroke: 'none',
+    areaY({ fill: '#4c78a8', fillOpacity: 0.7, stroke: 'none',
             channels: { x: { field: 'date' }, y: { field: 'price' } } }),
-    point({ table: 'history', fill: '#4c78a8', size: 2.5,
+    point({ fill: '#4c78a8', size: 2.5,
             channels: { x: { field: 'date' }, y: { field: 'price' } } }),
     areaY({
       fill: '#f58518', fillOpacity: 0.3, stroke: '#f58518', handles: 'hit',
@@ -1937,8 +1918,8 @@ mount(Elicit({
       title: 'Bracket the surge',
       question: 'Over which months did unemployment rise fastest during the 2008–09 recession?',
       try: 'Drag the band\'s edges to bracket the months, or its body to slide it.',
-      why: 'The stream is a `context` table drawn by the recreation\'s own stacked `areaY`. The dataset is one row with a `start` and an `end`, drawn by a `rect` that spans the plot height, and `brushSpan()` resizes the edge you grab or slides both.',
-      uses: ['brushSpan()', 'rect()', 'context table'],
+      why: 'The stream is `context` rows drawn by the recreation\'s own stacked `areaY`. The answer is one row with a `start` and an `end`, drawn by a `rect` that spans the plot height, and `brushSpan()` resizes the edge you grab or slides both.',
+      uses: ['brushSpan()', 'rect()', 'context'],
       code: `const rows = await vegaData('unemployment-across-industries.json');
 const order = [...new Set(rows.map((d) => d.series))].sort();
 const stream = [];
@@ -1957,16 +1938,13 @@ const v = { type: 'quantitative', domain: [-8000, 8000] };
 mount(Elicit({
   width: 440, height: 240,
   margins: { top: 10, right: 8, bottom: 30, left: 10 },
-  schema: {
-    data: { start: t, end: t },
-    stream: { context: true, fields: {                       //! the stream is drawn, not elicited
-      t, lo: v, hi: v, series: { type: 'categorical', domain: order } } },
-  },
-  data: { data: [{ start: 2001, end: 2002 }], stream },
+  schema: { start: t, end: t, t, lo: v, hi: v, series: { type: 'categorical', domain: order } },
+  data: [...stream, { start: 2001, end: 2002 }],
+  context: (d) => d.series != null,                         //! the stream is drawn, not elicited
   axes: { x: { title: '', tickFormat: 'd', ticks: 6 }, y: false },
   marks: [
     areaY({
-      table: 'stream', stroke: 'none', fillOpacity: 0.85,
+      stroke: 'none', fillOpacity: 0.85,
       channels: {
         x: { field: 't' }, y1: { field: 'lo' }, y2: { field: 'hi' },
         fill: { field: 'series', scale: { range: category20b } },
@@ -1987,8 +1965,8 @@ mount(Elicit({
       title: 'Sweep the stream',
       question: 'How many workers (thousands) will be unemployed in total each quarter through 2012?',
       try: 'Drag along the top or bottom edge of the grey stream to paint its thickness; the other edge mirrors it.',
-      why: 'A streamgraph is centred on zero, so its thickness is the total. The forecast band has `edit.line.sweep()` on `y1` and `y2`, and a sweep paints only the edge nearest the pointer at dragstart. `symmetric({ about: "mid" })` mirrors that edge about the zero line, so one stroke sets the whole thickness. The record is a `context` table drawn by the stacked `areaY`.',
-      uses: ['edit.line.sweep()', 'symmetric()', 'context table'],
+      why: 'A streamgraph is centred on zero, so its thickness is the total. The forecast band has `edit.line.sweep()` on `y1` and `y2`, and a sweep paints only the edge nearest the pointer at dragstart. `symmetric({ about: "mid" })` mirrors that edge about the zero line, so one stroke sets the whole thickness. The record is `context` rows with `bottom` and `top` columns of their own, drawn by the stacked `areaY`.',
+      uses: ['edit.line.sweep()', 'symmetric()', 'context'],
       code: `const rows = await vegaData('unemployment-across-industries.json');
 const order = [...new Set(rows.map((d) => d.series))].sort();
 const stream = [];
@@ -1998,7 +1976,7 @@ for (const [t, group] of d3.group(rows, (d) => d.year + (d.month - 1) / 12)) {
   let base = -last / 2;
   for (const series of [...order].reverse()) {
     const count = d3.sum(group.filter((d) => d.series === series), (d) => d.count);
-    stream.push({ t, series, lo: base, hi: (base += count) });
+    stream.push({ t, series, bottom: base, top: (base += count) });
   }
 }
 const category20b = ['#393b79', '#5254a3', '#6b6ecf', '#9c9ede', '#637939', '#8ca252', '#b5cf6b',
@@ -2010,20 +1988,18 @@ mount(Elicit({
   width: 440, height: 240,
   margins: { top: 10, right: 8, bottom: 30, left: 10 },
   schema: {
-    data: { t, lo: v, hi: v, mid: v },
-    stream: { context: true, fields: { t, lo: v, hi: v, series: { type: 'categorical', domain: order } } },
+    t, lo: v, hi: v, mid: v,
+    bottom: v, top: v, series: { type: 'categorical', domain: order },
   },
-  data: {
-    data: d3.range(2010.25, 2013.01, 0.25).map((t) => ({ t, lo: -last / 2, hi: last / 2, mid: 0 })),
-    stream,
-  },
+  data: [...stream, ...d3.range(2010.25, 2013.01, 0.25).map((t) => ({ t, lo: -last / 2, hi: last / 2, mid: 0 }))],
+  context: (d) => d.series != null,                         // the record is drawn, not elicited
   constraints: [ symmetric({ field: ['lo', 'hi'], about: 'mid' }) ], //! one edge mirrors the other about zero
   axes: { x: { title: '', tickFormat: 'd', ticks: 6 }, y: false },
   marks: [
     areaY({
-      table: 'stream', stroke: 'none', fillOpacity: 0.85,
+      stroke: 'none', fillOpacity: 0.85,
       channels: {
-        x: { field: 't' }, y1: { field: 'lo' }, y2: { field: 'hi' },
+        x: { field: 't' }, y1: { field: 'bottom' }, y2: { field: 'top' },
         fill: { field: 'series', scale: { range: category20b } },
       },
     }),
@@ -2080,8 +2056,8 @@ mount(Elicit({
       title: 'Find the peak week',
       question: 'Reading the horizon, which five consecutive days add up to the most?',
       try: 'Drag the window left or right.',
-      why: '`moveSpan()` translates the window\'s `x1` and `x2` together, so its width stays five days. Two `snap()` rules land both ends halfway between days, so the window always covers five whole days. The horizon is a `context` table drawn by the recreation\'s two folded `areaY` layers.',
-      uses: ['moveSpan()', 'snap()', 'context table'],
+      why: '`moveSpan()` translates the window\'s `x1` and `x2` together, so its width stays five days. Two `snap()` rules land both ends halfway between days, so the window always covers five whole days. The horizon is `context` rows drawn by the recreation\'s two folded `areaY` layers.',
+      uses: ['moveSpan()', 'snap()', 'context'],
       code: `const values = [28, 55, 43, 91, 81, 53, 19, 87, 52, 48, 24, 49, 87, 66, 17, 27, 68, 16, 49, 15];
 const days = values.map((y, i) => ({ day: i + 1, low: Math.min(y, 50), high: Math.max(y - 50, 0) }));
 const edge = { type: 'quantitative', domain: [0.5, 20.5] };
@@ -2090,19 +2066,17 @@ const band = { type: 'quantitative', domain: [0, 50] };
 mount(Elicit({
   width: 400, height: 90,
   margins: { top: 6, right: 12, bottom: 28, left: 12 },
-  schema: {
-    data: { a: edge, b: edge },
-    days: { context: true, fields: { day: edge, low: band, high: band } }, //! the horizon is context
-  },
-  data: { data: [{ a: 0.5, b: 5.5 }], days },              // days 1–5
+  schema: { a: edge, b: edge, day: edge, low: band, high: band },
+  data: [...days, { a: 0.5, b: 5.5 }],                     // the window starts on days 1–5
+  context: (d) => d.day != null,                            //! the horizon is context
   constraints: [                                            //! edges land between days
     snap({ step: 1, origin: 0.5, field: 'a' }), snap({ step: 1, origin: 0.5, field: 'b' }),
   ],
   axes: { x: { title: 'day', ticks: 20 }, y: false },
   marks: [
-    areaY({ table: 'days', fill: '#4c78a8', fillOpacity: 0.6, stroke: 'none', curve: 'monotoneX',
+    areaY({ fill: '#4c78a8', fillOpacity: 0.6, stroke: 'none', curve: 'monotoneX',
             channels: { x: { field: 'day' }, y: { field: 'low' } } }),
-    areaY({ table: 'days', fill: '#4c78a8', fillOpacity: 0.3, stroke: 'none', curve: 'monotoneX',
+    areaY({ fill: '#4c78a8', fillOpacity: 0.3, stroke: 'none', curve: 'monotoneX',
             channels: { x: { field: 'day' }, y: { field: 'high' } } }),
     rect({
       fill: '#f58518', fillOpacity: 0.2, stroke: '#f58518', strokeWidth: 2,
@@ -2116,8 +2090,8 @@ mount(Elicit({
       title: 'Band the next ten days',
       question: 'For each of the next ten days, what range are you 80% sure the value will fall in?',
       try: 'Drag along the band\'s top edge to paint the highs, along its bottom edge to paint the lows.',
-      why: 'A fold maps two values to one height, so a pointer on a folded band cannot say which it means; the band you answer on is drawn unfolded, on the full 0–100 scale, beside the twenty folded days. `edit.line.sweep()` on `y1` and `y2` paints the edge nearest the pointer at dragstart, and `ordering()` keeps each low below its high. A rule at 50 marks where the horizon folds.',
-      uses: ['edit.line.sweep()', 'ordering()', 'guides.rule()', 'context table'],
+      why: 'A fold maps two values to one height, so a pointer on a folded band cannot say which it means; the band you answer on is drawn unfolded, on the full 0–100 scale, beside the twenty folded days. `edit.line.sweep()` on `y1` and `y2` paints the edge nearest the pointer at dragstart, and `ordering()` keeps each low below its high. A rule at 50 marks where the horizon folds, and `context` marks the twenty folded days.',
+      uses: ['edit.line.sweep()', 'ordering()', 'guides.rule()', 'context'],
       code: `const values = [28, 55, 43, 91, 81, 53, 19, 87, 52, 48, 24, 49, 87, 66, 17, 27, 68, 16, 49, 15];
 const days = values.map((y, i) => ({ day: i + 1, low: Math.min(y, 50), high: Math.max(y - 50, 0) }));
 const day = { type: 'quantitative', domain: [1, 30] };
@@ -2126,18 +2100,16 @@ const v = { type: 'quantitative', domain: [0, 100] };
 mount(Elicit({
   width: 440, height: 150,
   margins: { top: 6, right: 12, bottom: 30, left: 46 },
-  schema: {
-    data: { day, lo: v, hi: v },
-    days: { context: true, fields: { day, low: v, high: v } },
-  },
-  data: { data: d3.range(21, 31).map((day) => ({ day, lo: 30, hi: 70 })), days },
+  schema: { day, lo: v, hi: v, low: v, high: v },
+  data: [...days, ...d3.range(21, 31).map((day) => ({ day, lo: 30, hi: 70 }))],
+  context: (d) => d.low != null,
   constraints: [ ordering({ field: ['lo', 'hi'] }) ],      //! each low stays below its high
   axes: { x: { title: 'day', ticks: 15 }, y: { title: 'value', ticks: 2 } },
   guides: [ guides.rule({ y: 50, stroke: '#94a3b8', strokeDash: [3, 3], label: 'fold' }) ],
   marks: [
-    areaY({ table: 'days', fill: '#4c78a8', fillOpacity: 0.6, stroke: 'none', curve: 'monotoneX',
+    areaY({ fill: '#4c78a8', fillOpacity: 0.6, stroke: 'none', curve: 'monotoneX',
             channels: { x: { field: 'day' }, y: { field: 'low' } } }),
-    areaY({ table: 'days', fill: '#4c78a8', fillOpacity: 0.3, stroke: 'none', curve: 'monotoneX',
+    areaY({ fill: '#4c78a8', fillOpacity: 0.3, stroke: 'none', curve: 'monotoneX',
             channels: { x: { field: 'day' }, y: { field: 'high' } } }),
     areaY({
       fill: '#f58518', fillOpacity: 0.3, stroke: '#f58518', curve: 'monotoneX', handles: 'hit',
@@ -2346,23 +2318,25 @@ mount(Elicit({
       title: 'Punch the busy hours',
       question: 'When does a typical open-source project get the most commits? Punch the six busiest hours of the week.',
       try: 'Click an empty slot to punch it; click a punched slot to take it back.',
-      why: '`toggle()` on `x` and `y` names a slot from the pointer: an empty slot mints a row there, a full one is removed. `count({ max: 6, strategy: "reject" })` turns away a seventh punch. The grey grid of slots is a `context` table drawn by a second `point`, so it never enters the answer.',
-      uses: ['toggle()', 'count()', 'context table'],
+      why: '`toggle()` on `x` and `y` names a slot from the pointer: an empty slot mints a row there, a full one is removed. The grey grid of slots is `context` rows with columns of their own, drawn by a second `point`, so it never enters the answer. `count()` counts those rows too, so its `max` is the 168 slots plus six, and `strategy: "reject"` turns away a seventh punch.',
+      uses: ['toggle()', 'count()', 'context'],
       code: `const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const fields = {
-  day:  { type: 'ordinal', domain: [...days].reverse() },
-  hour: { type: 'ordinal', domain: d3.range(24) },
-};
+const day = { type: 'ordinal', domain: [...days].reverse() };
+const hour = { type: 'ordinal', domain: d3.range(24) };
+const slots = days.flatMap((slotDay) => d3.range(24).map((slotHour) => ({ slotDay, slotHour })));
+
 mount(Elicit({
   width: 480, height: 200,
   margins: { top: 8, right: 8, bottom: 32, left: 56 },
-  schema: { data: fields, slots: { context: true, fields } }, //! every slot, drawn faintly
-  data: { data: [], slots: days.flatMap((day) => d3.range(24).map((hour) => ({ day, hour }))) },
-  constraints: [ count({ max: 6, strategy: 'reject' }) ],   //! six punches
+  schema: { day, hour, slotDay: day, slotHour: hour },
+  data: slots,
+  context: true,                                             //! every slot, drawn faintly
+  // count() counts the context rows too: every slot plus six punches.
+  constraints: [ count({ max: slots.length + 6, strategy: 'reject' }) ], //! six punches
   axes: { x: { title: 'time (hours)' }, y: { title: 'time (day)' } },
   marks: [
-    point({ table: 'slots', fill: '#cbd5e1', size: 2,
-            channels: { x: { field: 'hour' }, y: { field: 'day' } } }),
+    point({ fill: '#cbd5e1', size: 2,
+            channels: { x: { field: 'slotHour' }, y: { field: 'slotDay' } } }),
     point({
       fill: '#4c78a8', size: 7,
       channels: { x: { field: 'hour' }, y: { field: 'day' } },

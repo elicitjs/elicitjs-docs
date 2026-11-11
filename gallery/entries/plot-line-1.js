@@ -1440,41 +1440,38 @@ mount(Elicit({
       title: 'Sweep past the bands',
       question: 'The last year of closes and their 20-day Bollinger band are shown. Where will the band’s low and high edges run over the next three months?',
       try: 'Press on the top edge of the orange band and sweep along it, then on its bottom edge.',
-      why: 'The history and its computed band live in a context table (`context: true`): drawn by marks with `table: "history"`, read-only, and left out of `getData()`. The elicited table holds only the forecast weeks, and each edge of its `areaY` span carries an `edit.line.sweep()`.',
-      uses: ['edit.line.sweep()', 'context table', 'ordering()', 'areaY span (y1/y2)'],
+      why: 'The history and its computed band are context rows (`context: (d) => d.Close != null`): drawn, read-only, and left out of `getData()`. The band fills its own columns, so the grey `areaY` draws it and the orange one draws only the forecast weeks, each edge carrying an `edit.line.sweep()`.',
+      uses: ['edit.line.sweep()', 'context', 'ordering()', 'areaY span (y1/y2)'],
       code: `const aapl = await plotData('aapl');
 const n = 20, k = 2;
 const history = aapl.slice(n - 1).map((d, j) => {
   const w = aapl.slice(j, j + n).map((e) => e.Close);
   const m = d3.mean(w), sd = d3.deviation(w);
-  return { Date: d.Date, Close: d.Close, lo: m - k * sd, hi: m + k * sd };
+  return { Date: d.Date, Close: d.Close, bandLo: m - k * sd, bandHi: m + k * sd };
 }).filter((d) => d.Date >= new Date('2017-05-01'));
 const last = history.at(-1);
 const forecast = d3.utcWeeks(d3.utcDay.offset(last.Date, 1), d3.utcMonth.offset(last.Date, 3))
-  .map((Date) => ({ Date, lo: Math.round(last.lo), hi: Math.round(last.hi) }));
+  .map((Date) => ({ Date, lo: Math.round(last.bandLo), hi: Math.round(last.bandHi) }));
 
 mount(Elicit({
   width: 460, height: 290,
   margins: { top: 16, right: 16, bottom: 28, left: 40 },
   schema: {
-    data: {
-      Date: { type: 'temporal' },
-      lo:   { type: 'quantitative', domain: [120, 240] },
-      hi:   { type: 'quantitative', domain: [120, 240] },
-    },
-    history: {
-      context: true,                                  //! drawn, read-only, never reported
-      fields: { Date: { type: 'temporal' }, Close: { type: 'quantitative' },
-                lo: { type: 'quantitative' }, hi: { type: 'quantitative' } },
-    },
+    Date:   { type: 'temporal' },
+    Close:  { type: 'quantitative' },
+    bandLo: { type: 'quantitative' },
+    bandHi: { type: 'quantitative' },
+    lo:     { type: 'quantitative', domain: [120, 240] },
+    hi:     { type: 'quantitative', domain: [120, 240] },
   },
-  data: { data: forecast, history },
+  data: [...history, ...forecast],
+  context: (d) => d.Close != null,                    //! drawn, read-only, never reported
   constraints: [ordering({ field: ['lo', 'hi'] })],
   axes: { y: { grid: true } },
   marks: [
-    areaY({ table: 'history', fill: 'currentColor', fillOpacity: 0.15, stroke: 'none',
-      channels: { x: { field: 'Date' }, y1: { field: 'lo' }, y2: { field: 'hi' } } }),
-    lineY({ table: 'history', stroke: 'currentColor', strokeWidth: 1,
+    areaY({ fill: 'currentColor', fillOpacity: 0.15, stroke: 'none',
+      channels: { x: { field: 'Date' }, y1: { field: 'bandLo' }, y2: { field: 'bandHi' } } }),
+    lineY({ stroke: 'currentColor', strokeWidth: 1,
       channels: { x: { field: 'Date' }, y: { field: 'Close' } } }),
     areaY({
       fill: '#e8833a', fillOpacity: 0.3, stroke: '#e8833a', handleSize: 3,
@@ -1538,8 +1535,8 @@ mount(Elicit({
       title: 'Fit a trend and a band',
       question: 'Draw the long-run warming trend through these yearly anomalies, then say how uncertain you are about where it will be by 2050.',
       try: 'Drag the centre handle to move the line and an end handle to tilt it; drag the band’s handles to widen or narrow it.',
-      why: 'A belief about a trend is two parameters, so the dataset is one row. `trend` writes `intercept` (the anomaly in 2000, since x is years from 2000) and `slope`; `trendBand` views the same row and writes the two spreads. The observed years sit in a context table, drawn by a `point` mark and left out of `getData()`.',
-      uses: ['trend', 'trendBand', 'edit.trend.intercept()', 'edit.trend.slope()', 'edit.trend.slopeSpread()', 'context table'],
+      why: 'A belief about a trend is two parameters, so the dataset is one row. `trend` writes `intercept` (the anomaly in 2000, since x is years from 2000) and `slope`; `trendBand` views the same row and writes the two spreads. The observed years are context rows that fill only `x` and `y`, drawn by a `point` mark and left out of `getData()`.',
+      uses: ['trend', 'trendBand', 'edit.trend.intercept()', 'edit.trend.slope()', 'edit.trend.slopeSpread()', 'context'],
       code: `const gistemp = await plotData('observablehq__plot-line-with-moving-average', 'gistemp.csv');
 const yearly = d3.rollups(gistemp, (v) => d3.mean(v, (d) => d.Anomaly), (d) => d.Date.getUTCFullYear())
   .filter(([year]) => year >= 1960)
@@ -1550,19 +1547,16 @@ mount(Elicit({
   margins: { top: 16, right: 16, bottom: 28, left: 40 },
   axes: { origin: false, x: { tickFormat: (v) => v + 2000 }, y: { grid: true } },
   schema: {
-    data: {
-      x: { type: 'quantitative', domain: [-40, 50] },   //! years from 2000
-      y: { type: 'quantitative', domain: [-0.6, 2.4] },
-      intercept: { type: 'quantitative' }, slope: { type: 'quantitative' },
-      aSd: { type: 'quantitative' }, bSd: { type: 'quantitative' },
-    },
-    // The observed years: drawn, read-only, never reported.
-    observed: { context: true, fields: { x: { type: 'quantitative' }, y: { type: 'quantitative' } } },
+    x: { type: 'quantitative', domain: [-40, 50] },     //! years from 2000
+    y: { type: 'quantitative', domain: [-0.6, 2.4] },
+    intercept: { type: 'quantitative' }, slope: { type: 'quantitative' },
+    aSd: { type: 'quantitative' }, bSd: { type: 'quantitative' },
   },
-  data: { data: [{ intercept: 0.3, slope: 0, aSd: 0.1, bSd: 0.004 }], observed: yearly },
+  data: [...yearly, { intercept: 0.3, slope: 0, aSd: 0.1, bSd: 0.004 }],
+  context: (d) => d.y != null,     // the observed years: drawn, read-only, never reported
   marks: [
     point({
-      table: 'observed', size: 2.5, stroke: 'none',
+      size: 2.5, stroke: 'none',
       channels: { x: { field: 'x' }, y: { field: 'y' }, fill: { fn: (d) => d.y > 0 ? '#d6604d' : '#4393c3' } },
     }),
     trendBand({
@@ -1588,30 +1582,30 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-line-chart-with-gaps',
   status: 'full',
-  verdict: 'The January–March closes are `null` (Plot uses `NaN`), so one `lineY` breaks wherever the quarter is missing; a faint line over a context table of the defined rows bridges the gaps, as in the notebook’s second chart.',
+  verdict: 'The January–March closes are `null` (Plot uses `NaN`), so one `lineY` breaks wherever the quarter is missing; a faint line over context rows holding the defined closes bridges the gaps, as in the notebook’s second chart.',
   needs: [],
   prep: ['prep-calculate'],
-  gaps: ['Plot’s second chart filters the same array for its faint line; here the filtered rows are a second, read-only context table, because a mark views exactly one table.'],
+  gaps: ['Plot’s second chart filters the same array for its faint line; here the filtered rows are copied in as context rows with their own `bridge` column, and both lines connect in array order (`connect: "sequence"`) so the copies never break the line through the gaps.'],
   recreation: {
     code: `const aapl = await plotData('aapl');
 const rows = aapl.map((d) => ({ Date: d.Date, Close: d.Date.getUTCMonth() < 3 ? null : d.Close }));
+// The notebook's second chart: the defined rows only, as context with their own column.
+const bridge = rows.filter((d) => d.Close != null).map((d) => ({ Date: d.Date, bridge: d.Close }));
 mount(Elicit({
   width: 460, height: 290,
   margins: { top: 16, right: 16, bottom: 28, left: 40 },
-  schema: {
-    data: { Date: { type: 'temporal' }, Close: { type: 'quantitative' } },
-    bridge: { context: true, fields: { Date: { type: 'temporal' }, Close: { type: 'quantitative' } } },
-  },
-  data: { data: rows, bridge: rows.filter((d) => d.Close != null) },
+  schema: { Date: { type: 'temporal' }, Close: { type: 'quantitative' }, bridge: { type: 'quantitative' } },
+  data: [...bridge, ...rows],
+  context: (d) => d.bridge != null,
   axes: { y: { grid: true } },
   marks: [
-    // The notebook's second chart: the defined rows only, bridging each gap faintly.
+    // Both lines connect in array order, so each draws its own rows as one run.
     lineY({
-      table: 'bridge', stroke: 'currentColor', strokeOpacity: 0.3, strokeWidth: 1.5,
-      channels: { x: { field: 'Date' }, y: { field: 'Close' } },
+      stroke: 'currentColor', strokeOpacity: 0.3, strokeWidth: 1.5, connect: 'sequence',
+      channels: { x: { field: 'Date' }, y: { field: 'bridge' } },
     }),
     lineY({
-      stroke: 'currentColor', strokeWidth: 1.5,   // a null close breaks the line
+      stroke: 'currentColor', strokeWidth: 1.5, connect: 'sequence',   // a null close breaks the line
       channels: { x: { field: 'Date' }, y: { field: 'Close' } },
     }),
   ],
@@ -1843,8 +1837,8 @@ mount(Elicit({
       title: 'An interval on a log axis',
       question: 'Since May 2013 Apple is up about 190%. What will the change be by May 2019: your best guess and an 80% range?',
       try: 'Drag the big dot for your best guess and the small dots for the ends of the range.',
-      why: 'The answer is one row with three columns, each drawn by its own `point` with its own `move()`, plus an inert `rule` between the ends. The chart-level `scales: { y: { type: "log" } }` makes every edit invert through the log scale, so equal drags are equal ratios. `ordering` keeps low ≤ guess ≤ high, and the price record is a read-only context table.',
-      uses: ['move()', 'ordering()', 'scales', 'context table'],
+      why: 'The answer is one row with three columns, each drawn by its own `point` with its own `move()`, plus an inert `rule` between the ends. The chart-level `scales: { y: { type: "log" } }` makes every edit invert through the log scale, so equal drags are equal ratios. `ordering` keeps low ≤ guess ≤ high, and the price record is read-only context rows with their own `ratio` column.',
+      uses: ['move()', 'ordering()', 'scales', 'context'],
       code: `const aapl = await plotData('aapl');
 const basis = aapl[0].Close;
 const history = d3.groups(aapl, (d) => +d3.utcMonth(d.Date)).map(([m, rows]) => ({ Date: new Date(m), ratio: rows.at(-1).Close / basis }));
@@ -1859,21 +1853,20 @@ mount(Elicit({
   width: 460, height: 300,
   margins: { top: 16, right: 16, bottom: 28, left: 46 },
   schema: {
-    data: {
-      Date: { type: 'temporal', domain: [new Date('2013-05-01'), new Date('2019-07-01')] },
-      lo:   { type: 'quantitative', domain: [0.8, 6] },
-      mid:  { type: 'quantitative', domain: [0.8, 6] },
-      hi:   { type: 'quantitative', domain: [0.8, 6] },
-    },
-    history: { context: true, fields: { Date: { type: 'temporal' }, ratio: { type: 'quantitative' } } },   //! the record: drawn, never reported
+    Date:  { type: 'temporal', domain: [new Date('2013-05-01'), new Date('2019-07-01')] },
+    ratio: { type: 'quantitative' },
+    lo:    { type: 'quantitative', domain: [0.8, 6] },
+    mid:   { type: 'quantitative', domain: [0.8, 6] },
+    hi:    { type: 'quantitative', domain: [0.8, 6] },
   },
-  data: { data: [{ Date: at, lo: 2.4, mid: 2.9, hi: 3.5 }], history },
+  data: [...history, { Date: at, lo: 2.4, mid: 2.9, hi: 3.5 }],
+  context: (d) => d.ratio != null,                    //! the record: drawn, never reported
   scales: { y: { type: 'log' } },                     //! every y edit inverts through log
   constraints: [ordering({ field: ['lo', 'mid', 'hi'] })],   //! low ≤ guess ≤ high
   axes: { y: { grid: true, tickValues: [1, 1.5, 2, 3, 4, 5], tickFormat: pct } },
   guides: [guides.rule({ y: 1, stroke: 'currentColor', strokeWidth: 1, strokeDash: 'none' })],
   marks: [
-    lineY({ table: 'history', stroke: 'steelblue', strokeWidth: 1.5, channels: { x: { field: 'Date' }, y: { field: 'ratio' } } }),
+    lineY({ stroke: 'steelblue', strokeWidth: 1.5, channels: { x: { field: 'Date' }, y: { field: 'ratio' } } }),
     rule({ stroke: 'steelblue', strokeWidth: 3, channels: { x: { field: 'Date' }, y1: { field: 'lo' }, y2: { field: 'hi' } } }),
     dot('lo', 5), dot('hi', 5), dot('mid', 8),        //! one mark per column
   ],
@@ -2050,8 +2043,8 @@ mount(Elicit({
       title: 'Brush the arrival window',
       question: 'Each pulse’s main peak arrives at a slightly different time. Which window, in milliseconds, holds the main peak of nine pulses out of ten?',
       try: 'Drag the middle of the shaded window to slide it; drag either edge to resize it.',
-      why: 'The answer is one row, `{ start, end }`, drawn as a `rect` spanning `x1`–`x2`. `brushSpan()` reads the grab position at dragstart: near an edge it resizes that edge, in the body it moves both, so one gesture edits the whole interval. The pulses behind it are a context table: drawn, read-only, and not in `getData()`.',
-      uses: ['brushSpan()', 'rect', 'context table'],
+      why: 'The answer is one row, `{ start, end }`, drawn as a `rect` spanning `x1`–`x2`. `brushSpan()` reads the grab position at dragstart: near an edge it resizes that edge, in the body it moves both, so one gesture edits the whole interval. The pulses behind it are context rows with their own columns: drawn, read-only, and not in `getData()`.',
+      uses: ['brushSpan()', 'rect', 'context'],
       code: `const csv = await plotData('observablehq__plot-psr-b1919-21', 'pulsar.csv', { type: 'text' });
 const pulses = d3.csvParseRows(csv, (r) => r.map(Number)).slice(0, 24);
 const step = 6;
@@ -2063,16 +2056,16 @@ mount(Elicit({
   margins: { top: 16, right: 16, bottom: 32, left: 16 },
   axes: { y: false, x: { title: 'Time (ms) →' } },
   schema: {
-    data: {
-      start: { type: 'quantitative', domain: [0, 92] },
-      end:   { type: 'quantitative', domain: [0, 92] },
-      y:     { type: 'quantitative', domain: [-4, step * pulses.length + 20] },
-    },
-    pulses: { context: true, fields: { k: { type: 'categorical' }, t: { type: 'quantitative' }, y: { type: 'quantitative' } } },   //! read-only backdrop
+    start: { type: 'quantitative', domain: [0, 92] },
+    end:   { type: 'quantitative', domain: [0, 92] },
+    k:     { type: 'categorical' },
+    t:     { type: 'quantitative' },
+    y:     { type: 'quantitative', domain: [-4, step * pulses.length + 20] },
   },
-  data: { data: [{ start: 40, end: 52 }], pulses: samples },
+  data: [...samples, { start: 40, end: 52 }],
+  context: (d) => d.k != null,                        //! read-only backdrop
   marks: [
-    lineY({ table: 'pulses', stroke: 'currentColor', strokeWidth: 1,
+    lineY({ stroke: 'currentColor', strokeWidth: 1,
       channels: { series: { field: 'k' }, x: { field: 't' }, y: { field: 'y' } } }),
     rect({
       fill: '#e8833a', fillOpacity: 0.25, stroke: '#e8833a',
@@ -2086,8 +2079,8 @@ mount(Elicit({
       title: 'Sweep the pulse envelope',
       question: 'Twelve pulses are overlaid. Through the main peak, between what intensities does a typical pulse run at each moment?',
       try: 'Press on the top edge of the orange band and sweep along it, then on its bottom edge.',
-      why: 'An `areaY` from `y1: lo` to `y2: hi` with an `edit.line.sweep()` on each edge, so the envelope’s ceiling and floor are separate strokes. The overlaid pulses are a context table under it, so you judge the spread against the real traces without them entering your answer.',
-      uses: ['edit.line.sweep()', 'areaY span (y1/y2)', 'ordering()', 'context table'],
+      why: 'An `areaY` from `y1: lo` to `y2: hi` with an `edit.line.sweep()` on each edge, so the envelope’s ceiling and floor are separate strokes. The overlaid pulses are context rows under it, so you judge the spread against the real traces without them entering your answer. The band connects in array order (`connect: "sequence"`), so the traces sharing its `t` column never break it.',
+      uses: ['edit.line.sweep()', 'areaY span (y1/y2)', 'ordering()', 'context'],
       code: `const csv = await plotData('observablehq__plot-psr-b1919-21', 'pulsar.csv', { type: 'text' });
 const pulses = d3.csvParseRows(csv, (r) => r.map(Number)).slice(0, 12);
 const inPeak = (t) => t >= 30 && t <= 62;
@@ -2099,20 +2092,21 @@ mount(Elicit({
   margins: { top: 16, right: 16, bottom: 32, left: 40 },
   axes: { x: { title: 'Time (ms) →' }, y: { grid: true } },
   schema: {
-    data: {
-      t:  { type: 'quantitative', domain: [30, 62] },
-      lo: { type: 'quantitative', domain: [0, top] },
-      hi: { type: 'quantitative', domain: [0, top] },
-    },
-    traces: { context: true, fields: { k: { type: 'categorical' }, t: { type: 'quantitative' }, v: { type: 'quantitative' } } },
+    t:  { type: 'quantitative', domain: [30, 62] },
+    k:  { type: 'categorical' },
+    v:  { type: 'quantitative' },
+    lo: { type: 'quantitative', domain: [0, top] },
+    hi: { type: 'quantitative', domain: [0, top] },
   },
-  data: { data: d3.range(30, 63, 2).map((t) => ({ t, lo: 2, hi: top / 4 })), traces },
+  data: [...traces, ...d3.range(30, 63, 2).map((t) => ({ t, lo: 2, hi: top / 4 }))],
+  context: (d) => d.k != null,                        // the traces: drawn, never reported
   constraints: [ordering({ field: ['lo', 'hi'] })],
   marks: [
-    lineY({ table: 'traces', stroke: 'currentColor', strokeOpacity: 0.35, strokeWidth: 1,
+    lineY({ stroke: 'currentColor', strokeOpacity: 0.35, strokeWidth: 1,
       channels: { series: { field: 'k' }, x: { field: 't' }, y: { field: 'v' } } }),
     areaY({
       fill: '#e8833a', fillOpacity: 0.3, stroke: '#e8833a', handleSize: 3,
+      connect: 'sequence',                            // array order: the traces sit ahead of it
       channels: {
         x:  { field: 't' },
         y1: { field: 'lo', edit: edit.line.sweep() },   //! the envelope's floor
@@ -2373,8 +2367,8 @@ mount(Elicit({
       title: 'Sweep Saturday’s range',
       question: 'Monday’s traffic at Köln-Nord is the grey line. On the following Saturday, between how many vehicles an hour will it run, hour by hour?',
       try: 'Press on the top edge of the green band and sweep along it, then on its bottom edge.',
-      why: 'Each edge of the `areaY` span carries an `edit.line.sweep()`, so the busy and quiet bounds are separate strokes. Monday is a context table: drawn for comparison by a `lineY` with `table: "monday"`, and never part of `getData()`.',
-      uses: ['edit.line.sweep()', 'areaY span (y1/y2)', 'ordering()', 'context table'],
+      why: 'Each edge of the `areaY` span carries an `edit.line.sweep()`, so the busy and quiet bounds are separate strokes. Monday’s hours are context rows with their own `value` column: drawn for comparison by a `lineY`, and never part of `getData()`. Both marks connect in array order (`connect: "sequence"`), so Monday’s hours never break the band, nor Saturday’s the line.',
+      uses: ['edit.line.sweep()', 'areaY span (y1/y2)', 'ordering()', 'context'],
       code: `const traffic = await plotData('observablehq__plot-horizon', 'traffic.csv');
 const monday = d3.sort(traffic.filter((d) => d.name === 'Köln-Nord' && d.date < new Date('2016-01-05')), (d) => d.date)
   .map((d) => ({ hour: d.date.getUTCHours(), value: d.value }));
@@ -2383,21 +2377,20 @@ mount(Elicit({
   width: 460, height: 280,
   margins: { top: 16, right: 16, bottom: 28, left: 54 },
   schema: {
-    data: {
-      hour: { type: 'quantitative', domain: [0, 23] },
-      lo:   { type: 'quantitative', domain: [0, 10000] },
-      hi:   { type: 'quantitative', domain: [0, 10000] },
-    },
-    monday: { context: true, fields: { hour: { type: 'quantitative' }, value: { type: 'quantitative' } } },   //! for comparison only
+    hour:  { type: 'quantitative', domain: [0, 23] },
+    value: { type: 'quantitative' },
+    lo:    { type: 'quantitative', domain: [0, 10000] },
+    hi:    { type: 'quantitative', domain: [0, 10000] },
   },
-  data: { data: d3.range(24).map((hour) => ({ hour, lo: 1000, hi: 3000 })), monday },
+  data: [...monday, ...d3.range(24).map((hour) => ({ hour, lo: 1000, hi: 3000 }))],
+  context: (d) => d.value != null,                    //! for comparison only
   constraints: [ordering({ field: ['lo', 'hi'] })],
   axes: { x: { tickFormat: (h) => h + ':00' }, y: { grid: true, title: 'Vehicles per hour' } },
   marks: [
-    lineY({ table: 'monday', stroke: '#94a3b8', strokeWidth: 2, curve: 'basis',
+    lineY({ stroke: '#94a3b8', strokeWidth: 2, curve: 'basis', connect: 'sequence',
       channels: { x: { field: 'hour' }, y: { field: 'value' } } }),
     areaY({
-      fill: '#74c476', fillOpacity: 0.4, stroke: '#238b45', curve: 'basis', handleSize: 3,
+      fill: '#74c476', fillOpacity: 0.4, stroke: '#238b45', curve: 'basis', handleSize: 3, connect: 'sequence',
       channels: {
         x:  { field: 'hour' },
         y1: { field: 'lo', edit: edit.line.sweep() },   //! the quietest you expect
@@ -2515,8 +2508,8 @@ label();`,
       title: 'Sweep a band on the stack',
       question: 'The three industries are stacked to 2006. How high will their combined unemployment run from 2007 to 2009? Give a range you are 80% sure of.',
       try: 'Press on the top edge of the orange band and sweep along it, then on its bottom edge.',
-      why: 'The stack is a context table, drawn by three `areaY` marks with `table: "history"` and never reported. The elicited table is just the total’s range: one `areaY` from `y1: lo` to `y2: hi`, with an `edit.line.sweep()` on each edge. `lock` pins 2006, so the band opens out of the stack’s top.',
-      uses: ['edit.line.sweep()', 'context table', 'ordering()', 'lock'],
+      why: 'The stack is context rows with their own columns (`industry`, `y1`, `y2`), drawn by one `areaY` per industry and never reported. Your answer is just the total’s range: one `areaY` from `y1: lo` to `y2: hi`, with an `edit.line.sweep()` on each edge. `lock` pins 2006, so the band opens out of the stack’s top.',
+      uses: ['edit.line.sweep()', 'context', 'ordering()', 'lock'],
       code: `const unemployment = await plotData('observablehq__plot-stacked-area-chart', 'unemployment.csv');
 const keys = ['Wholesale and Retail Trade', 'Manufacturing', 'Construction'];
 const yearly = d3.rollup(unemployment.filter((d) => keys.includes(d.industry) && d.date < new Date('2007-01-01')),
@@ -2531,24 +2524,23 @@ mount(Elicit({
   width: 460, height: 340,
   margins: { top: 16, right: 16, bottom: 28, left: 62 },
   schema: {
-    data: {
-      year: { type: 'quantitative', domain: [2000, 2009] },
-      lo:   { type: 'quantitative', domain: [0, 6000] },
-      hi:   { type: 'quantitative', domain: [0, 6000] },
-    },
-    history: { context: true, fields: {                       //! the stack: drawn, never reported
-      industry: { type: 'categorical', domain: keys }, year: { type: 'quantitative' },
-      y1: { type: 'quantitative' }, y2: { type: 'quantitative' } } },
+    year:     { type: 'quantitative', domain: [2000, 2009] },
+    industry: { type: 'categorical', domain: keys },
+    y1:       { type: 'quantitative' },
+    y2:       { type: 'quantitative' },
+    lo:       { type: 'quantitative', domain: [0, 6000] },
+    hi:       { type: 'quantitative', domain: [0, 6000] },
   },
-  data: {
-    data: d3.range(2006, 2010).map((year) => year === 2006 ? { year, lo: total, hi: total } : { year, lo: total - 300, hi: total + 300 }),
-    history: stack,
-  },
+  data: [
+    ...stack,
+    ...d3.range(2006, 2010).map((year) => year === 2006 ? { year, lo: total, hi: total } : { year, lo: total - 300, hi: total + 300 }),
+  ],
+  context: (d) => d.industry != null,                 //! the stack: drawn, never reported
   lock: (d) => d.year === 2006,                       //! the band starts at the stack's top
   constraints: [ordering({ field: ['lo', 'hi'] })],
   axes: { x: { tickFormat: 'd' }, y: { grid: true, title: 'Unemployed (thousands)' } },
   marks: [
-    areaY({ table: 'history', stroke: 'none', fillOpacity: 0.85,
+    areaY({ stroke: 'none', fillOpacity: 0.85,
       channels: { series: { field: 'industry' }, x: { field: 'year' }, y1: { field: 'y1' }, y2: { field: 'y2' },
         fill: { field: 'industry', scale: { scheme: 'tableau10' }, legend: { anchor: 'top' } } } }),
     areaY({

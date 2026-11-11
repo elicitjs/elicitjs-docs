@@ -88,8 +88,8 @@ mount(Elicit({
       title: 'Box the males',
       question: 'Draw the range of flipper length and body mass that holds most adult male penguins.',
       try: 'Drag the box’s body to move it, its edges or corners to resize it.',
-      why: 'The answer is one row of four columns, drawn by a `rect`. `brushRect()` maps the body, each edge and each corner to the columns they move. The observed penguins live in a context table: drawn, read-only, and left out of `getData()`.',
-      uses: ['brushRect()', 'rect', 'context table'],
+      why: 'The answer is one row of four columns, drawn by a `rect`. `brushRect()` maps the body, each edge and each corner to the columns they move. The observed penguins are `context` rows with columns of their own: drawn, read-only, and left out of `getData()`.',
+      uses: ['brushRect()', 'rect', 'context'],
       code: `const observed = (await plotData('penguins'))
   .filter((d) => Number.isFinite(d.flipper_length_mm))
   .map((d) => ({ flipper: d.flipper_length_mm, mass: d.body_mass_g, male: d.sex === 'MALE' ? 'male' : 'other' }));
@@ -98,26 +98,23 @@ mount(Elicit({
   width: 460, height: 320,
   margins: { top: 30, right: 16, bottom: 36, left: 66 },
   schema: {
-    data: {
-      x1: { type: 'quantitative', domain: [170, 235] },
-      x2: { type: 'quantitative', domain: [170, 235] },
-      y1: { type: 'quantitative', domain: [2500, 6500] },
-      y2: { type: 'quantitative', domain: [2500, 6500] },
-    },
-    penguins: { context: true, fields: {                    //! every penguin, as read-only context
-      flipper: { type: 'quantitative', domain: [170, 235] },
-      mass:    { type: 'quantitative', domain: [2500, 6500] },
-      male:    { type: 'categorical', domain: ['male', 'other'] },
-    } },
+    x1: { type: 'quantitative', domain: [170, 235] },
+    x2: { type: 'quantitative', domain: [170, 235] },
+    y1: { type: 'quantitative', domain: [2500, 6500] },
+    y2: { type: 'quantitative', domain: [2500, 6500] },
+    flipper: { type: 'quantitative', domain: [170, 235] },
+    mass:    { type: 'quantitative', domain: [2500, 6500] },
+    male:    { type: 'categorical', domain: ['male', 'other'] },
   },
-  data: { data: [{ x1: 195, x2: 215, y1: 3800, y2: 4800 }], penguins: observed },
+  data: [...observed, { x1: 195, x2: 215, y1: 3800, y2: 4800 }],
+  context: (d) => d.flipper != null,                         //! every penguin, as read-only context
   axes: {
     x: { title: 'flipper_length_mm →', grid: true },
     y: { title: 'body_mass_g →', grid: true },
   },
   marks: [
     point({
-      table: 'penguins', size: 2.5, fill: 'none', strokeWidth: 1.2,
+      size: 2.5, fill: 'none', strokeWidth: 1.2,
       channels: {
         x: { field: 'flipper' }, y: { field: 'mass' },
         stroke: { field: 'male', scale: { range: ['#efb118', '#cbd5e1'] } },
@@ -219,31 +216,31 @@ mount(Elicit({
       title: 'Drag the centres',
       question: 'Where is the typical bill of each species: its average length and depth?',
       try: 'Drag near a labelled dot to move it; the nearest one follows.',
-      why: '`pick: \'nearest\'` lets the press land anywhere within `threshold` pixels, and `guide: true` draws the catchment so you can see which dot you will take. The observed penguins are a context table: drawn behind, never part of the answer.',
-      uses: ['move()', "pick: 'nearest'", 'context table'],
+      why: '`pick: \'nearest\'` lets the press land anywhere within `threshold` pixels, and `guide: true` draws the catchment so you can see which dot you will take. The observed penguins are `context` rows with columns of their own: drawn behind, never part of the answer.',
+      uses: ['move()', "pick: 'nearest'", 'context'],
       code: `const observed = (await plotData('penguins'))
   .filter((d) => Number.isFinite(d.culmen_length_mm))
-  .map((d) => ({ species: d.species, length: d.culmen_length_mm, depth: d.culmen_depth_mm }));
+  .map((d) => ({ kind: d.species, bill: d.culmen_length_mm, billDepth: d.culmen_depth_mm }));
 const colour = { Adelie: '#4269d0', Chinstrap: '#efb118', Gentoo: '#ff725c' };
-const fields = {
-  length:  { type: 'quantitative', domain: [32, 60] },
-  depth:   { type: 'quantitative', domain: [13, 22] },
-  species: { type: 'categorical', domain: Object.keys(colour) },
-};
 
 mount(Elicit({
   width: 460, height: 320,
   margins: { top: 30, right: 16, bottom: 36, left: 54 },
-  schema: { data: fields, observed: { context: true, fields } }, //! the observed penguins are read-only context
-  data: {
-    data: Object.keys(colour).map((species) => ({ species, length: 46, depth: 17.5 })),
-    observed,
+  schema: {
+    length:    { type: 'quantitative', domain: [32, 60] },
+    depth:     { type: 'quantitative', domain: [13, 22] },
+    species:   { type: 'categorical', domain: Object.keys(colour) },
+    bill:      { type: 'quantitative', domain: [32, 60] },
+    billDepth: { type: 'quantitative', domain: [13, 22] },
+    kind:      { type: 'categorical', domain: Object.keys(colour) },
   },
+  data: [...observed, ...Object.keys(colour).map((species) => ({ species, length: 46, depth: 17.5 }))],
+  context: (d) => d.bill != null,                           //! the observed penguins are read-only context
   axes: { x: { title: 'culmen_length_mm →' }, y: { title: 'culmen_depth_mm →' } },
   marks: [
     point({
-      table: 'observed', size: 2.5, fill: 'none', opacity: 0.3,
-      channels: { x: { field: 'length' }, y: { field: 'depth' }, stroke: { field: 'species', scale: { range: Object.values(colour) } } },
+      size: 2.5, fill: 'none', opacity: 0.3,
+      channels: { x: { field: 'bill' }, y: { field: 'billDepth' }, stroke: { field: 'kind', scale: { range: Object.values(colour) } } },
     }),
     point({
       size: 8, stroke: 'white', strokeWidth: 2,
@@ -458,35 +455,29 @@ mount(Elicit({
       question: 'Where does a typical gymnast, rower, basketball player and weightlifter sit by weight and height?',
       try: 'Drag near a labelled dot; the nearest one follows the pointer.',
       why: 'Four rows, one per sport, each drawn as a dot and a label from the same columns. `pick: \'nearest\'` grabs the closest dot so a small target is easy to take, and the label re-derives from the row you moved. The mark’s `tip` reads out the row under the pointer, and a tip never blocks a drag.',
-      uses: ['move()', "pick: 'nearest'", 'tip', 'context table'],
+      uses: ['move()', "pick: 'nearest'", 'tip', 'context'],
       code: `const olympians = (await plotData('olympians')).filter((d) => Number.isFinite(d.weight) && Number.isFinite(d.height));
-const sample = olympians.filter((d, i) => i % 6 === 0).map((d) => ({ weight: d.weight, height: d.height }));
+const sample = olympians.filter((d, i) => i % 6 === 0).map((d) => ({ kg: d.weight, m: d.height }));
 const sports = ['gymnastics', 'rowing', 'basketball', 'weightlifting'];
 
 mount(Elicit({
   width: 460, height: 340,
   margins: { top: 30, right: 16, bottom: 36, left: 54 },
   schema: {
-    data: {
-      sport:  { type: 'categorical', domain: sports },
-      weight: { type: 'quantitative', domain: [25, 175] },
-      height: { type: 'quantitative', domain: [1.2, 2.25] },
-    },
-    athletes: { context: true, fields: {                     //! every sixth athlete, as read-only context
-      weight: { type: 'quantitative' },
-      height: { type: 'quantitative' },
-    } },
+    sport:  { type: 'categorical', domain: sports },
+    weight: { type: 'quantitative', domain: [25, 175] },
+    height: { type: 'quantitative', domain: [1.2, 2.25] },
+    kg:     { type: 'quantitative' },
+    m:      { type: 'quantitative' },
   },
-  data: {
-    data: sports.map((sport, i) => ({ sport, weight: 45 + i * 30, height: 1.35 + i * 0.12 })),
-    athletes: sample,
-  },
+  data: [...sample, ...sports.map((sport, i) => ({ sport, weight: 45 + i * 30, height: 1.35 + i * 0.12 }))],
+  context: (d) => d.kg != null,                             //! every sixth athlete, as read-only context
   constraints: [ clamp({ field: 'weight', min: 25, max: 175 }), clamp({ field: 'height', min: 1.2, max: 2.25 }) ],
   axes: { x: { title: 'weight →' }, y: { title: 'height →' } },
   marks: [
     point({
-      table: 'athletes', size: 1.8, fill: 'none', stroke: '#cbd5e1',
-      channels: { x: { field: 'weight' }, y: { field: 'height' } },
+      size: 1.8, fill: 'none', stroke: '#cbd5e1',
+      channels: { x: { field: 'kg' }, y: { field: 'm' } },
     }),
     point({
       size: 7, stroke: 'white', strokeWidth: 1.5,
@@ -749,7 +740,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-qq-plot',
   status: 'full',
-  verdict: 'Sorted quantiles of two ceramic batches as dots, with the y = x diagonal drawn by a `line` over a two-row context table.',
+  verdict: 'Sorted quantiles of two ceramic batches as dots, with the y = x diagonal drawn by a `line` over two context rows.',
   prep: ['prep-calculate', 'prep-window'],
   gaps: [
     'The quantile pairing is computed in JavaScript, as the notebook’s own `qq` helper does.',
@@ -768,19 +759,16 @@ mount(Elicit({
   width: 400, height: 400,
   margins: { top: 30, right: 16, bottom: 36, left: 58 },
   schema: {
-    data: {
-      batch2: { type: 'quantitative', domain: [300, 900] },
-      batch1: { type: 'quantitative', domain: [300, 900] },
-    },
-    diagonal: { context: true, fields: { batch2: { type: 'quantitative' }, batch1: { type: 'quantitative' } } },
+    batch2: { type: 'quantitative', domain: [300, 900] },
+    batch1: { type: 'quantitative', domain: [300, 900] },
+    diagX:  { type: 'quantitative', domain: [300, 900] },    // the y = x diagonal's own columns
+    diagY:  { type: 'quantitative', domain: [300, 900] },
   },
-  data: {
-    data: X.map((x, i) => ({ batch2: x, batch1: Y[i] })),
-    diagonal: [{ batch2: lo, batch1: lo }, { batch2: hi, batch1: hi }],
-  },
+  data: [{ diagX: lo, diagY: lo }, { diagX: hi, diagY: hi }, ...X.map((x, i) => ({ batch2: x, batch1: Y[i] }))],
+  context: (d) => d.diagX != null,
   axes: { x: { title: 'Batch 2 →', grid: true }, y: { title: 'Batch 1 →', grid: true } },
   marks: [
-    line({ table: 'diagonal', stroke: '#111', channels: { x: { field: 'batch2' }, y: { field: 'batch1' } } }),
+    line({ stroke: '#111', channels: { x: { field: 'diagX' }, y: { field: 'diagY' } } }),
     point({ size: 3, fill: 'none', stroke: 'steelblue', strokeWidth: 1.5, channels: { x: { field: 'batch2' }, y: { field: 'batch1' } } }),
   ],
 }))`,
@@ -791,7 +779,7 @@ mount(Elicit({
       question: 'Batch 1 is believed to be the stronger batch. How do you think its deciles compare with batch 2’s?',
       try: 'Drag each dot up or down. Dots above the diagonal mean batch 1 is stronger at that decile.',
       why: 'Each row is one decile: batch 2’s value is fixed on x, and `move()` on `y` sets batch 1’s. A quantile function can only rise, so `monotonic` along `batch2` keeps your sketch a valid Q–Q curve.',
-      uses: ['move()', 'monotonic()', 'context table', 'strokeDash'],
+      uses: ['move()', 'monotonic()', 'context', 'strokeDash'],
       code: `const raw = await plotData('observablehq__qq-plot', 'JAHANMI2.DAT', { type: 'text' });
 const lines = raw.split('\\r\\n').slice(48, -1);
 const [header, , ...cells] = lines.map((l) => l.trim().split(/\\s+/g));
@@ -802,22 +790,22 @@ mount(Elicit({
   width: 400, height: 400,
   margins: { top: 30, right: 16, bottom: 36, left: 58 },
   schema: {
-    data: {
-      batch2: { type: 'quantitative', domain: [450, 850] },
-      batch1: { type: 'quantitative', domain: [450, 850] },
-    },
-    diagonal: { context: true, fields: { batch2: { type: 'quantitative' }, batch1: { type: 'quantitative' } } },
+    batch2: { type: 'quantitative', domain: [450, 850] },
+    batch1: { type: 'quantitative', domain: [450, 850] },
+    diagX:  { type: 'quantitative', domain: [450, 850] },    // the y = x reference's own columns
+    diagY:  { type: 'quantitative', domain: [450, 850] },
   },
-  data: {
-    data: deciles.map((x) => ({ batch2: x, batch1: x })),     // start on the diagonal: “no difference”
-    diagonal: [{ batch2: 450, batch1: 450 }, { batch2: 850, batch1: 850 }],
-  },
+  data: [
+    { diagX: 450, diagY: 450 }, { diagX: 850, diagY: 850 },
+    ...deciles.map((x) => ({ batch2: x, batch1: x })),       // start on the diagonal: “no difference”
+  ],
+  context: (d) => d.diagX != null,                          // the diagonal is context, not an answer
   constraints: [ monotonic({ field: 'batch1', along: 'batch2' }) ], //! quantiles can only increase
   axes: { x: { title: 'Batch 2 decile →', grid: true }, y: { title: 'Batch 1 decile →', grid: true } },
   marks: [
     line({                                                    //! the y = x reference, dashed
-      table: 'diagonal', stroke: '#94a3b8', strokeDash: '4 3',
-      channels: { x: { field: 'batch2' }, y: { field: 'batch1' } },
+      stroke: '#94a3b8', strokeDash: '4 3',
+      channels: { x: { field: 'diagX' }, y: { field: 'diagY' } },
     }),
     point({
       size: 6, fill: 'white', stroke: 'steelblue', strokeWidth: 2.5,
@@ -836,7 +824,7 @@ GALLERY.add({
   prep: ['prep-calculate'],
   gaps: [
     'The cyclical scale is a sequential ramp whose `range` is 13 samples of `d3.interpolateRainbow`, so January and December share a hue as in Plot.',
-    'The widest day is picked in JavaScript (Plot’s `selectMaxY`) and drawn from a one-row context table.',
+    'The widest day is picked in JavaScript (Plot’s `selectMaxY`) and drawn from one context row with columns of its own.',
   ],
   recreation: {
     code: `const weather = await plotData('observablehq__plot-temperature-amplitude', 'seattle-weather.csv');
@@ -848,17 +836,15 @@ mount(Elicit({
   width: 460, height: 420,
   margins: { top: 30, right: 16, bottom: 36, left: 54 },
   schema: {
-    data: {
-      low:   { type: 'quantitative', domain: [-8, 20] },
-      delta: { type: 'quantitative', domain: [0, 20] },
-      month: { type: 'quantitative', domain: [0, 11] },
-    },
-    widest: { context: true, fields: { low: { type: 'quantitative' }, delta: { type: 'quantitative' }, date: { type: 'categorical' } } },
+    low:   { type: 'quantitative', domain: [-8, 20] },
+    delta: { type: 'quantitative', domain: [0, 20] },
+    month: { type: 'quantitative', domain: [0, 11] },
+    peakLow:   { type: 'quantitative' },                     // the widest day's own columns
+    peakDelta: { type: 'quantitative' },
+    date:      { type: 'categorical' },
   },
-  data: {
-    data: temps,
-    widest: [{ low: w.temp_min, delta: w.temp_max - w.temp_min, date: w.date.toISOString().slice(0, 10) }],
-  },
+  data: [{ peakLow: w.temp_min, peakDelta: w.temp_max - w.temp_min, date: w.date.toISOString().slice(0, 10) }, ...temps],
+  context: (d) => d.date != null,
   axes: { x: { title: 'Daily low temperature (°C) →' }, y: { title: 'Daily temperature variation (Δ°C) →' } },
   marks: [
     rule({ stroke: '#111', channels: { y: { datum: 0 } } }),
@@ -872,8 +858,8 @@ mount(Elicit({
         },
       },
     }),
-    point({ table: 'widest', size: 5, fill: 'none', stroke: '#111', strokeWidth: 1.5, channels: { x: { field: 'low' }, y: { field: 'delta' } } }),
-    text({ table: 'widest', fontSize: 11, dy: -10, lineAnchor: 'bottom', channels: { x: { field: 'low' }, y: { field: 'delta' }, text: { field: 'date' } } }),
+    point({ size: 5, fill: 'none', stroke: '#111', strokeWidth: 1.5, channels: { x: { field: 'peakLow' }, y: { field: 'peakDelta' } } }),
+    text({ fontSize: 11, dy: -10, lineAnchor: 'bottom', channels: { x: { field: 'peakLow' }, y: { field: 'peakDelta' }, text: { field: 'date' } } }),
   ],
 }))`,
   },
@@ -914,7 +900,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-linear-regression-simpson',
   status: 'full',
-  verdict: 'Dots by species, with each species’ and the pooled least-squares line and 95% confidence band drawn from a context table of fitted rows.',
+  verdict: 'Dots by species, with each species’ and the pooled least-squares line and 95% confidence band drawn from fitted context rows.',
   prep: ['prep-regression'],
   gaps: [
     'The fits and bands are computed in JavaScript (Plot’s `linearRegressionY`), with a normal 1.96 multiplier where Plot uses the t distribution.',
@@ -933,7 +919,7 @@ function fit(group, rows) {                                  // least squares + 
   return d3.range(21).map((k) => {
     const length = x1 + (k / 20) * (x2 - x1), fit = a + b * length;
     const e = 1.96 * s * Math.sqrt(1 / n + (length - mx) ** 2 / sxx);
-    return { group, length, fit, lo: fit - e, hi: fit + e };
+    return { group, at: length, fit, lo: fit - e, hi: fit + e };
   });
 }
 const fits = [...d3.groups(penguins, (d) => d.species).flatMap(([g, rows]) => fit(g, rows)), ...fit('all', penguins)];
@@ -942,31 +928,28 @@ mount(Elicit({
   width: 460, height: 340,
   margins: { top: 34, right: 16, bottom: 36, left: 54 },
   schema: {
-    data: {
-      length:  { type: 'quantitative', domain: [32, 60] },
-      depth:   { type: 'quantitative', domain: [13, 22] },
-      species: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] },
-    },
-    fits: { context: true, fields: {
-      group:  { type: 'categorical', domain: Object.keys(colour) },
-      length: { type: 'quantitative' },
-      fit: { type: 'quantitative' }, lo: { type: 'quantitative' }, hi: { type: 'quantitative' },
-    } },
+    length:  { type: 'quantitative', domain: [32, 60] },
+    depth:   { type: 'quantitative', domain: [13, 22] },
+    species: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] },
+    group:   { type: 'categorical', domain: Object.keys(colour) }, // the fitted rows' own columns
+    at:  { type: 'quantitative' },
+    fit: { type: 'quantitative' }, lo: { type: 'quantitative' }, hi: { type: 'quantitative' },
   },
-  data: { data: penguins, fits },
+  data: [...fits, ...penguins],
+  context: (d) => d.fit != null,
   axes: { x: { title: 'culmen_length_mm →', grid: true }, y: { title: 'culmen_depth_mm →', grid: true } },
   marks: [
     areaY({
-      table: 'fits', fillOpacity: 0.15, stroke: 'none',
+      fillOpacity: 0.15, stroke: 'none',
       channels: {
-        x: { field: 'length' }, y1: { field: 'lo' }, y2: { field: 'hi' },
+        x: { field: 'at' }, y1: { field: 'lo' }, y2: { field: 'hi' },
         series: { field: 'group' }, fill: { field: 'group', scale: { range: Object.values(colour) } },
       },
     }),
     lineY({
-      table: 'fits', strokeWidth: 1.5,
+      strokeWidth: 1.5,
       channels: {
-        x: { field: 'length' }, y: { field: 'fit' },
+        x: { field: 'at' }, y: { field: 'fit' },
         series: { field: 'group' }, stroke: { field: 'group', scale: { range: Object.values(colour) } },
       },
     }),
@@ -985,35 +968,30 @@ mount(Elicit({
       title: 'One line for everyone',
       question: 'Ignoring species, how does bill depth change with bill length across all penguins?',
       try: 'Drag the left handle to raise or lower the line, the right one to tilt it.',
-      why: 'A `trend` is one row holding an intercept and a slope. `edit.trend.intercept()` and `edit.trend.slope()` each claim their own handle, so the two gestures never fight. The penguins sit behind as a context table.',
-      uses: ['trend', 'edit.trend.intercept()', 'edit.trend.slope()', 'context table'],
+      why: 'A `trend` is one row holding an intercept and a slope. `edit.trend.intercept()` and `edit.trend.slope()` each claim their own handle, so the two gestures never fight. The penguins sit behind as `context` rows.',
+      uses: ['trend', 'edit.trend.intercept()', 'edit.trend.slope()', 'context'],
       code: `const penguins = (await plotData('penguins'))
   .filter((d) => Number.isFinite(d.culmen_length_mm))
   .map((d) => ({ x: d.culmen_length_mm, y: d.culmen_depth_mm, species: d.species }));
 const colour = { Adelie: '#4269d0', Chinstrap: '#efb118', Gentoo: '#ff725c' };
-const context = { context: true, fields: {                  // the penguins: drawn, read-only, not reported
-  x: { type: 'quantitative' }, y: { type: 'quantitative' },
-  species: { type: 'categorical', domain: Object.keys(colour) },
-} };
 
 mount(Elicit({
   width: 460, height: 340,
   margins: { top: 30, right: 16, bottom: 36, left: 54 },
   schema: {
-    data: {
-      x: { type: 'quantitative', domain: [32, 60] },
-      y: { type: 'quantitative', domain: [13, 22] },
-      intercept: { type: 'quantitative' },
-      slope:     { type: 'quantitative' },
-    },
-    penguins: context,
+    x: { type: 'quantitative', domain: [32, 60] },
+    y: { type: 'quantitative', domain: [13, 22] },
+    species:   { type: 'categorical', domain: Object.keys(colour) },
+    intercept: { type: 'quantitative' },
+    slope:     { type: 'quantitative' },
   },
-  data: { data: [{ intercept: 17, slope: 0 }], penguins },
+  data: [...penguins, { intercept: 17, slope: 0 }],
+  context: (d) => d.x != null,                              // the penguins: drawn, read-only, not reported
   constraints: [ clamp({ field: 'slope', min: -1, max: 1 }) ],
   axes: { origin: false, x: { title: 'culmen_length_mm →', grid: true }, y: { title: 'culmen_depth_mm →', grid: true } },
   marks: [
     point({
-      table: 'penguins', size: 2.5, opacity: 0.35,
+      size: 2.5, opacity: 0.35,
       channels: { x: { field: 'x' }, y: { field: 'y' }, fill: { field: 'species', scale: { range: Object.values(colour) } } },
     }),
     trend({
@@ -1036,37 +1014,29 @@ mount(Elicit({
   .filter((d) => Number.isFinite(d.culmen_length_mm))
   .map((d) => ({ x: d.culmen_length_mm, y: d.culmen_depth_mm, species: d.species }));
 const colour = { Adelie: '#4269d0', Chinstrap: '#efb118', Gentoo: '#ff725c' };
-const context = { context: true, fields: {                  // the penguins: drawn, read-only, not reported
-  x: { type: 'quantitative' }, y: { type: 'quantitative' },
-  species: { type: 'categorical', domain: Object.keys(colour) },
-} };
 
 mount(Elicit({
   width: 460, height: 340,
   margins: { top: 34, right: 16, bottom: 36, left: 54 },
   schema: {
-    data: {
-      x: { type: 'quantitative', domain: [32, 60] },
-      y: { type: 'quantitative', domain: [13, 22] },
-      species:   { type: 'categorical', domain: Object.keys(colour) },
-      intercept: { type: 'quantitative' },
-      slope:     { type: 'quantitative' },
-    },
-    penguins: context,
+    x: { type: 'quantitative', domain: [32, 60] },
+    y: { type: 'quantitative', domain: [13, 22] },
+    species:   { type: 'categorical', domain: Object.keys(colour) },
+    intercept: { type: 'quantitative' },
+    slope:     { type: 'quantitative' },
   },
-  data: {
-    data: [
-      { species: 'Adelie', intercept: 18.5, slope: 0 },
-      { species: 'Chinstrap', intercept: 18, slope: 0 },
-      { species: 'Gentoo', intercept: 15, slope: 0 },
-    ],
-    penguins,
-  },
+  data: [
+    ...penguins,                                             // the penguins: drawn, read-only, not reported
+    { species: 'Adelie', intercept: 18.5, slope: 0 },
+    { species: 'Chinstrap', intercept: 18, slope: 0 },
+    { species: 'Gentoo', intercept: 15, slope: 0 },
+  ],
+  context: (d) => d.x != null,
   constraints: [ clamp({ field: 'slope', min: -1, max: 1 }) ],
   axes: { origin: false, x: { title: 'culmen_length_mm →', grid: true }, y: { title: 'culmen_depth_mm →', grid: true } },
   marks: [
     point({
-      table: 'penguins', size: 2.5, opacity: 0.35,
+      size: 2.5, opacity: 0.35,
       channels: { x: { field: 'x' }, y: { field: 'y' }, fill: { field: 'species', scale: { range: Object.values(colour) } } },
     }),
     trend({
@@ -1089,7 +1059,7 @@ GALLERY.add({
   verdict: 'Each state’s age-group shares as coloured dots on one row, with a min–max rule and the state name at the left end.',
   prep: ['prep-reshape', 'prep-aggregate', 'prep-calculate'],
   gaps: [
-    'Each state’s min and max share are computed in JavaScript (Plot’s `groupY` reducer) into a context table that the rule and the label read.',
+    'Each state’s min and max share are computed in JavaScript (Plot’s `groupY` reducer) into context rows that the rule and the label read.',
   ],
   recreation: {
     code: `const wide = await plotData('observablehq__plot-dot-plot', 'us-population-state-age.csv');
@@ -1107,23 +1077,19 @@ mount(Elicit({
   width: 460, height: 680,
   margins: { top: 30, right: 16, bottom: 10, left: 16 },
   schema: {
-    data: {
-      state: { type: 'categorical', domain: states },
-      age:   { type: 'ordinal', domain: ages },
-      share: { type: 'quantitative', domain: [0, 0.22] },
-    },
-    ranges: { context: true, fields: {                       // one row per state: its min and max share
-      state: { type: 'categorical', domain: states },
-      lo:    { type: 'quantitative' },
-      hi:    { type: 'quantitative' },
-    } },
+    state: { type: 'categorical', domain: states },
+    age:   { type: 'ordinal', domain: ages },
+    share: { type: 'quantitative', domain: [0, 0.22] },
+    lo:    { type: 'quantitative' },                         // the range rows' own columns
+    hi:    { type: 'quantitative' },
   },
-  data: { data: rows, ranges },
+  data: [...ranges, ...rows],                                // one range row per state: its min and max share
+  context: (d) => d.lo != null,
   scales: { y: { reverse: true } },                         // lowest minimum share first, as Plot sorts
   axes: { x: { anchor: 'top', grid: true, tickFormat: '.0%' }, y: false },
   marks: [
     rule({ stroke: '#111', channels: { x: { datum: 0 } } }),
-    rule({ table: 'ranges', stroke: '#999', channels: { y: { field: 'state' }, x1: { field: 'lo' }, x2: { field: 'hi' } } }),
+    rule({ stroke: '#999', channels: { y: { field: 'state' }, x1: { field: 'lo' }, x2: { field: 'hi' } } }),
     point({
       size: 3.5,
       channels: {
@@ -1132,7 +1098,7 @@ mount(Elicit({
       },
     }),
     text({
-      table: 'ranges', fontSize: 9, textAnchor: 'end', dx: -6,
+      fontSize: 9, textAnchor: 'end', dx: -6,
       channels: { x: { field: 'lo' }, y: { field: 'state' }, text: { field: 'state' } },
     }),
   ],
@@ -1219,26 +1185,23 @@ mount(Elicit({
       question: 'These are three penguin species. Which cluster is which?',
       try: 'Drag each label onto a cluster, then double-click it to type the species.',
       why: 'Each label is a row with a position and a name. `move()` places it and `editText()` on the `text` channel retypes it, so one mark collects both where the reader thinks a group is and what they call it.',
-      uses: ['text', 'move()', 'editText()', 'context table'],
+      uses: ['text', 'move()', 'editText()', 'context'],
       code: `const penguins = (await plotData('penguins'))
   .filter((d) => Number.isFinite(d.culmen_length_mm))
-  .map((d) => ({ length: d.culmen_length_mm, depth: d.culmen_depth_mm }));
+  .map((d) => ({ bill: d.culmen_length_mm, billDepth: d.culmen_depth_mm }));
 
 mount(Elicit({
   width: 460, height: 320,
   margins: { top: 30, right: 30, bottom: 36, left: 54 },
   schema: {
-    data: {
-      length: { type: 'quantitative', domain: [31, 61] },
-      depth:  { type: 'quantitative', domain: [12.8, 22] },
-      name:   { type: 'categorical' },
-    },
-    penguins: { context: true, fields: { length: { type: 'quantitative' }, depth: { type: 'quantitative' } } }, //! the dots are context, not answers
+    length: { type: 'quantitative', domain: [31, 61] },
+    depth:  { type: 'quantitative', domain: [12.8, 22] },
+    name:   { type: 'categorical' },
+    bill:      { type: 'quantitative' },                     // the penguins' own columns
+    billDepth: { type: 'quantitative' },
   },
-  data: {
-    data: [36, 46, 56].map((length) => ({ length, depth: 13.8, name: 'species?' })),
-    penguins,
-  },
+  data: [...penguins, ...[36, 46, 56].map((length) => ({ length, depth: 13.8, name: 'species?' }))],
+  context: (d) => d.bill != null,                           //! the dots are context, not answers
   axes: { x: { title: 'culmen_length_mm →', grid: true }, y: { title: 'culmen_depth_mm →', grid: true } },
   guides: [
     guides.custom(({ width, height }) => [                    // frame + a flat stand-in for the photo
@@ -1246,7 +1209,7 @@ mount(Elicit({
     ]),
   ],
   marks: [
-    point({ table: 'penguins', size: 3, fill: 'white', stroke: '#333', channels: { x: { field: 'length' }, y: { field: 'depth' } } }),
+    point({ size: 3, fill: 'white', stroke: '#333', channels: { x: { field: 'bill' }, y: { field: 'billDepth' } } }),
     text({
       fontSize: 14, fill: '#9a3412',
       channels: {
@@ -1454,35 +1417,33 @@ mount(Elicit({
       title: 'Opinions that add up',
       question: 'Where do Lincoln, Nixon and Carter sit today: what share of people view each favourably, and what share unfavourably?',
       try: 'Drag each dot. You can’t cross the dashed line, where the two shares would pass 100%.',
-      why: 'Favourable and unfavourable are shares of one population, so their sum cannot pass 100. That rule is not a box on either axis, so it is a `constraints.custom` gate: any drag that breaks it is refused. A dashed `line` over a two-row context table draws the boundary.',
-      uses: ['move()', 'constraints.custom', 'context table', 'strokeDash'],
+      why: 'Favourable and unfavourable are shares of one population, so their sum cannot pass 100. That rule is not a box on either axis, so it is a `constraints.custom` gate: any drag that breaks it is refused. A dashed `line` over two `context` rows draws the boundary.',
+      uses: ['move()', 'constraints.custom', 'context', 'strokeDash'],
       code: `mount(Elicit({
   width: 400, height: 400,
   margins: { top: 30, right: 20, bottom: 36, left: 54 },
   schema: {
-    data: {
-      name:  { type: 'categorical' },
-      fav:   { type: 'quantitative', domain: [0, 100] },
-      unfav: { type: 'quantitative', domain: [0, 100] },
-    },
-    boundary: { context: true, fields: { fav: { type: 'quantitative' }, unfav: { type: 'quantitative' } } },
+    name:  { type: 'categorical' },
+    fav:   { type: 'quantitative', domain: [0, 100] },
+    unfav: { type: 'quantitative', domain: [0, 100] },
+    edgeFav:   { type: 'quantitative' },                     // the boundary's own columns
+    edgeUnfav: { type: 'quantitative' },
   },
-  data: {
-    data: [
-      { name: 'Lincoln', fav: 20, unfav: 20 },
-      { name: 'Nixon', fav: 35, unfav: 35 },
-      { name: 'Carter', fav: 50, unfav: 20 },
-    ],
-    boundary: [{ fav: 0, unfav: 100 }, { fav: 100, unfav: 0 }],
-  },
+  data: [
+    { edgeFav: 0, edgeUnfav: 100 }, { edgeFav: 100, edgeUnfav: 0 },
+    { name: 'Lincoln', fav: 20, unfav: 20 },
+    { name: 'Nixon', fav: 35, unfav: 35 },
+    { name: 'Carter', fav: 50, unfav: 20 },
+  ],
+  context: (d) => d.edgeFav != null,
   constraints: [
-    constraints.custom(({ data }) => data.every((d) => d.fav >= 0 && d.unfav >= 0 && d.fav + d.unfav <= 100)), //! the two shares can't pass 100%
+    constraints.custom(({ data }) => data.every((d) => d.fav == null || (d.fav >= 0 && d.unfav >= 0 && d.fav + d.unfav <= 100))), //! the two shares can't pass 100%
   ],
   axes: { x: { title: 'Favorable opinion (%) →', grid: true }, y: { title: 'Unfavorable opinion (%) →', grid: true } },
   marks: [
     line({                                                    //! the boundary: fav + unfav = 100
-      table: 'boundary', stroke: '#e4572e', strokeDash: '5 4',
-      channels: { x: { field: 'fav' }, y: { field: 'unfav' } },
+      stroke: '#e4572e', strokeDash: '5 4',
+      channels: { x: { field: 'edgeFav' }, y: { field: 'edgeUnfav' } },
     }),
     point({
       size: 8, fill: '#4269d0', stroke: 'white', strokeWidth: 1.5,
@@ -2259,7 +2220,7 @@ GALLERY.add({
   verdict: 'Each sex × species panel repeats the whole population in grey behind its own subset: faceting / multiple views are not covered by this study.',
   needs: ['facet'],
   gaps: ['No facets, so there is no notion of a mark that is repeated in every panel versus one that is split across them.'],
-  alternative: 'One panel with the whole population in a context table behind one subset as the data shows the same comparison for a chosen group.',
+  alternative: 'One panel with the whole population as `context` rows behind one subset as the data shows the same comparison for a chosen group.',
 });
 
 GALLERY.add({
@@ -2320,8 +2281,8 @@ mount(Elicit({
       title: 'Regions in 2050',
       question: 'Where will the typical country of each region be in 2050, in income and life expectancy?',
       try: 'Drag each region’s dot from its grey ring (2009) to where you expect it in 2050.',
-      why: 'One row per region, seeded with the 2009 median. `move()` on both channels inverts x through the log scale, so a drag right is a multiplication of income, not an addition. The grey rings are a context table holding where each region started: drawn, read-only, and not part of the answer.',
-      uses: ['move()', "scale: 'log'", 'context table', 'text'],
+      why: 'One row per region, seeded with the 2009 median. `move()` on both channels inverts x through the log scale, so a drag right is a multiplication of income, not an addition. The grey rings are `context` rows holding where each region started: drawn, read-only, and not part of the answer.',
+      uses: ['move()', "scale: 'log'", 'context', 'text'],
       code: `const nations = (await plotData('observablehq__plot-wealth-health-nations', 'nations.csv')).filter((d) => d.year === 2009 && d.income != null && d.lifeExpectancy != null);
 const today = d3.rollups(nations, (v) => ({ income: d3.median(v, (d) => d.income), life: d3.median(v, (d) => d.lifeExpectancy) }), (d) => d.region)
   .map(([region, m]) => ({ region, income: Math.round(m.income), life: +m.life.toFixed(1) }));
@@ -2330,21 +2291,21 @@ mount(Elicit({
   width: 460, height: 340,
   margins: { top: 30, right: 16, bottom: 36, left: 50 },
   schema: {
-    data: {
-      region: { type: 'categorical' },
-      income: { type: 'quantitative', domain: [200, 100000] },
-      life:   { type: 'quantitative', domain: [15, 95] },
-    },
-    start: { context: true, fields: { region: { type: 'categorical' }, income: { type: 'quantitative' }, life: { type: 'quantitative' } } },
+    region: { type: 'categorical' },
+    income: { type: 'quantitative', domain: [200, 100000] },
+    life:   { type: 'quantitative', domain: [15, 95] },
+    income2009: { type: 'quantitative', domain: [200, 100000] }, // the grey rings' own columns
+    life2009:   { type: 'quantitative', domain: [15, 95] },
   },
-  data: { data: today.map((d) => ({ ...d })), start: today },
+  data: [...today.map((d) => ({ income2009: d.income, life2009: d.life })), ...today],
+  context: (d) => d.income2009 != null,                      // the 2009 positions are context
   constraints: [ clamp({ field: 'income', min: 200, max: 100000 }), clamp({ field: 'life', min: 15, max: 95 }) ],
   scales: { x: { type: 'log' } },                             //! the drag multiplies income
   axes: { x: { title: 'income →', grid: true, tickValues: [300, 1000, 3000, 10000, 30000, 100000], tickFormat: '~s' }, y: { title: 'life expectancy →', grid: true } },
   marks: [
     point({                                                     //! where each region was in 2009
-      table: 'start', size: 9, fill: 'none', stroke: '#cbd5e1', strokeWidth: 2,
-      channels: { x: { field: 'income' }, y: { field: 'life' } },
+      size: 9, fill: 'none', stroke: '#cbd5e1', strokeWidth: 2,
+      channels: { x: { field: 'income2009' }, y: { field: 'life2009' } },
     }),
     point({
       size: 7, stroke: 'white', strokeWidth: 1.5,
@@ -2612,28 +2573,29 @@ mount(Elicit({
       title: 'Herds today',
       question: 'The chart counts United States livestock in the 1930s. How many million cattle, sheep and pigs does the country have today?',
       try: 'Drag each coloured pictogram along its row. The grey ones are the 1930s counts.',
-      why: '`shape` draws an SVG path per row, picked by the `symbol` channel through a `range` of paths, so each animal is a pictogram. `move()` on `x` sets the count and `snap` keeps it to whole millions; the 1930s counts are a context table drawn with the same shapes.',
-      uses: ['shape', 'symbol', 'move()', 'snap()', 'context table'],
+      why: '`shape` draws an SVG path per row, picked by the `symbol` channel through a `range` of paths, so each animal is a pictogram. `move()` on `x` sets the count and `snap` keeps it to whole millions; the 1930s counts are `context` rows drawn with the same shapes.',
+      uses: ['shape', 'symbol', 'move()', 'snap()', 'context'],
       code: `const cow = 'M2 7 L14 7 L16 4 L17 6 L19 6 L20 9 L18 10 L16 10 L16 15 L14 15 L14 12 L5 12 L5 15 L3 15 L3 11 L1 9 Z';
 const sheep = 'M3 9 A3 3 0 0 1 6 5 A3 3 0 0 1 11 4.5 A3 3 0 0 1 15 6 L18 6 L19 9 L16 10 L15 12 L14 12 L14 15 L12 15 L12 12 L7 12 L7 15 L5 15 L5 12 A3 3 0 0 1 3 9 Z';
 const pig = 'M2 9 A7 4.5 0 0 1 16 7 L19 7 L19 10 L16 11 L15 12 L15 15 L13 15 L13 13 L6 13 L6 15 L4 15 L4 12 A3 3 0 0 1 2 9 Z';
-const fields = {
-  animal:   { type: 'categorical', domain: ['cattle', 'sheep', 'pigs'] },
-  millions: { type: 'quantitative', domain: [0, 100] },
-};
-const then = [{ animal: 'cattle', millions: 10 }, { animal: 'sheep', millions: 7 }, { animal: 'pigs', millions: 6 }];
+const then = [{ animal: 'cattle', in1930s: 10 }, { animal: 'sheep', in1930s: 7 }, { animal: 'pigs', in1930s: 6 }];
 const symbol = { field: 'animal', scale: { range: [cow, sheep, pig] } };   // one path per animal
 
 mount(Elicit({
   width: 460, height: 220,
   margins: { top: 10, right: 20, bottom: 36, left: 60 },
-  schema: { data: fields, then: { context: true, fields } },
-  data: { data: then.map((d) => ({ ...d, millions: 50 })), then }, // start every answer mid-scale
+  schema: {
+    animal:   { type: 'categorical', domain: ['cattle', 'sheep', 'pigs'] },
+    millions: { type: 'quantitative', domain: [0, 100] },
+    in1930s:  { type: 'quantitative', domain: [0, 100] },     // the 1930s counts' own column
+  },
+  data: [...then, ...then.map(({ animal }) => ({ animal, millions: 50 }))], // start every answer mid-scale
+  context: (d) => d.in1930s != null,                          // the 1930s counts are context
   constraints: [ snap({ step: 1 }), clamp({ min: 0, max: 100 }) ],
   scales: { y: { type: 'point', reverse: true } },
   axes: { x: { title: 'Millions of animals →', grid: true }, y: {} },
   marks: [
-    shape({ table: 'then', size: 14, fill: '#cbd5e1', channels: { x: { field: 'millions' }, y: { field: 'animal' }, symbol } }),
+    shape({ size: 14, fill: '#cbd5e1', channels: { x: { field: 'in1930s' }, y: { field: 'animal' }, symbol } }),
     shape({
       size: 14,
       channels: {

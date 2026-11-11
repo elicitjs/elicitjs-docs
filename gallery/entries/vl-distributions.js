@@ -535,8 +535,8 @@ mount(Elicit({
       title: 'Draw the third species',
       question: 'You know the Adelie and Chinstrap body masses. Sketch where Gentoo penguins’ masses lie.',
       try: 'Press on the flat Gentoo curve and sweep across. The other two species are fixed.',
-      why: 'The two observed species are a context table: drawn by their own `areaY`, never edited and never part of the answer. The answer is the Gentoo rows alone, so the `sweep` has one series to paint.',
-      uses: ["move({ pick: 'sweep' })", 'context table', 'series'],
+      why: 'The two observed species are `context`: read-only, and left out of `getData()`, so the answer is the Gentoo rows alone. Their curves sit in a `measured` column that only they fill, so their own `areaY` draws them and the editable one draws Gentoo alone, which leaves the `sweep` one series to paint.',
+      uses: ["move({ pick: 'sweep' })", 'context', 'series'],
       code: `const penguins = (await vegaData('penguins.json')).filter((d) => d['Body Mass (g)'] != null);
 const masses = d3.range(2500, 6501, 250);
 const kernel = (u) => Math.exp(-0.5 * u * u) / Math.sqrt(2 * Math.PI);
@@ -545,27 +545,29 @@ const kde = (s) => {
   const bw = 1.06 * d3.deviation(obs) * obs.length ** -0.2;
   return masses.map((x) => d3.mean(obs, (v) => kernel((x - v) / bw)) / bw);
 };
-const observed = ['Adelie', 'Chinstrap'].flatMap((s) => kde(s).map((d, i) => ({ species: s, mass: masses[i], density: d })));
+const observed = ['Adelie', 'Chinstrap'].flatMap((s) => kde(s).map((d, i) => ({ species: s, mass: masses[i], measured: d })));
 const gentoo = masses.map((mass) => ({ species: 'Gentoo', mass, density: 0.0001 }));
-const fields = {
-  species: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] },
-  mass: { type: 'quantitative', domain: [2500, 6500] },
-  density: { type: 'quantitative', domain: [0, 0.0012] },
-};
+const density = { type: 'quantitative', domain: [0, 0.0012] };
 
 mount(Elicit({
   width: 440, height: 220,
   margins: { top: 12, right: 12, bottom: 34, left: 64 },
   axes: { x: { title: 'Body Mass (g)' }, y: { title: 'density', ticks: 3 } },
   legends: { fill: { anchor: 'right', labelWidth: 60 } },
-  schema: { data: fields, observed: { context: true, fields } }, //! the observed species are context
-  data: { data: gentoo, observed },
+  data: [...observed, ...gentoo],
+  context: (d) => d.species !== 'Gentoo', //! the observed species are context
+  schema: {
+    species: { type: 'categorical', domain: ['Adelie', 'Chinstrap', 'Gentoo'] },
+    mass: { type: 'quantitative', domain: [2500, 6500] },
+    measured: density, // the observed curves
+    density, // your Gentoo curve
+  },
   constraints: [ clamp({ field: 'density', min: 0 }) ],
   marks: [
     areaY({
-      table: 'observed', fillOpacity: 0.45,
+      fillOpacity: 0.45,
       channels: {
-        x: { field: 'mass' }, y: { field: 'density' },
+        x: { field: 'mass' }, y: { field: 'measured' },
         fill: { field: 'species' }, stroke: { field: 'species' }, series: { field: 'species' },
       },
     }),
@@ -1854,6 +1856,8 @@ const history = d3.rollups(cars, (v) => {
   const se = d3.deviation(v, (d) => d.Miles_per_Gallon) / Math.sqrt(v.length);
   return { mean: m, lo: m - 1.96 * se, hi: m + 1.96 * se };
 }, (d) => +d.Year.slice(0, 4)).map(([year, s]) => ({ year, ...s })).sort((a, b) => a.year - b.year);
+// The record fills columns of its own, so the grey marks draw it and the blue ones don't.
+const past = history.map((d) => ({ year: d.year, pastMean: d.mean, pastLo: d.lo, pastHi: d.hi }));
 const mpg = { type: 'quantitative', domain: [10, 50] };
 const year = { type: 'quantitative', domain: [1970, 1988] };`;
 
@@ -1893,8 +1897,8 @@ mount(Elicit({
       title: 'Extend the band',
       question: 'Average fuel economy rose through 1970–1982. Where will the mean go in 1983–1988, and how sure are you?',
       try: 'Drag a dot on the line to move that year’s mean: its band moves with it. Drag a band edge to widen or narrow one side.',
-      why: 'The observed years are a context table: drawn by their own `areaY` and `lineY`, never part of the answer. Over the forecast rows, `follow` carries `lo` and `hi` with the mean, and `ordering` keeps the mean inside its band. The 1982 row is `lock`ed so the forecast starts from what was seen.',
-      uses: ["context table", 'move()', 'follow()', 'ordering()', 'lock'],
+      why: 'The observed years are `context`: read-only and left out of `getData()`. They fill their own `past…` columns, so only the grey `areaY` and `lineY` draw them. Over the forecast rows, `follow` carries `lo` and `hi` with the mean, and `ordering` keeps the mean inside its band. The 1982 row is `lock`ed so the forecast starts from what was seen.',
+      uses: ['context', 'move()', 'follow()', 'ordering()', 'lock'],
       code: `${MPG_HISTORY}
 const last = history[history.length - 1];
 const next = [last, ...d3.range(1983, 1989).map((year) => ({ year, mean: 31, lo: 28, hi: 34 }))];
@@ -1904,19 +1908,17 @@ mount(Elicit({
   width: 440, height: 260,
   margins: { top: 10, right: 16, bottom: 36, left: 48 },
   axes: { x: { tickFormat: d3.format('d') }, y: { title: 'mean MPG' } },
-  schema: {
-    data: { year, mean: mpg, lo: mpg, hi: mpg },
-    history: { context: true, fields: { year, mean: mpg, lo: mpg, hi: mpg } }, //! observed years: drawn, never elicited
-  },
-  data: { data: next, history },
+  schema: { year, mean: mpg, lo: mpg, hi: mpg, pastMean: mpg, pastLo: mpg, pastHi: mpg },
+  data: [...past, ...next],
+  context: (d) => d.pastMean != null, //! observed years: drawn, never elicited
   lock: (d) => d.year === last.year, // the forecast starts from 1982
   constraints: [
     follow({ field: ['lo', 'hi'], lead: 'mean' }), //! the band moves with the mean
     ordering({ field: ['lo', 'mean', 'hi'] }),
   ],
   marks: [
-    band({ table: 'history', channels: { x: { field: 'year' }, y1: { field: 'lo' }, y2: { field: 'hi' } } }),
-    lineY({ table: 'history', stroke: '#94a3b8', channels: { x: { field: 'year' }, y: { field: 'mean' } } }),
+    band({ channels: { x: { field: 'year' }, y1: { field: 'pastLo' }, y2: { field: 'pastHi' } } }),
+    lineY({ stroke: '#94a3b8', channels: { x: { field: 'year' }, y: { field: 'pastMean' } } }),
     band({
       handleSize: 4,
       channels: {
@@ -1934,7 +1936,7 @@ mount(Elicit({
       question: 'Forecast the mean fuel economy for 1983–1988 with an interval the same width above and below.',
       try: 'Drag a band edge: the opposite edge mirrors it about the mean. Drag the line to move a year’s mean and band together.',
       why: '`symmetric` sets the edge you did not drag to the mean’s reflection of the one you did, so one drag sets that year’s margin; `follow` keeps the mirrored band riding on the mean.',
-      uses: ['move()', 'symmetric()', 'follow()', 'context table'],
+      uses: ['move()', 'symmetric()', 'follow()', 'context'],
       code: `${MPG_HISTORY}
 const next = d3.range(1983, 1989).map((year) => ({ year, mean: 31, lo: 28, hi: 34 }));
 
@@ -1942,20 +1944,18 @@ mount(Elicit({
   width: 440, height: 260,
   margins: { top: 10, right: 16, bottom: 36, left: 48 },
   axes: { x: { tickFormat: d3.format('d') }, y: { title: 'mean MPG' } },
-  schema: {
-    data: { year, mean: mpg, lo: mpg, hi: mpg },
-    history: { context: true, fields: { year, mean: mpg, lo: mpg, hi: mpg } },
-  },
-  data: { data: next, history },
+  schema: { year, mean: mpg, lo: mpg, hi: mpg, pastMean: mpg, pastLo: mpg, pastHi: mpg },
+  data: [...past, ...next],
+  context: (d) => d.pastMean != null, // observed years: drawn, never elicited
   constraints: [
     follow({ field: ['lo', 'hi'], lead: 'mean' }),
     symmetric({ field: ['lo', 'hi'], about: 'mean' }), //! one edge mirrors the other
     ordering({ field: ['lo', 'mean', 'hi'] }),
   ],
   marks: [
-    areaY({ table: 'history', fill: '#94a3b8', fillOpacity: 0.25, strokeWidth: 0,
-            channels: { x: { field: 'year' }, y1: { field: 'lo' }, y2: { field: 'hi' } } }),
-    lineY({ table: 'history', stroke: '#94a3b8', channels: { x: { field: 'year' }, y: { field: 'mean' } } }),
+    areaY({ fill: '#94a3b8', fillOpacity: 0.25, strokeWidth: 0,
+            channels: { x: { field: 'year' }, y1: { field: 'pastLo' }, y2: { field: 'pastHi' } } }),
+    lineY({ stroke: '#94a3b8', channels: { x: { field: 'year' }, y: { field: 'pastMean' } } }),
     areaY({
       fill: '#4c78a8', fillOpacity: 0.25, strokeWidth: 0, handleSize: 4,
       channels: {
@@ -1981,19 +1981,17 @@ mount(Elicit({
   width: 440, height: 260,
   margins: { top: 10, right: 16, bottom: 36, left: 48 },
   axes: { x: { tickFormat: d3.format('d') }, y: { title: 'mean MPG' } },
-  schema: {
-    data: { year, mean: mpg, lo: mpg, hi: mpg },
-    history: { context: true, fields: { year, mean: mpg, lo: mpg, hi: mpg } },
-  },
-  data: { data: next, history },
+  schema: { year, mean: mpg, lo: mpg, hi: mpg, pastMean: mpg, pastLo: mpg, pastHi: mpg },
+  data: [...past, ...next],
+  context: (d) => d.pastMean != null, // observed years: drawn, never elicited
   constraints: [
     follow({ field: ['lo', 'hi'], lead: 'mean' }), //! painting the mean carries the band
     ordering({ field: ['lo', 'mean', 'hi'] }),
   ],
   marks: [
-    areaY({ table: 'history', fill: '#94a3b8', fillOpacity: 0.25, strokeWidth: 0,
-            channels: { x: { field: 'year' }, y1: { field: 'lo' }, y2: { field: 'hi' } } }),
-    lineY({ table: 'history', stroke: '#94a3b8', channels: { x: { field: 'year' }, y: { field: 'mean' } } }),
+    areaY({ fill: '#94a3b8', fillOpacity: 0.25, strokeWidth: 0,
+            channels: { x: { field: 'year' }, y1: { field: 'pastLo' }, y2: { field: 'pastHi' } } }),
+    lineY({ stroke: '#94a3b8', channels: { x: { field: 'year' }, y: { field: 'pastMean' } } }),
     areaY({
       fill: '#4c78a8', fillOpacity: 0.25, strokeWidth: 0, handleSize: 4,
       channels: {
@@ -2045,35 +2043,32 @@ mount(Elicit({
       title: 'State mean and SD',
       question: 'Without computing anything, where is the average MPG of these cars, and how far does a typical car sit from it?',
       try: 'Drag the dark line to set the mean: the band comes with it. Drag either band edge to set one standard deviation; the other edge mirrors it.',
-      why: 'The cars are a context table, drawn but never part of the answer. The answer is one row of `mean`, `lo`, `hi`: `follow` carries the band with the mean, `symmetric` mirrors one edge onto the other, so the band is always mean ± one SD.',
-      uses: ['context table', 'move()', 'follow()', 'symmetric()', 'ordering()'],
+      why: 'The cars are `context`: drawn, read-only and left out of `getData()`. The answer is one row of `mean`, `lo`, `hi`: `follow` carries the band with the mean, `symmetric` mirrors one edge onto the other, so the band is always mean ± one SD.',
+      uses: ['context', 'move()', 'follow()', 'symmetric()', 'ordering()'],
       code: `const cars = (await vegaData('cars.json'))
   .filter((d) => d.Horsepower != null && d.Miles_per_Gallon != null)
   .map((d) => ({ hp: d.Horsepower, mpg: d.Miles_per_Gallon }));
 const mpg = { type: 'quantitative', domain: [0, 50] };
-const edge = (f) => ruleY({ stroke: '#4c78a8', strokeWidth: 2,
-  channels: { x1: { datum: 0 }, x2: { datum: 240 }, y: { field: f, edit: move() } } });
+// Full-width rules: a car row has no lo/mean/hi, so it draws none.
+const edge = (f) => ruleY({ stroke: '#4c78a8', strokeWidth: 2, channels: { y: { field: f, edit: move() } } });
 
 mount(Elicit({
   width: 420, height: 280,
   margins: { top: 10, right: 16, bottom: 36, left: 48 },
   axes: { x: { title: 'Horsepower' }, y: { title: 'Miles per Gallon' } },
-  schema: {
-    data: { lo: mpg, mean: mpg, hi: mpg },
-    cars: { context: true, fields: { hp: { type: 'quantitative', domain: [0, 240] }, mpg } }, //! the scatter is context
-  },
-  data: { data: [{ lo: 25, mean: 30, hi: 35 }], cars },
+  schema: { hp: { type: 'quantitative', domain: [0, 240] }, mpg, lo: mpg, mean: mpg, hi: mpg },
+  data: [...cars, { lo: 25, mean: 30, hi: 35 }],
+  context: (d) => d.hp != null, //! the scatter is context
   constraints: [
     follow({ field: ['lo', 'hi'], lead: 'mean' }), //! the band rides on the mean
     symmetric({ field: ['lo', 'hi'], about: 'mean' }), //! mean ± one SD
     ordering({ field: ['lo', 'mean', 'hi'] }),
   ],
   marks: [
-    point({ table: 'cars', stroke: '#94a3b8', fill: 'none', size: 3, channels: { x: { field: 'hp' }, y: { field: 'mpg' } } }),
+    point({ stroke: '#94a3b8', fill: 'none', size: 3, channels: { x: { field: 'hp' }, y: { field: 'mpg' } } }),
     rect({ fill: '#4c78a8', fillOpacity: 0.2, channels: { x1: { datum: 0 }, x2: { datum: 240 }, y1: { field: 'lo' }, y2: { field: 'hi' } } }),
     edge('lo'), edge('hi'),
-    ruleY({ stroke: '#334155', strokeWidth: 3,
-            channels: { x1: { datum: 0 }, x2: { datum: 240 }, y: { field: 'mean', edit: move() } } }),
+    ruleY({ stroke: '#334155', strokeWidth: 3, channels: { y: { field: 'mean', edit: move() } } }),
   ],
 }));`,
     },
@@ -2219,7 +2214,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-boxplot_2D_vertical',
   status: 'full',
-  verdict: 'Tukey box plots with 1.5×IQR whiskers: one summary row per species, and the outliers in a context table drawn by their own `point` layer.',
+  verdict: 'Tukey box plots with 1.5×IQR whiskers: one summary row per species, and the outliers as `context` rows in a `value` column that only their `point` layer reads.',
   needs: ['boxplot'],
   prep: ['prep-aggregate', 'prep-calculate'],
   gaps: [
@@ -2242,17 +2237,15 @@ mount(Elicit({
   width: 300, height: 300,
   margins: { top: 10, right: 12, bottom: 36, left: 60 },
   axes: { x: { title: 'Species' }, y: { title: 'Body Mass (g)' } },
-  schema: {
-    data: { species, q1: mass, median: mass, q3: mass, lo: mass, hi: mass },
-    outliers: { context: true, fields: { species, value: mass } }, // the dot layer's own rows
-  },
-  data: { data: boxes, outliers },
+  schema: { species, q1: mass, median: mass, q3: mass, lo: mass, hi: mass, value: mass },
+  data: [...boxes, ...outliers],
+  context: (d) => d.value != null, // the outliers: the dot layer's own column
   marks: [
     ruleX({ stroke: 'black', channels: { x: { field: 'species' }, y1: { field: 'lo' }, y2: { field: 'hi' } } }),
     rect({ channels: { x: { field: 'species' }, width: { value: 14 }, y1: { field: 'q1' }, y2: { field: 'q3' },
                        fill: { field: 'species', scale: { scheme: 'tableau10' } } } }),
     tickY({ stroke: 'white', strokeWidth: 1.5, length: 14, channels: { x: { field: 'species' }, y: { field: 'median' } } }),
-    point({ table: 'outliers', fill: 'none', size: 3, channels: {
+    point({ fill: 'none', size: 3, channels: {
       x: { field: 'species' }, y: { field: 'value' },
       stroke: { field: 'species', scale: { scheme: 'tableau10' } },
     } }),
@@ -2307,10 +2300,10 @@ mount(controls);`,
 GALLERY.add({
   id: 'vl-boxplot_preaggregated',
   status: 'full',
-  verdict: 'The pre-aggregated summaries map onto a `ruleY` whisker, a `barX` box and a white `tickX` median under the chart `title`; the flattened outliers are a context table drawn as dots.',
+  verdict: 'The pre-aggregated summaries map onto a `ruleY` whisker, a `barX` box and a white `tickX` median under the chart `title`; the flattened outliers are `context` rows drawn as dots.',
   prep: ['prep-reshape'],
   gaps: [
-    'The `outliers` arrays are flattened into a context table of their own (Vega-Lite flattens them inside the spec).',
+    'The `outliers` arrays are flattened into `context` rows with a `value` column of their own (Vega-Lite flattens them inside the spec).',
   ],
   recreation: { code: `const summary = [
   { Species: 'Adelie', lower: 2850, q1: 3350, median: 3700, q3: 4000, upper: 4775, outliers: [] },
@@ -2326,18 +2319,16 @@ mount(Elicit({
   width: 420, height: 190,
   margins: { top: 10, right: 16, bottom: 30, left: 70 },
   title: 'Body Mass of Penguin Species (g)',
-  schema: {
-    data: { Species, lower: mass, q1: mass, median: mass, q3: mass, upper: mass },
-    outliers: { context: true, fields: { Species, value: mass } }, // the flattened outlier rows
-  },
-  data: { data: boxes, outliers },
+  schema: { Species, lower: mass, q1: mass, median: mass, q3: mass, upper: mass, value: mass },
+  data: [...boxes, ...outliers],
+  context: (d) => d.value != null, // the flattened outlier rows
   marks: [
     ruleY({ stroke: 'black', channels: { y: { field: 'Species' }, x1: { field: 'lower' }, x2: { field: 'upper' } } }),
     rect({ channels: { y: { field: 'Species' }, height: { value: 14 }, x1: { field: 'q1' }, x2: { field: 'q3' },
                        // listed in domain order (bottom-up), so Adelie keeps the first colour
                        fill: { field: 'Species', scale: { range: ['#e45756', '#f58518', '#4c78a8'] } } } }),
     tickX({ stroke: 'white', strokeWidth: 1.5, length: 14, channels: { y: { field: 'Species' }, x: { field: 'median' } } }),
-    point({ table: 'outliers', fill: 'none', stroke: '#4c78a8', strokeWidth: 1.5, size: 3,
+    point({ fill: 'none', stroke: '#4c78a8', strokeWidth: 1.5, size: 3,
             channels: { y: { field: 'Species' }, x: { field: 'value' } } }),
   ],
 }));` },
@@ -2346,15 +2337,15 @@ mount(Elicit({
       title: 'Brush the box',
       question: 'A fourth species, the Emperor penguin, is far heavier. Sketch its box beside the three measured ones.',
       try: 'Drag the white median tick to place the whole box, or a dark whisker tick to set that end. Shift-drag the box’s ends to set the quartiles, or its middle to slide them.',
-      why: 'The three measured species are a context table, drawn by their own marks and never part of the answer. On the Emperor row, `follow` carries the box and whiskers with the median, and `brushSpan` edits the interquartile box by both edges and its body. The brush claims every press on the plot, so it waits for `when.shift` and a plain press falls through to the ticks.',
-      uses: ['brushSpan()', 'when.shift', 'move()', 'follow()', 'context table'],
+      why: 'The three measured species are `context`: read-only and left out of `getData()`. Their summaries fill `known…` columns of their own, so only the grey marks draw them. On the Emperor row, `follow` carries the box and whiskers with the median, and `brushSpan` edits the interquartile box by both edges and its body. The brush claims every press on the plot, so it waits for `when.shift` and a plain press falls through to the ticks.',
+      uses: ['brushSpan()', 'when.shift', 'move()', 'follow()', 'context'],
       code: `const mass = { type: 'quantitative', domain: [2000, 45000] };
 const Species = { type: 'categorical', domain: ['Emperor', 'Gentoo', 'Chinstrap', 'Adelie'] };
-const fields = { Species, lower: mass, q1: mass, median: mass, q3: mass, upper: mass };
+// The measured boxes fill columns of their own, so the grey marks draw them and the blue ones don't.
 const measured = [
-  { Species: 'Adelie', lower: 2850, q1: 3350, median: 3700, q3: 4000, upper: 4775 },
-  { Species: 'Chinstrap', lower: 2700, q1: 3487.5, median: 3700, q3: 3950, upper: 4800 },
-  { Species: 'Gentoo', lower: 3950, q1: 4700, median: 5000, q3: 5500, upper: 6300 },
+  { Species: 'Adelie', knownLower: 2850, knownQ1: 3350, knownMedian: 3700, knownQ3: 4000, knownUpper: 4775 },
+  { Species: 'Chinstrap', knownLower: 2700, knownQ1: 3487.5, knownMedian: 3700, knownQ3: 3950, knownUpper: 4800 },
+  { Species: 'Gentoo', knownLower: 3950, knownQ1: 4700, knownMedian: 5000, knownQ3: 5500, knownUpper: 6300 },
 ];
 const y = { field: 'Species' };
 const handle = (f, o) => tickX({ strokeWidth: 3, length: 18, ...o, channels: { y, x: { field: f, edit: move() } } });
@@ -2363,16 +2354,20 @@ mount(Elicit({
   width: 440, height: 220,
   margins: { top: 10, right: 16, bottom: 36, left: 70 },
   axes: { x: { title: 'Body mass (g)' } },
-  schema: { data: fields, measured: { context: true, fields } }, //! the measured species are context
-  data: { data: [{ Species: 'Emperor', lower: 8000, q1: 10000, median: 12000, q3: 14000, upper: 16000 }], measured },
+  schema: {
+    Species, lower: mass, q1: mass, median: mass, q3: mass, upper: mass,
+    knownLower: mass, knownQ1: mass, knownMedian: mass, knownQ3: mass, knownUpper: mass,
+  },
+  data: [...measured, { Species: 'Emperor', lower: 8000, q1: 10000, median: 12000, q3: 14000, upper: 16000 }],
+  context: (d) => d.Species !== 'Emperor', //! the measured species are context
   constraints: [
     follow({ field: ['lower', 'q1', 'q3', 'upper'], lead: 'median' }), //! the median carries the box
     ordering({ field: ['lower', 'q1', 'median', 'q3', 'upper'], strategy: 'push' }),
   ],
   marks: [
-    ruleY({ table: 'measured', stroke: '#94a3b8', channels: { y, x1: { field: 'lower' }, x2: { field: 'upper' } } }),
-    barX({ table: 'measured', fill: '#94a3b8', channels: { y, x1: { field: 'q1' }, x2: { field: 'q3' } } }),
-    tickX({ table: 'measured', stroke: 'white', strokeWidth: 1.5, length: 14, channels: { y, x: { field: 'median' } } }),
+    ruleY({ stroke: '#94a3b8', channels: { y, x1: { field: 'knownLower' }, x2: { field: 'knownUpper' } } }),
+    barX({ fill: '#94a3b8', channels: { y, x1: { field: 'knownQ1' }, x2: { field: 'knownQ3' } } }),
+    tickX({ stroke: 'white', strokeWidth: 1.5, length: 14, channels: { y, x: { field: 'knownMedian' } } }),
     ruleY({ stroke: '#64748b', channels: { y, x1: { field: 'lower' }, x2: { field: 'upper' } } }),
     barX({
       fill: '#4c78a8', fillOpacity: 0.7,
