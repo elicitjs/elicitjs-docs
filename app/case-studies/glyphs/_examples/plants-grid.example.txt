@@ -1,0 +1,59 @@
+// The plant from above, as a function of where it goes.
+const plant = (channels) => composite({
+  channels,
+  parts: [
+    ruleX({ channels: {
+      x: { frame: 0 }, y1: { frame: -0.55 },
+      y2: { field: "energy", frame: [-0.15, 0.65] },
+      stroke: { value: "#4d7c0f" }, strokeWidth: { value: 3 },
+    } }),
+    ellipse({ channels: {
+      x: { field: "support", frame: [-0.08, -0.3] }, y: { frame: -0.3 },
+      rx: { field: "support", frame: [0.06, 0.28], edit: slide({ axis: "x", increase: "left", when: when.noShift }) },
+      ry: { frame: 0.07 }, angle: { value: -25 }, fill: { value: "#65a30d" },
+    } }),
+    ellipse({ channels: {
+      x: { field: "support", frame: [0.08, 0.3] }, y: { frame: -0.3 },
+      rx: { field: "support", frame: [0.06, 0.28], edit: slide({ axis: "x", increase: "right", when: when.noShift }) },
+      ry: { frame: 0.07 }, angle: { value: 25 }, fill: { value: "#65a30d" },
+    } }),
+    rect({ channels: {
+      x1: { frame: -0.3 }, x2: { frame: 0.3 }, y1: { frame: -0.95 }, y2: { frame: -0.55 },
+      fill: { value: "#b45309" },
+    } }),
+    point({ channels: {
+      y: { field: "energy", frame: [-0.15, 0.65], edit: move({ channels: ["y"], when: when.noShift }) },
+      size: { field: "joy", frame: [0.08, 0.3], edit: slide({ axis: "x", increase: "right", when: when.noShift }) },
+      fill: { value: "#db2777" },
+    } }),
+    point({ channels: {
+      y: { field: "energy", frame: [-0.15, 0.65] },
+      size: { field: "joy", frame: [0.03, 0.11] },
+      fill: { value: "#fde047" },
+    } }),
+  ],
+});
+
+const people = ["Ana", "Ben", "Cai"];
+const weeks = ["Week 1", "Week 2", "Week 3"];
+
+mount(Elicit({
+  width: 400, height: 360,
+  // One plant per person per week: both positions are categories, so each
+  // plant fills its cell.
+  data: people.flatMap((person, p) => weeks.map((week, w) => ({
+    person, week, energy: 0.3 + 0.2 * w, joy: 0.3 + 0.1 * p, support: 0.5,
+  }))),
+  schema: {
+    person:  { type: "categorical", domain: people },
+    week:    { type: "ordinal", domain: weeks },
+    energy:  { type: "quantitative", domain: [0, 1] },
+    joy:     { type: "quantitative", domain: [0, 1] },
+    support: { type: "quantitative", domain: [0, 1] },
+  },
+  marks: [plant({
+    // Shift-drag moves the nearest plant to another cell; a plain drag answers.
+    x: { field: "week", edit: move({ channels: ["x", "y"], pick: "nearest", when: when.shift }) },
+    y: { field: "person" },
+  })],
+}))

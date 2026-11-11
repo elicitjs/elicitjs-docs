@@ -6,6 +6,9 @@ import { Lead } from '../../../components/Lead';
 import angerOrDisgust from './_examples/anger-or-disgust.example.txt';
 import wellbeingPlant from './_examples/wellbeing-plant.example.txt';
 import hourglass from './_examples/hourglass.example.txt';
+import facesScatter from './_examples/faces-scatter.example.txt';
+import plantsGrid from './_examples/plants-grid.example.txt';
+import hourglassScatter from './_examples/hourglass-scatter.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -17,7 +20,7 @@ export default function Layout({ children }) {
 
 <Section id="steps" title="The steps">
 
-1. **Declare the answer.** One row, one field per thing you ask. The `schema` gives each field its type and domain.
+1. **Declare the answer.** One field per thing you ask. The `schema` gives each field its type and domain.
 2. **Draw the glyph.** A [`composite` in box mode](/marks/composite#box) places every part in the glyph's own units: `x` and `y` from `-1` to `1`, y up. The composite's `size` sets the box's half-size, so the whole glyph scales with it.
 3. **Bind the fields.** A channel with a `field` and a `frame: [lo, hi]` range maps the field's domain onto that slice of the box. Two parts that read the same field and range always line up.
 4. **Add the gestures.** An edit on a channel writes that channel's field: `move` for a position, `slide` for a size, colour or angle. A part with no edit can't be grabbed, so a drag passes through it.
@@ -66,19 +69,67 @@ Each leaf's centre and width both read `support`. As the leaf widens, its centre
 
 <Section id="hourglass" title="An hourglass you fill">
 
-How long will this work take? The timer holds up to 12 weeks of sand, and the sand in the top bulb is your estimate.
+How long will this work take? The timer holds 12 weeks of sand. The top bulb holds your estimate and the bottom holds the rest.
 
-The sand is a `rect` whose top edge, `y2`, reads `weeks`. `move({ mode: "relative" })` on `y2` moves the surface by the drag distance, so it stays under the pointer wherever you grab the sand. `snap({ step: 1 })` rounds the answer to whole weeks. The label reads the same field through a `{ fn }` text channel.
+Each pile of sand is a `rect`, drawn as a plain bar. The top pile's upper edge, `y2`, reads `weeks` over `frame: [0, 0.8]`. The bottom pile reads the same field over the mirrored range, `[0, -0.8]`, so as the top drains the bottom fills. Both carry `move({ mode: "relative" })`, so you can drag either pile and its surface stays under the pointer. `snap({ step: 1 })` rounds the answer to whole weeks.
 
-The glass, the stream and the caps carry no edit, so they are drawn but can't be grabbed.
+The glass is a [`shape`](/marks/shape) drawn from an SVG path. A second `shape` is a mask: a box with the glass cut out of it, painted over the sand in the background colour. It trims each bar to the curve of its bulb. Neither shape carries an edit, so a drag passes through them to the sand.
 
 <Example
   code={hourglass}
   title="How long will this take?"
-  blurb="Rects for the glass and the sand; the sand's top edge is the estimate, snapped to whole weeks."
+  blurb="Two bars on one field with mirrored ranges, trimmed to the glass by a masking shape and snapped to whole weeks."
   try={(
     <>
-      <b>Drag the sand</b> up to add time, down to take it away.
+      <b>Drag either pile of sand</b> up or down: the other pile moves the opposite way.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="positions" title="Glyphs as points">
+
+A glyph's own `x` and `y` place it on the chart's scales, like a `point`. Give the composite a field for each, and you get one glyph per row: a scatter plot when both are quantitative, a grid when both are categories. The positions are data you already have, and the glyphs are the answers. Every part keeps its edit, so each glyph is answered on its own.
+
+With `x` and `y` on band scales, each glyph fills its cell by default. On a continuous scale, set `size` to fix the box's half-size in pixels.
+
+A `move` on the composite's `x` moves the whole glyph, writing both position fields. Its press would compete with the parts' edits, so `when` splits the gestures by modifier:
+
+- `move({ channels: ["x", "y"], pick: "nearest", when: when.shift })` takes a Shift-drag and moves the nearest glyph.
+- Every part's own edit takes `when: when.noShift`, so a plain drag still answers with the part you grab.
+
+On a categorical axis the move snaps to the nearest category, so a plant dragged with Shift lands in another cell.
+
+<Example
+  code={facesScatter}
+  title="How does each person feel?"
+  blurb="face() with x and y bound to fields: one face per person, placed by hours slept and worked. Shift-drag moves a face."
+  try={(
+    <>
+      <b>Drag a forehead</b> sideways to colour that face · <b>drag a mouth</b> up or down · <b>Shift-drag</b> a face to move it.
+    </>
+  )}
+/>
+
+<Example
+  code={plantsGrid}
+  title="A plant per person per week"
+  blurb="The plant as a function of its channels, placed on an ordinal x and a categorical y."
+  try={(
+    <>
+      <b>Drag any flower</b> up or down to grow its plant · <b>Shift-drag</b> a plant to another cell.
+    </>
+  )}
+/>
+
+<Example
+  code={hourglassScatter}
+  title="An estimate per task"
+  blurb="One hourglass per task, on an ordinal x and a quantitative y."
+  try={(
+    <>
+      <b>Drag the sand</b> in any hourglass to change that task's estimate · <b>Shift-drag</b> an hourglass to move it.
     </>
   )}
 />

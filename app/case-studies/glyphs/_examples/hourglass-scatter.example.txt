@@ -1,0 +1,63 @@
+// The hourglass from above, as a function of where it goes.
+const GLASS = "M-0.42,-0.8 L0.42,-0.8 C0.42,-0.3 0.05,-0.12 0.05,0 C0.05,0.12 0.42,0.3 0.42,0.8 " +
+              "L-0.42,0.8 C-0.42,0.3 -0.05,0.12 -0.05,0 C-0.05,-0.12 -0.42,-0.3 -0.42,-0.8 Z";
+const MASK = "M-0.46,-0.82 L-0.46,0.82 L0.46,0.82 L0.46,-0.82 Z " + GLASS;
+
+const hourglass = (channels) => composite({
+  channels,
+  parts: [
+    rect({ channels: {
+      x1: { frame: -0.42 }, x2: { frame: 0.42 }, y1: { frame: 0 },
+      y2: { field: "weeks", frame: [0, 0.8], edit: move({ mode: "relative", when: when.noShift }) },
+      fill: { value: "#eab308" },
+    } }),
+    rect({ channels: {
+      x1: { frame: -0.42 }, x2: { frame: 0.42 }, y1: { frame: -0.8 },
+      y2: { field: "weeks", frame: [0, -0.8], edit: move({ mode: "relative", when: when.noShift }) },
+      fill: { value: "#eab308" },
+    } }),
+    shape({ path: MASK, channels: { size: { frame: 0.82 }, fill: { value: "#ffffff" }, stroke: { value: "none" } } }),
+    shape({ path: GLASS, channels: {
+      size: { frame: 0.8 }, fill: { value: "none" },
+      stroke: { value: "#64748b" }, strokeWidth: { value: 1.5 },
+    } }),
+    rect({ channels: {
+      x1: { frame: -0.52 }, x2: { frame: 0.52 }, y1: { frame: 0.8 }, y2: { frame: 0.88 },
+      fill: { value: "#78350f" },
+    } }),
+    rect({ channels: {
+      x1: { frame: -0.52 }, x2: { frame: 0.52 }, y1: { frame: -0.88 }, y2: { frame: -0.8 },
+      fill: { value: "#78350f" },
+    } }),
+    text({ channels: {
+      x: { frame: 0.62 },
+      text: { fn: (d) => `${d.weeks} wk` },
+      textAnchor: { value: "start" }, fontSize: { value: 11 }, fill: { value: "#334155" },
+    } }),
+  ],
+});
+
+mount(Elicit({
+  width: 400, height: 340,
+  axes: { y: { title: "Team size" } },
+  // How long will each task take? Tasks run along x, and the team on each sits
+  // on y. Each hourglass is one estimate.
+  data: [
+    { task: "Design", team: 2, weeks: 3 },
+    { task: "Build",  team: 6, weeks: 8 },
+    { task: "Test",   team: 4, weeks: 4 },
+    { task: "Launch", team: 3, weeks: 1 },
+  ],
+  schema: {
+    task:  { type: "ordinal", domain: ["Design", "Build", "Test", "Launch"] },
+    team:  { type: "quantitative", domain: [0, 8] },
+    weeks: { type: "quantitative", domain: [0, 12] },
+  },
+  constraints: [snap({ step: 1, field: "weeks" })],
+  marks: [hourglass({
+    // Shift-drag moves the nearest hourglass; a plain drag on its sand answers.
+    x: { field: "task", edit: move({ channels: ["x", "y"], pick: "nearest", when: when.shift }) },
+    y: { field: "team" },
+    size: { value: 30 },
+  })],
+}))

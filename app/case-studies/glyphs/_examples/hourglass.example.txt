@@ -1,53 +1,56 @@
+// The glass, as an SVG path in its own units (y down, as in SVG): two curved
+// bulbs meeting at a narrow neck. `shape` scales a path to fit, so its half-height
+// (0.8) is the `size` it is drawn at.
+const GLASS = "M-0.42,-0.8 L0.42,-0.8 C0.42,-0.3 0.05,-0.12 0.05,0 C0.05,0.12 0.42,0.3 0.42,0.8 " +
+              "L-0.42,0.8 C-0.42,0.3 -0.05,0.12 -0.05,0 C-0.05,-0.12 -0.42,-0.3 -0.42,-0.8 Z";
+// A mask: a box with the glass cut out of it. Painted over the sand in the
+// background colour, it trims each bar to the shape of its bulb.
+const MASK = "M-0.46,-0.82 L-0.46,0.82 L0.46,0.82 L0.46,-0.82 Z " + GLASS;
+
 mount(Elicit({
   width: 320, height: 340,
   margins: { top: 10, right: 10, bottom: 10, left: 10 },
-  // How long will this work take? The timer holds up to 12 weeks of sand.
+  // How long will this work take? The timer holds 12 weeks of sand; the top
+  // bulb holds your estimate and the rest has run through.
   data: [{ weeks: 4 }],
   schema: { weeks: { type: "quantitative", domain: [0, 12] } },
   // Whole weeks only.
   constraints: [snap({ step: 1 })],
   marks: [
     composite({
-      channels: { size: { value: 150 } },
+      channels: { size: { value: 140 } },
       parts: [
-        // The glass: two bulbs and a neck, drawn in the glyph's own units.
+        // Top sand: a bar from the neck up to `weeks`.
         rect({ channels: {
-          x1: { frame: -0.42 }, x2: { frame: 0.42 }, y1: { frame: 0.06 }, y2: { frame: 0.82 },
-          rx: { value: 18 }, fill: { value: "#f1f5f9" }, stroke: { value: "#94a3b8" }, strokeWidth: { value: 2 },
-        } }),
-        rect({ channels: {
-          x1: { frame: -0.42 }, x2: { frame: 0.42 }, y1: { frame: -0.82 }, y2: { frame: -0.06 },
-          rx: { value: 18 }, fill: { value: "#f1f5f9" }, stroke: { value: "#94a3b8" }, strokeWidth: { value: 2 },
-        } }),
-        rect({ channels: {
-          x1: { frame: -0.05 }, x2: { frame: 0.05 }, y1: { frame: -0.08 }, y2: { frame: 0.08 },
-          fill: { value: "#f1f5f9" }, stroke: { value: "#94a3b8" }, strokeWidth: { value: 2 },
-        } }),
-        // The sand in the top bulb is the estimate: its surface sits at `weeks`.
-        // Drag the sand up to add time, down to take it away.
-        rect({ channels: {
-          x1: { frame: -0.38 }, x2: { frame: 0.38 }, y1: { frame: 0.1 },
-          y2: { field: "weeks", frame: [0.1, 0.78],
-                edit: move({ mode: "relative" }) },
+          x1: { frame: -0.42 }, x2: { frame: 0.42 }, y1: { frame: 0 },
+          y2: { field: "weeks", frame: [0, 0.8], edit: move({ mode: "relative" }) },
           fill: { value: "#eab308" },
         } }),
-        // A thin stream falls through the neck.
+        // Bottom sand: the same field over the mirrored range, so as the top
+        // drains the bottom fills. It is a handle too.
         rect({ channels: {
-          x1: { frame: -0.012 }, x2: { frame: 0.012 }, y1: { frame: -0.3 }, y2: { frame: 0.1 },
+          x1: { frame: -0.42 }, x2: { frame: 0.42 }, y1: { frame: -0.8 },
+          y2: { field: "weeks", frame: [0, -0.8], edit: move({ mode: "relative" }) },
           fill: { value: "#eab308" },
         } }),
-        // The two wooden caps.
+        // The mask, then the glass outline over it.
+        shape({ path: MASK, channels: { size: { frame: 0.82 }, fill: { value: "#ffffff" }, stroke: { value: "none" } } }),
+        shape({ path: GLASS, channels: {
+          size: { frame: 0.8 }, fill: { value: "none" },
+          stroke: { value: "#64748b" }, strokeWidth: { value: 2.5 },
+        } }),
+        // The wooden caps.
         rect({ channels: {
-          x1: { frame: -0.55 }, x2: { frame: 0.55 }, y1: { frame: 0.82 }, y2: { frame: 0.92 },
+          x1: { frame: -0.52 }, x2: { frame: 0.52 }, y1: { frame: 0.8 }, y2: { frame: 0.88 },
           rx: { value: 4 }, fill: { value: "#78350f" },
         } }),
         rect({ channels: {
-          x1: { frame: -0.55 }, x2: { frame: 0.55 }, y1: { frame: -0.92 }, y2: { frame: -0.82 },
+          x1: { frame: -0.52 }, x2: { frame: 0.52 }, y1: { frame: -0.88 }, y2: { frame: -0.8 },
           rx: { value: 4 }, fill: { value: "#78350f" },
         } }),
         // The answer, read off the same field.
         text({ channels: {
-          y: { frame: -0.56 },
+          y: { frame: 1 },
           text: { fn: (d) => `${d.weeks} week${d.weeks === 1 ? "" : "s"}` },
           fontSize: { value: 18 }, fill: { value: "#334155" },
         } }),

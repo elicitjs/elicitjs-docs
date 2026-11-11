@@ -1,0 +1,37 @@
+mount(Elicit({
+  width: 400, height: 340,
+  axes: { x: { title: "Hours slept" }, y: { title: "Hours worked" } },
+  // How does each person feel? Where each face sits is data you already have:
+  // hours slept against hours worked. The face is the answer.
+  data: [
+    { name: "Ana", slept: 8,   worked: 4,  valence: 0.6,  feeling: 0 },
+    { name: "Ben", slept: 5,   worked: 10, valence: -0.5, feeling: -0.6 },
+    { name: "Cai", slept: 6.5, worked: 7,  valence: 0,    feeling: 0.3 },
+    { name: "Dee", slept: 9,   worked: 9,  valence: 0.2,  feeling: 0 },
+    { name: "Eli", slept: 4.5, worked: 3,  valence: -0.2, feeling: 0.7 },
+  ],
+  schema: {
+    name:    { type: "categorical" },
+    slept:   { type: "quantitative", domain: [4, 10] },
+    worked:  { type: "quantitative", domain: [0, 12] },
+    valence: { type: "quantitative", domain: [-1, 1] },
+    feeling: { type: "quantitative", domain: [-1, 1] },
+  },
+  marks: [
+    face({
+      channels: {
+        // Placed like a point: x and y are positions on the chart's scales.
+        // Shift-drag moves the nearest face; a plain drag answers with its parts.
+        x: { field: "slept", edit: move({ channels: ["x", "y"], pick: "nearest", when: when.shift }) },
+        y: { field: "worked" },
+        size: { value: 30 },
+        mouthCurve: { field: "valence", edit: slide({ axis: "y", increase: "up", when: when.noShift }) },
+        fill: {
+          field: "feeling",
+          scale: { type: "diverging", range: ["#d62728", "#ffd666", "#2ca02c"] },
+          edit: slide({ axis: "x", increase: "right", when: when.noShift }),
+        },
+      },
+    }),
+  ],
+}))
