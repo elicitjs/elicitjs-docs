@@ -1,0 +1,27 @@
+// A space-saving y axis: no spine or ticks, labels moved inside the plot above
+// each bar, gridlines between the bands, and a flat title at the top left.
+mount(Elicit({
+  width: 420, height: 230,
+  margins: { top: 22, right: 12, bottom: 34, left: 6 },
+  data: [{ team: "Design", n: 12 }, { team: "Engineering", n: 31 }, { team: "Research", n: 8 }],
+  schema: {
+    team: { type: "categorical", domain: ["Research", "Engineering", "Design"] },
+    n: { type: "quantitative", domain: [0, 40] },
+  },
+  axes: {
+    x: { title: "Headcount" },
+    y: {
+      line: false, tickSize: 0,
+      tickPadding: -5, labelAlign: "start", labelOffset: -18,
+      title: "Team", titleAngle: 0, titleAnchor: "end",
+      grid: { bandPosition: 0 },
+    },
+  },
+  marks: [
+    rectX({ rx: 2, channels: {
+      y: { field: "team", scale: { padding: 0 } },
+      x: { field: "n", edit: move() },
+      height: { value: 22 },
+    } }),
+  ],
+}));

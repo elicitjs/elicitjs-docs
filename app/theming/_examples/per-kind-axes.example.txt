@@ -1,0 +1,19 @@
+// `axis.discrete` / `axis.continuous` style each KIND of axis apart: a spine
+// under the categories, none on the values, a dotted value grid and a rule at 0.
+mount(Elicit({
+  width: 440, height: 260,
+  theme: {
+    axis: {
+      tickSize: 0, tickPadding: 6,
+      discrete: { line: true, stroke: "#111827" },
+      continuous: { line: false },
+    },
+    grid: { show: "value", strokeDash: "1 3", stroke: "#9ca3af", zero: { stroke: "#111827", strokeWidth: 1.5 } },
+  },
+  data: [{ q: "Q1", d: 12 }, { q: "Q2", d: -8 }, { q: "Q3", d: 20 }, { q: "Q4", d: 5 }],
+  schema: {
+    q: { type: "categorical", domain: ["Q1", "Q2", "Q3", "Q4"] },
+    d: { type: "quantitative", domain: [-20, 30] },
+  },
+  marks: [barY({ channels: { x: { field: "q" }, y: { field: "d", edit: move() } } })],
+}));

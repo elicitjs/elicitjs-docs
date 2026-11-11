@@ -16,6 +16,8 @@ import aStackedBarChart from './_examples/a-stacked-bar-chart.example.txt';
 import cutAStackIntoParts from './_examples/cut-a-stack-into-parts.example.txt';
 import anOpenDomain from './_examples/an-open-domain.example.txt';
 import aGradientFill from './_examples/a-gradient-fill.example.txt';
+import groupedBars from './_examples/grouped-bars.example.txt';
+import fillInOneGroup from './_examples/fill-in-one-group.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -75,6 +77,30 @@ Segments are ordered by the mark's series field, so the same category sits at th
   code={aStackedBarChart}
   title="A stacked bar chart"
   blurb={'stack: true with fill: { field: "asset" }. The pct domain covers the total, [0, 100].'}
+/>
+
+</Section>
+
+<Section id="grouped" title="Grouped bars (xOffset, yOffset)">
+
+`xOffset` splits each `x` category into one sub-band per value of a second field, so the bars of one category sit side by side. `yOffset` does the same inside each `y` category, for grouped `barX`. The offset needs a categorical `x` (or `y`) to divide, and it draws no axis of its own: colour the groups with `fill` on the same field and turn on its legend.
+
+Sub-bands touch by default, and the gap between categories is the `x` band's padding. `scale: \{ padding \}` on the offset channel opens a gap inside each group. `yOffset` puts its first value at the bottom of the slot, as a band `y` axis does.
+
+<Example
+  code={groupedBars}
+  title="Grouped bars"
+  blurb={'xOffset: { field: "year" } splits each region into three sub-bands. y carries edit: move().'}
+  try={<><b>Drag</b> any bar up or down.</>}
+/>
+
+A row that names a category but no group draws no bar. Combine `xOffset` with `stack: true` and each sub-band stacks on its own. `create()` and `toggle()` read the group from where you click, and `move(\{ channels: ["x", "xOffset"] \})` drags a bar into another category and group.
+
+<Example
+  code={fillInOneGroup}
+  title="Fill in one group"
+  blurb={'context marks 2023 as given; you drag the 2024 bar beside it in each region.'}
+  try={<><b>Drag</b> a purple bar to your estimate. The grey bars are fixed.</>}
 />
 
 </Section>

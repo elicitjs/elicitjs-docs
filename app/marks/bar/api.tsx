@@ -127,6 +127,17 @@ export const api: ApiEntry[] = [
         desc: <>Explicit horizontal span (barX) — a Gantt-style range per category.</>,
       },
       {
+        name: 'xOffset / yOffset',
+        type: 'band',
+        desc: (
+          <>
+            A second category nested inside each <code className="inline">x</code> (or{' '}
+            <code className="inline">y</code>) category: one sub-band per value, for
+            grouped bars.
+          </>
+        ),
+      },
+      {
         name: 'fill, stroke, strokeWidth, opacity',
         type: 'const | field',
         desc: <>Standard style surface; a field tints through the ordinal palette.</>,

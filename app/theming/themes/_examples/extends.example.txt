@@ -1,0 +1,19 @@
+// Start from a named theme and change what you need. `extends` names the base;
+// the rest deep-merges over it.
+mount(Elicit({
+  width: 420, height: 260,
+  theme: {
+    extends: "swiss",
+    ink: "#0067a5",                      // Swiss blue instead of signal red
+    marks: { bar: { rx: 2 } },
+    title: { fontStyle: "italic" },
+  },
+  title: "Budget split",
+  subtitle: "Drag each bar to your estimate, %",
+  data: [{ line: "Staff", v: 45 }, { line: "Rent", v: 25 }, { line: "Tools", v: 30 }],
+  schema: {
+    line: { type: "categorical", domain: ["Staff", "Rent", "Tools"] },
+    v: { type: "quantitative", domain: [0, 60] },
+  },
+  marks: [barY({ channels: { x: { field: "line" }, y: { field: "v", edit: move() } } })],
+}));

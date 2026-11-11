@@ -92,6 +92,11 @@ One band (category) axis — <code className="inline">x</code> or <code classNam
         type: "linear",
         desc: "The magnitude, in data units, on its own count axis — not on x or y. One cell is worth one unit of the field.",
       },
+      {
+        name: "xOffset / yOffset",
+        type: "band",
+        desc: "A second category nested inside the category axis: one block per value, side by side.",
+      },
     ],
     returns: (
       <>

@@ -1,0 +1,29 @@
+// 2023 is given; you estimate 2024 beside it in every region.
+const regions = ["North", "South", "West", "East"];
+const given = { North: 55, South: 34, West: 47, East: 40 };
+mount(Elicit({
+  width: 400, height: 250,
+  margins: { top: 16, right: 16, bottom: 28, left: 36 },
+  data: regions.flatMap((region) => [
+    { region, year: "2023", sales: given[region] },
+    { region, year: "2024", sales: given[region] },
+  ]),
+  context: (d) => d.year === "2023",
+  schema: {
+    region: { type: "categorical", domain: regions },
+    year:   { type: "categorical", domain: ["2023", "2024"] },
+    sales:  { type: "quantitative", domain: [0, 80] },
+  },
+  constraints: [clamp({ min: 0 })],
+  marks: [
+    barY({
+      channels: {
+        x:       { field: "region" },
+        xOffset: { field: "year", scale: { padding: 0.1 } },
+        y:       { field: "sales", edit: move() },
+        fill:    { field: "year", scale: { range: ["#cbd5e1", "#4f46e5"] },
+                   legend: { anchor: "top", title: false } },
+      },
+    }),
+  ],
+}))

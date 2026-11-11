@@ -1,0 +1,19 @@
+// The ggplot2 look from tokens alone: a grey panel under white gridlines,
+// no spines or ticks, and wider gaps between the bars.
+mount(Elicit({
+  width: 440, height: 260,
+  theme: {
+    panel: { fill: "#ebebeb" },
+    grid: { stroke: "#ffffff", strokeWidth: 1.2, show: "all" },
+    axis: { line: false, tickSize: 3, stroke: "#333333", labelFill: "#4d4d4d" },
+    bandPadding: 0.35,
+    ink: "#595959",
+  },
+  data: [{ cat: "A", n: 30 }, { cat: "B", n: 55 }, { cat: "C", n: 40 }, { cat: "D", n: 22 }],
+  schema: {
+    cat: { type: "categorical", domain: ["A", "B", "C", "D"] },
+    n: { type: "quantitative", domain: [0, 60] },
+  },
+  axes: { y: { title: "count" } },
+  marks: [barY({ channels: { x: { field: "cat" }, y: { field: "n", edit: move() } } })],
+}));

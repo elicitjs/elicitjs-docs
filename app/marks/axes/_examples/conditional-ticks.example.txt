@@ -1,0 +1,25 @@
+// Per-tick styling: a long tick, a bold two-line label and a solid gridline on
+// each January; short ticks and dashed lines elsewhere.
+const months = d3.timeMonths(new Date(2006, 0, 1), new Date(2008, 0, 2));
+const isJan = (d) => d.getMonth() === 0;
+mount(Elicit({
+  width: 520, height: 260,
+  margins: { top: 16, right: 20, bottom: 20, left: 40 },
+  axes: {
+    x: {
+      tickValues: months,
+      tickFormat: (d) => (isJan(d) ? d3.timeFormat("%b\n%Y")(d) : d3.timeFormat("%b")(d)[0]),
+      tickSize: (d) => (isJan(d) ? 14 : 4),
+      fontWeight: (d) => (isJan(d) ? "bold" : null),
+      line: false,
+      // The paired grid borrows the axis's tickValues; its dash is per line too.
+      grid: { strokeDash: (d) => (isJan(d) ? null : "2 3") },
+    },
+  },
+  data: months.map((date, i) => ({ date, price: 420 + 140 * Math.sin(i / 4) + i * 8 })),
+  schema: {
+    date: { type: "temporal", domain: [months[0], months[months.length - 1]] },
+    price: { type: "quantitative", domain: [200, 800] },
+  },
+  marks: [lineY({ channels: { x: { field: "date" }, y: { field: "price", edit: move() } }, handles: true })],
+}));

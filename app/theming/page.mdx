@@ -10,6 +10,9 @@ import perChartTheme from './_examples/per-chart-theme.example.txt';
 import perMarkOverride from './_examples/per-mark-override.example.txt';
 import darkMode from './_examples/dark-mode.example.txt';
 import titledChartWithACaption from './_examples/titled-chart-with-a-caption.example.txt';
+import chromeTokens from './_examples/chrome-tokens.example.txt';
+import perKindAxes from './_examples/per-kind-axes.example.txt';
+import typography from './_examples/typography.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -17,7 +20,7 @@ export default function Layout({ children }) {
 
 # Theming & style
 
-<Lead>Every default colour, font, and affordance token lives in one place — the **theme**. Pass a partial `theme` on `Elicit` (or on any widget) and it deep-merges over the built-in defaults, so you name only what you change. It sits alongside, and under, the two style hooks you already have: a per-datum paint **channel** (`fill`, `stroke`) still wins over any theme token, and the [effects](/effects) layer still owns interaction feedback. The showcase is the [survey widgets](/widgets): one theme restyles the whole family.</Lead>
+<Lead>Every default colour, font, and affordance token lives in one place — the **theme**. Pass a partial `theme` on `Elicit` (or on any widget) and it deep-merges over the built-in defaults, so you name only what you change. It sits alongside, and under, the two style hooks you already have: a per-datum paint **channel** (`fill`, `stroke`) still wins over any theme token, and the [effects](/effects) layer still owns interaction feedback. Seventeen [named themes](/theming/themes) ship with the library — `theme: "nyt"` restyles a whole chart from one word.</Lead>
 
 <ApiReference entries={api} />
 
@@ -60,6 +63,41 @@ A theme is plain data — no functions, no classes — so it merges cleanly. `in
 
 </Section>
 
+<Section id="chrome" title="Axes, grids and the plot panel">
+
+The `axis` tokens style every axis: `stroke` and `strokeWidth` for the spine and ticks, `line: false` to drop the spine, `tickSize` (0 for none) and `tickPadding` for the gap to the label, `labelAngle` to turn the labels. Each is also an [`axis()` option](/marks/axes#styling), which wins. `grid.show` adds gridlines you did not ask for. `panel` paints the plot area under the grid and can frame it; `background` covers the margins too. `bandPadding` sets the gap between bars.
+
+<Example
+  code={chromeTokens}
+  title="A grey panel, white gridlines"
+  blurb="panel, grid, axis and bandPadding tokens, and nothing else."
+  try={"drag a bar."}
+/>
+
+`axis.discrete` and `axis.continuous` override any axis token for axes of that kind. That is how a house drops the spine on the value axis and keeps it under the categories. `grid.show: "value"` grids the axis the value runs along: the continuous one, or y when both are. `grid.zero` draws an emphasised line at 0.
+
+<Example
+  code={perKindAxes}
+  title="Per-kind axes and a zero rule"
+  blurb="A spine under the categories, none on the values, a dotted value grid and a rule at 0."
+  try={"drag Q2 above zero."}
+/>
+
+</Section>
+
+<Section id="typography" title="Typography">
+
+`font.family` sets the chart's typeface; null inherits the page's. `title`, `subtitle` and `caption` each take `fontFamily`, `fontStyle`, `fontWeight`, `fontSize` and `fill`, so a headline can be a serif over sans-serif labels. The axis takes `fontFamily` and `fontWeight` for its labels and `titleFill`, `titleFontSize` and `titleFontWeight` for its title. A [`text`](/marks/text) mark takes `fontWeight`, `fontStyle` and `fontFamily`, each a constant or a channel.
+
+<Example
+  code={typography}
+  title="A serif title over sans-serif labels"
+  blurb="font, title, subtitle and axis tokens, and a bold text mark."
+  try={"drag a bar."}
+/>
+
+</Section>
+
 <Section id="titles" title="Titles and captions">
 
 `title`, `subtitle` and `caption` on the `Elicit` spec draw text above and below the plot, left-aligned with it. They reserve layout space the way a legend does: the chart keeps its declared `width` and `height`, and the plot shrinks to make room. The theme's `title`, `subtitle` and `caption` tokens style them, each `{ fill, fontSize, fontWeight }`. A token with no `fill` takes the axis label colour, so the titles follow a dark theme.
@@ -95,6 +133,7 @@ import { setTheme, themes } from "elicit-js";
 
 setTheme(themes.survey);          // app-wide default
 // …every Elicit(...) after this inherits it
+setTheme("economist");            // or a named theme by name
 setTheme({ ink: "#4f46e5" });     // or just a token or two
 ```
 

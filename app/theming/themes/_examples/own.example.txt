@@ -1,0 +1,29 @@
+// One chart, drawn under each theme. Only `theme` changes.
+const chart = (theme) => Elicit({
+  width: 320, height: 240, theme,
+  title: theme,
+  subtitle: "Chance of each outcome, %",
+  data: [
+    { outcome: "Rain", who: "You", p: 40 }, { outcome: "Rain", who: "Experts", p: 55 },
+    { outcome: "Sun", who: "You", p: 35 }, { outcome: "Sun", who: "Experts", p: 30 },
+    { outcome: "Snow", who: "You", p: 25 }, { outcome: "Snow", who: "Experts", p: 15 },
+  ],
+  schema: {
+    outcome: { type: "categorical", domain: ["Rain", "Sun", "Snow"] },
+    who: { type: "categorical", domain: ["You", "Experts"] },
+    p: { type: "quantitative", domain: [0, 60] },
+  },
+  marks: [
+    barY({
+      channels: {
+        x: { field: "outcome" }, xOffset: { field: "who" },
+        y: { field: "p", edit: move() },
+        fill: { field: "who", legend: { anchor: "top", title: false } },
+      },
+    }),
+  ],
+});
+const row = document.createElement("div");
+row.style.cssText = "display:flex;flex-wrap:wrap;gap:20px;max-width:680px";
+for (const name of ["default", "survey", "dark"]) row.append(chart(name));
+mount(row);

@@ -1,0 +1,20 @@
+// Turned labels and two-line labels. `labelAngle` turns the tick labels (the
+// axis makes room for them); a `\n` in a formatted label starts a second line.
+mount(Elicit({
+  width: 460, height: 280,
+  margins: { top: 16, right: 16, bottom: 20, left: 40 },
+  axes: {
+    x: { labelAngle: 40, tickSize: 0 },
+    y: { grid: { strokeDash: "2 3" } },
+  },
+  data: [
+    { brand: "Northwind Traders", v: 42 }, { brand: "Contoso", v: 30 },
+    { brand: "Fabrikam Fiber", v: 25 }, { brand: "Adventure Works", v: 18 },
+    { brand: "Tailspin Toys", v: 12 },
+  ],
+  schema: {
+    brand: { type: "categorical", domain: ["Northwind Traders", "Contoso", "Fabrikam Fiber", "Adventure Works", "Tailspin Toys"] },
+    v: { type: "quantitative", domain: [0, 50] },
+  },
+  marks: [barY({ channels: { x: { field: "brand" }, y: { field: "v", edit: move() } } })],
+}));

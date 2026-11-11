@@ -11,6 +11,7 @@ import clickADotToSetTheCount from './_examples/click-a-dot-to-set-the-count.exa
 import talliesOf16 from './_examples/tallies-of-1-6.example.txt';
 import aCountAxis from './_examples/a-count-axis.example.txt';
 import blocksThatGrowRightward from './_examples/blocks-that-grow-rightward.example.txt';
+import aWafflePerGroup from './_examples/a-waffle-per-group.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -84,6 +85,19 @@ The axis is **opt-in**. Ask for it with `axes: \{ count: true \}`. It defaults o
   code={aCountAxis}
   title="A count axis"
   blurb={"axes: { count: true } — one cell is 10, so the 320 domain spans 32 cells."}
+/>
+
+</Section>
+
+<Section id="grouped" title="Grouped waffles (xOffset, yOffset)">
+
+`xOffset` splits each category into one block per value of a second field, side by side. Each block keeps its own cells, so `edit.waffle.fill()` fills the block you point at. `yOffset` does the same for `waffleX`. The cells shrink to fit the narrower block.
+
+<Example
+  code={aWafflePerGroup}
+  title="A waffle per group"
+  blurb={'xOffset: { field: "sex" } gives each sport a block for women and one for men. One cell is 10 athletes.'}
+  try={<><b>Click</b> or <b>drag</b> in a block to set its count.</>}
 />
 
 </Section>

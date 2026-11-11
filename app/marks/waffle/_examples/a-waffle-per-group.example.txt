@@ -1,0 +1,25 @@
+const sports = ["rowing", "cycling", "judo"];
+mount(Elicit({
+  width: 420, height: 260,
+  margins: { top: 16, right: 12, bottom: 28, left: 28 },
+  data: sports.flatMap((sport) => [
+    { sport, sex: "women", athletes: 40 },
+    { sport, sex: "men", athletes: 40 },
+  ]),
+  schema: {
+    sport:    { type: "categorical", domain: sports },
+    sex:      { type: "categorical", domain: ["women", "men"] },
+    athletes: { type: "quantitative", domain: [0, 200] },
+  },
+  marks: [
+    waffleY({
+      unit: 10,
+      channels: {
+        x:       { field: "sport" },
+        xOffset: { field: "sex", scale: { padding: 0.15 } },
+        count:   { field: "athletes", edit: edit.waffle.fill() },
+        fill:    { field: "sex", legend: { anchor: "top", title: false } },
+      },
+    }),
+  ],
+}));

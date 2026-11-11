@@ -100,13 +100,25 @@ export const api: ApiEntry[] = [
         name: "tickFormat",
         type: "string | fn",
         default: "auto",
-        desc: "A d3-format string or a formatter function.",
+        desc: "A d3-format string or a formatter function. A newline in a label breaks it onto a second line.",
       },
       {
         name: "tickSize",
+        type: "number | (v, i) => number",
+        default: "theme (6)",
+        desc: "Tick mark length in pixels; 0 draws none. A function sets each tick's length.",
+      },
+      {
+        name: "tickPadding",
         type: "number",
-        default: "6",
-        desc: "Tick mark length in pixels.",
+        default: "theme (3)",
+        desc: "Gap between a tick's end and its label, in pixels.",
+      },
+      {
+        name: "labelAngle",
+        type: "number",
+        default: "theme (0)",
+        desc: "Tick-label rotation in degrees, counter-clockwise like a mark's angle. The axis reserves the room the turned labels need.",
       },
       {
         name: "title",
@@ -121,20 +133,54 @@ export const api: ApiEntry[] = [
         desc: "Rotation of the title in degrees. 0 lays a y title flat. On an x axis the title is flat unless set.",
       },
       {
-        name: "stroke / fill / fontSize",
+        name: "stroke / strokeWidth / line",
         type: "style",
-        default: "#6b7280 / #374151 / 10",
+        default: "theme (#6b7280 / 1 / true)",
         desc: (
           <>
-            Spine + tick colour, label colour (labels are text nodes, so they take a <code className="inline">fill</code>), label size.
+            Spine and tick colour and width; <code className="inline">line: false</code> drops the spine. <code className="inline">stroke</code> also takes <code className="inline">(v, i) =&gt; colour</code> per tick.
           </>
         ),
       },
       {
+        name: "fill / fontSize / fontFamily / fontWeight",
+        type: "style",
+        default: "theme (#374151 / 10)",
+        desc: (
+          <>
+            Label paint (labels are text nodes, so they take a <code className="inline">fill</code>). <code className="inline">fill</code> and <code className="inline">fontWeight</code> also take a per-tick function.
+          </>
+        ),
+      },
+      {
+        name: "titleFill / titleFontSize / titleFontWeight / titlePadding",
+        type: "style",
+        default: "theme (label fill / fontSize + 1 / — / 0)",
+        desc: "The title's paint, and extra pixels between the labels and the title.",
+      },
+      {
+        name: "labelAlign / labelOffset",
+        type: "'start' | 'middle' | 'end' / number",
+        default: "theme (side's own / 0)",
+        desc: "A tick label's text-anchor, and pixels every label moves along the axis. With a negative tickPadding, labelAlign: 'start' on a left axis puts the labels inside the plot.",
+      },
+      {
+        name: "titleAnchor",
+        type: "'start' | 'middle' | 'end'",
+        default: "theme ('middle')",
+        desc: "Where the title sits along the axis; 'end' is the right of x, the top of y. A flat y title at an end sits past it, over the plot: leave room in that margin.",
+      },
+      {
+        name: "offset",
+        type: "number",
+        default: "0",
+        desc: "Move the axis this many pixels away from the plot.",
+      },
+      {
         name: "grid",
-        type: "boolean",
+        type: "boolean | grid options",
         default: "false",
-        desc: "Also add a matching grid mark alongside the axis.",
+        desc: "In the global axes config, also add a matching grid. An object styles it (strokeDash, zero, …).",
       },
       {
         name: "edit / edits",
@@ -207,10 +253,22 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "stroke / strokeWidth",
+        name: "stroke / strokeWidth / strokeDash / opacity",
         type: "style",
-        default: "#e5e7eb / 1",
-        desc: "Line colour and width.",
+        default: "theme (#e5e7eb / 1)",
+        desc: "Line paint. stroke, strokeWidth and strokeDash also take (v, i) => value per line.",
+      },
+      {
+        name: "zero",
+        type: "boolean | { stroke, strokeWidth, strokeDash }",
+        default: "theme (none)",
+        desc: "An emphasised line at 0 on a continuous scale. true takes the theme's grid.zero style.",
+      },
+      {
+        name: "bandPosition",
+        type: "number",
+        default: "theme (0.5)",
+        desc: "On a band axis, where in each band a line sits: 0 its start edge, so the lines run between the categories.",
       },
       {
         name: "id",

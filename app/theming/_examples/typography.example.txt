@@ -1,0 +1,26 @@
+// Type from the theme: a body family, a serif title, bold axis titles. A text
+// mark takes `fontWeight`, `fontStyle` and `fontFamily` per label.
+mount(Elicit({
+  width: 440, height: 280,
+  title: "How sure are you?",
+  subtitle: "Drag each bar to your confidence",
+  theme: {
+    font: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
+    title: { fontFamily: "Georgia, serif", fontSize: 20 },
+    subtitle: { fontStyle: "italic" },
+    axis: { titleFontWeight: "bold", titleFill: "#111827" },
+  },
+  axes: { x: false, y: { title: "Confidence (%)" } },
+  data: [{ claim: "Claim 1", c: 70 }, { claim: "Claim 2", c: 35 }, { claim: "Claim 3", c: 55 }],
+  schema: {
+    claim: { type: "categorical", domain: ["Claim 1", "Claim 2", "Claim 3"] },
+    c: { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    barY({ rx: 3, channels: { x: { field: "claim" }, y: { field: "c", edit: move() } } }),
+    text({
+      dy: -10, fontWeight: "bold", fill: "white",
+      channels: { x: { field: "claim" }, y: { datum: 0 }, text: { field: "claim" } },
+    }),
+  ],
+}));

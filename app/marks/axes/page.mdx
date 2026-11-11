@@ -12,6 +12,9 @@ import explicitGridyAxisxAxisyRuley from './_examples/explicit-gridy-axisx-axisy
 import elementsNamespace from './_examples/elements-namespace.example.txt';
 import titlesAlongTheAxis from './_examples/titles-along-the-axis.example.txt';
 import aFlatYTitle from './_examples/a-flat-y-title.example.txt';
+import rotatedAndTwoLineLabels from './_examples/rotated-and-two-line-labels.example.txt';
+import conditionalTicks from './_examples/conditional-ticks.example.txt';
+import spaceSavingAxis from './_examples/space-saving-axis.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -110,6 +113,37 @@ A band or point y axis lists `domain[0]` at the bottom, the same direction a val
   code={aFlatYTitle}
   title="A flat y title"
   blurb={"axes: { y: { title: \"°C\", titleAngle: 0 } }"}
+/>
+
+</Section>
+
+<Section id="styling" title="Styling an axis">
+
+Every axis option below defaults to the [theme's](/theming#chrome) `axis` token of the same name, so set it once in a theme or here on one axis. `line: false` drops the spine and `tickSize: 0` the ticks. `tickPadding` sets the gap from tick to label, and `offset` moves the whole axis away from the plot. `labelAngle` turns the tick labels, and the axis reserves the room they need. A `\n` in a formatted label starts a second line.
+
+<Example
+  code={rotatedAndTwoLineLabels}
+  title="Turned labels"
+  blurb={"axes: { x: { labelAngle: 40, tickSize: 0 }, y: { grid: { strokeDash: \"2 3\" } } }"}
+  try={"drag a bar."}
+/>
+
+`tickSize`, `stroke`, `fill` and `fontWeight` also take a function of the tick's value and index, and so do a grid's `stroke`, `strokeWidth` and `strokeDash`. Use it to mark a period boundary.
+
+<Example
+  code={conditionalTicks}
+  title="Per-tick styling"
+  blurb="Long ticks, bold two-line labels and solid gridlines on each January."
+  try={"drag a point on the line."}
+/>
+
+`labelAlign` sets a label's text-anchor and `labelOffset` moves every label along the axis. A negative `tickPadding` with `labelAlign: "start"` puts a y axis's labels inside the plot, and a grid's `bandPosition: 0` draws its lines between the categories. `titleAnchor` places the title along the axis; `"end"` with `titleAngle: 0` sets a y title at the top left, over the plot, so leave room in `margins.top`.
+
+<Example
+  code={spaceSavingAxis}
+  title="A space-saving axis"
+  blurb="Labels above each bar, gridlines between the bands, the title at the top left."
+  try={"drag a bar."}
 />
 
 </Section>

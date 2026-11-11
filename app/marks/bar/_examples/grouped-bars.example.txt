@@ -1,0 +1,26 @@
+mount(Elicit({
+  width: 400, height: 250,
+  margins: { top: 16, right: 16, bottom: 28, left: 36 },
+  data: [
+    { region: "North", year: "2022", sales: 40 }, { region: "North", year: "2023", sales: 55 },
+    { region: "North", year: "2024", sales: 62 }, { region: "South", year: "2022", sales: 30 },
+    { region: "South", year: "2023", sales: 34 }, { region: "South", year: "2024", sales: 48 },
+    { region: "West",  year: "2022", sales: 52 }, { region: "West",  year: "2023", sales: 47 },
+    { region: "West",  year: "2024", sales: 58 },
+  ],
+  schema: {
+    region: { type: "categorical", domain: ["North", "South", "West"] },
+    year:   { type: "categorical", domain: ["2022", "2023", "2024"] },
+    sales:  { type: "quantitative", domain: [0, 80] },
+  },
+  marks: [
+    barY({
+      channels: {
+        x:       { field: "region" },
+        xOffset: { field: "year" },
+        y:       { field: "sales", edit: move() },
+        fill:    { field: "year", legend: { anchor: "top", title: false } },
+      },
+    }),
+  ],
+}))

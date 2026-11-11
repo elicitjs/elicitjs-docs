@@ -1,0 +1,24 @@
+// A built-in theme by NAME. `theme: themes.nyt` is the same thing.
+mount(Elicit({
+  width: 480, height: 300,
+  theme: "nyt",
+  title: "Where will unemployment go next?",
+  subtitle: "Rate, %. Drag the dots after 2024 to your forecast.",
+  caption: "Up to 2024 is observed; the rest is yours.",
+  context: (d) => d.year <= 2024,
+  data: [
+    { year: 2020, rate: 8.1 }, { year: 2021, rate: 5.4 }, { year: 2022, rate: 3.6 },
+    { year: 2023, rate: 3.6 }, { year: 2024, rate: 4.0 },
+    { year: 2025, rate: 4.2 }, { year: 2026, rate: 4.4 }, { year: 2027, rate: 4.5 },
+  ],
+  schema: {
+    year: { type: "quantitative", domain: [2020, 2027] },
+    rate: { type: "quantitative", domain: [0, 10] },
+  },
+  // Ticks clear of the corner, where the two axes' end labels would meet.
+  axes: { x: { tickFormat: "d", tickValues: [2021, 2023, 2025, 2027] } },
+  marks: [
+    lineY({ channels: { x: { field: "year" }, y: { field: "rate" } } }),
+    point({ channels: { x: { field: "year" }, y: { field: "rate", edit: move() } } }),
+  ],
+}));

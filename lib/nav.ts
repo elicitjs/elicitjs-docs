@@ -89,6 +89,7 @@ export const SITE: NavGroup[] = [
       { href: "/effects", title: "Interaction effects" },
       { href: "/guides", title: "Guides" },
       { href: "/theming", title: "Theming & style" },
+      { href: "/theming/themes", title: "Named themes" },
     ],
   },
   {

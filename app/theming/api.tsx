@@ -9,7 +9,8 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "theme: { ink, accent, muted, handle, handleStroke, background, palette, ramp, diverging,\n         font, axis, grid, guide, constraint, effects, ghost, widget, marks }",
+      "theme: { extends, ink, accent, muted, handle, handleStroke, background, palette, ramp, diverging,\n         font, title, subtitle, caption, axis, grid, panel, bandPadding, guide, constraint,\n         effects, ghost, widget, marks }",
+      'theme: "nyt"   // a named theme — see /theming/themes',
     ],
     options: [
       {
@@ -55,14 +56,44 @@ export const api: ApiEntry[] = [
         desc: <>Typography. A non-null <code className="inline">family</code> is emitted on the root svg (and used by the canvas renderer) so every label inherits it; the default null inherits the host page's font.</>,
       },
       {
-        name: "axis / grid / guide",
-        type: "object",
+        name: "extends",
+        type: "theme name",
+        default: "—",
+        desc: <>Start from a <a className="underline" href="/theming/themes">named theme</a>; the rest of the object deep-merges over it. A bare string (<code className="inline">theme: "nyt"</code>) is the same as <code className="inline">{'{ extends: "nyt" }'}</code>.</>,
+      },
+      {
+        name: "axis",
+        type: "{ stroke, strokeWidth, line, tickSize, tickPadding, labelFill, fontSize, fontFamily, fontWeight, labelAngle, labelAlign, labelOffset, titleFill, titleFontSize, titleFontWeight, titlePadding, titleAnchor, handle, discrete, continuous }",
+        default: "grey spine, 6px ticks",
+        desc: <>Axis chrome. Each token is also an <a className="underline" href="/marks/axes#styling"><code className="inline">axis()</code> option</a> of the same name, and the option wins. <code className="inline">line: false</code> drops the spine; <code className="inline">tickSize: 0</code> the ticks. <code className="inline">discrete</code> and <code className="inline">continuous</code> override any token for axes of that kind — <code className="inline">{'{ continuous: { line: false } }'}</code> drops the value-axis spine and keeps the category one.</>,
+      },
+      {
+        name: "grid",
+        type: "{ stroke, strokeWidth, strokeDash, opacity, show, zero, bandPosition }",
+        default: "show: \"none\"",
+        desc: <>Gridline paint, and which implicit axes get a grid you did not ask for: <code className="inline">"none"</code>, <code className="inline">"value"</code> (the axis the value runs along), <code className="inline">"continuous"</code> or <code className="inline">"all"</code>. <code className="inline">zero</code> draws an emphasised line at 0, <code className="inline">{'{ stroke, strokeWidth, strokeDash }'}</code>.</>,
+      },
+      {
+        name: "panel",
+        type: "{ fill, stroke, strokeWidth }",
+        default: "none",
+        desc: <>The plot area&rsquo;s own surface, under the grid, and a frame around it. <code className="inline">background</code> covers the margins too.</>,
+      },
+      {
+        name: "bandPadding",
+        type: "number",
+        default: "0.1",
+        desc: <>The gap between bars on a band axis, as a fraction of the step. A channel&rsquo;s <code className="inline">scale: {'{ padding }'}</code> wins.</>,
+      },
+      {
+        name: "guide",
+        type: "{ rule, region, legend, bounds, catchment, track }",
         default: "neutral greys",
-        desc: <>Chart chrome tokens — axis spine/labels/handle, grid lines, and the reference-rule / region / legend guides. A dash pattern is spelled <code className="inline">strokeDash</code>, e.g. <code className="inline">guide: {'{ rule: { strokeDash: "5 4" } }'}</code>.</>,
+        desc: <>Guide paint. A dash pattern is spelled <code className="inline">strokeDash</code>, e.g. <code className="inline">guide: {'{ rule: { strokeDash: "5 4" } }'}</code>. <code className="inline">legend</code> also takes <code className="inline">swatchSize</code>, <code className="inline">gap</code>, <code className="inline">swatchRadius</code> (half the size for round chips) and <code className="inline">titleFontWeight</code>.</>,
       },
       {
         name: "title / subtitle / caption",
-        type: "{ fill, fontSize, fontWeight }",
+        type: "{ fill, fontSize, fontWeight, fontFamily, fontStyle }",
         default: "fontSize 16 (weight 600) / 12 / 11",
         desc: <>Text style of the spec&rsquo;s <a className="underline" href="#titles"><code className="inline">title</code>, <code className="inline">subtitle</code> and <code className="inline">caption</code></a>. A null <code className="inline">fill</code> (the default) takes <code className="inline">axis.labelFill</code>.</>,
       },
@@ -94,7 +125,7 @@ export const api: ApiEntry[] = [
         name: "marks",
         type: "Record<mark, style>",
         default: "{}",
-        desc: <>Sparse per-mark default overrides, keyed by mark name — e.g. <code className="inline">{'{ bar: { fill: "crimson" } }'}</code>.</>,
+        desc: <>Sparse per-mark default overrides, keyed by mark name — e.g. <code className="inline">{'{ bar: { fill: "crimson" } }'}</code>. Beyond paint, <code className="inline">bar.rx</code> and <code className="inline">rect.rx</code> set a corner radius and <code className="inline">point.size</code> a radius.</>,
       },
     ],
   },
@@ -102,10 +133,16 @@ export const api: ApiEntry[] = [
     name: "themes",
     summary: (
       <>
-        The built-in themes. <code className="inline">themes.default</code> is the library look; <code className="inline">themes.survey</code> is a clean, professional survey style; <code className="inline">themes.dark</code> is a self-contained dark mode (it sets <code className="inline">background</code>). Each is a partial — pass it as <code className="inline">theme</code>, or layer your own on top with a deep-merge.
+        The seventeen <a className="underline" href="/theming/themes">named themes</a>: <code className="inline">default</code>, <code className="inline">survey</code> and <code className="inline">dark</code>, plus fourteen house styles from <a className="underline" href="https://github.com/microsoft/flint-chart">Flint</a>. Each is a partial — pass it (or its name) as <code className="inline">theme</code>, or start from one with <code className="inline">extends</code>.
       </>
     ),
-    signatures: ["themes.default", "themes.survey", "themes.dark"],
+    signatures: [
+      "themes.default · survey · dark",
+      "themes.nyt · economist · bbc · datawrapper",
+      "themes.swiss · nature · deStijl",
+      "themes.mckinsey · powerbi · powerbiLight",
+      "themes.apple · material · pop · cartoon",
+    ],
   },
   {
     name: "setTheme(partial)",
@@ -114,6 +151,6 @@ export const api: ApiEntry[] = [
         Set the application-wide default theme. Every chart created afterwards inherits it unless it passes its own <code className="inline">theme</code>, which layers on top. Pass <code className="inline">null</code> to reset.
       </>
     ),
-    signatures: ["setTheme(themes.survey)", "setTheme({ ink: '#4f46e5' })", "setTheme(null)"],
+    signatures: ["setTheme(themes.survey)", "setTheme('economist')", "setTheme({ ink: '#4f46e5' })", "setTheme(null)"],
   },
 ];
