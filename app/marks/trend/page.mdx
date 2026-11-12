@@ -41,13 +41,13 @@ Unlike a `point` or `bar`, a trend line is **derived**: its position comes from 
 
 <Section id="inert" title="Inert until an edit names the column">
 
-`trend()` draws the line and both handles, and writes nothing. Like every other mark, it is a **view** until an `edit` says which column a gesture sets — `edit.trend.intercept()` on the intercept channel, `edit.trend.slope()` on the slope channel. Staging goes on the edit (`edit.trend.slope({ stage: 1 })`), the same way it does everywhere else.
+`trend()` with no edit draws the line, no handles, and writes nothing. Like every other mark, it is a **view** until an `edit` says which column a gesture sets — `edit.trend.intercept()` on the intercept channel, `edit.trend.slope()` on the slope channel. Staging goes on the edit (`edit.trend.slope({ stage: 1 })`), the same way it does everywhere else.
 
 <Example
   code={inertWithoutAnEdit}
   title="No edit, no writes"
-  blurb="The handles are drawn but the data never moves."
-  try={"drag either dot — nothing changes."}
+  blurb="The line draws without handles, and the data never moves."
+  try={"drag the line. Nothing changes."}
 />
 
 </Section>

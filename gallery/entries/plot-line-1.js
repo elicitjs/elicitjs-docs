@@ -233,7 +233,7 @@ mount(Elicit({
       title: 'Drag the year-end price',
       question: 'Where will each of these four stocks close at the end of 2018?',
       try: 'Drag the dot at the end of each line up or down. The label rides along.',
-      why: 'Only the four year-end rows are free: `lock` fixes the monthly history, so the history handles are not grabbable. `move()` on `y` writes the close; the label is a second mark over the same rows, so it re-derives on every commit.',
+      why: 'Only the four year-end rows are free: `lock` fixes the monthly history, so the history draws no handles. `move()` on `y` writes the close; the label is a second mark over the same rows, so it re-derives on every commit.',
       uses: ['move()', 'lock', 'clamp()', 'text'],
       code: `const files = [['AAPL', 'aapl.csv'], ['AMZN', 'amzn.csv'], ['GOOG', 'goog.csv'], ['IBM', 'ibm.csv']];
 const stocks = (await Promise.all(files.map(async ([Symbol, file]) =>

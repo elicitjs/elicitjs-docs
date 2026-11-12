@@ -92,7 +92,7 @@ Put `edit: move(\{ pick: "sweep" \})` on the value channel for the NYT-style "yo
 
 <Section id="handles" title="Hiding the handles">
 
-The per-point handles draw only when the line carries an edit. `handles: 'hit'` keeps them invisible but targetable, so a sweep or nearest pick still finds the line; `handles: false` removes them, and a proximity edit then has nothing to aim at (the chart warns). `handleSize` sizes them when shown.
+The per-point handles draw only where an edit can move the row. A line with no edit draws none, and neither does a `lock`ed or `context` row, or a line whose edits wait for a later `stage`. To draw points on a line with no edit, set `handles: true`; they then draw on every row. `handles: 'hit'` keeps them invisible but targetable, so a sweep or nearest pick still finds the line; `handles: false` removes them, and a proximity edit then has nothing to aim at (the chart warns). `handleSize` sizes them when shown.
 
 <Example
   code={aCleanLineStillSweepable}

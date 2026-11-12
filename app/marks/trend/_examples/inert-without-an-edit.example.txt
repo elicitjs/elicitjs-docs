@@ -9,8 +9,8 @@ mount(Elicit({
   },
   data: [{ intercept: 2, slope: 0.5 }],
   marks: [
-    // No edit anywhere: the line and both handles draw, and nothing you do to
-    // them changes the data. A mark is a VIEW until an edit names the column a
+    // No edit anywhere: the line draws without handles, and nothing you do to
+    // it changes the data. A mark is a VIEW until an edit names the column a
     // gesture writes — trend is no exception, and used to be.
     trend({
       channels: {
