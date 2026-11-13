@@ -12,7 +12,7 @@ mount(Elicit({
   },
   marks: [
     lineY({
-      stroke: "#dc2626", strokeWidth: 2,
+      stroke: "#EE7B5E", strokeWidth: 2,
       channels: { x: { field: "m" }, y: { field: "t", edit: move() } },
     }),
   ],

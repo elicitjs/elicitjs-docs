@@ -36,14 +36,14 @@ mount(Elicit({
     ],
   },
   marks: [
-    link({ stroke: "#94a3b8", strokeWidth: 1.5, edits: [edit.network.rewire()] }),
+    link({ stroke: "#94A5B3", strokeWidth: 1.5, edits: [edit.network.rewire()] }),
     shape({
       size: 14,
       channels: {
         x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
         y: { field: "y" },
         symbol: { field: "kind", scale: { range: ["triangle", "circle", "square"] } },
-        fill: { field: "kind", scale: { range: ["#59a14f", "#4e79a7", "#e15759"] } },
+        fill: { field: "kind", scale: { range: ["#7DB86B", "#50AEB7", "#EE7B5E"] } },
         // Drag from a port to another station to link them.
         ports: { value: true, edit: edit.network.connect() },
       },

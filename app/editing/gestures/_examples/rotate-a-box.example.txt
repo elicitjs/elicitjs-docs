@@ -14,8 +14,8 @@ mount(Elicit({
         y: { field: "y" },
         width:  { value: 110 },
         height: { value: 70 },
-        fill:   { value: "#6366f1" },
-        stroke: { value: "#3730a3" },
+        fill:   { value: "#50AEB7" },
+        stroke: { value: "#37919B" },
         // rotate() inverts the pointer's angle about the mark centre onto theta.
         angle: {
           field: "theta",

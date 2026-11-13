@@ -39,7 +39,7 @@ mount(Elicit({
   marks: [
     link({
       inset: 4,
-      stroke: "#4e79a7",
+      stroke: "#50AEB7",
       strokeWidth: 2,
       // A fixed bow. These links share no pair of nodes, so "auto" would leave
       // every one of them flat — including the arc, whose only parameter this is.
@@ -52,6 +52,6 @@ mount(Elicit({
       },
       edits: [cycle({ channels: ["curve"] })],
     }),
-    point({ size: 4, fill: "#94a3b8", channels: { x: { field: "x" }, y: { field: "y" } } }),
+    point({ size: 4, fill: "#94A5B3", channels: { x: { field: "x" }, y: { field: "y" } } }),
   ],
 }));

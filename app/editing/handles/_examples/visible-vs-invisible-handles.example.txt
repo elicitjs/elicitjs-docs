@@ -12,7 +12,7 @@ mount(Elicit({
   marks: [
     areaY({
       handles: "hit",
-      fill: "#3b82f6",
+      fill: "#50AEB7",
       opacity: 0.7,
       channels: {
         x: { field: "t" },

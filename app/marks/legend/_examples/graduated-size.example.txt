@@ -16,7 +16,7 @@ mount(Elicit({
     people: { type: "quantitative", domain: [0, 1000] },
   },
   marks: [
-    point({ fill: "#4f46e5", fillOpacity: 0.5, channels: {
+    point({ fill: "#50AEB7", fillOpacity: 0.5, channels: {
       x: { field: "x" }, y: { field: "y" }, size: { field: "people" },
     } }),
     legendSize({ anchor: "right" }),

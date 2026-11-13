@@ -26,11 +26,16 @@ const {
   waffle: _editWaffle,
   trend: _editTrend,
   network: _editNetwork,
+  hierarchy: _editHierarchy,
   when: _editWhen,
   ...universalEdits
 } = elicit.edit;
 
 export function createElicitScope() {
+  // The docs site draws every chart in the Data & Dialogue Lab theme. It is the
+  // app-wide base, so an example's own `theme` still layers on top of it. Set on every
+  // eval so an example that calls `setTheme()` never leaks into the next one.
+  elicit.setTheme('dd');
   return {
     // Marks — view DATA.
     ...elicit.plot,

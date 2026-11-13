@@ -1,0 +1,73 @@
+mount(Elicit({
+  width: 520, height: 320,
+  margins: { top: 20, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      // Named for the data; `role` says which table each one is.
+      topics: {
+        role: "nodes",
+        fields: {
+          name: { type: "categorical", key: true, open: true },
+          kind: { type: "categorical", domain: ["theme", "quote"] },
+          x: { type: "quantitative", domain: [0, 100] },
+          y: { type: "quantitative", domain: [0, 100] },
+          w: { type: "quantitative", domain: [0, 600] },
+          h: { type: "quantitative", domain: [0, 400] },
+        },
+      },
+      memberships: {
+        role: "nesting",
+        fields: {
+          // The first ref is the contained node, the second its container.
+          quote: { type: "ref" },
+          theme: { type: "ref" },
+          // A column of its own: every membership row carries one.
+          coder: { type: "categorical", domain: ["seed", "participant"], default: "participant" },
+        },
+      },
+    },
+  },
+  data: {
+    topics: [
+      { name: "Trust", kind: "theme", x: 25, y: 58, w: 130, h: 80 },
+      { name: "Cost", kind: "theme", x: 75, y: 58, w: 130, h: 80 },
+      { name: "\u201cIt just works\u201d", kind: "quote", x: 25, y: 58, w: 104, h: 26 },
+      { name: "\u201cToo pricey\u201d", kind: "quote", x: 75, y: 58, w: 104, h: 26 },
+      { name: "\u201cWho sees my data?\u201d", kind: "quote", x: 50, y: 12, w: 140, h: 26 },
+    ],
+    memberships: [
+      { quote: "\u201cIt just works\u201d", theme: "Trust", coder: "seed" },
+      { quote: "\u201cToo pricey\u201d", theme: "Cost", coder: "seed" },
+    ],
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        contains: { fn: (d) => d.kind === "theme", padding: 12 },
+        fill: { fn: (d) => (d.kind === "theme" ? "#EDF7F8" : "#EBD6AD") },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "name" },
+        dy: { fn: (d) => (d.kind === "theme" ? -d.h / 2 - 8 : 0) },
+      },
+    }),
+  ],
+}));

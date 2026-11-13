@@ -11,10 +11,10 @@ mount(Elicit({
   marks: [
     geoBasemap({
       geojson: vancouver,
-      fill: "#e8eef5", stroke: "#64748b", strokeWidth: 0.8,
+      fill: "#EDF7F8", stroke: "#46596B", strokeWidth: 0.8,
     }),
     geoPoint({
-      size: 8, fill: "#1d4ed8", stroke: "#fff", strokeWidth: 1.5,
+      size: 8, fill: "#50AEB7", stroke: "#fff", strokeWidth: 1.5,
       channels: {
         lon: { field: "lon" },
         lat: { field: "lat" },

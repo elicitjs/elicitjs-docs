@@ -10,7 +10,7 @@ mount(Elicit({
   },
   scales: { x: { type: "band" } },
   marks: [
-    barY({ fill: "#0ea5e9", channels: {
+    barY({ fill: "#2B5D87", channels: {
       x: { field: "cat" },
       y: { field: "value", edit: move() },
     } }),

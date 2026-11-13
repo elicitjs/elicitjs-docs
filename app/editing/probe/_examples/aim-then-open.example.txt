@@ -21,7 +21,7 @@ const chart = Elicit({
     trend({
       id: "belief",
       handles: false,
-      stroke: "#d33", strokeWidth: 3,
+      stroke: "#EE7B5E", strokeWidth: 3,
       channels: {
         intercept: { datum: 0 },
         // Stage 0: no handle to grab, so the gesture takes the pointer's own x
@@ -36,7 +36,7 @@ const chart = Elicit({
 });
 mount(chart);
 const out = document.createElement("div");
-out.style.cssText = "font:12px ui-monospace,monospace;margin-top:6px;color:#64748b";
+out.style.cssText = "font:12px ui-monospace,monospace;margin-top:6px;color:#6F8294";
 const show = () => {
   const d = chart.getData()[0] || {};
   out.textContent = "stage " + chart.getStage() +

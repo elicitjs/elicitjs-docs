@@ -27,7 +27,7 @@ mount(Elicit({
         // arch it and dragging down cup it.
         curvature: { field: "convexity", scale: { range: [-0.8, 0.8] },
                      edit: slide({ axis: "y", increase: "up" }) },
-        stroke: { value: "#4e79a7" },
+        stroke: { value: "#50AEB7" },
         strokeWidth: { value: 3 },
       },
     }),

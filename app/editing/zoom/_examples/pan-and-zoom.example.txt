@@ -18,9 +18,9 @@ const chart = Elicit({
     x: { edits: [edit.axis.zoom({ minSpan: 4 }), edit.axis.pan()] },
   },
   marks: [
-    lineY({ stroke: "#0284c7", strokeWidth: 2, channels: { x: { field: "week" }, y: { field: "rain" } } }),
+    lineY({ stroke: "#2B5D87", strokeWidth: 2, channels: { x: { field: "week" }, y: { field: "rain" } } }),
     point({
-      fill: "#0284c7", size: 4,
+      fill: "#2B5D87", size: 4,
       channels: { x: { field: "week" }, y: { field: "rain", edit: move() } },
     }),
   ],
@@ -41,14 +41,14 @@ const addButton = (label, onclick) => {
   const b = document.createElement("button");
   b.textContent = label;
   b.onclick = onclick;
-  b.style.cssText = "padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer";
+  b.style.cssText = "padding:4px 10px;border:1px solid #BCC9D4;border-radius:6px;background:#fff;cursor:pointer";
   controls.append(b);
 };
 addButton("Zoom in", () => zoomBy(0.5));
 addButton("Zoom out", () => zoomBy(2));
 addButton("Reset", () => chart.setDomain("week", null));
 const readout = document.createElement("span");
-readout.style.color = "#64748b";
+readout.style.color = "#6F8294";
 controls.append(readout);
 mount(controls);
 

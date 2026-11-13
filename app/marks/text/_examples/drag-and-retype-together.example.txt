@@ -11,7 +11,7 @@ mount(Elicit({
     label: { type: "categorical" },
   },
   marks: [
-    text({ fontSize: 14, fill: "#b45309",
+    text({ fontSize: 14, fill: "#8F6511",
       channels: {
         x: { field: "x" }, y: { field: "y" },
         text: { field: "label", edit: editText() },

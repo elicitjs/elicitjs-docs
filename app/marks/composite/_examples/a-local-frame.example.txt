@@ -28,7 +28,7 @@ mount(Elicit({
         // inside a box, saying nothing means "here, at the glyph".
         point({ channels: {
           size: { frame: 1 },
-          fill: { value: "#eef2f7" }, stroke: { value: "#9aa7b4" },
+          fill: { value: "#EDF7F8" }, stroke: { value: "#6F8294" },
         } }),
         // The needle: a tick spanning the box's full width, rotated by `load`.
         // The angle is a PRIVATE frame scale, so this glyph's degrees can't
@@ -38,7 +38,7 @@ mount(Elicit({
           x2: { frame: 0.85 },
           angle: { field: "load", frame: [-80, 80],
                    edit: rotate({ pivot: "mark", pick: "direct" }) },
-          stroke: { value: "#e15759" },
+          stroke: { value: "#EE7B5E" },
           strokeWidth: { frame: 0.09 },
         } }),
       ],

@@ -16,11 +16,11 @@ mount(Elicit({
     place: { type: "categorical" },
   },
   marks: [
-    geoBasemap({ geojson: vancouver, fill: "#eef2f7", stroke: "#94a3b8", strokeWidth: 0.7 }),
+    geoBasemap({ geojson: vancouver, fill: "#EDF7F8", stroke: "#6F8294", strokeWidth: 0.7 }),
 
     // The connector: lon/lat channels -> one path across the rows, in `stop` order.
     geoLine({
-      stroke: "#b91c1c", strokeWidth: 2, curve: "linear",
+      stroke: "#EE7B5E", strokeWidth: 2, curve: "linear",
       channels: {
         lon: { field: "lon" },
         lat: { field: "lat" },
@@ -31,7 +31,7 @@ mount(Elicit({
 
     // The stops: their own feature, so a drag lands on one dot.
     geoPoint({
-      size: 6, fill: "#b91c1c", stroke: "#fff", strokeWidth: 1.5,
+      size: 6, fill: "#EE7B5E", stroke: "#fff", strokeWidth: 1.5,
       channels: {
         lon: { field: "lon" },
         lat: { field: "lat" },

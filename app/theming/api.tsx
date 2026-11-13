@@ -133,7 +133,7 @@ export const api: ApiEntry[] = [
     name: "themes",
     summary: (
       <>
-        The seventeen <a className="underline" href="/theming/themes">named themes</a>: <code className="inline">default</code>, <code className="inline">survey</code> and <code className="inline">dark</code>, plus fourteen house styles from <a className="underline" href="https://github.com/microsoft/flint-chart">Flint</a>. Each is a partial — pass it (or its name) as <code className="inline">theme</code>, or start from one with <code className="inline">extends</code>.
+        The eighteen <a className="underline" href="/theming/themes">named themes</a>: <code className="inline">default</code>, <code className="inline">survey</code>, <code className="inline">dark</code> and <code className="inline">dd</code>, plus fourteen house styles from <a className="underline" href="https://github.com/microsoft/flint-chart">Flint</a>. Each is a partial — pass it (or its name) as <code className="inline">theme</code>, or start from one with <code className="inline">extends</code>.
       </>
     ),
     signatures: [

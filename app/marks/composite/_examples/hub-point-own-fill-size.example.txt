@@ -25,15 +25,13 @@ mount(Elicit({
         },
       },
       parts: [
-        tickY({ length: 32, stroke: "#94a3b8", strokeWidth: 3 }),
-        tickX({ length: 32, stroke: "#94a3b8", strokeWidth: 3 }),
+        tickY({ length: 32, stroke: "#94A5B3", strokeWidth: 3 }),
+        tickX({ length: 32, stroke: "#94A5B3", strokeWidth: 3 }),
         // Hub: own shape/fill/size; inherits x/y/angle; keeps rotate() (last).
         point({
           shape: "square",
           size: 6,
-          fill: "#fbbf24",
-          stroke: "#92400e",
-          strokeWidth: 1,
+          fill: "#F2B94B",
         }),
       ],
     }),

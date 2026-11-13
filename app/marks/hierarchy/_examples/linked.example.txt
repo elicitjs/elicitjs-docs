@@ -1,0 +1,84 @@
+mount(Elicit({
+  width: 560, height: 360,
+  margins: { top: 20, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["system", "part"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+      links: {
+        directed: true,
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+        },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "front", label: "Frontend", kind: "system", x: 22, y: 55, w: 120, h: 80 },
+      { id: "back", label: "Backend", kind: "system", x: 72, y: 55, w: 120, h: 80 },
+      { id: "ui", label: "UI", kind: "part", x: 22, y: 68, w: 70, h: 26 },
+      { id: "state", label: "State", kind: "part", x: 22, y: 42, w: 70, h: 26 },
+      { id: "api", label: "API", kind: "part", x: 64, y: 68, w: 70, h: 26 },
+      { id: "db", label: "Database", kind: "part", x: 82, y: 42, w: 70, h: 26 },
+      { id: "cache", label: "Cache", kind: "part", x: 48, y: 12, w: 70, h: 26 },
+    ],
+    nesting: [
+      { child: "ui", parent: "front" },
+      { child: "state", parent: "front" },
+      { child: "api", parent: "back" },
+      { child: "db", parent: "back" },
+    ],
+    links: [
+      { source: "ui", target: "state" },
+      { source: "state", target: "api" },
+      { source: "api", target: "db" },
+      { source: "front", target: "back" },
+    ],
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        contains: { fn: (d) => d.kind === "system", padding: 16 },
+        fill: { fn: (d) => (d.kind === "system" ? "#EDF7F8" : "#B2CEE6") },
+        // A dot on each edge while you hover: drag from one to another node.
+        ports: { value: true, edit: edit.network.connect() },
+      },
+    }),
+    link({ stroke: "#20555A", strokeWidth: 1.5, edits: [remove({ when: when.alt })] }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        dy: { fn: (d) => (d.kind === "system" ? -d.h / 2 - 8 : 0) },
+      },
+    }),
+  ],
+}));

@@ -12,7 +12,7 @@ mount(Elicit({
   guides: [guides.crosshair({ format: ".1f" })],
   marks: [
     point({
-      fill: "#e15759", size: 6,
+      fill: "#EE7B5E", size: 6,
       channels: { x: { field: "hours" }, y: { field: "score" } },
       edits: [move({ channels: ["x", "y"] })],
     }),

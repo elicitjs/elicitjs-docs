@@ -9,7 +9,7 @@ mount(Elicit({
   data: [],
   marks: [
     point({
-      size: 7, fill: "#0d9488", stroke: "#0f5c53", strokeWidth: 1,
+      size: 7, fill: "#1B3F60",
       channels: {
         x: { field: "when" }, y: { field: "belief" },
       },

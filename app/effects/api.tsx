@@ -52,9 +52,13 @@ export const api: ApiEntry[] = [
       },
       {
         name: "<state>.outline",
-        type: "false | { color, width, pad, dash, opacity }",
-        default: "accent",
-        desc: "An outline overlay traced around the mark, above every other layer. Handles every node type — circle, rect, line, path and text.",
+        type: "false | { color, darken, fallback, width, pad, dash, opacity }",
+        default: "{ color: 'auto', pad: 0, width: 3 }",
+        desc: (
+          <>
+            An outline overlay traced on the mark&rsquo;s edge, above every other layer. Handles every node type &mdash; circle, rect, line, path and text. <code className="inline">color: &apos;auto&apos;</code> reads the mark&rsquo;s fill (or its stroke, when the fill is missing or near-white) and darkens it by <code className="inline">darken</code> (0.6 hovered, 1.5 selected; negative lightens). <code className="inline">&apos;fill&apos;</code> / <code className="inline">&apos;stroke&apos;</code> pick that paint; a CSS colour fixes it; a function <code className="inline">(color, node) =&gt; string</code> rewrites it. <code className="inline">fallback</code> paints when nothing can be read. <code className="inline">pad</code> moves the trace out from the edge.
+          </>
+        ),
       },
     ],
     returns: (

@@ -1,0 +1,79 @@
+mount(Elicit({
+  width: 560, height: 380,
+  margins: { top: 20, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["group", "person"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "org", label: "Company", kind: "group", x: 40, y: 55, w: 100, h: 60 },
+      { id: "eng", label: "Engineering", kind: "group", x: 25, y: 55, w: 100, h: 60 },
+      { id: "des", label: "Design", kind: "group", x: 60, y: 55, w: 100, h: 60 },
+      { id: "web", label: "Web", kind: "group", x: 25, y: 40, w: 100, h: 60 },
+      { id: "p1", label: "Ana", kind: "person", x: 18, y: 72, w: 56, h: 26 },
+      { id: "p2", label: "Ben", kind: "person", x: 32, y: 72, w: 56, h: 26 },
+      { id: "p3", label: "Cy", kind: "person", x: 18, y: 38, w: 56, h: 26 },
+      { id: "p4", label: "Dee", kind: "person", x: 32, y: 38, w: 56, h: 26 },
+      { id: "p5", label: "Eli", kind: "person", x: 60, y: 60, w: 56, h: 26 },
+      { id: "p6", label: "New hire", kind: "person", x: 88, y: 20, w: 70, h: 26 },
+    ],
+    nesting: [
+      { child: "eng", parent: "org" },
+      { child: "des", parent: "org" },
+      { child: "web", parent: "eng" },
+      { child: "p1", parent: "eng" },
+      { child: "p2", parent: "eng" },
+      { child: "p3", parent: "web" },
+      { child: "p4", parent: "web" },
+      { child: "p5", parent: "des" },
+    ],
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        contains: { fn: (d) => d.kind === "group", padding: 18 },
+        fill: { fn: (d) => (d.kind === "group" ? "#2B5D87" : "#ffffff") },
+        fillOpacity: { fn: (d) => (d.kind === "group" ? 0.12 : 1) },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        // Inside the top padding, so nested groups' names do not collide.
+        dy: { fn: (d) => (d.kind === "group" ? -d.h / 2 + 10 : 0) },
+        dx: { fn: (d) => (d.kind === "group" ? -d.w / 2 + 10 : 0) },
+        textAnchor: { fn: (d) => (d.kind === "group" ? "start" : "middle") },
+      },
+    }),
+  ],
+}));

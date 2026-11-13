@@ -21,11 +21,11 @@ mount(Elicit({
   ],
   marks: [
     tickX({
-      strokeWidth: 2, stroke: "#2563eb",
+      strokeWidth: 2, stroke: "#50AEB7",
       channels: { x: { field: "at", edit: move() } },
     }),
     text({
-      dy: -14, fontSize: 11, fill: "#64748b",
+      dy: -14, fontSize: 11, fill: "#566A7C",
       channels: { x: { field: "at" }, text: { field: "grade" } },
     }),
   ],

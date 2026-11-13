@@ -19,9 +19,9 @@ for (const render of ["region", "gradient", "samples"]) {
     },
     data: belief,
     marks: [
-      trendBand({ render, levels: 6, samples: 80, fill: "#0f766e", stroke: "#0f766e", channels: spreads }),
+      trendBand({ render, levels: 6, samples: 80, fill: "#1B3F60", stroke: "#1B3F60", channels: spreads }),
       // Three renderings of the SAME belief, so all three share one edit set.
-      trend({ stroke: "#0f766e", channels: lineParams }),
+      trend({ stroke: "#1B3F60", channels: lineParams }),
     ],
   }));
 }

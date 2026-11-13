@@ -10,9 +10,9 @@ mount(Elicit({
     n: { type: "quantitative", domain: [0, 60] },
   },
   theme: {
-    ink: "#e11d48",
-    axis: { stroke: "#cbd5e1", labelFill: "#64748b" },
-    grid: { stroke: "#f1f5f9" },
+    ink: "#EE7B5E",
+    axis: { stroke: "#BCC9D4", labelFill: "#6F8294" },
+    grid: { stroke: "#EDF7F8" },
   },
   axes: { x: {}, y: { grid: true } },
   marks: [

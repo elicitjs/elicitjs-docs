@@ -16,7 +16,7 @@ mount(Elicit({
   constraints: [clamp({ min: 0, max: 24, field: "n" })],
   marks: [
     rectY({
-      fill: "#0d9488", fillOpacity: 0.75, stroke: "#0f766e",
+      fill: "#1B3F60", fillOpacity: 0.75,
       channels: {
         x1: { field: "x1" },
         x2: { field: "x2" },

@@ -10,10 +10,11 @@ mount(Elicit({
     n:   { type: "quantitative", domain: [0, 100] },
   },
   // Different weights: `hovered` says which bar a gesture would take, `selected`
-  // says which one you picked. `selected` outranks `hovered`.
+  // says which one you picked. `selected` outranks `hovered`. Both keep the default
+  // `color: "auto"` (a shade of the bar's own colour); `darken` sets how deep.
   effects: {
-    hovered:  { outline: { color: "#94a3b8", width: 2,   pad: 3, opacity: 0.9 } },
-    selected: { outline: { color: "#0f766e", width: 3,   pad: 3, opacity: 1 } },
+    hovered:  { outline: { darken: 0.3, width: 2 } },
+    selected: { outline: { darken: 2, width: 4 } },
     grabbed:  { filter: "brightness(0.85)" },
   },
   marks: [

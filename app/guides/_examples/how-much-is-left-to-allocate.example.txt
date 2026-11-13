@@ -15,7 +15,7 @@ mount(Elicit({
   constraints: [ clamp({ min: 0 }), maintainSum({ total: 100, strategy: "cap" }) ],
   marks: [
     barY({
-      fill: "#7c3aed",
+      fill: "#8A78C0",
       channels: {
         x: { field: "x" },
         y: { field: "y", edit: move() },

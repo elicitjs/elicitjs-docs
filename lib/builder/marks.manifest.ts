@@ -50,7 +50,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'bar', x: 'barX', y: 'barY' },
     buildable: true,
     channels: ['x', 'y'],
-    defaultStyle: { fill: 'steelblue' },
+    defaultStyle: { fill: '#50AEB7' },
   },
   {
     family: 'rect',
@@ -61,7 +61,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'rect', x: 'rectX', y: 'rectY' },
     buildable: true,
     channels: ['x', 'y', 'x1', 'x2', 'y1', 'y2'],
-    defaultStyle: { fill: 'steelblue' },
+    defaultStyle: { fill: '#50AEB7' },
   },
   {
     family: 'waffle',
@@ -73,7 +73,7 @@ export const MARKS: MarkManifestEntry[] = [
     buildable: true,
     channels: ['x', 'y', 'count'],
     defaultOptions: { unit: 1, shape: 'rect', showEmpty: true },
-    defaultStyle: { fill: 'steelblue' },
+    defaultStyle: { fill: '#50AEB7' },
   },
   {
     family: 'dotStack',
@@ -84,7 +84,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'dotStack', x: 'dotStackX', y: 'dotStackY' },
     buildable: true,
     channels: ['x', 'y'],
-    defaultStyle: { fill: 'steelblue', size: 6 },
+    defaultStyle: { fill: '#50AEB7', size: 6 },
   },
 
   // 2. Lines & Areas
@@ -98,7 +98,7 @@ export const MARKS: MarkManifestEntry[] = [
     buildable: true,
     channels: ['x', 'y'],
     supportsSeries: true,
-    defaultStyle: { stroke: 'steelblue', strokeWidth: 2.5 },
+    defaultStyle: { stroke: '#50AEB7', strokeWidth: 2.5 },
   },
   {
     family: 'area',
@@ -110,7 +110,7 @@ export const MARKS: MarkManifestEntry[] = [
     buildable: true,
     channels: ['x', 'y', 'y1', 'y2'],
     supportsSeries: true,
-    defaultStyle: { fill: 'steelblue', opacity: 0.35 },
+    defaultStyle: { fill: '#50AEB7', opacity: 0.35 },
   },
   {
     family: 'curve',
@@ -121,7 +121,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'curveY', x: 'curveX', y: 'curveY' },
     buildable: true,
     channels: ['x', 'y'],
-    defaultStyle: { stroke: 'steelblue', strokeWidth: 2 },
+    defaultStyle: { stroke: '#50AEB7', strokeWidth: 2 },
   },
 
   // 3. Points & Ticks
@@ -134,7 +134,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'point' },
     buildable: true,
     channels: ['x', 'y', 'size', 'fill'],
-    defaultStyle: { fill: 'steelblue', size: 7 },
+    defaultStyle: { fill: '#50AEB7', size: 7 },
   },
   {
     family: 'tick',
@@ -145,7 +145,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'tick', x: 'tickX', y: 'tickY' },
     buildable: true,
     channels: ['x', 'y'],
-    defaultStyle: { stroke: 'steelblue', strokeWidth: 2 },
+    defaultStyle: { stroke: '#50AEB7', strokeWidth: 2 },
   },
   {
     family: 'rule',
@@ -156,7 +156,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'rule', x: 'ruleX', y: 'ruleY' },
     buildable: true,
     channels: ['x', 'y'],
-    defaultStyle: { stroke: '#94a3b8', strokeWidth: 1.5 },
+    defaultStyle: { stroke: '#94A5B3', strokeWidth: 1.5 },
   },
   {
     family: 'symbol',
@@ -192,7 +192,7 @@ export const MARKS: MarkManifestEntry[] = [
     buildable: true,
     channels: ['x', 'y', 'text'],
     defaultOptions: { padding: 8, radius: 6 },
-    defaultStyle: { fill: '#fef08a', stroke: '#eab308' },
+    defaultStyle: { fill: '#F8DDA0', stroke: '#C99128' },
   },
 
   // 5. Polar & Gauges
@@ -217,7 +217,7 @@ export const MARKS: MarkManifestEntry[] = [
     buildable: true,
     channels: ['theta', 'x', 'y'],
     defaultOptions: { orient: 'top', arc: 'semi' },
-    defaultStyle: { fill: '#dc2626' },
+    defaultStyle: { fill: '#EE7B5E' },
   },
   {
     family: 'axisRadial',
@@ -240,7 +240,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'trend' },
     buildable: true,
     channels: ['x', 'y', 'intercept', 'slope'],
-    defaultStyle: { stroke: '#2563eb', strokeWidth: 2.5 },
+    defaultStyle: { stroke: '#2B5D87', strokeWidth: 2.5 },
   },
   {
     family: 'trendBand',
@@ -263,7 +263,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'ellipse' },
     buildable: true,
     channels: ['x', 'y', 'rx', 'ry', 'angle'],
-    defaultStyle: { fill: 'steelblue', opacity: 0.3 },
+    defaultStyle: { fill: '#50AEB7', opacity: 0.3 },
   },
 
   // 7. Composites & Glyphs
@@ -287,7 +287,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'node' },
     buildable: true,
     channels: ['x', 'y', 'text', 'fill', 'size'],
-    defaultStyle: { fill: 'steelblue', size: 12 },
+    defaultStyle: { fill: '#50AEB7', size: 12 },
   },
   {
     family: 'link',
@@ -299,7 +299,7 @@ export const MARKS: MarkManifestEntry[] = [
     buildable: true,
     channels: ['source', 'target', 'stroke', 'strokeWidth'],
     defaultOptions: { curve: 'arc', arrow: 'target' },
-    defaultStyle: { stroke: '#94a3b8', strokeWidth: 2 },
+    defaultStyle: { stroke: '#94A5B3', strokeWidth: 2 },
   },
   {
     family: 'composite',
@@ -322,7 +322,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'geoBasemap' },
     buildable: true,
     channels: [],
-    defaultOptions: { fill: '#f1f5f9', stroke: '#cbd5e1', strokeWidth: 1 },
+    defaultOptions: { fill: '#EEF3F7', stroke: '#D5DFE6', strokeWidth: 1 },
   },
   {
     family: 'geoTile',
@@ -355,7 +355,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'geoLine' },
     buildable: true,
     channels: ['lon', 'lat'],
-    defaultStyle: { stroke: '#dc2626', strokeWidth: 2 },
+    defaultStyle: { stroke: '#EE7B5E', strokeWidth: 2 },
   },
   {
     family: 'geoPolygon',
@@ -366,7 +366,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'geoPolygon' },
     buildable: true,
     channels: ['geometry', 'fill'],
-    defaultStyle: { fill: 'steelblue', opacity: 0.4 },
+    defaultStyle: { fill: '#50AEB7', opacity: 0.4 },
   },
   {
     family: 'geoRect',
@@ -377,7 +377,7 @@ export const MARKS: MarkManifestEntry[] = [
     factoryNames: { auto: 'geoRect' },
     buildable: true,
     channels: ['west', 'south', 'east', 'north'],
-    defaultStyle: { fill: 'steelblue', opacity: 0.2, stroke: 'steelblue' },
+    defaultStyle: { fill: '#50AEB7', opacity: 0.2 },
   },
   {
     family: 'geoText',

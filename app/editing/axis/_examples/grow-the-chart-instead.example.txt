@@ -10,7 +10,7 @@ mount(Elicit({
   marks: [
     axisY(),
     axisX({ title: "x", edit: edit.axis.scale({ mode: "grow" }) }),
-    point({ fill: "#059669", size: 7,
+    point({ fill: "#315228", size: 7,
       channels: { x: { field: "x" }, y: { field: "y" } } }),
   ],
 }))

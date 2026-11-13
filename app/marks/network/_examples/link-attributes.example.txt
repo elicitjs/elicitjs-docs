@@ -43,14 +43,14 @@ mount(Elicit({
       labelBackground: true,
       channels: {
         strokeWidth: { field: "trust", scale: { range: [1, 6] } },
-        stroke: { field: "trust", scale: { scheme: "blues" } },
+        stroke: { field: "trust", scale: { scheme: "ddramp" } },
         text: { field: "note" },
       },
       edits: [editText()],
     }),
     node({
       size: 10,
-      fill: "#1f2937",
+      fill: "#20555A",
       channels: {
         x: { field: "x", edit: move({ channels: ["x", "y"] }) },
         y: { field: "y" },

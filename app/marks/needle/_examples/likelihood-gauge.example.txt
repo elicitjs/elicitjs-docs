@@ -21,11 +21,11 @@ mount(Elicit({
         theta: { field: "chance", scale: { range: [180, 0] } },
         // ColorBrewer RdBu is red→blue; reverse so D (left) is blue and R (right)
         // is red — a proper 7-class diverging categorical palette.
-        fill: { field: "chance", scale: { scheme: "RdBu", reverse: true } },
+        fill: { field: "chance", scale: { scheme: "dddiverging", reverse: true } },
       },
     }),
     needle({
-      length: 95, fill: "#b91c1c",
+      length: 95, fill: "#EE7B5E",
       channels: {
         theta: {
           field: "chance",

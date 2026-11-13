@@ -11,9 +11,9 @@ mount(Elicit({
   },
   marks: [
     areaY({
-      stroke: "#1d4ed8", fillOpacity: 0.9,
+      fillOpacity: 0.9,
       // Offset 0 is the bottom of the area's box, 1 the top.
-      gradient: { stops: [[0, "#eff6ff"], [1, "#3b82f6"]], direction: "vertical" },
+      gradient: { stops: [[0, "#EDF7F8"], [1, "#50AEB7"]], direction: "vertical" },
       channels: {
         x: { field: "t" },
         y: { field: "n", edit: move() },

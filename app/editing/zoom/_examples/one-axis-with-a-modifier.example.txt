@@ -18,7 +18,7 @@ mount(Elicit({
   },
   marks: [
     lineY({
-      stroke: "#0f766e", strokeWidth: 2,
+      stroke: "#1B3F60", strokeWidth: 2,
       channels: {
         x: { field: "month" },
         y: { field: "value", edit: move() },

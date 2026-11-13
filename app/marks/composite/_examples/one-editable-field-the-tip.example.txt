@@ -14,11 +14,11 @@ mount(Elicit({
       id: "lollipop",
       parts: [
         ruleX({
-          stroke: "#94a3b8", strokeWidth: 2,
+          stroke: "#94A5B3", strokeWidth: 2,
           channels: { x: { field: "g" }, y2: { field: "value" } },
         }),
         point({
-          fill: "steelblue", size: 7,
+          fill: "#50AEB7", size: 7,
           channels: {
             x: { field: "g" },
             y: { field: "value", edit: move() },

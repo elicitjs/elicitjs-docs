@@ -23,12 +23,12 @@ mount(Elicit({
   data: [],
   marks: [
     point({
-      size: 7, stroke: "#1f2733", strokeWidth: 1,
+      size: 7,
       channels: {
         x: { field: "age" },
         y: { field: "immigration" },
-        // RdYlGn: low → red (anti), high → green (pro)
-        fill: { field: "immigration", scale: { scheme: "RdYlGn" } },
+        // dddiverging, reversed: low → coral (anti), high → blue (pro)
+        fill: { field: "immigration", scale: { scheme: "dddiverging", reverse: true } },
       },
       edits: [
         create({ gesture: "dblclick" }),

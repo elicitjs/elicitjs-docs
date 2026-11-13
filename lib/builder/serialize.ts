@@ -183,7 +183,7 @@ function effectsLiteral(state: BuilderState): Record<string, unknown> | undefine
   if (effects.hoverOutlineColor || effects.hoverOutlineWidth) {
     out.hovered = {
       outline: {
-        color: effects.hoverOutlineColor || '#2563eb',
+        color: effects.hoverOutlineColor || '#2B5D87',
         width: effects.hoverOutlineWidth || 2,
       },
     };
@@ -191,7 +191,7 @@ function effectsLiteral(state: BuilderState): Record<string, unknown> | undefine
   if (effects.selectedOutlineColor || effects.selectedOutlineWidth) {
     out.selected = {
       outline: {
-        color: effects.selectedOutlineColor || '#ea580c',
+        color: effects.selectedOutlineColor || '#EE7B5E',
         width: effects.selectedOutlineWidth || 3,
       },
     };
@@ -306,7 +306,7 @@ export function buildStandaloneHtml(state: BuilderState): string {
       margin: 0;
       padding: 2rem;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f8fafc;
+      background: #F6F9FB;
       display: flex;
       justify-content: center;
     }

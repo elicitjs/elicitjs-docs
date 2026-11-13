@@ -11,7 +11,7 @@ mount(Elicit({
   ],
   marks: [
     barY({
-      fill: "#4e79a7",
+      fill: "#50AEB7",
       // A tooltip of the row's columns. The bars stay draggable under it.
       tip: true,
       channels: {

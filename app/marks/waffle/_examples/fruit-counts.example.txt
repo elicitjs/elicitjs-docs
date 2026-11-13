@@ -13,7 +13,7 @@ mount(Elicit({
   scales: { x: { type: "band" } },
   marks: [
     waffleY({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       channels: {
         x: { field: "cat" },
         count: { field: "value" },

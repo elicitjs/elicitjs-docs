@@ -15,7 +15,7 @@ mount(Elicit({
   axes: { x: { title: "Month" }, y: { title: "Demand" } },
   marks: [
     lineY({
-      stroke: "#4f46e5", strokeWidth: 3, curve: "catmullRom",
+      stroke: "#50AEB7", strokeWidth: 3, curve: "catmullRom",
       channels: {
         x: { field: "month" },
         y: { field: "demand",

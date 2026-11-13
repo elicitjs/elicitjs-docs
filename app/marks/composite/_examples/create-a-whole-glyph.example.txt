@@ -17,7 +17,7 @@ mount(Elicit({
       parts: [
         // The stem: inert, so it stays pointer-transparent and carries no create.
         ruleX({
-          stroke: "#94a3b8", strokeWidth: 2,
+          stroke: "#94A5B3", strokeWidth: 2,
           channels: { x: { field: "x" }, y2: { field: "value" } },
         }),
         // The tip: the ONE part that owns the create. A plane gesture fans to every
@@ -25,7 +25,7 @@ mount(Elicit({
         // and because both parts read that row, a whole lollipop (stem + tip) appears.
         // dblclick, since a move-drag also lives on this handle.
         point({
-          fill: "steelblue", size: 7,
+          fill: "#50AEB7", size: 7,
           channels: {
             x: { field: "x" },
             y: { field: "value", edit: move() },

@@ -13,7 +13,7 @@ mount(Elicit({
   marks: [
     // The band is a VIEW. It draws the spreads; the handles below write them.
     trendBand({
-      fill: "#7c3aed",
+      fill: "#8A78C0",
       handles: true,
       channels: {
         interceptSpread: { field: "aSd", edit: edit.trend.interceptSpread() },
@@ -21,7 +21,7 @@ mount(Elicit({
       },
     }),
     trend({
-      stroke: "#7c3aed",
+      stroke: "#8A78C0",
       channels: {
         intercept: { field: "intercept", edit: edit.trend.intercept() },
         slope:     { field: "slope",     edit: edit.trend.slope() },

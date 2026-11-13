@@ -26,7 +26,7 @@ const chart = Elicit({
         y: { field: "y" },
         fill: {
           field: "group",
-          scale: { range: ["#2563eb", "#059669", "#d97706"] },
+          scale: { range: ["#50AEB7", "#315228", "#F2B94B"] },
           // A universal value edit: an external picker writes the chosen category.
           edit: set({ name: "category" }),
         },
@@ -62,9 +62,9 @@ pickWrap.append("category", pick);
 // local position to data space and drives the `move` edit live: begin() … set() …
 // end() collapse into ONE undo entry, just like a real drag.
 const pad = document.createElement("div");
-pad.style.cssText = "position:relative;width:120px;height:120px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;touch-action:none;cursor:grab";
+pad.style.cssText = "position:relative;width:120px;height:120px;border:1px solid #BCC9D4;border-radius:8px;background:#F6F9FB;touch-action:none;cursor:grab";
 const knob = document.createElement("div");
-knob.style.cssText = "position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#111827";
+knob.style.cssText = "position:absolute;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#14283A";
 pad.append(knob);
 const placeKnob = () => {
   const d = chart.getData()[i];
@@ -90,7 +90,7 @@ pad.addEventListener("pointerup", stop);
 pad.addEventListener("pointercancel", stop);
 
 const padWrap = document.createElement("div");
-padWrap.style.cssText = "display:flex;flex-direction:column;gap:4px;align-items:center;color:#64748b";
+padWrap.style.cssText = "display:flex;flex-direction:column;gap:4px;align-items:center;color:#6F8294";
 padWrap.append(pad, document.createTextNode("drag to move point 0"));
 
 controls.append(pickWrap, padWrap);

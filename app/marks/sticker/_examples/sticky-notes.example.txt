@@ -4,22 +4,22 @@ mount(Elicit({
   axes: false,
   schema: {
     note: { type: "categorical", open: true },
-    tone: { type: "categorical", domain: ["#fde68a", "#bbf7d0", "#bfdbfe"] },
+    tone: { type: "categorical", domain: ["#EBD6AD", "#C2DEBA", "#EDF7F8"] },
     x: { type: "quantitative", domain: [0, 100] },
     y: { type: "quantitative", domain: [0, 100] },
   },
   data: [
-    { note: "Drag me", tone: "#fde68a", x: 25, y: 75 },
-    { note: "Double-click to rewrite. Long notes wrap and the box grows.", tone: "#bbf7d0", x: 70, y: 45 },
-    { note: "Click empty space for a new one", tone: "#bfdbfe", x: 25, y: 22 },
+    { note: "Drag me", tone: "#EBD6AD", x: 25, y: 75 },
+    { note: "Double-click to rewrite. Long notes wrap and the box grows.", tone: "#C2DEBA", x: 70, y: 45 },
+    { note: "Click empty space for a new one", tone: "#EDF7F8", x: 25, y: 22 },
   ],
   marks: [
     sticker({
-      stroke: "#00000022",
+      stroke: "rgba(70, 89, 107, 0.13)",
       maxWidth: 140,
       edits: [
         editText({ multiline: true }),
-        create({ defaults: { note: "New note", tone: "#fde68a" } }),
+        create({ defaults: { note: "New note", tone: "#EBD6AD" } }),
         remove({ when: when.alt }),
       ],
       channels: {

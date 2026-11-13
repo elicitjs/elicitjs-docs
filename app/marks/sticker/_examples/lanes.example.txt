@@ -16,8 +16,8 @@ mount(Elicit({
   marks: [
     grid({ channel: "x" }),
     sticker({
-      fill: "#e0f2fe",
-      stroke: "#0284c7",
+      fill: "#ECF3F9",
+      stroke: "#1D4467",
       maxWidth: 120,
       edits: [
         editText({ multiline: true }),

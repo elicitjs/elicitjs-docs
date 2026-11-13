@@ -17,7 +17,7 @@ const chart = Elicit({
         y: { value: 90 },
         fill: {
           field: "kind",
-          scale: { range: ["#93c5fd", "#3b82f6", "#1e3a8a"] },
+          scale: { range: ["#B7DEE1", "#50AEB7", "#50AEB7"] },
           // Direct choice — a picker writes exactly this value.
           edit: set({ name: "pick" }),
         },

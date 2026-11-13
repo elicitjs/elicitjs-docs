@@ -15,14 +15,14 @@ const chart = Elicit({
   },
   marks: [
     barY({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       channels: { x: { field: "cat" }, y: { field: "n", edit: move() } },
     }),
   ],
 });
 
 const readout = document.createElement("pre");
-readout.style.cssText = "font-size:12px;margin:8px 0 0;color:#55606c";
+readout.style.cssText = "font-size:12px;margin:8px 0 0;color:#6F8294";
 readout.textContent = chart.getData().map((d) => `${d.cat}: ${d.n}`).join("   ");
 
 mount(chart);

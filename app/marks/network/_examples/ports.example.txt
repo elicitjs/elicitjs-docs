@@ -42,7 +42,7 @@ mount(Elicit({
   marks: [
     link({
       curve: "orthogonal",
-      stroke: "#4e79a7",
+      stroke: "#50AEB7",
       strokeWidth: 2,
       // The columns a connection writes.
       channels: {
@@ -52,8 +52,8 @@ mount(Elicit({
       edits: [edit.network.rewire(), remove({ when: when.alt })],
     }),
     sticker({
-      fill: "#eef2ff",
-      stroke: "#4e79a7",
+      fill: "#EDF7F8",
+      stroke: "#37919B",
       radius: 6,
       maxWidth: 110,
       channels: {

@@ -16,7 +16,7 @@ const chart = Elicit({
   },
   marks: [
     point({
-      fill: "#7c3aed", size: 6,
+      fill: "#8A78C0", size: 6,
       channels: { x: { field: "x" }, y: { field: "y" } },
       edits: [move({ channels: ["x", "y"] })],
     }),
@@ -44,7 +44,7 @@ const addButton = (label, onclick) => {
   const b = document.createElement("button");
   b.textContent = label;
   b.onclick = onclick;
-  b.style.cssText = "padding:4px 10px;border:1px solid #cbd5e1;border-radius:6px;background:#fff;cursor:pointer";
+  b.style.cssText = "padding:4px 10px;border:1px solid #BCC9D4;border-radius:6px;background:#fff;cursor:pointer";
   controls.append(b);
 };
 addButton("Zoom in", () => zoomBy(0.5));

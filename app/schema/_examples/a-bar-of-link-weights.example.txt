@@ -31,7 +31,7 @@ mount(Elicit({
   marks: [
     barY({
       table: "links",
-      fill: "#4e79a7",
+      fill: "#50AEB7",
       channels: {
         x: { field: "source" },
         y: { field: "strength", edit: move({ channels: ["y"] }) },

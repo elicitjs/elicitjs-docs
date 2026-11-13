@@ -22,7 +22,7 @@ const chart = Elicit({
 });
 mount(chart);
 const out = document.createElement("div");
-out.style.cssText = "font:12px ui-monospace,monospace;margin-top:6px;color:#64748b";
+out.style.cssText = "font:12px ui-monospace,monospace;margin-top:6px;color:#6F8294";
 const show = () => {
   const d = chart.getData()[0] || {};
   out.textContent = "intercept " + d.intercept.toFixed(2) +

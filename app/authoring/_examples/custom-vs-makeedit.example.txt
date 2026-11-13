@@ -15,7 +15,7 @@ mount(Elicit({
   },
   marks: [
     point({
-      fill: "#0d9488", size: 9, stroke: "#1f2733", strokeWidth: 1,
+      fill: "#1B3F60", size: 9,
       channels: {
         x: { field: "x", edit: move() },
         y: { field: "y" },

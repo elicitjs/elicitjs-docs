@@ -11,7 +11,7 @@ mount(Elicit({
     label: { type: "categorical", domain: ["drag me", "and me"] },
   },
   marks: [
-    text({ fontSize: 13, fill: "#2563eb",
+    text({ fontSize: 13, fill: "#2A7880",
       channels: {
         x: { field: "x" }, y: { field: "y" },
         text: { field: "label" },

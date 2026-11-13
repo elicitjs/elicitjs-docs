@@ -23,7 +23,7 @@ mount(Elicit({
     // it encodes. Same x/y channels as the needle → one ring per row.
     axisRadial({
       radius: 22, ticks: 0, tickSize: 0, labelOffset: 6, fontSize: 7,
-      start: 180, end: 0, stroke: "#cbd5e1",
+      start: 180, end: 0, stroke: "#BCC9D4",
       channels: {
         x: { field: "g" },
         y: { field: "layer" },

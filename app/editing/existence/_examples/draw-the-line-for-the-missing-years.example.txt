@@ -34,24 +34,24 @@ const chart = mount(Elicit({
   },
   stageLabels: ["draw", "revealed"],
   guides: [
-    guides.region({ x: [1968, 1990], fill: "#94a3b8", opacity: 0.12 }),
+    guides.region({ x: [1968, 1990], fill: "#94A5B3", opacity: 0.12 }),
     guides.custom(({ data, scales }) => [1968, 1990]
       .map((y) => data.find((d) => d.year === y))
       .filter(Boolean)
       .map((d) => ({
         type: "text", text: d3.format(",")(d.deaths),
         x: scales.x.encode(d.year), y: scales.y.encode(d.deaths) - 12,
-        fontSize: 12, textAnchor: "middle", fill: "#0f172a",
+        fontSize: 12, textAnchor: "middle", fill: "#20555A",
       }))),
     guides.custom(({ scales, stage }) => stage < 1 ? [] : [{
-      type: "path", fill: "none", stroke: "#e8833a", strokeWidth: 2.5,
+      type: "path", fill: "none", stroke: "#F2B94B", strokeWidth: 2.5,
       points: truth.map((d) => [scales.x.encode(d.year),
                                 scales.y.encode(d.deaths)]),
     }]),
   ],
   marks: [
     lineY({
-      stroke: "#7f9dc9", strokeWidth: 3, curve: "catmullRom", handleSize: 3,
+      stroke: "#50AEB7", strokeWidth: 3, curve: "catmullRom", handleSize: 3,
       channels: {
         x: { field: "year" },
         y: { field: "deaths" },

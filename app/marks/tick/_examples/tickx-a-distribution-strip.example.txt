@@ -10,7 +10,7 @@ mount(Elicit({
   },
   marks: [
     tickX({
-      stroke: "#0d9488", strokeWidth: 2, inset: 10,
+      stroke: "#1B3F60", strokeWidth: 2, inset: 10,
       channels: {
         x: { field: "v" },
       },

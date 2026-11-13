@@ -12,7 +12,7 @@ mount(Elicit({
           x: { type: "quantitative", domain: [0, 100] },
           y: { type: "quantitative", domain: [0, 100] },
           // The SAME vocabulary is declared on both tables.
-          team: { type: "categorical", domain: ["red", "blue"] },
+          team: { type: "categorical", domain: ["#EE7B5E", "#50AEB7"] },
         },
       },
       ties: {
@@ -20,26 +20,26 @@ mount(Elicit({
         fields: {
           source: { type: "ref" },
           target: { type: "ref" },
-          team: { type: "categorical", domain: ["red", "blue"] },
+          team: { type: "categorical", domain: ["#EE7B5E", "#50AEB7"] },
         },
       },
     },
   },
   data: {
     people: [
-      { id: "a", x: 20, y: 75, team: "red"  },
-      { id: "b", x: 75, y: 78, team: "blue" },
-      { id: "c", x: 48, y: 22, team: "red"  },
+      { id: "a", x: 20, y: 75, team: "#EE7B5E"  },
+      { id: "b", x: 75, y: 78, team: "#50AEB7" },
+      { id: "c", x: 48, y: 22, team: "#EE7B5E"  },
     ],
     ties: [
-      { source: "a", target: "c", team: "red"  },
-      { source: "b", target: "c", team: "blue" },
+      { source: "a", target: "c", team: "#EE7B5E"  },
+      { source: "b", target: "c", team: "#50AEB7" },
     ],
   },
   marks: [
     // One `stroke` scale spans BOTH tables' `team` columns.
     link({ strokeWidth: 3, channels: { stroke: { field: "team" } } }),
-    point({ size: 12, fill: "#fff", strokeWidth: 3, channels: {
+    point({ size: 12, fill: "#fff", channels: {
       x: { field: "x" }, y: { field: "y" }, stroke: { field: "team" },
     } }),
     legendColor({ channel: "stroke", anchor: "right", edit: edit.scale.categories() }),

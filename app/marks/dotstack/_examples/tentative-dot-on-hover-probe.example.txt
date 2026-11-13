@@ -25,7 +25,7 @@ const chart = Elicit({
 });
 mount(chart);
 const out = document.createElement("div");
-out.style.cssText = "font:12px ui-monospace,monospace;color:#64748b";
+out.style.cssText = "font:12px ui-monospace,monospace;color:#6F8294";
 const show = () => { out.textContent = "committed tokens: " + chart.getData().length + " / 20"; };
 chart.on("change", show); show();
 mount(out);

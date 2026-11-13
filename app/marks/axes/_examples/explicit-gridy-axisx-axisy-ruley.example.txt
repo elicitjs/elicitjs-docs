@@ -11,9 +11,9 @@ mount(Elicit({
     gridY({ ticks: 5 }),
     // `datum` is a DATA-space constant: it goes through the y scale, so the
     // line lands where y = 50 is. (`value` would mean 50 pixels.)
-    ruleY({ channels: { y: { datum: 50 } }, stroke: "#e4572e", strokeDash: "4 3" }),
+    ruleY({ channels: { y: { datum: 50 } }, stroke: "#EE7B5E", strokeDash: "4 3" }),
     point({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       size: 8,
       channels: {
         x: { field: "x" },

@@ -10,7 +10,7 @@ mount(Elicit({
   },
   marks: [
     rect({
-      fill: "#7b2d8b", fillOpacity: 0.5, stroke: "#7b2d8b",
+      fill: "#8A78C0", fillOpacity: 0.5,
       channels: {
         x1: { field: "x1" }, x2: { field: "x2" },
         y1: { field: "y1" }, y2: { field: "y2" },

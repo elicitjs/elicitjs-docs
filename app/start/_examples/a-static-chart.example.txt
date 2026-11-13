@@ -14,7 +14,7 @@ mount(Elicit({
   // The MARKS — how the rows are drawn.
   marks: [
     barY({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       channels: { x: { field: "cat" }, y: { field: "n" } },
     }),
   ],

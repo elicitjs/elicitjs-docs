@@ -1,0 +1,79 @@
+mount(Elicit({
+  width: 520, height: 340,
+  margins: { top: 20, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["phase", "task"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "p1", label: "Phase 1 (max 3)", kind: "phase", x: 25, y: 58, w: 130, h: 80 },
+      { id: "p2", label: "Phase 2 (max 3)", kind: "phase", x: 75, y: 58, w: 130, h: 80 },
+      { id: "t1", label: "Scope", kind: "task", x: 18, y: 68, w: 70, h: 26 },
+      { id: "t2", label: "Budget", kind: "task", x: 32, y: 56, w: 70, h: 26 },
+      { id: "t3", label: "Hire", kind: "task", x: 20, y: 44, w: 70, h: 26 },
+      { id: "t4", label: "Launch", kind: "task", x: 75, y: 58, w: 70, h: 26 },
+      { id: "t5", label: "Review", kind: "task", x: 50, y: 12, w: 70, h: 26 },
+    ],
+    nesting: [
+      { child: "t1", parent: "p1" },
+      { child: "t2", parent: "p1" },
+      { child: "t3", parent: "p1" },
+      { child: "t4", parent: "p2" },
+    ],
+  },
+  constraints: [
+    // A rule about the nesting table: no phase holds more than three tasks.
+    constraints.custom(
+      (ctx) => {
+        const counts = {};
+        for (const row of ctx.data) counts[row.parent] = (counts[row.parent] || 0) + 1;
+        return Object.values(counts).every((n) => n <= 3);
+      },
+      { table: "nesting" }
+    ),
+  ],
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        contains: { fn: (d) => d.kind === "phase", padding: 12 },
+        fill: { fn: (d) => (d.kind === "phase" ? "#F9EEEC" : "#F6D5CB") },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#9A3E27",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        dy: { fn: (d) => (d.kind === "phase" ? -d.h / 2 - 8 : 0) },
+      },
+    }),
+  ],
+}));

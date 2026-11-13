@@ -36,13 +36,13 @@ mount(Elicit({
   marks: [
     link({
       inset: 3,
-      stroke: "#94a3b8",
+      stroke: "#94A5B3",
       strokeWidth: 1.5,
       edits: [edit.network.reverse({ when: when.alt })],
     }),
     node({
       size: 10,
-      fill: "#4e79a7",
+      fill: "#50AEB7",
       edits: [edit.network.connect({ when: when.shift })],
       channels: {
         x: { field: "x", edit: move({ channels: ["x", "y"], when: when.noShift }) },

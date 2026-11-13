@@ -1,7 +1,9 @@
 // One chart, drawn under each theme. Only `theme` changes.
-const chart = (theme) => Elicit({
-  width: 320, height: 240, theme,
-  title: theme,
+const chart = (name) => Elicit({
+  width: 320, height: 240,
+  // The dark surface needs light categories; the others keep the site palette.
+  theme: name === "dark" ? { extends: "dark", palette: ["#50AEB7", "#F2B94B"] } : name,
+  title: name,
   subtitle: "Chance of each outcome, %",
   data: [
     { outcome: "Rain", who: "You", p: 40 }, { outcome: "Rain", who: "Experts", p: 55 },
@@ -25,5 +27,5 @@ const chart = (theme) => Elicit({
 });
 const row = document.createElement("div");
 row.style.cssText = "display:flex;flex-wrap:wrap;gap:20px;max-width:680px";
-for (const name of ["default", "survey", "dark"]) row.append(chart(name));
+for (const name of ["dd", "survey", "dark"]) row.append(chart(name));
 mount(row);

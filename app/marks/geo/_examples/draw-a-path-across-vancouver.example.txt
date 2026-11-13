@@ -7,9 +7,9 @@ mount(Elicit({
     coordinates: { type: "categorical" },
   },
   marks: [
-    geoBasemap({ geojson: vancouver, fill: "#e8eef5", stroke: "#64748b", strokeWidth: 0.8 }),
+    geoBasemap({ geojson: vancouver, fill: "#EDF7F8", stroke: "#46596B", strokeWidth: 0.8 }),
     geoLine({
-      stroke: "#b91c1c", strokeWidth: 2.5, showVertices: true, handleSize: 4,
+      stroke: "#EE7B5E", strokeWidth: 2.5, showVertices: true, handleSize: 4,
       channels: {
         coordinates: { field: "coordinates", scale: null },
       },

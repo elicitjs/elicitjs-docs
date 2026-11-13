@@ -13,7 +13,7 @@ const chart = Elicit({
   data: years.map((year) => ({ year, v: 50 })),
   marks: [
     lineY({
-      stroke: "#4f46e5", strokeWidth: 2.5,
+      stroke: "#50AEB7", strokeWidth: 2.5,
       channels: {
         x: { field: "year" },
         y: { field: "v", edit: move({ pick: "sweep", name: "forecast" }) },
@@ -27,7 +27,7 @@ const row = document.createElement("div");
 row.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font:13px system-ui";
 const inputs = years.map((year, i) => {
   const label = document.createElement("label");
-  label.style.cssText = "display:flex;flex-direction:column;gap:2px;color:#64748b";
+  label.style.cssText = "display:flex;flex-direction:column;gap:2px;color:#6F8294";
   label.textContent = year;
   const input = document.createElement("input");
   input.type = "number"; input.min = 0; input.max = 100; input.style.width = "64px";

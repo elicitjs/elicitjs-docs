@@ -12,7 +12,7 @@ const chart = mount(Elicit({
   onChange: (d) => console.log("elicited", d),
   marks: [
     bar({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       channels: {
         x: { field: "cat" },
         y: { field: "n", edit: move() },

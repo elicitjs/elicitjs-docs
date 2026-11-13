@@ -5,10 +5,10 @@ mount(Elicit({
   theme: {
     axis: {
       tickSize: 0, tickPadding: 6,
-      discrete: { line: true, stroke: "#111827" },
+      discrete: { line: true, stroke: "#20555A" },
       continuous: { line: false },
     },
-    grid: { show: "value", strokeDash: "1 3", stroke: "#9ca3af", zero: { stroke: "#111827", strokeWidth: 1.5 } },
+    grid: { show: "value", strokeDash: "1 3", stroke: "#94A5B3", zero: { stroke: "#20555A", strokeWidth: 1.5 } },
   },
   data: [{ q: "Q1", d: 12 }, { q: "Q2", d: -8 }, { q: "Q3", d: 20 }, { q: "Q4", d: 5 }],
   schema: {

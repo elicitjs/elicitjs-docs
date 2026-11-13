@@ -46,7 +46,7 @@ mount(Elicit({
   marks: [
     link({
       curve: "orthogonal",
-      stroke: "#64748b",
+      stroke: "#6F8294",
       strokeWidth: 1.5,
       channels: {
         sourceSide: { field: "fromSide" },
@@ -61,7 +61,7 @@ mount(Elicit({
         x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },
         y: { field: "y" },
         text: { field: "label" },
-        fill: { field: "kind", scale: { range: ["#fef3c7", "#dcfce7"] } },
+        fill: { field: "kind", scale: { range: ["#F9F4EC", "#F0F7EE"] } },
         // An end step takes links in but sends none out.
         ports: {
           fn: (d) => (d.kind === "end" ? { in: ["left"] } : { out: ["right"], in: ["left"] }),

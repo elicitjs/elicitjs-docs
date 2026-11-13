@@ -1,0 +1,283 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import groups from './_examples/groups.example.txt';
+import levels from './_examples/levels.example.txt';
+import anyNode from './_examples/any-node.example.txt';
+import buckets from './_examples/buckets.example.txt';
+import circles from './_examples/circles.example.txt';
+import linked from './_examples/linked.example.txt';
+import rules from './_examples/rules.example.txt';
+import setData from './_examples/set-data.example.txt';
+import namedTables from './_examples/named-tables.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Hierarchy
+
+<Lead>A **hierarchy** is nodes that sit inside each other, declared with `structure: "hierarchy"`. The nodes are one table and each "this is inside that" is a row of a second, `nesting`. Any mark that draws a node shape can draw a container: a `contains` channel says which rows hold others, and `fit: true` on a size channel makes a container follow its contents. `edit.hierarchy.nest` drops a node into a container or out of one.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="schema" title="Declaring the structure">
+
+`structure: "hierarchy"` gives the dataset a `nodes` table and a `nesting` table. A `links` table is optional.
+
+```js
+schema: {
+  structure: "hierarchy",
+  tables: {
+    nodes: {
+      id: { type: "categorical", key: true, open: true },
+      kind: { type: "categorical", domain: ["group", "note"] },
+      x: { type: "quantitative", domain: [0, 100] },
+      y: { type: "quantitative", domain: [0, 100] },
+      w: { type: "quantitative", domain: [0, 600] },
+      h: { type: "quantitative", domain: [0, 400] },
+    },
+    nesting: {
+      child: { type: "ref" },
+      parent: { type: "ref" },
+    },
+  },
+}
+```
+
+`getData()`, `onChange` and `setData` use one array per table. A table you leave out of `data` starts empty.
+
+<Example
+  code={groups}
+  title="Groups and notes"
+  blurb="contains picks the rows that hold others; fit sizes them to their contents."
+  try={(
+    <>
+      <b>Drag</b> a note into a group or out of one. <b>Drag</b> a group to move it with
+      its contents. Watch <code className="inline">nesting</code> and the group&rsquo;s{" "}
+      <code className="inline">w</code>/<code className="inline">h</code> in the data.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="nesting" title="The nesting table">
+
+The nesting table is declared like any other table: a field map, with a type for every column.
+
+It needs two `ref` columns. The first names the contained node and the second names its container. Both point at the nodes table's `key: true` column, so their values are node identities. The column names are yours.
+
+```js
+nesting: {
+  child: { type: "ref" },    // the contained node
+  parent: { type: "ref" },   // its container
+}
+```
+
+One row is one membership. A node with no row is at the top level. A node has one container at most, and is never inside itself or its own contents. A seeded row that breaks either rule is ignored with a warning, and so is a row that names a missing node.
+
+Add any other columns you want to record about a membership. They take a `type`, a `domain` and a `default` like columns anywhere else. A row made by a drop takes each column's `default`, or the value you pass in `edit.hierarchy.nest({ defaults })`.
+
+```js
+nesting: {
+  child: { type: "ref" },
+  parent: { type: "ref" },
+  coder: { type: "categorical", domain: ["seed", "participant"], default: "participant" },
+}
+```
+
+Deleting a node removes the nesting rows that name it. Its contents move to the top level.
+
+</Section>
+
+<Section id="naming" title="Naming the tables">
+
+Name the tables for your data and give each a `role`: `"nodes"`, `"nesting"` or `"links"`. A table named after its role needs no `role`, which is the short form used above.
+
+```js
+tables: {
+  topics:      { role: "nodes",   fields: { … } },
+  memberships: { role: "nesting", fields: { … } },
+}
+```
+
+`data`, `getData()` and `setData` are then keyed `topics` and `memberships`. Marks and edits find each table by its role.
+
+<Example
+  code={namedTables}
+  title="Named tables, and a column on the membership"
+  blurb="topics and memberships, by role. A dropped quote's row takes coder's default."
+  try={(
+    <>
+      <b>Drag</b> the loose quote into a theme and read its{" "}
+      <code className="inline">memberships</code> row: <code className="inline">coder</code>{" "}
+      is <code className="inline">participant</code>, where the seeded rows say{" "}
+      <code className="inline">seed</code>.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="containers" title="Containers">
+
+A container is a row of an ordinary mark. Two statements in the channel map set it up.
+
+`contains` says which rows hold other nodes. `{ value: true }` is every row. `{ fn }` or `{ field }` decides per row, so a chart can let groups receive and notes not.
+
+`fit: true` on a size channel says the column follows the row's contents. It applies to rows that hold other nodes. The channel names a `field`, and the fitted size is written to it.
+
+```js
+rect({
+  channels: {
+    x: { field: "x" },
+    y: { field: "y" },
+    width: { field: "w", scale: null, fit: true },
+    height: { field: "h", scale: null, fit: true },
+    contains: { fn: (d) => d.kind === "group", padding: 12 },
+  },
+})
+```
+
+`scale: null` reads the column as pixels. `padding` is the gap between a container's edge and its contents.
+
+A row with contents has its fitted columns set for it, so a resize edit leaves them alone. A row without contents keeps its own size and stays editable.
+
+Because the size is in the data, other channels can read it. The examples here place a group's name from its `h` column.
+
+<Example
+  code={levels}
+  title="Groups inside groups"
+  blurb="A container is fitted after its contents, at any depth."
+  tall
+  try={(
+    <>
+      <b>Drag</b> a person between teams. <b>Drag</b> the Web team out of Engineering
+      and into Design. Every group it leaves or joins re-fits.
+    </>
+  )}
+/>
+
+<Example
+  code={anyNode}
+  title="Any node can hold others"
+  blurb="contains: { value: true } — drop one node on another to make a group."
+  try={(
+    <>
+      <b>Drag</b> Apple onto Fruit. <b>Click</b> empty space to add a node and{" "}
+      <b>Alt-click</b> one to delete it. Deleting a group releases its contents.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="fixed" title="Fixed containers">
+
+Leave `fit` off and a container keeps the size it was given. Use this for regions that are part of the question: buckets, lanes, zones. Lock them with `lock` so only the cards move.
+
+The answer is the nesting table: one row per card, naming its bucket.
+
+<Example
+  code={buckets}
+  title="Sorting cards into buckets"
+  blurb="No fit: each bucket keeps its size, and nesting records the sort."
+  try={(
+    <>
+      <b>Drag</b> each card into a bucket. A card released outside every bucket has no
+      nesting row.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="shapes" title="Other shapes">
+
+`point`, `ellipse`, `shape` and a `composite` hold other nodes the same way. A round mark fits the circle that encloses its contents. Fit a point through `size`, and an ellipse through `rx` and `ry`.
+
+<Example
+  code={circles}
+  title="Circles"
+  blurb="size: { field, fit: true } — a set's radius encloses its items."
+  try={(
+    <>
+      <b>Drag</b> Penguin into Birds. <b>Drag</b> an item towards a set&rsquo;s edge and
+      the set grows on release.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="gestures" title="Dragging in and out">
+
+`edit.hierarchy.nest()` goes on the mark you drag, beside `move({ mode: "relative" })`. The move carries the node. On release, the node joins the innermost container under the pointer. Released over no container, it leaves the one it was in.
+
+While you drag, the container the node would join is outlined and drawn at the size it would take. The container it came from holds its size until you let go. Style the outline with the `target` state of `effects`.
+
+Moving a container is the same `move`: its contents travel with it.
+
+A rule about which nodes may go where is a constraint on the nesting table. A drop the rule refuses shows no outline and changes nothing.
+
+<Example
+  code={rules}
+  title="A limit on each container"
+  blurb="constraints.custom over the nesting table: three tasks per phase."
+  try={(
+    <>
+      <b>Drag</b> Review into Phase 1: it is full, so nothing lights up. <b>Drag</b> it
+      into Phase 2 instead.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="links" title="Nested and linked">
+
+Add a `links` table and the nodes can be connected as in a [network](/marks/network). `link()` draws the links and meets a container at its edge. A `ports` channel and `edit.network.connect()` work on the same mark.
+
+<Example
+  code={linked}
+  title="Systems and their parts"
+  blurb="A hierarchy with a links table: parts link across group borders."
+  tall
+  try={(
+    <>
+      <b>Hover</b> a box and <b>drag</b> from a dot to another box to link them.{" "}
+      <b>Drag</b> Cache into Backend. <b>Alt-click</b> a link to delete it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="external" title="Reading and setting from outside">
+
+Containment is plain rows, so a program reads and writes it like any other data. `getData()` returns the nesting rows and each container's fitted size.
+
+`setData` takes the same shape. Change the nesting rows and every container re-fits. A node sent with no `x` and `y` is placed inside the container it joins.
+
+```js
+const data = el.getData();
+el.setData({ ...data, nesting: [...data.nesting, { child: "n4", parent: "g2" }] });
+```
+
+<Example
+  code={setData}
+  title="Set from outside"
+  blurb="Each button calls setData with new nesting rows; no sizes are sent."
+  try={(
+    <>
+      <b>Click</b> the buttons, then <b>drag</b> a note. Both write the same tables.
+    </>
+  )}
+/>
+
+</Section>

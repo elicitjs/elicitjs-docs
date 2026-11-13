@@ -20,11 +20,11 @@ mount(Elicit({
       tickSize: 0, labelOffset: 18, fontSize: 8,
       channels: {
         theta: { field: "chance", scale: { range: [180, 0] } },
-        fill: { field: "chance", scale: { scheme: "RdBu", reverse: true } },
+        fill: { field: "chance", scale: { scheme: "dddiverging", reverse: true } },
       },
     }),
     needle({
-      length: 95, fill: "#b91c1c",
+      length: 95, fill: "#EE7B5E",
       channels: {
         theta: {
           field: "chance",

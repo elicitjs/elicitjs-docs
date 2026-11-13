@@ -64,7 +64,7 @@ clear.textContent = "clear";
 clear.onclick = () => chart.clearSelection();
 
 const readout = document.createElement("span");
-readout.style.cssText = "margin-left:auto;color:#6b7280";
+readout.style.cssText = "margin-left:auto;color:#6F8294";
 
 controls.append(itemWrap, catWrap, clear, readout);
 mount(controls);

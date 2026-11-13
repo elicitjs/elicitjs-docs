@@ -10,8 +10,8 @@ mount(Elicit({
   marks: [
     geoBasemap({
       geojson: vancouver,
-      fill: "#e8eef5",
-      stroke: "#64748b",
+      fill: "#EDF7F8",
+      stroke: "#46596B",
       strokeWidth: 0.8,
     }),
   ],

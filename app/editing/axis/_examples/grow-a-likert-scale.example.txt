@@ -13,7 +13,7 @@ mount(Elicit({
   marks: [
     axisY(),
     axisX({ edit: edit.scale.categories({ mode: "grow" }) }),
-    bar({ fill: "#0ea5e9",
+    bar({ fill: "#2B5D87",
       channels: { x: { field: "step" }, y: { field: "n" } } }),
   ],
 }))

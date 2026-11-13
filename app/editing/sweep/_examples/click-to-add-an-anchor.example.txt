@@ -12,7 +12,7 @@ mount(Elicit({
   },
   marks: [
     line({
-      stroke: "#2563eb",
+      stroke: "#50AEB7",
       channels: {
         x: { field: "step" },
         y: { field: "val", edit: move() },

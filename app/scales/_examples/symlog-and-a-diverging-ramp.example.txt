@@ -27,11 +27,11 @@ mount(Elicit({
         // lopsided (-100 vs 1000).
         fill: { field: "delta",
                 scale: { type: "diverging", pivot: 0,
-                         range: ["#b2182b", "#f7f7f7", "#2166ac"] } },
+                         range: ["#EE7B5E", "#EAF0F4", "#50AEB7"] } },
       },
     }),
     // The zero line, through the symlog scale (`datum`, not `value` — `value`
     // would put it 0 pixels from the left edge).
-    ruleX({ channels: { x: { datum: 0 } }, stroke: "#94a3b8", strokeDash: "3 3" }),
+    ruleX({ channels: { x: { datum: 0 } }, stroke: "#94A5B3", strokeDash: "3 3" }),
   ],
 }))

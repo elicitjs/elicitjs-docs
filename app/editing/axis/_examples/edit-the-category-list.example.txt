@@ -14,7 +14,7 @@ mount(Elicit({
   marks: [
     axisY(),
     axisX({ edit: edit.scale.categories() }),
-    bar({ fill: "#2563eb",
+    bar({ fill: "#50AEB7",
       channels: { x: { field: "cat" }, y: { field: "v" } } }),
   ],
 }))

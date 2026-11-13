@@ -64,10 +64,20 @@ paint while the state holds and are removed when it ends. Your data-driven `fill
 and `stroke` are never written. (`filter` and `cursor` are SVG-only — a canvas has no
 element to hover and no per-shape filter. Everything else paints in both renderers.)
 
-**`outline`** draws an overlay around the mark, above every other layer. It takes
-`color`, `width`, `pad`, `dash` and `opacity`, and traces whatever shape the mark
-is: a ring on a circle, a padded ellipse on an ellipse, an inflated box on a rect or
-tick, the path itself on an arc slice or polygon, a ring at the anchor on a label.
+**`outline`** draws an overlay on the mark's edge, above every other layer. It takes
+`color`, `darken`, `fallback`, `width`, `pad`, `dash` and `opacity`, and traces
+whatever shape the mark is: a ring on a circle or ellipse, the box on a rect (with its
+corner radius), the segment on a tick, the path itself on an arc slice, line or
+polygon, a ring at the anchor on a label. `pad` moves the trace out from the edge; it
+is 0 by default.
+
+The outline's colour comes from the mark. With the default `color: "auto"`, it is
+the mark's fill, or its stroke when the fill is missing or near-white, darkened by
+`darken` (0.6 for `hovered`, 1.5 for `selected`; a negative value lightens). A teal bar
+lights up in deep teal and a coral dot in deep coral. `"fill"` or `"stroke"` reads
+that paint only. A CSS colour fixes the outline to that colour. A function
+`(color, node) => string` receives the derived colour and returns the one to paint.
+`fallback` is used when the mark's paint can't be read, such as a gradient fill.
 
 Restyling is the mark's own node, so it follows the mark wherever the mark goes. An
 outline is a separate node, and it copies the mark's rotation to keep up: spin a mark
@@ -100,7 +110,7 @@ field. See [Editing a selected item](/marks/legend#dynamic-target).
 <Example
   code={hoveredThenSelected}
   title="A light hover, a firm selection"
-  blurb="Alt-click selects, so a plain click still drags. Hover stays light; the selection holds."
+  blurb="Alt-click selects, so a plain click still drags. A shallow shade on hover, a deep thick one on selection."
   try={(
     <>
       <b>Alt-click</b> a bar to select it, <b>hover</b> the others, <b>drag</b> any.
@@ -156,10 +166,10 @@ The dots keep the `stroke` you set throughout.
 <Example
   code={restyledFeedback}
   title="Restyled feedback"
-  blurb="Indigo ring, thicker outline, softer grab — paint channels untouched."
+  blurb="A fixed-colour ring padded out from the dot, a thicker selection, a softer grab — paint channels untouched."
   try={(
     <>
-      <b>Move</b> / <b>drag</b> — indigo ring, thicker outline, softer grab.
+      <b>Move</b> / <b>drag</b> — fixed-colour ring, thicker outline, softer grab.
     </>
   )}
 />

@@ -21,7 +21,7 @@ mount(Elicit({
         x:       { field: "region" },
         xOffset: { field: "year", scale: { padding: 0.1 } },
         y:       { field: "sales", edit: move() },
-        fill:    { field: "year", scale: { range: ["#cbd5e1", "#4f46e5"] },
+        fill:    { field: "year", scale: { range: ["#BCC9D4", "#50AEB7"] },
                    legend: { anchor: "top", title: false } },
       },
     }),

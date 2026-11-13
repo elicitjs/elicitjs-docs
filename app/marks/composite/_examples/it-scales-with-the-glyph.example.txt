@@ -28,14 +28,14 @@ mount(Elicit({
         // reaches the box underneath.
         point({ channels: {
           size: { frame: 1 },
-          fill: { value: "#f2f5f9" }, stroke: { value: "#9aa7b4" },
+          fill: { value: "#EDF7F8" }, stroke: { value: "#6F8294" },
         } }),
         // The inner disc is 0..0.8 of the half-size — a FRACTION, so it grows with
         // the glyph and its edit still writes `share` on the same [0, 1] domain.
         point({ channels: {
           size: { field: "share", frame: [0, 0.8],
                   edit: slide({ axis: "y", increase: "up" }) },
-          fill: { value: "#4e79a7" },
+          fill: { value: "#50AEB7" },
         } }),
       ],
     }),

@@ -11,7 +11,7 @@ mount(Elicit({
   },
   marks: [
     areaY({
-      fill: "#2563eb", stroke: "#2563eb",
+      fill: "#50AEB7",
       channels: {
         x: { field: "t" },
         y: { field: "n", edit: move() },

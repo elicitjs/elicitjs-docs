@@ -9,17 +9,17 @@ mount(Elicit({
   marks: [
     // Dashed threshold at x = 50 (data units, through the scale).
     ruleX({
-      stroke: "#94a3b8", strokeWidth: 1.5, strokeDash: "4 3",
+      stroke: "#94A5B3", strokeWidth: 1.5, strokeDash: "4 3",
       channels: { x: { datum: 50 } },
     }),
     point({
-      stroke: "#1f2733", strokeWidth: 1, size: 10,
+      size: 10,
       channels: {
         x: { field: "x", edit: move() },
         y: { field: "y" },
         // Derived channel: computed per datum in VISUAL space (a colour, used
         // as-is). Read-only — the drag lives on x; fill re-derives on commit.
-        fill: { fn: (d) => d.x > 50 ? "#dc2626" : "#2563eb" },
+        fill: { fn: (d) => d.x > 50 ? "#EE7B5E" : "#50AEB7" },
       },
     }),
   ],

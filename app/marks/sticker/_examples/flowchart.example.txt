@@ -42,7 +42,7 @@ mount(Elicit({
   },
   marks: [
     link({
-      stroke: "#94a3b8",
+      stroke: "#94A5B3",
       strokeWidth: 1.5,
       channels: {
         curve: { field: "kind" },
@@ -56,8 +56,8 @@ mount(Elicit({
       ],
     }),
     sticker({
-      fill: "#fef3c7",
-      stroke: "#f59e0b",
+      fill: "#F9F4EC",
+      stroke: "#C99128",
       maxWidth: 130,
       radius: 8,
       edits: [

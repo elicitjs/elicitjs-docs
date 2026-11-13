@@ -22,7 +22,7 @@ mount(Elicit({
         x: { field: "x" },
         y: { field: "y", edit: move({
           pick: "nearest", threshold: 40,
-          guide: { bounds: true, catchment: true, color: "#0f766e" },
+          guide: { bounds: true, catchment: true, color: "#1B3F60" },
         }) },
       },
     }),
@@ -44,10 +44,10 @@ mount(Elicit({
           pick: "nearest", threshold: 40,
           guide: {
             bounds: {
-              color: "#b91c1c", dash: "6 2", width: 1.5, opacity: 1,
+              color: "#EE7B5E", dash: "6 2", width: 1.5, opacity: 1,
               tickLength: 18, tickOpacity: 0.9,
             },
-            catchment: { color: "#94a3b8", dash: "1 4", width: 1, opacity: 0.35 },
+            catchment: { color: "#94A5B3", dash: "1 4", width: 1, opacity: 0.35 },
           },
         }) },
       },

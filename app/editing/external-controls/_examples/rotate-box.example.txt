@@ -18,8 +18,8 @@ const chart = Elicit({
         y: { field: "y" },
         width:  { value: 90 },
         height: { value: 60 },
-        fill: { value: "#6366f1" },
-        stroke: { value: "#3730a3" },
+        fill: { value: "#50AEB7" },
+        stroke: { value: "#37919B" },
         angle: {
           field: "theta",
           scale: { range: [0, 360] },
@@ -48,7 +48,7 @@ cw.textContent = "⟳ +15°";
 cw.onclick = () => spinBy(15);
 
 const readout = document.createElement("span");
-readout.style.cssText = "color:#64748b";
+readout.style.cssText = "color:#6F8294";
 const sync = () => { readout.textContent = Math.round(chart.getData()[0].theta) + "°"; };
 chart.on("change", sync);
 sync();

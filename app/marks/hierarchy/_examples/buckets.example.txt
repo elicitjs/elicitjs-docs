@@ -1,0 +1,67 @@
+mount(Elicit({
+  width: 560, height: 340,
+  margins: { top: 20, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  // The buckets are the question, so they stay where they are.
+  lock: (d, i, table) => table === "nodes" && d.kind === "bucket",
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["bucket", "card"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "must", label: "Must have", kind: "bucket", x: 18, y: 58, w: 150, h: 210 },
+      { id: "should", label: "Should have", kind: "bucket", x: 50, y: 58, w: 150, h: 210 },
+      { id: "wont", label: "Won't have", kind: "bucket", x: 82, y: 58, w: 150, h: 210 },
+      { id: "c1", label: "Offline mode", kind: "card", x: 18, y: 6, w: 96, h: 26 },
+      { id: "c2", label: "Dark theme", kind: "card", x: 39, y: 6, w: 96, h: 26 },
+      { id: "c3", label: "Export PDF", kind: "card", x: 60, y: 6, w: 96, h: 26 },
+      { id: "c4", label: "Comments", kind: "card", x: 81, y: 6, w: 96, h: 26 },
+      { id: "c5", label: "Search", kind: "card", x: 18, y: 70, w: 96, h: 26 },
+    ],
+    nesting: [{ child: "c5", parent: "must" }],
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        // No `fit`: a bucket keeps the size it was given.
+        width: { field: "w", scale: null },
+        height: { field: "h", scale: null },
+        contains: { fn: (d) => d.kind === "bucket" },
+        fill: { fn: (d) => (d.kind === "bucket" ? "#EDF7F8" : "#B7DEE1") },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        dy: { fn: (d) => (d.kind === "bucket" ? -d.h / 2 + 12 : 0) },
+      },
+    }),
+  ],
+}));

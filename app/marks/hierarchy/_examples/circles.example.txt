@@ -1,0 +1,64 @@
+mount(Elicit({
+  width: 480, height: 340,
+  margins: { top: 16, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["set", "item"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        r: { type: "quantitative", domain: [0, 300] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "s1", label: "Mammals", kind: "set", x: 30, y: 55, r: 40 },
+      { id: "s2", label: "Birds", kind: "set", x: 72, y: 55, r: 40 },
+      { id: "i1", label: "Otter", kind: "item", x: 24, y: 62, r: 16 },
+      { id: "i2", label: "Bat", kind: "item", x: 36, y: 48, r: 16 },
+      { id: "i3", label: "Owl", kind: "item", x: 72, y: 55, r: 16 },
+      { id: "i4", label: "Penguin", kind: "item", x: 50, y: 12, r: 16 },
+    ],
+    nesting: [
+      { child: "i1", parent: "s1" },
+      { child: "i2", parent: "s1" },
+      { child: "i3", parent: "s2" },
+    ],
+  },
+  marks: [
+    point({
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        // A set's radius is the circle that encloses its items.
+        size: { field: "r", scale: null, fit: true },
+        contains: { fn: (d) => d.kind === "set", padding: 8 },
+        fill: { fn: (d) => (d.kind === "set" ? "#EDF7F8" : "#C3B9DF") },
+      },
+    }),
+    text({
+      fontSize: 10,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        dy: { fn: (d) => (d.kind === "set" ? -d.r - 8 : 0) },
+      },
+    }),
+  ],
+}));

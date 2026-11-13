@@ -11,7 +11,7 @@ mount(Elicit({
   ],
   marks: [
     point({
-      stroke: "#334155", strokeWidth: 1,
+
       channels: {
         x: { field: "h" },
         y: { field: "weight" },

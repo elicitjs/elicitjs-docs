@@ -26,7 +26,7 @@ mount(Elicit({
         x: { field: "x" },
         y: { field: "y" },
         fill: { field: "source",
-                scale: { range: ["#94a3b8", "#4f46e5"] } },
+                scale: { range: ["#94A5B3", "#50AEB7"] } },
       },
       edits: [
         create({ when: when.noAlt }),     // click empty space -> add

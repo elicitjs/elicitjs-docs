@@ -46,14 +46,14 @@ export const SCALES: ScaleManifestEntry[] = [
   {
     type: 'ordinal', label: 'Ordinal (colour)', group: 'color',
     options: [
-      { name: 'scheme', type: 'string', default: "'tableau10'", desc: "Named categorical scheme ('tableau10', 'category10', 'set2', …)." },
+      { name: 'scheme', type: 'string', default: "'tableau10'", desc: "Named categorical scheme ('tableau10', 'category10', 'set2', 'dd', …)." },
       { name: 'reverse', type: 'boolean', default: 'false', desc: 'Flip the resolved range.' },
     ],
   },
   {
     type: 'sequential', label: 'Sequential (colour)', group: 'color',
     options: [
-      { name: 'scheme', type: 'string', default: "'blues'", desc: "Named sequential ramp ('blues', 'viridis', …)." },
+      { name: 'scheme', type: 'string', default: "'blues'", desc: "Named sequential ramp ('blues', 'viridis', 'ddramp', …)." },
       { name: 'reverse', type: 'boolean', default: 'false', desc: 'Flip the resolved range.' },
     ],
   },

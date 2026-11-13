@@ -13,7 +13,7 @@ mount(Elicit({
   },
   marks: [
     barX({
-      fill: "#2563eb",
+      fill: "#50AEB7",
       channels: {
         y: { field: "person" },
         x1: { field: "start" },

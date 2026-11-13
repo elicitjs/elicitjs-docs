@@ -11,12 +11,12 @@ mount(Elicit({
   },
   marks: [
     lineY({
-      stroke: "#4f46e5", strokeWidth: 2.5, curve: "catmullRom",
+      stroke: "#50AEB7", strokeWidth: 2.5, curve: "catmullRom",
       channels: { x: { field: "t" }, y: { field: "n" } },
     }),
     text({
       fontSize: 11, dy: -10, lineAnchor: "bottom",
-      fill: "#4f46e5", format: ".0f",
+      fill: "#2A7880", format: ".0f",
       channels: {
         x: { field: "t" }, y: { field: "n" },
         text: { field: "n" },

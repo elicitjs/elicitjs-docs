@@ -12,7 +12,7 @@ mount(Elicit({
   marks: [
     dotStackX({
       size: 8,
-      fill: "#0ea5e9",
+      fill: "#2B5D87",
       // The category is on y, so tokens stack along x.
       channels: { y: { field: "bin" } },
       edits: [ create({ gesture: "click", channels: ["y"] }), remove() ],

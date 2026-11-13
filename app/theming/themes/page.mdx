@@ -18,7 +18,7 @@ export default function Layout({ children }) {
 
 # Named themes
 
-<Lead>A **named theme** restyles a whole chart from one word: `theme: "nyt"`. There are seventeen. Fourteen are the house styles of [Flint](https://github.com/microsoft/flint-chart), Microsoft's chart grammar, transcribed from its presets; `default`, `survey` and `dark` are ElicitJS's own. Each is a partial [theme](/theming), so a chart can start from one and change any token.</Lead>
+<Lead>A **named theme** restyles a whole chart from one word: `theme: "nyt"`. There are eighteen. Fourteen are the house styles of [Flint](https://github.com/microsoft/flint-chart), Microsoft's chart grammar, transcribed from its presets; `default`, `survey`, `dark` and `dd` are ElicitJS's own. Each is a partial [theme](/theming), so a chart can start from one and change any token.</Lead>
 
 <Section id="by-name" title="Using a named theme">
 
@@ -102,12 +102,14 @@ A named theme sets the surface, the ink and palettes, the fonts of the labels an
 
 <Section id="own" title="ElicitJS's own">
 
-`default` is the built-in look. `survey` restyles the [survey widgets](/widgets) with an indigo accent and Inter. `dark` paints its own slate surface, so it reads on a dark page with no host CSS.
+`default` is the built-in look. `survey` restyles the [survey widgets](/widgets) with an indigo accent and Inter. `dark` paints its own slate surface, so it reads on a dark page with no host CSS. `dd` is the Data & Dialogue Lab theme: the lab's teal as the ink, its blue for handles and answers, then coral, gold, violet, leaf and rose for categories. Shapes carry no stroke, and a stroke that does appear is the same hue a step darker. Every chart on this site is drawn with it.
+
+The palette is also available as colour schemes: `scheme: "dd"` for categories, `"ddramp"` for a sequential channel and `"dddiverging"` for a diverging one.
 
 <Example
   code={own}
-  title="default · survey · dark"
-  blurb="The library's own three."
+  title="dd · survey · dark"
+  blurb="ElicitJS's own looks, side by side."
   try={"drag a bar."}
 />
 

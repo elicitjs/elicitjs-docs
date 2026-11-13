@@ -12,14 +12,14 @@ mount(Elicit({
   marks: [
     // Both marks read the same rows — neither owns data.
     bar({
-      fill: "#c7d2fe",
+      fill: "#EDF7F8",
       channels: {
         x: { field: "cat" },
         y: { field: "n" },
       },
     }),
     point({
-      fill: "#4f46e5", stroke: "#1f2733", strokeWidth: 1, size: 7,
+      fill: "#50AEB7", size: 7,
       channels: {
         x: { field: "cat" },
         y: { field: "n", edit: move() },

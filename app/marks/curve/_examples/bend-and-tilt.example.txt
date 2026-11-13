@@ -25,7 +25,7 @@ mount(Elicit({
                      edit: slide({ axis: "y", increase: "up" }) },
         angle: { field: "lean", scale: { range: [-45, 45] },
                  edit: slide({ axis: "x", increase: "right" }) },
-        stroke: { value: "#e15759" },
+        stroke: { value: "#EE7B5E" },
         strokeWidth: { value: 3 },
       },
     }),

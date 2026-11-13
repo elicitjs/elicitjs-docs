@@ -13,7 +13,7 @@ mount(Elicit({
   constraints: [clamp({ min: 0 }), maintainSum({ total: 100 })],
   marks: [
     barY({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       channels: { x: { field: "cat" }, y: { field: "n", edit: move() } },
     }),
   ],

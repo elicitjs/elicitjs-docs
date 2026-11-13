@@ -16,7 +16,7 @@ export const GUIDES: GuideManifestEntry[] = [
       { name: 'x', type: 'number', default: '—', desc: 'X position in data units (vertical rule).' },
       { name: 'y', type: 'number', default: '—', desc: 'Y position in data units (horizontal rule).' },
       { name: 'label', type: 'string', default: '—', desc: 'Reference label text (e.g. "Target", "Mean").' },
-      { name: 'stroke', type: 'string', default: "'#64748b'", desc: 'Line colour.' },
+      { name: 'stroke', type: 'string', default: "'#6F8294'", desc: 'Line colour.' },
       { name: 'strokeDash', type: 'string', default: "'5 4'", desc: 'Dash pattern.' },
     ],
   },
@@ -27,7 +27,7 @@ export const GUIDES: GuideManifestEntry[] = [
     options: [
       { name: 'x', type: 'string', default: '—', desc: 'X interval [min, max] comma-separated.' },
       { name: 'y', type: 'string', default: '—', desc: 'Y interval [min, max] comma-separated.' },
-      { name: 'fill', type: 'string', default: "'#64748b'", desc: 'Band fill colour.' },
+      { name: 'fill', type: 'string', default: "'#6F8294'", desc: 'Band fill colour.' },
       { name: 'opacity', type: 'number', default: '0.1', desc: 'Band opacity.' },
     ],
   },

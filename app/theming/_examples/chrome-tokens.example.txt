@@ -3,11 +3,11 @@
 mount(Elicit({
   width: 440, height: 260,
   theme: {
-    panel: { fill: "#ebebeb" },
+    panel: { fill: "#EAF0F4" },
     grid: { stroke: "#ffffff", strokeWidth: 1.2, show: "all" },
-    axis: { line: false, tickSize: 3, stroke: "#333333", labelFill: "#4d4d4d" },
+    axis: { line: false, tickSize: 3, stroke: "#14283A", labelFill: "#46596B" },
     bandPadding: 0.35,
-    ink: "#595959",
+    ink: "#46596B",
   },
   data: [{ cat: "A", n: 30 }, { cat: "B", n: 55 }, { cat: "C", n: 40 }, { cat: "D", n: 22 }],
   schema: {

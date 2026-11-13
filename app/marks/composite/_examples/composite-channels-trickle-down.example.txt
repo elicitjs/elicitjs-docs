@@ -28,9 +28,9 @@ mount(Elicit({
       },
       parts: [
         // Horizontal arm — own stroke/length; inherits x/y/angle (edit stripped).
-        tickY({ length: 28, stroke: "#93c5fd", strokeWidth: 5 }),
+        tickY({ length: 28, stroke: "#B7DEE1", strokeWidth: 5 }),
         // Vertical arm — own stroke; last part keeps the inherited rotate().
-        tickX({ length: 28, stroke: "#1d4ed8", strokeWidth: 5 }),
+        tickX({ length: 28, stroke: "#50AEB7", strokeWidth: 5 }),
       ],
     }),
   ],

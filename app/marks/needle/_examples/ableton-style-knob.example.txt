@@ -16,7 +16,7 @@ function knobArc(options = {}) {
     innerRadius = 78,
     start = START,
     end = END,
-    track = "#1a1a1a",
+    track = "#14283A",
   } = opts;
   return {
     ...authoring.markCommon(opts),
@@ -27,7 +27,7 @@ function knobArc(options = {}) {
       return data.flatMap((d, i) => {
         const deg = authoring.encodeAngle(scales, channels, d, start, i, data);
         const style = authoring.resolveStyle(
-          scales, channels, d, { fill: "#00aebc" }, i, data,
+          scales, channels, d, { fill: "#2B5D87" }, i, data,
         );
         const nodes = [];
         const trackD = authoring.arcPath(cx, cy, outerRadius, start, end, { innerRadius });
@@ -61,7 +61,7 @@ mount(Elicit({
   width: 260, height: 280,
   margins: { top: 40, right: 24, bottom: 44, left: 24 },
   axes: false,
-  theme: { background: "#323232", ink: "#b4b4b4" },
+  theme: { background: "#14283A", ink: "#94A5B3" },
   data: [{ level: 25 }],
   schema: { level: { type: "quantitative", domain: [0, 100] } },
   marks: [
@@ -72,7 +72,7 @@ mount(Elicit({
           fontSize: 13, dy: -108,
           channels: {
             text: { value: "Compress" },
-            fill: { value: "#b4b4b4" },
+            fill: { value: "#94A5B3" },
             textAnchor: { value: "middle" },
             lineAnchor: { value: "middle" },
           },
@@ -80,16 +80,16 @@ mount(Elicit({
         knobArc({
           outerRadius: 88, innerRadius: 76,
           start: START, end: END,
-          track: "#1a1a1a",
+          track: "#14283A",
           channels: {
             theta: { field: "level", scale: { range: [START, END] } },
-            fill: { value: "#00aebc" },
+            fill: { value: "#2B5D87" },
           },
         }),
         needle({
           length: 70, baseWidth: 2.5,
           handles: "hit",
-          fill: "#1a1a1a", stroke: "#1a1a1a",
+          fill: "#14283A", stroke: "#14283A",
           channels: {
             theta: {
               field: "level",
@@ -103,7 +103,7 @@ mount(Elicit({
           format: (v) => `${Math.round(v)} %`,
           channels: {
             text: { field: "level" },
-            fill: { value: "#b4b4b4" },
+            fill: { value: "#94A5B3" },
             textAnchor: { value: "middle" },
             lineAnchor: { value: "middle" },
           },

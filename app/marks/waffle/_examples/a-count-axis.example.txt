@@ -16,7 +16,7 @@ mount(Elicit({
   scales: { x: { type: "band" } },
   marks: [
     waffleY({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       channels: {
         x: { field: "cat" },
         // The magnitude is `count`, on a count axis of its own — not `y`.

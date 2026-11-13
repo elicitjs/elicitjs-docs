@@ -19,7 +19,7 @@ mount(Elicit({
   ],
   marks: [
     point({
-      size: 8, fill: "#2563eb",
+      size: 8, fill: "#50AEB7",
       channels: {
         // A drag on both axes — so both axes take arrow keys, free of charge.
         x: { field: "effort", edit: move() },

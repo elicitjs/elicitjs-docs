@@ -37,14 +37,14 @@ mount(Elicit({
       inset: 3,
       channels: {
         strokeWidth: { field: "strength", scale: { range: [1, 7] } },
-        stroke: { field: "strength", scale: { scheme: "blues" } },
+        stroke: { field: "strength", scale: { scheme: "ddramp" } },
       },
       // A handle at each link's source end, shown when you hover the link.
       edits: [edit.network.rewire({ channels: ["source"] })],
     }),
     node({
       size: 10,
-      fill: "#1f2937",
+      fill: "#20555A",
       channels: {
         x: { field: "x", edit: move({ channels: ["x", "y"] }) },
         y: { field: "y" },

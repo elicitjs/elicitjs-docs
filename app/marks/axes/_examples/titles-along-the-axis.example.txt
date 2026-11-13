@@ -16,7 +16,7 @@ mount(Elicit({
   },
   marks: [
     barX({
-      fill: "#0f766e",
+      fill: "#1B3F60",
       channels: {
         // A band y axis puts domain[0] at the bottom; reverse lists it top-down.
         y: { field: "activity", scale: { reverse: true } },

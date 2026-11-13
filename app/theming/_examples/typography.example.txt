@@ -8,7 +8,7 @@ mount(Elicit({
     font: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
     title: { fontFamily: "Georgia, serif", fontSize: 20 },
     subtitle: { fontStyle: "italic" },
-    axis: { titleFontWeight: "bold", titleFill: "#111827" },
+    axis: { titleFontWeight: "bold", titleFill: "#20555A" },
   },
   axes: { x: false, y: { title: "Confidence (%)" } },
   data: [{ claim: "Claim 1", c: 70 }, { claim: "Claim 2", c: 35 }, { claim: "Claim 3", c: 55 }],

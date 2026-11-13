@@ -11,7 +11,7 @@ mount(Elicit({
   },
   marks: [
     tickY({
-      stroke: "#4f46e5", strokeWidth: 3,
+      stroke: "#50AEB7", strokeWidth: 3,
       channels: {
         x: { field: "x" },
         y: { field: "y" },

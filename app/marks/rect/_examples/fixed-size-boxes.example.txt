@@ -18,7 +18,7 @@ mount(Elicit({
     // and band cells. The anchor stays a positional channel: a drag on x and y
     // inverts the pointer through both scales, so the whole box moves.
     rect({
-      fill: "#2563eb", fillOpacity: 0.8,
+      fill: "#50AEB7", fillOpacity: 0.8,
       channels: {
         x:      { field: "x", edit: edit.move() },
         y:      { field: "y", edit: edit.move() },

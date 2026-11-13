@@ -19,7 +19,7 @@ mount(Elicit({
       handleSize: 6,
       channels: {
         theta: { field: "v" },
-        fill: { field: "cat", scale: { scheme: "tableau10" } },
+        fill: { field: "cat", scale: { scheme: "dd" } },
       },
     }),
   ],

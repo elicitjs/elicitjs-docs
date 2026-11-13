@@ -3,7 +3,7 @@ const radius = 11;
 
 const prompt = (text) => guides.custom(() => [{
   type: "text", x: 0, y: -18, text,
-  textAnchor: "start", fontSize: 13, fill: "#0f172a",
+  textAnchor: "start", fontSize: 13, fill: "#20555A",
 }]);
 
 const optionRings = () => guides.custom((ctx) => {
@@ -16,17 +16,17 @@ const optionRings = () => guides.custom((ctx) => {
       type: "line",
       x1: cxOf(cats[i]) + radius, y1: cy,
       x2: cxOf(cats[i + 1]) - radius, y2: cy,
-      stroke: "#e2e8f0", strokeWidth: 3, background: true,
+      stroke: "#D9E2E9", strokeWidth: 3, background: true,
     });
   }
   for (const c of cats) {
     nodes.push({
       type: "circle", cx: cxOf(c), cy, r: radius,
-      fill: "none", stroke: "#cbd5e1", strokeWidth: 1.5,
+      fill: "none", stroke: "#BCC9D4", strokeWidth: 1.5,
     });
     nodes.push({
       type: "text", x: cxOf(c), y: cy + 30, text: String(c),
-      textAnchor: "middle", fontSize: 12, fill: "#334155",
+      textAnchor: "middle", fontSize: 12, fill: "#20555A",
     });
   }
   return nodes;
@@ -45,7 +45,7 @@ mount(Elicit({
     point({
       id: "likert",
       size: radius - 3,
-      fill: "#2563eb",
+      fill: "#50AEB7",
       channels: { x: { field: "choice" } },
       edits: [ create({ pick: "probe", channels: ["x"], advance: false }) ],
     }),

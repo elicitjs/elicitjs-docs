@@ -5,7 +5,7 @@ mount(Elicit({
   subtitle: "Drag each bar to your estimate",
   caption: "Shares in percent; they need not sum to 100.",
   // Title tokens restyle all three; omitted ones keep their defaults.
-  theme: { title: { fill: "#1e3a8a" }, caption: { fill: "#64748b" } },
+  theme: { title: { fill: "#50AEB7" }, caption: { fill: "#6F8294" } },
   axes: { x: false },
   data: [{ party: "Left", n: 38 }, { party: "Centre", n: 24 }, { party: "Right", n: 33 }],
   schema: {
@@ -14,7 +14,7 @@ mount(Elicit({
   },
   marks: [
     barX({
-      fill: "#2563eb",
+      fill: "#50AEB7",
       channels: {
         y: { field: "party", scale: { reverse: true } },
         x: { field: "n", edit: move() },

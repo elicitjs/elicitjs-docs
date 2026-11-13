@@ -14,7 +14,7 @@ mount(Elicit({
   scales: { y: { type: "band" } },
   marks: [
     waffleX({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       channels: {
         // The category is on y, so the count runs along x.
         y: { field: "cat" },

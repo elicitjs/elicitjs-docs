@@ -44,12 +44,12 @@ mount(Elicit({
     link({
       curve: "orthogonal",
       inset: 4,
-      stroke: "#4e79a7",
+      stroke: "#50AEB7",
       strokeWidth: 2,
     }),
     sticker({
-      fill: "#eef2ff",
-      stroke: "#4e79a7",
+      fill: "#EDF7F8",
+      stroke: "#37919B",
       radius: 6,
       channels: {
         x: { field: "x", edit: move({ channels: ["x", "y"], mode: "relative" }) },

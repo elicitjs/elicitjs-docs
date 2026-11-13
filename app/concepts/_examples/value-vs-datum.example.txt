@@ -11,7 +11,7 @@ mount(Elicit({
   },
   marks: [
     bar({
-      fill: "#c7d2fe",
+      fill: "#EDF7F8",
       channels: {
         x: { field: "cat" },
         y: { field: "n" },
@@ -19,12 +19,12 @@ mount(Elicit({
     }),
     // datum: data units → through the scale (lands where n = 40 is)
     ruleY({
-      stroke: "#4f46e5", strokeWidth: 2,
+      stroke: "#50AEB7", strokeWidth: 2,
       channels: { y: { datum: 40 } },
     }),
     // value: visual units → skips the scale (pixel 28 from the top of the plot)
     ruleY({
-      stroke: "#b45309", strokeWidth: 2, strokeDash: "4 3",
+      stroke: "#F2B94B", strokeWidth: 2, strokeDash: "4 3",
       channels: { y: { value: 28 } },
     }),
   ],

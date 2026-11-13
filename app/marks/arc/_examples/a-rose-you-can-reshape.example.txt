@@ -17,7 +17,7 @@ mount(Elicit({
     arc({
       innerRadius: 12, outerRadius: 120, padAngle: 2,
       start: 112.5, end: -247.5,  // clockwise, N centred at the top
-      fill: "#0d9488", fillOpacity: 0.85, stroke: "white",
+      fill: "#1B3F60", fillOpacity: 0.85,
       channels: {
         theta: { value: 1 },  // equal slices: the value lives on the radius
         // sqrt: a slice's AREA grows with the value, not its radius.

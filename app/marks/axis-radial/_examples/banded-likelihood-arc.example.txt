@@ -18,7 +18,7 @@ mount(Elicit({
       channels: {
         theta: { field: "chance", scale: { range: [180, 0] } },
         // RdBu is red→blue natively; reverse for the D→R (blue→red) reading.
-        fill: { field: "chance", scale: { scheme: "RdBu", reverse: true } },
+        fill: { field: "chance", scale: { scheme: "dddiverging", reverse: true } },
       },
     }),
   ],

@@ -13,7 +13,7 @@ mount(Elicit({
   marks: [
     node({
       size: 9,
-      fill: "#4e79a7",
+      fill: "#50AEB7",
       edits: [create(), remove({ when: when.alt })],
       channels: {
         x: { field: "effort", edit: move({ channels: ["effort", "value"] }) },

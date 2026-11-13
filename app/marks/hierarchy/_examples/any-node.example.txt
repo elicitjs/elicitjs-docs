@@ -1,0 +1,64 @@
+mount(Elicit({
+  width: 480, height: 320,
+  margins: { top: 20, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "a", label: "Fruit", x: 25, y: 70, w: 80, h: 28 },
+      { id: "b", label: "Apple", x: 60, y: 75, w: 80, h: 28 },
+      { id: "c", label: "Pear", x: 75, y: 45, w: 80, h: 28 },
+      { id: "d", label: "Tool", x: 25, y: 25, w: 80, h: 28 },
+      { id: "e", label: "Hammer", x: 60, y: 18, w: 80, h: 28 },
+    ],
+    nesting: [],
+  },
+  marks: [
+    rect({
+      rx: 6,
+      fill: "#E3F1DF",
+      stroke: "#5C9A4B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+        create({ defaults: { label: "New", w: 80, h: 28 } }),
+        remove({ when: when.alt }),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        // Every node may hold others: drop one on another to make a group.
+        contains: { value: true, padding: 14 },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#3A6630",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        // A node that has grown past a single line is a group: name it above.
+        dy: { fn: (d) => (d.h > 30 ? -d.h / 2 - 8 : 0) },
+      },
+    }),
+  ],
+}));

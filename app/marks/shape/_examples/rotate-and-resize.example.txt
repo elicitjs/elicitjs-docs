@@ -19,7 +19,7 @@ mount(Elicit({
   marks: [
     shape({
       path: arrow,
-      fill: "#2563eb",
+      fill: "#50AEB7",
       channels: {
         x: { field: "x" },
         y: { field: "y" },

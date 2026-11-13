@@ -10,8 +10,8 @@ mount(Elicit({
     n: { type: "quantitative", domain: [0, 60] },
   },
   theme: {
-    ink: "#0ea5e9",
-    marks: { point: { fill: "#f59e0b" } },
+    ink: "#2B5D87",
+    marks: { point: { fill: "#F2B94B" } },
   },
   marks: [
     barY({ channels: { x: { field: "cat" }, y: { field: "n" } } }),

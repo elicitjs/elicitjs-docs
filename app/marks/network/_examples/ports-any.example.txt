@@ -45,7 +45,7 @@ mount(Elicit({
   marks: [
     link({
       curve: "bezier",
-      stroke: "#7c3aed",
+      stroke: "#8A78C0",
       strokeWidth: 1.5,
       channels: {
         sourceSide: { field: "fromSide" },
@@ -54,8 +54,8 @@ mount(Elicit({
       edits: [edit.network.rewire(), remove({ when: when.alt })],
     }),
     sticker({
-      fill: "#f5f3ff",
-      stroke: "#7c3aed",
+      fill: "#EDF7F8",
+      stroke: "#6B5AA2",
       radius: 8,
       maxWidth: 120,
       edits: [editText(), create({ defaults: { label: "New idea" } })],

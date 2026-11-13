@@ -53,7 +53,7 @@ mount(Elicit({
   },
   marks: [
     point({
-      fill: "#4f46e5", size: 9, stroke: "#1f2733", strokeWidth: 1,
+      fill: "#50AEB7", size: 9,
       channels: {
         x: { field: "x" },
         y: { field: "y" },

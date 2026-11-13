@@ -17,7 +17,7 @@ mount(Elicit({
   // 3. Draw bars; dragging a bar changes its number
   marks: [
     bar({
-      fill: "#4f46e5",
+      fill: "#50AEB7",
       channels: {
         x: { field: "cat" },
         y: { field: "n", edit: move() },

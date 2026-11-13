@@ -18,7 +18,7 @@ mount(Elicit({
     // `fill` resolves to a sequential colour ramp.
     // `select()` makes a cell the target row, so the legend edits the one you click.
     rect({
-      stroke: "#fff", strokeWidth: 1,
+
       edits: [ edit.select() ],
       channels: {
         x:    { field: "day",  scale: { padding: 0 } },

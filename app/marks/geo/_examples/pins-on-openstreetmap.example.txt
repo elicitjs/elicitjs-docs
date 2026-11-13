@@ -27,7 +27,7 @@ mount(Elicit({
     geoTile(),   // defaults to OSM standard + its attribution
 
     geoPoint({
-      size: 7, fill: "#dc2626", stroke: "#fff", strokeWidth: 2,
+      size: 7, fill: "#EE7B5E", stroke: "#fff", strokeWidth: 2,
       channels: {
         lon: { field: "lon" },
         lat: { field: "lat" },

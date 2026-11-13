@@ -12,7 +12,7 @@ mount(Elicit({
   constraints: [ clamp({ field: "mag", min: 1, max: 14 }) ],
   marks: [
     point({
-      fill: "#ede9fe", stroke: "#7c3aed", strokeWidth: 2,
+      fill: "#8A78C0",
       channels: {
         x: { field: "x" },
         y: { field: "y" },

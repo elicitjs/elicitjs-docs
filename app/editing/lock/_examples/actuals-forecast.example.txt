@@ -20,7 +20,7 @@ mount(Elicit({
         x: { field: "q" },
         y: { field: "n", edit: move({ guide: true }) },
         fill: { field: "kind",
-                scale: { range: ["#94a3b8", "#4f46e5"] } },
+                scale: { range: ["#94A5B3", "#50AEB7"] } },
       },
     }),
   ],

@@ -61,7 +61,7 @@ export function ThemeEffectsEditor({ state, dispatch }: Props) {
             <input
               type="text"
               className="opt-input"
-              placeholder="e.g. steelblue or #3b82f6"
+              placeholder="e.g. steelblue or #50AEB7"
               value={typeof theme.overrides.ink === 'string' ? theme.overrides.ink : ''}
               onChange={(e) =>
                 dispatch({
@@ -77,7 +77,7 @@ export function ThemeEffectsEditor({ state, dispatch }: Props) {
             <input
               type="text"
               className="opt-input"
-              placeholder="e.g. #2563eb"
+              placeholder="e.g. #2B5D87"
               value={typeof theme.overrides.accent === 'string' ? theme.overrides.accent : ''}
               onChange={(e) =>
                 dispatch({
@@ -133,7 +133,7 @@ export function ThemeEffectsEditor({ state, dispatch }: Props) {
             <input
               type="text"
               className="opt-input"
-              placeholder="#2563eb"
+              placeholder="#2B5D87"
               value={effects.hoverOutlineColor || ''}
               onChange={(e) =>
                 dispatch({
@@ -169,7 +169,7 @@ export function ThemeEffectsEditor({ state, dispatch }: Props) {
             <input
               type="text"
               className="opt-input"
-              placeholder="#ea580c"
+              placeholder="#EE7B5E"
               value={effects.selectedOutlineColor || ''}
               onChange={(e) =>
                 dispatch({

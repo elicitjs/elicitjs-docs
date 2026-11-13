@@ -12,7 +12,7 @@ function square(options = {}) {
     yKey: channels.y && channels.y.field,
     build(data, scales, width, height) {
       return data.map((d, i) => {
-        const style = authoring.resolveStyle(scales, channels, d, { fill: "#4f46e5" });
+        const style = authoring.resolveStyle(scales, channels, d, { fill: "#50AEB7" });
         const cx = authoring.encodeChannel(scales, channels, "x", d, width / 2);
         const cy = authoring.encodeChannel(scales, channels, "y", d, height / 2);
         const r = authoring.encodeChannel(scales, channels, "size", d, 8);
@@ -38,7 +38,7 @@ mount(Elicit({
   },
   marks: [
     square({
-      size: 9, stroke: "#1f2733", strokeWidth: 1,
+      size: 9,
       channels: {
         x: { field: "x" },
         y: { field: "y" },

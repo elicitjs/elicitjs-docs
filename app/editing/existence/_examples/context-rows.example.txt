@@ -15,10 +15,10 @@ mount(Elicit({
   ],
   // The record is context: drawn and read-only, but not part of your answer.
   context: (d) => d.year <= 2020,
-  guides: [guides.region({ x: [2010, 2020], fill: "#94a3b8", opacity: 0.12 })],
+  guides: [guides.region({ x: [2010, 2020], fill: "#94A5B3", opacity: 0.12 })],
   marks: [
     lineY({
-      stroke: "#2563eb", strokeWidth: 2,
+      stroke: "#50AEB7", strokeWidth: 2,
       channels: {
         x: { field: "year" },
         y: { field: "rate", edit: move() },

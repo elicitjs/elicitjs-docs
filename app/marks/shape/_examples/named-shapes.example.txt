@@ -14,7 +14,7 @@ mount(Elicit({
   ],
   marks: [
     shape({
-      size: 9, fill: "#0f766e",
+      size: 9, fill: "#1B3F60",
       channels: {
         x: { field: "x" },
         y: { field: "y" },

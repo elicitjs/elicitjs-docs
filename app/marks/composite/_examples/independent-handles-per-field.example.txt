@@ -20,22 +20,22 @@ mount(Elicit({
       parts: [
         // Inert visual: no edit, so the engine makes it pointer-transparent.
         ruleX({
-          stroke: "#64748b", strokeWidth: 1.5,
+          stroke: "#6F8294", strokeWidth: 1.5,
           channels: { x: { field: "g" }, y1: { field: "lo" }, y2: { field: "hi" } },
         }),
         point({
-          fill: "steelblue", size: 6,
+          fill: "#50AEB7", size: 6,
           channels: {
             x: { field: "g" },
             y: { field: "mean", edit: move() },
           },
         }),
         tick({
-          stroke: "#334155", strokeWidth: 2,
+          stroke: "#20555A", strokeWidth: 2,
           channels: { x: { field: "g" }, y: { field: "lo", edit: move() } },
         }),
         tick({
-          stroke: "#334155", strokeWidth: 2,
+          stroke: "#20555A", strokeWidth: 2,
           channels: { x: { field: "g" }, y: { field: "hi", edit: move() } },
         }),
       ],

@@ -21,15 +21,15 @@ const chart = Elicit({
     x: { edits: [edit.axis.zoom({ minSpan: 5 }), edit.axis.pan()] },
   },
   marks: [
-    lineY({ stroke: "#ea580c", strokeWidth: 2, channels: { x: { field: "day" }, y: { field: "high" } } }),
+    lineY({ stroke: "#EE7B5E", strokeWidth: 2, channels: { x: { field: "day" }, y: { field: "high" } } }),
     point({
-      fill: "#ea580c", size: 6,
+      fill: "#EE7B5E", size: 6,
       channels: { x: { field: "day" }, y: { field: "high", edit: move() } },
     }),
     // Pinned 8 px past the plot's right edge, at the latest day's value.
     // `clip: false` lets it draw in the margin.
     text({
-      clip: false, textAnchor: "start", fontSize: 12, fill: "#9a3412",
+      clip: false, textAnchor: "start", fontSize: 12, fill: "#B14A30",
       channels: {
         x: { value: W - margins.left - margins.right + 8 },
         y: { field: "high" },

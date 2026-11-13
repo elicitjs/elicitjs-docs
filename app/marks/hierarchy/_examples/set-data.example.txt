@@ -1,0 +1,96 @@
+const el = Elicit({
+  width: 520, height: 320,
+  margins: { top: 20, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["group", "note"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "g1", label: "Group A", kind: "group", x: 25, y: 55, w: 130, h: 80 },
+      { id: "g2", label: "Group B", kind: "group", x: 75, y: 55, w: 130, h: 80 },
+      { id: "n1", label: "One", kind: "note", x: 20, y: 62, w: 70, h: 26 },
+      { id: "n2", label: "Two", kind: "note", x: 30, y: 46, w: 70, h: 26 },
+    ],
+    nesting: [
+      { child: "n1", parent: "g1" },
+      { child: "n2", parent: "g1" },
+    ],
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        contains: { fn: (d) => d.kind === "group", padding: 12 },
+        fill: { fn: (d) => (d.kind === "group" ? "#EDF7F8" : "#C2DEBA") },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        dy: { fn: (d) => (d.kind === "group" ? -d.h / 2 - 8 : 0) },
+      },
+    }),
+  ],
+});
+mount(el);
+
+// What a program (or a model) does: read the tables, write them back.
+const button = (label, run) => {
+  const b = document.createElement("button");
+  b.textContent = label;
+  b.style.cssText = "margin: 0 6px 8px 0; padding: 4px 10px; font: 12px system-ui; cursor: pointer;";
+  b.onclick = run;
+  return b;
+};
+const toolbar = document.createElement("div");
+let minted = 0;
+toolbar.append(
+  // Re-parent by rewriting the nesting rows. No sizes or positions are sent.
+  button("Move everything to Group B", () => {
+    const data = el.getData();
+    el.setData({
+      ...data,
+      nesting: data.nodes.filter((d) => d.kind === "note").map((d) => ({ child: d.id, parent: "g2" })),
+    });
+  }),
+  // A new node with no x/y: it is placed inside the group it joins.
+  button("Add a note to Group A", () => {
+    const data = el.getData();
+    const id = "new" + ++minted;
+    el.setData({
+      nodes: [...data.nodes, { id, label: "Added " + minted, kind: "note", x: null, y: null, w: 70, h: 26 }],
+      nesting: [...data.nesting, { child: id, parent: "g1" }],
+    });
+  }),
+  button("Ungroup all", () => el.setData({ ...el.getData(), nesting: [] })),
+);
+if (el.parentNode) el.parentNode.insertBefore(toolbar, el);

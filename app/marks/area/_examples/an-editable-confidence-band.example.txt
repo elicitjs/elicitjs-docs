@@ -14,7 +14,7 @@ mount(Elicit({
   constraints: [ ordering({ field: ["lo", "hi"] }) ],
   marks: [
     areaY({
-      fill: "#2563eb", stroke: "#2563eb",
+      fill: "#50AEB7",
       channels: {
         x:  { field: "year" },
         // An endpoint PAIR instead of a single value: fill BETWEEN the two
