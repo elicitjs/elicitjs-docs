@@ -21,6 +21,10 @@ missing features would unlock them.
   interface relates to its original, the elicitation strategies used, the most
   unique interfaces, and suggested improvements. `analysis/ROUND2-interfaces.csv`
   holds the per-interface judgements.
+- **`analysis/ELICITATION-TASKS.md`**: the taxonomy of elicitation types. Every
+  interface is coded by task (what is asked: predict, estimate, fill in,
+  uncertainty, distribution, allocation …), frame, method and interaction.
+  `analysis/ELICITATION-TASKS.csv` holds the per-interface codes.
 
 ## What's in the folder
 

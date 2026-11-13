@@ -1,62 +1,165 @@
 'use client';
 
+import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { ApiEntry, ApiOption } from '../lib/types';
+
+/**
+ * Long tables fold after FOLD_AT rows, but only when that hides at least
+ * MIN_HIDDEN rows — folding away two rows saves nothing and costs a click.
+ * Nothing is removed: folded rows stay in the DOM under hidden="until-found",
+ * so the browser's find-in-page still reaches them and unfolds the table.
+ */
+const FOLD_AT = 10;
+const MIN_HIDDEN = 5;
+
+/** Defaults that mean "no default" — rendered as nothing rather than a dash. */
+const EMPTY_DEFAULTS = new Set(['', '—', '-', '–']);
+
+/**
+ * Insert soft break opportunities into a code string so long union / function
+ * types wrap at their seams (`a | b`, `{ x, y }`, `(ctx) => r`) instead of
+ * forcing the column wide or breaking mid-identifier.
+ */
+function breakable(src: string): ReactNode {
+  const parts = src.split(/(\|\s*|,\s*|=>\s*)/);
+  if (parts.length === 1) return src;
+  return parts.map((p, i) =>
+    /^(\||,|=>)/.test(p) ? (
+      <Fragment key={i}>
+        {p}
+        <wbr />
+      </Fragment>
+    ) : (
+      p
+    ),
+  );
+}
 
 function OptionsTable({
   label,
-  cols,
+  nameCol,
   rows,
-  keys,
+  withDefault,
 }: {
   label: string;
-  cols: string[];
+  nameCol: string;
   rows: ApiOption[];
-  keys: Array<'name' | 'type' | 'default' | 'desc'>;
+  withDefault: boolean;
 }) {
+  const hasType = rows.some((r) => r.type != null);
+  const hasDefault =
+    withDefault && rows.some((r) => r.default != null && !EMPTY_DEFAULTS.has(r.default.trim()));
+  const foldable = rows.length - FOLD_AT >= MIN_HIDDEN;
+  const [open, setOpen] = useState(!foldable);
+  const tableRef = useRef<HTMLTableElement>(null);
+  const folded = foldable && !open;
+
+  // React only emits boolean `hidden`; upgrade it to "until-found" so the
+  // browser's find-in-page can still match (and reveal) folded rows.
+  useLayoutEffect(() => {
+    if (!folded) return;
+    tableRef.current
+      ?.querySelectorAll('[data-fold]')
+      .forEach((el) => el.setAttribute('hidden', 'until-found'));
+  }, [folded]);
+
+  // Find-in-page hit inside a folded row → unfold the whole table.
+  useEffect(() => {
+    const el = tableRef.current;
+    if (!el || !foldable) return;
+    const onMatch = () => setOpen(true);
+    el.addEventListener('beforematch', onMatch);
+    return () => el.removeEventListener('beforematch', onMatch);
+  }, [foldable]);
+
+  // Unfold for print so a printed / PDF'd reference is complete.
+  useEffect(() => {
+    if (!foldable) return;
+    const onPrint = () => setOpen(true);
+    window.addEventListener('beforeprint', onPrint);
+    return () => window.removeEventListener('beforeprint', onPrint);
+  }, [foldable]);
+
+  const collapse = () => {
+    setOpen(false);
+    const top = tableRef.current?.getBoundingClientRect().top ?? 0;
+    if (top < 0) tableRef.current?.scrollIntoView({ block: 'start' });
+  };
+
+  const noun = label === 'Channels' ? 'channels' : 'options';
+
   return (
     <>
-      <div className="api-label">{label}</div>
+      <div className="api-label">
+        {label}
+        {foldable ? <span className="api-label-count">{rows.length}</span> : null}
+      </div>
       <div className="api-table-wrap">
-        <table className="api-table">
+        <table
+          ref={tableRef}
+          className={'api-table api-options' + (folded ? ' is-folded' : '')}
+        >
           <thead>
             <tr>
-              {cols.map((c) => (
-                <th key={c}>{c}</th>
-              ))}
+              <th>{nameCol}</th>
+              {hasType ? <th>{hasDefault ? 'Type · default' : 'Type'}</th> : null}
+              <th>Description</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.name}>
-                {keys.map((key) => {
-                  if (key === 'name') {
-                    return (
-                      <td key={key}>
-                        <code className="api-name">{r.name}</code>
-                      </td>
-                    );
-                  }
-                  if (key === 'type') {
-                    return (
-                      <td key={key}>
-                        {r.type != null ? <code className="api-type">{r.type}</code> : null}
-                      </td>
-                    );
-                  }
-                  if (key === 'default') {
-                    return (
-                      <td key={key}>
-                        {r.default != null ? <code className="api-def">{r.default}</code> : null}
-                      </td>
-                    );
-                  }
-                  return <td key={key}>{r.desc}</td>;
-                })}
-              </tr>
-            ))}
+            {rows.map((r, i) => {
+              const def =
+                withDefault && r.default != null && !EMPTY_DEFAULTS.has(r.default.trim())
+                  ? r.default
+                  : null;
+              const extra = foldable && i >= FOLD_AT;
+              const fold = extra && folded ? { hidden: true, 'data-fold': '' } : {};
+              return (
+                <tr key={r.name} className={extra ? 'api-row-extra' : undefined}>
+                  <td className="api-col-name">
+                    <div {...fold}>
+                      <code className="api-name">{breakable(r.name)}</code>
+                    </div>
+                  </td>
+                  {hasType ? (
+                    <td className="api-col-type">
+                      <div {...fold}>
+                        {r.type != null && !EMPTY_DEFAULTS.has(r.type.trim()) ? (
+                          <code className="api-type">{breakable(r.type)}</code>
+                        ) : null}
+                        {def != null ? (
+                          <span className="api-def-row">
+                            <span className="api-def-label">default</span>
+                            <code className="api-def">{breakable(def)}</code>
+                          </span>
+                        ) : null}
+                      </div>
+                    </td>
+                  ) : null}
+                  <td className="api-col-desc">
+                    <div {...fold}>{r.desc}</div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+      {foldable ? (
+        <button
+          type="button"
+          className="api-fold-toggle"
+          aria-expanded={open}
+          onClick={() => (open ? collapse() : setOpen(true))}
+        >
+          {open
+            ? `Show fewer ${noun}`
+            : `Show all ${rows.length} ${noun} (${rows.length - FOLD_AT} more)`}
+          <span className="api-fold-chevron" aria-hidden="true">
+            {open ? '▴' : '▾'}
+          </span>
+        </button>
+      ) : null}
     </>
   );
 }
@@ -80,19 +183,14 @@ export function ApiReference({ entries }: { entries: ApiEntry[] }) {
               </pre>
             ) : null}
             {entry.options?.length ? (
-              <OptionsTable
-                label="Options"
-                cols={['Option', 'Type', 'Default', 'Description']}
-                rows={entry.options}
-                keys={['name', 'type', 'default', 'desc']}
-              />
+              <OptionsTable label="Options" nameCol="Option" rows={entry.options} withDefault />
             ) : null}
             {entry.channels?.length ? (
               <OptionsTable
                 label="Channels"
-                cols={['Channel', 'Type', 'Description']}
+                nameCol="Channel"
                 rows={entry.channels}
-                keys={['name', 'type', 'desc']}
+                withDefault={false}
               />
             ) : null}
             {entry.returns ? (

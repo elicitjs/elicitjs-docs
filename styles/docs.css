@@ -261,6 +261,101 @@ table.api-table td:first-child, table.api-table th:first-child { padding-left: 0
 code.api-name { font-weight: 600; color: var(--ink); white-space: nowrap; }
 code.api-type { color: var(--accent); white-space: nowrap; }
 code.api-def { color: #b45309; white-space: nowrap; }
+
+/* Options / channels tables. Name and type columns size to their content but
+   are CAPPED (the inline-block max-width bounds the cell's preferred width), so
+   a long union type wraps at its `|` seams instead of crushing the description.
+   The default lives under the type — most rows have none, so a whole column of
+   dashes collapses away. */
+table.api-options { line-height: 1.45; }
+table.api-options td { padding: 0.45rem 1rem 0.45rem 0; }
+table.api-options td:last-child, table.api-options th:last-child { padding-right: 0; }
+table.api-options tbody tr:hover td { background: #f8f9fb; }
+table.api-options .api-col-name code.api-name,
+table.api-options .api-col-type code.api-type,
+table.api-options code.api-def {
+  display: inline-block;
+  /* width:max-content + max-width makes the cell's MIN-content width equal its
+     natural width up to the cap — short types never wrap, long ones wrap at
+     the <wbr> seams once they hit the cap. */
+  width: max-content;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+table.api-options .api-col-name code.api-name { max-width: 11rem; }
+table.api-options .api-col-type { min-width: 6rem; }
+table.api-options .api-col-type code.api-type { max-width: 15rem; }
+table.api-options .api-def-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-top: 0.15rem;
+  max-width: 15rem;
+}
+table.api-options .api-def-label {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #a3acb7;
+  font-weight: 600;
+  flex: none;
+}
+table.api-options .api-col-desc { color: #4a5561; }
+table.api-options .api-col-desc p { margin: 0; }
+
+/* Folding. Folded rows keep their content in the DOM (hidden="until-found");
+   here the row itself collapses to nothing so it takes no height. */
+table.api-options.is-folded tr.api-row-extra td { padding: 0; border: 0; }
+table.api-options.is-folded tbody tr:nth-child(10) td { border-bottom-color: transparent; }
+.api-label-count {
+  margin-left: 0.4rem;
+  font-weight: 600;
+  color: #b4bcc6;
+  font-variant-numeric: tabular-nums;
+}
+.api-fold-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  margin: 0 0 0.4rem;
+  padding: 0.4rem 0.6rem;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: linear-gradient(to bottom, #f8f9fb, #f2f3f7);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.api-fold-toggle:hover { background: #eef0fb; border-color: #c7c9f5; }
+.api-fold-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.api-fold-chevron { font-size: 0.7rem; }
+@media print {
+  .api-fold-toggle { display: none; }
+}
+
+/* Narrow screens: stack each row — name · type on one line, prose beneath. */
+@media (max-width: 720px) {
+  table.api-options thead { display: none; }
+  table.api-options, table.api-options tbody { display: block; }
+  table.api-options tr {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f2f4;
+  }
+  table.api-options td { display: block; padding: 0; border: 0; }
+  table.api-options .api-col-desc { flex-basis: 100%; margin-top: 0.2rem; }
+  table.api-options .api-col-type code.api-type,
+  table.api-options .api-def-row { max-width: none; }
+  table.api-options .api-def-row { display: inline-flex; margin: 0 0 0 0.5rem; }
+  table.api-options.is-folded tr.api-row-extra { padding: 0; border: 0; }
+  table.api-options.is-folded tr.api-row-extra .api-col-desc { margin: 0; }
+}
 table.api-table code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
 table.api-table td code.inline { background: #eef0f3; padding: 0.02rem 0.28rem; border-radius: 4px; }
 .api-returns { color: var(--muted); font-size: 0.88rem; max-width: 78ch; margin: 0.2rem 0 0; }
