@@ -10,6 +10,7 @@ import pickVsCycle from './_examples/pick-vs-cycle.example.txt';
 import faceSliders from './_examples/face-sliders.example.txt';
 import rotateBox from './_examples/rotate-box.example.txt';
 import selectItemOrCategory from './_examples/select-item-or-category.example.txt';
+import inputsBesideASweep from './_examples/inputs-beside-a-sweep.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -75,6 +76,23 @@ Each facial parameter is a channel; bind it to a field with a named `set()` edit
   title="Rotate a box by an icon"
   blurb="Buttons step the angle in data space; the façade forward-encodes to the rotate edit."
   try={"press the rotate buttons, or drag the box itself."}
+/>
+
+</Section>
+
+<Section id="plane" title="Sweep and nearest edits">
+
+`control(name, index)` names its row, so it also drives an edit whose pick only chooses a row: `nearest` and `sweep`. `.set(v)` writes row `index`, whichever row the pointer would have found. An edit that needs a pointer path or position, such as `edit.line.draw()`, a brush or `create()`, logs a warning and writes nothing. Drive those with `el.emit({ type, x, y })` in plot pixels.
+
+<Example
+  code={inputsBesideASweep}
+  title="Type or sweep a forecast"
+  blurb={"One move({ pick: \"sweep\", name: \"forecast\" }) edit takes both the sweep and the inputs."}
+  try={(
+    <>
+      <b>Sweep</b> across the chart, or <b>type</b> a value under a year.
+    </>
+  )}
 />
 
 </Section>

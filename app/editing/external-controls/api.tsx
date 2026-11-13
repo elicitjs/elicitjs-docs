@@ -41,7 +41,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Write a <b>data</b> value. A scalar for a single-channel edit, or a map keyed by channel or field for a multi-channel one. Untouched axes hold their current position rather than teleporting.
+            Write a <b>data</b> value. A scalar for a single-channel edit, or a map keyed by channel or field for a multi-channel one. Untouched axes hold their current position rather than teleporting. Drives a direct edit, or a <code className="inline">nearest</code> or <code className="inline">sweep</code> pick on the control's row. Other plane edits log a warning; use <code className="inline">el.emit</code> for them.
           </>
         ),
       },

@@ -1,0 +1,42 @@
+// A you-draw-it line takes its answer two ways: sweep across the chart, or type
+// a value per year. `move({ pick: "sweep" })` finds the row under the pointer;
+// `control("forecast", i)` names the row itself, so `.set(v)` writes year i.
+const years = [2024, 2025, 2026, 2027, 2028];
+const chart = Elicit({
+  width: 420, height: 240,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  axes: { x: { tickFormat: "d" } },
+  schema: {
+    year: { type: "quantitative", domain: [2024, 2028] },
+    v:    { type: "quantitative", domain: [0, 100] },
+  },
+  data: years.map((year) => ({ year, v: 50 })),
+  marks: [
+    lineY({
+      stroke: "#4f46e5", strokeWidth: 2.5,
+      channels: {
+        x: { field: "year" },
+        y: { field: "v", edit: move({ pick: "sweep", name: "forecast" }) },
+      },
+    }),
+  ],
+});
+mount(chart);
+
+const row = document.createElement("div");
+row.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font:13px system-ui";
+const inputs = years.map((year, i) => {
+  const label = document.createElement("label");
+  label.style.cssText = "display:flex;flex-direction:column;gap:2px;color:#64748b";
+  label.textContent = year;
+  const input = document.createElement("input");
+  input.type = "number"; input.min = 0; input.max = 100; input.style.width = "64px";
+  input.onchange = () => chart.control("forecast", i).set(Number(input.value));
+  label.append(input);
+  row.append(label);
+  return input;
+});
+const sync = () => chart.getData().forEach((d, i) => { inputs[i].value = Math.round(d.v); });
+chart.on("change", sync);
+sync();
+mount(row);
