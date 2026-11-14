@@ -1,0 +1,74 @@
+mount(Elicit({
+  width: 520, height: 340,
+  margins: { top: 16, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["group", "note"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "g1", label: "Research", kind: "group", x: 25, y: 60, w: 130, h: 80 },
+      { id: "g2", label: "Build", kind: "group", x: 62, y: 60, w: 130, h: 80 },
+      { id: "n1", label: "Interviews", kind: "note", x: 25, y: 66, w: 88, h: 28 },
+      { id: "n2", label: "Survey", kind: "note", x: 25, y: 52, w: 88, h: 28 },
+      { id: "n3", label: "Prototype", kind: "note", x: 62, y: 60, w: 88, h: 28 },
+      { id: "n4", label: "Drop me on a note", kind: "note", x: 44, y: 12, w: 120, h: 28 },
+    ],
+    nesting: [
+      { child: "n1", parent: "g1" },
+      { child: "n2", parent: "g1" },
+      { child: "n3", parent: "g2" },
+    ],
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        // A group's size follows its contents; a note keeps its own.
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        // Only groups hold other nodes. The top side leaves room for the name.
+        contains: {
+          fn: (d) => d.kind === "group",
+          padding: { top: 30, right: 12, bottom: 12, left: 12 },
+        },
+        // Overlapping siblings are pushed 10px apart when a drag ends.
+        dodge: { value: true, gap: 10 },
+        fill: { fn: (d) => (d.kind === "group" ? "#EDF7F8" : "#EBD6AD") },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        // A group's name sits in its top padding.
+        dy: { fn: (d) => (d.kind === "group" ? -d.h / 2 + 15 : 0) },
+      },
+    }),
+  ],
+}));

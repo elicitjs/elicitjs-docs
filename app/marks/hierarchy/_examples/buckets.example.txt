@@ -49,7 +49,10 @@ mount(Elicit({
         // No `fit`: a bucket keeps the size it was given.
         width: { field: "w", scale: null },
         height: { field: "h", scale: null },
-        contains: { fn: (d) => d.kind === "bucket" },
+        // Cards stay inside the padding, below the bucket's name.
+        contains: { fn: (d) => d.kind === "bucket", padding: { top: 26 } },
+        // No two cards overlap, and a loose card keeps clear of the buckets.
+        dodge: true,
         fill: { fn: (d) => (d.kind === "bucket" ? "#EDF7F8" : "#B7DEE1") },
       },
     }),

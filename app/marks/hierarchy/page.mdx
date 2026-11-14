@@ -9,6 +9,7 @@ import groups from './_examples/groups.example.txt';
 import levels from './_examples/levels.example.txt';
 import anyNode from './_examples/any-node.example.txt';
 import buckets from './_examples/buckets.example.txt';
+import spacing from './_examples/spacing.example.txt';
 import circles from './_examples/circles.example.txt';
 import linked from './_examples/linked.example.txt';
 import rules from './_examples/rules.example.txt';
@@ -144,7 +145,7 @@ rect({
 })
 ```
 
-`scale: null` reads the column as pixels. `padding` is the gap between a container's edge and its contents.
+`scale: null` reads the column as pixels. `padding` is the room between a container's edge and its contents; see [Padding and spacing](#spacing).
 
 A row with contents has its fitted columns set for it, so a resize edit leaves them alone. A row without contents keeps its own size and stays editable.
 
@@ -177,16 +178,50 @@ Because the size is in the data, other channels can read it. The examples here p
 
 </Section>
 
+<Section id="spacing" title="Padding and spacing">
+
+Every container keeps `padding` between its edge and its contents. The default is 10px. Give one number, or a side each; a side you leave out takes the default.
+
+```js
+contains: { fn: (d) => d.kind === "group", padding: { top: 30, right: 12, bottom: 12, left: 12 } }
+```
+
+A fitted container is sized to leave that room. A container with a size of its own moves its contents inside it.
+
+`dodge` keeps nodes from overlapping. It is a channel like `contains`: `true` is every row, and `{ fn }` or `{ field }` picks the rows that take part. `gap` is the space they keep, 8px by default.
+
+```js
+dodge: { value: true, gap: 10 }
+```
+
+Nodes are compared with their siblings: the contents of one container with each other, and the top-level nodes with each other. When two overlap, the node you just dropped stays put and the other moves the shortest distance that clears it. A container that grows pushes its neighbours the same way, and they take their contents along. A pushed node stays inside its container's padding, or inside the plot at the top level. Where there is no room left, nodes are moved as far apart as the space allows.
+
+Nothing is pushed while you drag. It happens on release, and when data arrives through `setData`. Seeded data is spaced once, at the start. Without `dodge`, nodes stay where they are put.
+
+<Example
+  code={spacing}
+  title="Room for a name, and no overlaps"
+  blurb="padding by side; dodge pushes overlapping siblings apart on release."
+  try={(
+    <>
+      <b>Drop</b> the loose note on top of Interviews: Interviews and Survey make room.{" "}
+      <b>Drag</b> Research onto Build and let go.
+    </>
+  )}
+/>
+
+</Section>
+
 <Section id="fixed" title="Fixed containers">
 
-Leave `fit` off and a container keeps the size it was given. Use this for regions that are part of the question: buckets, lanes, zones. Lock them with `lock` so only the cards move.
+Leave `fit` off and a container keeps the size it was given. Use this for regions that are part of the question: buckets, lanes, zones. Lock them with `lock` so only the cards move. Cards stay inside the bucket's padding, and a locked row is never pushed.
 
 The answer is the nesting table: one row per card, naming its bucket.
 
 <Example
   code={buckets}
   title="Sorting cards into buckets"
-  blurb="No fit: each bucket keeps its size, and nesting records the sort."
+  blurb="No fit: each bucket keeps its size and its cards inside it; nesting records the sort."
   try={(
     <>
       <b>Drag</b> each card into a bucket. A card released outside every bucket has no
@@ -262,7 +297,7 @@ Add a `links` table and the nodes can be connected as in a [network](/marks/netw
 
 Containment is plain rows, so a program reads and writes it like any other data. `getData()` returns the nesting rows and each container's fitted size.
 
-`setData` takes the same shape. Change the nesting rows and every container re-fits. A node sent with no `x` and `y` is placed inside the container it joins.
+`setData` takes the same shape. Change the nesting rows and every container re-fits. A node sent with no `x` and `y` is placed inside the container it joins. With `dodge`, it is also moved clear of the nodes already there.
 
 ```js
 const data = el.getData();

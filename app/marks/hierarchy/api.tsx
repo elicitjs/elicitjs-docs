@@ -63,7 +63,7 @@ export const api: ApiEntry[] = [
         nodes.
       </>
     ),
-    signatures: ["contains: { value | fn | field, padding }"],
+    signatures: ["contains: true | { value | fn | field, padding }"],
     options: [
       {
         name: "value | fn | field",
@@ -79,9 +79,44 @@ export const api: ApiEntry[] = [
       },
       {
         name: "padding",
-        type: "number",
+        type: "number | { top, right, bottom, left }",
         default: "10",
-        desc: <>The gap in px between a fitted container&rsquo;s edge and its contents.</>,
+        desc: (
+          <>
+            The room in px between a container&rsquo;s edge and its contents. A fitted
+            container is sized to leave it. A fixed one keeps its contents inside it.
+          </>
+        ),
+      },
+    ],
+  },
+  {
+    name: "channels.dodge",
+    summary: (
+      <>
+        A channel on the mark that draws the nodes. Rows that take part are pushed clear
+        of their siblings when a drag ends and when data is set from outside.
+      </>
+    ),
+    signatures: ["dodge: true | { value | fn | field, gap }"],
+    options: [
+      {
+        name: "value | fn | field",
+        type: "boolean",
+        default: "—",
+        desc: (
+          <>
+            <code className="inline">true</code> is every row. Use{" "}
+            <code className="inline">fn</code> or <code className="inline">field</code> to
+            pick the rows that take part.
+          </>
+        ),
+      },
+      {
+        name: "gap",
+        type: "number",
+        default: "8",
+        desc: <>The space in px two siblings keep between them.</>,
       },
     ],
   },
