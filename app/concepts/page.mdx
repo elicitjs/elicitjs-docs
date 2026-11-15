@@ -21,15 +21,15 @@ export default function Layout({ children }) {
 # Core concepts
 
 <Lead>
-  The model behind every ElicitJS chart: one dataset, marks that encode it, and
-  edits that write it back.
+  The model behind every elicitation interface: one dataset, marks that encode
+  it, and edits that write it back.
 </Lead>
 
 {/* <ApiReference entries={api} /> */}
 
 <Section id="one-dataset" title="Marks are views over one dataset">
 
-A chart elicits one dataset. Each mark is a _view_ over that dataset: it encodes some fields onto visual channels, and where a channel carries an `edit`, it writes them back. Two marks over the same rows stay in sync — an edit on one commits to the shared data, and the other re-renders from it.
+An elicitation interface elicits one dataset. Each mark is a _view_ over that dataset: it encodes some fields onto visual channels, and where a channel carries an `edit`, it writes them back. Two marks over the same rows stay in sync — an edit on one commits to the shared data, and the other re-renders from it.
 
 <Example
   code={twoMarksOneDataset}
@@ -115,7 +115,7 @@ A derived channel is **read-only**. It is opaque to the edit layer, so it can't 
 
 <Section id="feature-kinds" title="Marks, elements, and guides">
 
-Three kinds of thing draw on a chart, and each **views** something different.
+Three kinds of thing draw on an interface, and each **views** something different.
 
 | Kind | Namespace | Spec key | One node per | Writes |
 | --- | --- | --- | --- | --- |
@@ -125,7 +125,7 @@ Three kinds of thing draw on a chart, and each **views** something different.
 
 A mark draws the data. An element — `axisX`, `gridY`, `legendColor` — draws a scale, so it takes a singular `channel` rather than a `channels` map, and an edit on it reshapes that field's domain. A guide draws the rule and the state: a target line, the range you should stay inside, how much of a budget is left.
 
-A guide is **read-only**. Every guide option takes a literal or a function of the chart context, so `guides.rule({ y: ({ data }) => d3.mean(data, d => d.y) })` follows the rows — but a guide has no `table`, no channels and no `edit`. Note this is not the same as a [derived channel](#derived): a derived channel is per-row and its mark can still be edited, while a guide's expressions run once per chart and never write.
+A guide is **read-only**. Every guide option takes a literal or a function of the chart context, so `guides.rule({ y: ({ data }) => d3.mean(data, d => d.y) })` follows the rows — but a guide has no `table`, no channels and no `edit`. A guide differs from a [derived channel](#derived): a derived channel is per-row and its mark can still be edited, while a guide's expressions run once per render and never write.
 
 `guides.remaining({ field: "y" })` reads its target from a `maintainSum` constraint when you don't pass one, so the total you enforce and the total you show stay the same number.
 

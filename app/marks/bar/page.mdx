@@ -25,13 +25,13 @@ export default function Layout({ children }) {
 
 # Bar
 
-<Lead>A rectangular mark: one axis is a categorical **band** (the position), the other a linear **value** drawn as length from a baseline (or an explicit start/end span via x1/x2 or y1/y2). `bar` auto-detects orientation from which axis is a band; `barY` forces vertical, `barX` horizontal. For rectangles that span **both** axes (heatmap cells, 2-D regions), use `rect` + `brushRect()` instead.</Lead>
+<Lead>`bar` draws one rectangle per row: a categorical **band** on one axis, and a **value** on the other, drawn as length from a baseline or as a span (`x1`/`x2`, `y1`/`y2`). `bar` takes its orientation from the band axis; `barY` forces vertical, `barX` horizontal. For rectangles that span both axes, use [`rect`](/marks/rect) with `brushRect()`.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="basics" title="Band × value">
 
-The band axis slots the bars; the linear axis sets their length from a baseline.
+The band axis places the bars. The linear axis sets their length from a baseline.
 
 <Example
   code={aVerticalBarChart}
@@ -57,7 +57,7 @@ The band axis slots the bars; the linear axis sets their length from a baseline.
 
 <Section id="orientation" title="Horizontal bars (barX)">
 
-Put the band on y and the value on x, and the bars run horizontally. `barX` forces this orientation; `bar` would infer it from the band axis.
+Put the band on `y` and the value on `x`, and the bars run horizontally. `barX` forces this orientation; `bar` infers it from the band axis.
 
 <Example
   code={barxValueOnX}
@@ -69,9 +69,9 @@ Put the band on y and the value on x, and the bars run horizontally. `barX` forc
 
 <Section id="stack" title="Stacked bars">
 
-`stack: true` stacks the bars that share a band: each segment sits on the cumulative total of the ones before it. The stack's grouping is its band — rows with the same `x` (or `y`, for `barX`) stack together — so there's no grouping option to set. Declare a schema domain covering the stacked **total**, not the individual values.
+`stack: true` stacks the bars that share a band. Each segment sits on the cumulative total of the ones before it. Rows with the same `x` (or `y`, for `barX`) stack together. Declare a schema domain that covers the stacked **total**.
 
-Segments are ordered by the mark's series field, so the same category sits at the same height in every band. `stack: true` says only *whether* to stack; **which** rows form a series is the `series` channel's job, and with none it falls back to `fill`'s field (then `stroke`'s). Span mode wins over `stack`: give the value axis `x1`/`x2` or `y1`/`y2` and the bars draw as spans instead.
+Segments are ordered by the mark's series field, so the same category sits at the same height in every band. The `series` channel sets which rows form a series; without it, the field on `fill` (then `stroke`) does. Span mode takes precedence over `stack`: give the value axis `x1`/`x2` or `y1`/`y2` and the bars draw as spans.
 
 <Example
   code={aStackedBarChart}
@@ -83,9 +83,9 @@ Segments are ordered by the mark's series field, so the same category sits at th
 
 <Section id="grouped" title="Grouped bars (xOffset, yOffset)">
 
-`xOffset` splits each `x` category into one sub-band per value of a second field, so the bars of one category sit side by side. `yOffset` does the same inside each `y` category, for grouped `barX`. The offset needs a categorical `x` (or `y`) to divide, and it draws no axis of its own: colour the groups with `fill` on the same field and turn on its legend.
+`xOffset` splits each `x` category into one sub-band per value of a second field, so the bars of one category sit side by side. `yOffset` does the same inside each `y` category, for grouped `barX`. The offset needs a categorical `x` (or `y`) to divide. It has no axis, so colour the groups with `fill` on the same field and turn on its legend.
 
-Sub-bands touch by default, and the gap between categories is the `x` band's padding. `scale: \{ padding \}` on the offset channel opens a gap inside each group. `yOffset` puts its first value at the bottom of the slot, as a band `y` axis does.
+Sub-bands touch by default, and the gap between categories is the `x` band's padding. `scale: { padding }` on the offset channel opens a gap inside each group. `yOffset` puts its first value at the bottom of the slot, as a band `y` axis does.
 
 <Example
   code={groupedBars}
@@ -94,7 +94,7 @@ Sub-bands touch by default, and the gap between categories is the `x` band's pad
   try={<><b>Drag</b> any bar up or down.</>}
 />
 
-A row that names a category but no group draws no bar. Combine `xOffset` with `stack: true` and each sub-band stacks on its own. `create()` and `toggle()` read the group from where you click, and `move(\{ channels: ["x", "xOffset"] \})` drags a bar into another category and group.
+A bar draws only for a row that names both a category and a group. Combine `xOffset` with `stack: true` and each sub-band stacks on its own. `create()` and `toggle()` read the group from where you click, and `move({ channels: ["x", "xOffset"] })` drags a bar into another category and group.
 
 <Example
   code={fillInOneGroup}
@@ -107,15 +107,15 @@ A row that names a category but no group draws no bar. Combine `xOffset` with `s
 
 <Section id="slice" title="Slicing a stack">
 
-A stacked bar divides one total among its rows, so three gestures reshape it — the same three that work on a `pie` or `donut`, which divide a total the same way:
+A stacked bar divides one total among its rows. Three gestures reshape it, the same three that work on a [pie or donut](/marks/arc#slice):
 
 - `edit.stack.cut()` — **click** inside a segment to divide it in two at that point.
 - `edit.stack.edge()` — **drag** a boundary to move value across it. Only the two segments it separates change.
 - `edit.stack.merge()` — **double-click** a boundary to fuse those two back into one.
 
-All three preserve the band's total: cutting divides a magnitude, dragging moves value from one row to its neighbour, merging adds two into one. Boundary handles appear once one of these edits is wired, and follow the shared `handles` / `handleSize` / `handleColor` contract.
+All three preserve the band's total. Cutting divides a magnitude, dragging moves value from one row to its neighbour, and merging adds two into one. Boundary handles appear once one of these edits is set, and take the shared `handles` / `handleSize` / `handleColor` options.
 
-A cut mints a row, and its category comes from the schema's domain — so building a stack takes no typing. A **closed** domain (the default) hands out the values that band doesn't yet use, and refuses the cut once they run out. Each band has its own copy of the vocabulary, so using `bonds` in 2023 doesn't stop 2024 from using it.
+A cut mints a row and takes its category from the schema's domain, so building a stack takes no typing. A **closed** domain (the default) hands out the values that band doesn't yet use, and refuses the cut once they run out. Each band draws from its own copy of the domain, so `bonds` in 2023 and `bonds` in 2024 are both available.
 
 <Example
   code={cutAStackIntoParts}
@@ -137,7 +137,7 @@ Set `open: true` on the field's schema entry and the domain becomes a starting s
 
 <Section id="span" title="Explicit spans (x1/x2, y1/y2)">
 
-Instead of one value drawn from the baseline, give the value axis two explicit endpoints — `x1`/`x2` for `barX`, `y1`/`y2` for `barY` — for a span that doesn't start at zero (a Gantt-style range per category). `x1`/`x2` share the same resolved scale as `x` (likewise `y1`/`y2` with `y`), so only one needs an explicit type/domain.
+Give the value axis two endpoints, `x1`/`x2` for `barX` or `y1`/`y2` for `barY`, and each bar spans from one to the other instead of starting at the baseline. Use it for a range per category, as in a Gantt chart. `x1`/`x2` share the scale of `x` (likewise `y1`/`y2` with `y`), so only one needs an explicit type and domain.
 
 <Example
   code={yearsActivePerPerson}
@@ -156,7 +156,7 @@ Instead of one value drawn from the baseline, give the value axis two explicit e
 
 <Section id="editing" title="Editing bars">
 
-Put `edit: move()` on the value channel and a bar drags to rewrite its value. Thin bars are easier to grab with `pick: "nearest"` — grab from anywhere in the column. A bar dragged to the baseline collapses to zero length but stays grabbable: it keeps a minimum grab target there, with either pick mode, so you can always drag it back up.
+Put `edit: move()` on the value channel and drag a bar to rewrite its value. With `pick: "nearest"`, you grab a bar from anywhere in its column, which helps with thin bars. A bar dragged to the baseline collapses to zero length but keeps a minimum grab target, with either pick mode, so you can drag it back up.
 
 <Example
   code={dragAValue}

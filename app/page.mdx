@@ -21,9 +21,9 @@ export default function Layout({ children }) {
 # ElicitJS
 
 <div className="hero-tag">
-  A declarative library for visual <b>belief elicitation</b>. Build a chart people
-  fill in: they drag a bar, place a point or turn a dial, and you get structured
-  data back.
+  A declarative library for <b>visual elicitation</b>. Build an elicitation
+  interface from charts: people drag a bar, place a point or turn a dial, and you
+  get structured data back.
 </div>
 
 <div className="hero-actions">
@@ -88,7 +88,7 @@ Use a line chart when you want someone to draw a path. Drag across the chart to 
 <Example
   code={drawAForecast}
   title="Draw the trend you expect"
-  blurb="Sketch the line with your mouse — like drawing a forecast by hand."
+  blurb="Drag across the chart to draw the line."
   try={
     <>
       <b>Drag</b> left-to-right across the chart to reshape the line.
@@ -100,12 +100,12 @@ Use a line chart when you want someone to draw a path. Drag across the chart to 
 
 <Section id="needle" title="How likely is Candidate D to win?" codeMode="collapsed">
 
-Use a needle dial for a single choice on a scale — from “very likely D” to “very likely R.” Drag the needle to answer.
+Use a needle dial for a single value on a scale, from “very likely D” to “very likely R.” Drag the needle to answer.
 
 <Example
   code={likelihoodNeedle}
   title="Likelihood gauge"
-  blurb="A dial you can turn — drag the needle to pick how likely something feels."
+  blurb="Drag the needle to set how likely you think the outcome is."
   try={
     <>
       <b>Drag</b> the needle left or right.
@@ -156,7 +156,7 @@ The New York Times' “You Draw It” format: 1968–1990 is historical record (
 <Example
   code={drawTheLineForTheMissingYears}
   title="Draw the missing years"
-  blurb="Drag across the empty space to draw 1991–2016, then advance to reveal the truth."
+  blurb="Drag across the empty space to draw 1991–2016, then advance to reveal the actual data."
   try={
     <>
       <b>Drag</b> left-to-right to draw the missing years · then press <b>Show me how I did</b>.
@@ -166,14 +166,14 @@ The New York Times' “You Draw It” format: 1968–1990 is historical record (
 
 </Section>
 
-<Section id="anatomy" title="How a chart is built" codeMode="readonly">
+<Section id="anatomy" title="How an interface is built" codeMode="readonly">
 
-Under the hood it’s a short recipe: starting data, what each field means, and a chart type with dragging turned on. The panel on the right is the answer you collect.
+An elicitation interface is built through a declarative spec: starting data, a schema that says what each field means, and marks with edits on them. The panel on the right is the data you collect.
 
 <Example
   code={howAChartIsBuilt}
   title="One editable bar chart"
-  blurb="The chart on the left and the numbers on the right are the same thing — drag a bar and watch the data update."
+  blurb="The chart on the left draws the data on the right. Drag a bar and the data updates."
   try={
     <>
       <b>Drag</b> a bar — the panel on the right is what your app would read.

@@ -3,7 +3,7 @@ function square(options = {}) {
   const opts = authoring.normalizeMarkOptions(options, { mark: "square", allow: [] });
   const { channels = {} } = opts;
   return {
-    // id / edits / constraints / table, passed through verbatim.
+    // id / edits / table / tip / clip, passed through verbatim.
     ...authoring.markCommon(opts),
     type: "square",
     channels,

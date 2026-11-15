@@ -16,13 +16,13 @@ export default function Layout({ children }) {
 
 # Area
 
-<Lead>A filled path under a series — the distributional sibling of `line`. Same grouping / ordering knobs; optional handles so sweep and drag reuse the line edit machinery. `areaY` fills to the y baseline; `areaX` to the x baseline. Declare an endpoint **pair** instead (`y1` + `y2`) and it fills **between** them rather than down to the baseline — an **uncertainty band**, editable by both edges.</Lead>
+<Lead>`area` fills the region under a series. It groups and orders rows as [`line`](/marks/line) does, and takes the same handles, drags and sweeps. `areaY` fills to the `y` baseline, `areaX` to the `x` baseline. Give the value axis an endpoint pair (`y1` + `y2`) and it fills between them instead, as an **uncertainty band** you edit by both edges.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="basics" title="Filled series">
 
-Drag handles to reshape the belief curve. Each handle is filled with the area's colour. Handles draw only when the area carries an edit.
+Drag a handle to reshape the curve. Each handle takes the area's colour. By default, handles draw only when the area carries an edit; `handles: true` draws them without one.
 
 <Example
   code={editableArea}
@@ -39,12 +39,12 @@ Drag handles to reshape the belief curve. Each handle is filled with the area's 
 
 <Section id="hit" title="Invisible handles">
 
-`handles: 'hit'` keeps the grab targets without drawing the circles — the shared contract with `line` and `arc`. `false` is neither drawn nor grabbable, so a sweep or nearest pick has nothing to target and the chart warns.
+`handles: 'hit'` keeps the handles grabbable but invisible, as on `line` and `arc`. `handles: false` removes them entirely; a sweep or nearest pick then has nothing to target and logs a warning.
 
 <Example
   code={hitHandles}
   title="handles: 'hit'"
-  blurb="Same area as Basics; the grips are invisible but still dragable."
+  blurb="Same area as above; the handles are invisible but still draggable."
   try={(
     <>
       <b>Drag</b> along the upper edge where a handle would sit.
@@ -56,7 +56,7 @@ Drag handles to reshape the belief curve. Each handle is filled with the area's 
 
 <Section id="gradient" title="Gradient fill">
 
-`gradient: { stops, direction }` paints the area with a linear gradient instead of a flat `fill`. Each stop is `[offset, colour]`, with `offset` from 0 to 1 across the area's own box. `direction: 'vertical'` (the default) runs from bottom (0) to top (1); `'horizontal'` runs left to right. `bar` and `rect` take the same option.
+`gradient: { stops, direction }` fills the area with a linear gradient instead of a flat `fill`. Each stop is `[offset, colour]`, with `offset` from 0 to 1 across the area's own box. `direction: 'vertical'` (the default) runs from bottom (0) to top (1); `'horizontal'` runs left to right. `bar` and `rect` take the same option.
 
 <Example
   code={aGradientFill}
@@ -73,7 +73,7 @@ Drag handles to reshape the belief curve. Each handle is filled with the area's 
 
 <Section id="band" title="Uncertainty band">
 
-Give the value axis an endpoint **pair** and the area fills between them — the shape of a confidence interval or a fan chart. Both edges get handles, so the interval is elicited by dragging its ends. Pair it with [ordering](/constraints#ordering) so the band cannot be turned inside-out: drag the low edge above the high one and the high edge is carried along, because the edge you grabbed is the one you meant.
+Give the value axis an endpoint pair and the area fills between them, as in a confidence interval or a fan chart. Both edges get handles, so you set the interval by dragging its ends. Add the [ordering](/constraints#ordering) constraint to keep the band the right way up: drag the low edge above the high one and the high edge moves with it, since the edge you grabbed is the one you meant.
 
 <Example
   code={anEditableConfidenceBand}
@@ -86,6 +86,6 @@ Give the value axis an endpoint **pair** and the area fills between them — the
   )}
 />
 
-A row whose value is `null`, `undefined` or `NaN` breaks the area or band there, as it breaks a [line](/marks/line#gaps), and gets no handle. To repaint one edge in a single drag, put `edit.line.sweep()` on `y1` and `y2`; see [Sweeping a band](/editing/sweep#band).
+A row whose value is `null`, `undefined` or `NaN` breaks the area or band there, as on a [line](/marks/line#gaps), and has no handle. To repaint one edge in a single drag, put `edit.line.sweep()` on `y1` and `y2`; see [Sweeping a band](/editing/sweep#band).
 
 </Section>

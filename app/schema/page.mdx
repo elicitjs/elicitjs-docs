@@ -16,13 +16,13 @@ export default function Layout({ children }) {
 
 # Data schema
 
-<Lead>A `schema` declares the output dataset: each field's **type**, **domain**, and creation default. It is the source of truth for a field's scale, so a chart resolves scales, draws axes, and mints data with **zero starter data**. `structure` says how many tables that dataset has — one by default, or a network of nodes and links.</Lead>
+<Lead>A `schema` declares the output dataset: each field's **type**, **domain**, and creation default. It is the source of truth for a field's scale, so an elicitation interface resolves scales, draws axes, and mints data with **zero starter data**. `structure` says which tables that dataset has: one by default, a network of nodes and links, or a hierarchy.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="empty" title="An empty chart that knows its axes">
 
-No data — the axes come straight from the schema. Every created point carries all declared fields (from the pointer or the field's default), so it is immediately editable.
+With no data, the axes come from the schema. Every created point carries all declared fields, from the pointer or the field's default, so it is editable at once.
 
 <Example
   code={elicitFromNothing}
@@ -83,7 +83,9 @@ links: {
 
 `true` draws arrowheads and separates reciprocal links; `false` treats the pair as unordered, so `connect` refuses `b → a` once `a → b` exists. Leave it out and neither applies. See [Kinds of network](/marks/network#directed).
 
-`multi: true` lets a pair hold more than one link, and `selfLoops: true` lets a link join a node to itself. Both are off unless declared. See [Parallel links and loops](/marks/network#multi).
+`multi: true` lets a pair hold more than one link, and `selfLoops: true` lets a link join a node to itself. Both are off by default. See [Parallel links and loops](/marks/network#multi).
+
+`structure: "hierarchy"` gives a `nodes` table and a `nesting` table, whose rows say which node sits inside which. A `links` table is optional. See [Hierarchy](/marks/hierarchy).
 
 </Section>
 
@@ -91,11 +93,11 @@ links: {
 
 Two field declarations join one table to another. `key: true` marks the column that identifies a row. `type: "ref"` marks a column that names one.
 
-A `ref` has no `domain` of its own — it reads the key column's, so you never list identities twice. A value that names no row is reported when you seed it, and dropped when it becomes dangling: delete a node and its links go with it.
+A `ref` reads its `domain` from the key column, so you list identities once. A value that names no row is reported when you seed it, and dropped when it becomes dangling: delete a node and its links go with it.
 
 Pair `key` with `open: true` so a creating edit can mint a fresh identity automatically. Naming is a separate act: put `editText()` on a `text` mark and write the label in place.
 
-A closed `domain` on a key is a fixed roster. `create` hands out the declared values one at a time and refuses once they run out — that caps how many rows may exist.
+A closed `domain` on a key is a fixed roster. `create` hands out the declared values one at a time and stops when they run out, which caps the number of rows.
 
 None of this needs a network. A single table can declare a `key` too, and every row you create gets an identity:
 
@@ -115,9 +117,9 @@ None of this needs a network. A single table can declare a `key` too, and every 
 
 <Section id="table" title="Which table a mark draws">
 
-Every mark draws exactly one table, and takes a `table` option naming which. On a single-table chart there is nothing to say, so you never write it.
+Every mark draws exactly one table, named by its `table` option. A single-table interface needs no `table`.
 
-With no `table`, a mark draws the **primary** table: the only one on a `structure: "table"` chart, and the nodes on a network. `link()` is the exception — it draws the links.
+With no `table`, a mark draws the **primary** table: the only one on a `structure: "table"` interface, and the nodes on a network or hierarchy. `link()` draws the links instead.
 
 Use `table` when you want an ordinary mark over another table:
 
@@ -127,7 +129,7 @@ barY({ table: "links", channels: { x: { field: "source" }, y: { field: "strength
 
 An edit on that mark writes rows of that table, and `getData()` shows the change there. A name the schema does not declare is reported, and the mark falls back to the primary table.
 
-Positional scales are shared across the chart. Two tables encoding different kinds of field on the same axis will disagree about its type, which is reported — give the second mark its own chart instead.
+Positional scales are shared across the interface. Two tables that encode different kinds of field on the same axis disagree about its type, and this is reported. Give the second mark its own chart instead.
 
 <Example
   code={barOfLinkWeights}

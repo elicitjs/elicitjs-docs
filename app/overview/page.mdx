@@ -15,13 +15,13 @@ export default function Layout({ children }) {
 
 # Overview
 
-<Lead>ElicitJS builds charts people answer with — drag a bar, place a point — and you get structured data back. A chart is a declarative `Elicit(spec)`: one **schema**, one **dataset**, and a list of **marks**. Every example on these pages runs the exact code beside it. This page is the wiring; [Core concepts](/concepts) is the mental model.</Lead>
+<Lead>ElicitJS builds elicitation interfaces from charts. People drag a bar or place a point, and you get structured data back. An interface is built through a declarative spec, `Elicit(spec)`: one **schema**, one **dataset**, and a list of **marks**. Every example on these pages runs the code beside it. [Core concepts](/concepts) explains the model.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="anatomy" title="A minimal chart">
 
-Three pieces make a static chart: `schema` (what each field is and its domain), `data` (the rows), and `marks` (the marks that encode those rows). That is the whole model until you attach an edit.
+Three pieces make a static chart: `schema` (what each field is and its domain), `data` (the rows), and `marks` (how those rows are drawn). An edit makes it interactive.
 
 <Example
   code={aBarMark}
@@ -33,7 +33,7 @@ Three pieces make a static chart: `schema` (what each field is and its domain), 
 
 <Section id="encode-edit" title="Encoding, and its inverse">
 
-Attach an edit to a channel and a gesture writes that channel back through the **same** scale. The bar below is identical to the one above, except `y` now carries `edit: move()` — so encoding (data → height) gains its inverse (drag → data).
+Attach an edit to a channel and a gesture writes that channel back through the **same** scale. The bar below matches the one above, except `y` now carries `edit: move()`. Encoding maps data to height; the edit maps a drag back to data.
 
 <Example
   code={theSameBarNowEditable}
@@ -50,12 +50,12 @@ Attach an edit to a channel and a gesture writes that channel back through the *
 
 <Section id="reading" title="Reading the answer">
 
-Committed data leaves the chart through `onChange`, `getData()`, or `chart.on("change", …)`. Hover previews never fire these — only a finished edit does.
+Read committed data through `onChange`, `getData()`, or `chart.on("change", …)`. These fire only when an edit finishes, so hover previews are excluded.
 
 <Example
   code={readingTheAnswer}
   title="onChange / getData"
-  blurb={"onChange logs each commit. getData() returns a deep copy of the elicited rows; on(\"change\") is the same seam as a listener."}
+  blurb={"onChange logs each commit. getData() returns a deep copy of the elicited rows. on(\"change\") subscribes a listener to the same commits."}
   try={(
     <>
       <b>Drag</b> a bar — open the console to see the committed rows.

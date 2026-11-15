@@ -16,26 +16,26 @@ export default function Layout({ children }) {
 
 # Stacked dots
 
-<Lead>A **dot histogram** — the "drop tokens into slots" elicitation. Each datum is one token; tokens sharing a slot stack into a countable column. Click an empty slot to add a token (`create`), click a token to remove it (`remove`). The belief is just how many tokens sit in each slot — `data.filter(d => d.bin === b).length`.</Lead>
+<Lead>`dotStack` draws a **dot histogram**: each row is one token, and tokens in the same slot stack into a countable column. Click an empty slot to add a token (`create`), and click a token to remove it (`remove`). The answer is the number of tokens in each slot: `data.filter(d => d.bin === b).length`.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="basics" title="Dropping tokens">
 
-Click to drop a token into the nearest slot; click a token to take it back. count() caps the budget.
+Click to drop a token into the nearest slot. Click a token to take it back. `count()` caps the budget.
 
 <Example
   code={probabilityTokensOverBins}
   title="Probability tokens over bins"
   blurb="A discrete point scale of bins 0–1; 25-token budget."
-  try={"click the plane to add, click a dot to remove."}
+  try={<><b>Click</b> the plane to add a token · <b>click</b> a dot to remove it.</>}
 />
 
 <Example
   code={tentativeDotOnHoverProbe}
   title="Tentative dot on hover (probe)"
   blurb={"create({ pick: \"probe\" }) shows the token before it is real; the click commits it."}
-  try={"hover a bin — a dot appears but is not counted until you click. Alt-click removes."}
+  try={<><b>Hover</b> a bin to preview a dot · <b>click</b> to commit it · <b>Alt-click</b> a dot to remove it.</>}
 />
 
 <Example
@@ -48,13 +48,13 @@ Click to drop a token into the nearest slot; click a token to take it back. coun
 
 <Section id="orientation" title="Orientation">
 
-Put the slots on `y` and tokens stack rightward instead of up. `dotStackY` and `dotStackX` force a direction; bare `dotStack` takes it from the channel map, since the slot channel's axis is the category and tokens stack along the other one. `orientation: "horizontal" | "vertical"` is the explicit form, the same option `bar` and `waffle` take.
+Put the slots on `y` and tokens stack rightward instead of up. `dotStackY` and `dotStackX` force a direction. Bare `dotStack` takes it from the channels: the slot channel's axis holds the categories, and tokens stack along the other. `orientation: "horizontal" | "vertical"` sets it explicitly, as on `bar` and `waffle`.
 
 <Example
   code={tokensThatStackRightward}
   title="Tokens that stack rightward"
   blurb={"dotStackX with the slots on y; columns grow from the left edge."}
-  try={"click a row to add a token, click a token to remove it."}
+  try={<><b>Click</b> a row to add a token · <b>click</b> a token to remove it.</>}
 />
 
 </Section>

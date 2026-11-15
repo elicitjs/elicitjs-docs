@@ -25,7 +25,7 @@ calibration page — its density and tone is the target for every other page.
    mark/edit is for and its main API surface in 1–3 sentences. Sections
    state what a gesture does and what you configure for it.
 6. **No analogy or scene-setting.** Skip framing like "the escape hatch,"
-   "the Leaflet model," "a natural fit for." State the fact, then the API.
+   "the Leaflet model," "a natural fit for." State the fact, then the API. Another one is. A chart is a Spec. It should say A chart is built through a declarative spec.
 7. **One voice across pages.** Same term for the same idea everywhere:
    "mint" for creating a datum, "re-derives" for recomputing from committed
    rows, British spelling to match the existing corpus (colour, behaviour,
@@ -109,8 +109,7 @@ escape hatch" from the section title itself, not just the prose:
 > and every mark, regardless of which one declared it. It can reject a
 > proposed change, or repair it by returning corrected rows — a repair
 > shows up everywhere on the next render, since every mark reads the same
-> rows. Declare it in `constraints: [...]` on the `Elicit` spec, or on a
-> mark as shorthand; both end up on the dataset."
+> rows. Declare it in `constraints: [...]` on the `Elicit` spec."
 
 **Two `<Lead>`s, an internal function name, and a buried correctness rule**
 (editing/existence — the worst offender found so far):
@@ -118,7 +117,7 @@ escape hatch" from the section title itself, not just the prose:
 > Before: two stacked `<Lead>` blocks. First: "**Creation is mark-agnostic.**
 > An edit is the inverse of encoding... That is why a single core
 > (`mintDatum`) serves them all, and why the variants differ on just
-> **three knobs**: *how many rows*..." Second: "**Declare a creator on
+> **three knobs**: _how many rows_..." Second: "**Declare a creator on
 > exactly one mark.** A plane gesture carries no node, so it fans out to
 > _every_ mark's plane-pick edits..."
 >
@@ -131,6 +130,12 @@ escape hatch" from the section title itself, not just the prose:
 > `edit.line.removeSeries` take rows back." The "one mark" rule moved into
 > the `create` section, next to the example it actually governs.
 > `mintDatum` (an internal helper, not exported) was dropped entirely.
+
+**Unecessary you never**
+
+> Before: "A mark names its columns in channels. x: { field: "cat" } encodes cat on the x position. The schema declares cat as categorical and a bar needs an interval, so that resolves to a band scale. You never write the scale down."
+>
+> After: "A mark names its columns in channels. x: { field: "cat" } encodes cat on the x position. The schema declares cat as categorical and a bar needs an interval, so that resolves to a band scale."
 
 ## What stays untouched
 

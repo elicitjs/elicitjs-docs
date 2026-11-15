@@ -16,13 +16,13 @@ export default function Layout({ children }) {
 
 # Radial axis
 
-<Lead>A composable **radial axis**: arc spine, ticks, labels, and optional coloured categorical bands. Sibling of `axisX`/`axisY`; reads the global `theta` scale — the polar angular *position*, which is what a needle encodes. (`angle` is a mark's rotation in place and has no axis.) Default orient is `top` (left → right through the top). `channel: 'radius'` draws the radius scale as concentric rings instead. Inert by default — pair with `needle` for interaction.</Lead>
+<Lead>`axisRadial()` draws the `theta` scale as a **radial axis**: an arc spine, ticks, labels, and optional coloured bands for categories. `orient` defaults to `top`, running left to right through the top. `channel: 'radius'` draws the radius scale as concentric rings instead. The axis is inert; pair it with a `needle` to take an answer.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="continuous" title="Continuous radial ticks">
 
-Spine + tick marks along a quantitative theta scale (top-facing by default).
+A quantitative `theta` scale gets a spine and tick marks. `theta` is the polar angular position, which is what a needle encodes. `angle`, a mark's rotation in place, has no axis.
 
 <Example
   code={semiCircleAxis}
@@ -34,7 +34,7 @@ Spine + tick marks along a quantitative theta scale (top-facing by default).
 
 <Section id="bands" title="Coloured categorical bands">
 
-Discrete domains get annular sectors, coloured by an ordinal fill.
+A discrete domain gets one annular sector per category, coloured by an ordinal fill.
 
 <Example
   code={bandedLikelihoodArc}
@@ -46,7 +46,7 @@ Discrete domains get annular sectors, coloured by an ordinal fill.
 
 <Section id="ticks" title="Tick + label customization">
 
-Ticks reuse the same helpers as Cartesian axes: `ticks` (count), `tickValues` (explicit), and `tickFormat` (d3-format string or function). Style labels with `fontSize`/`labelFill` and the spine with `stroke`.
+Ticks take the same options as Cartesian axes: `ticks` (a count), `tickValues` (explicit values), and `tickFormat` (a d3-format string or function). Style labels with `fontSize` and `labelFill`, and the spine with `stroke`.
 
 <Example
   code={percentTicksAtChosenValues}
@@ -58,7 +58,7 @@ Ticks reuse the same helpers as Cartesian axes: `ticks` (count), `tickValues` (e
 
 <Section id="radius" title="Rings for a radius scale">
 
-`axisRadial({ channel: 'radius' })` reads the `radius` scale instead of `theta`. It draws a concentric ring at each tick, labelled up the vertical, so it keys an [arc](/marks/arc#radius) whose slices take their rim from a `radius` field. The rings sit at the scale's own extent (the arc's `innerRadius` to `outerRadius`), so the axis ignores its `radius` option. `ticks`, `tickValues` and `tickFormat` work as on the angular axis.
+`axisRadial({ channel: 'radius' })` reads the `radius` scale instead of `theta`. It draws a concentric ring at each tick, labelled up the vertical. Use it to key an [arc](/marks/arc#radius) whose slices take their rim from a `radius` field. The rings span the scale's own extent, from the arc's `innerRadius` to its `outerRadius`, so the axis's `radius` option has no effect. `ticks`, `tickValues` and `tickFormat` work as on the angular axis.
 
 <Example
   code={ringsForARadiusScale}

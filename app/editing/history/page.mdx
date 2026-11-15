@@ -13,23 +13,23 @@ export default function Layout({ children }) {
 
 # History & undo
 
-<Lead>Belief elicitation is a drafting process: respondents need the freedom to explore hypotheses and take back slips. `chart.undo()` and `chart.redo()` step the dataset backwards and forwards one full gesture at a time, preserving snapshots of data rows, schema domains, and responsive sizing.</Lead>
+<Lead>`chart.undo()` and `chart.redo()` step back and forward one gesture at a time. Each step restores the data rows, the schema's domains and the chart size.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="undo" title="Gesture-level undo & redo">
 
-History transactions open when a gesture starts and close when it ends. A whole drag across the screen is recorded as a single atomic undo step rather than hundreds of pixel increments.
+A history transaction opens when a gesture starts and closes when it ends. A whole drag is one undo step.
 
-Calling `undo()` or `redo()` returns a boolean indicating whether the history stack moved, and dispatches the standard `change` event so downstream listeners update automatically.
+`undo()` and `redo()` return a boolean: whether the history moved. Both fire the `change` event, so your listeners update.
 
 <Example
   code={undoADrag}
   title="Undo a whole drag"
-  blurb="chart.undo() / chart.redo() step the belief data. canUndo() / canRedo() drive the button states."
+  blurb="chart.undo() / chart.redo() step the answer. canUndo() / canRedo() drive the button states."
   try={(
     <>
-      <b>Drag</b> a bar, then press <b>Undo</b> — the bar resets in one atomic step.
+      <b>Drag</b> a bar, then press <b>Undo</b> — the bar resets in one step.
     </>
   )}
 />
@@ -38,10 +38,10 @@ Calling `undo()` or `redo()` returns a boolean indicating whether the history st
 
 <Section id="transactions" title="Transaction boundaries & snapshots">
 
-Snapshots hold the complete chart state: data rows, schema domain changes (such as added categories or rescaled axes), and chart sizing.
+A snapshot holds the data rows, the schema's domains (added categories, rescaled axes) and the chart size.
 
-- **Gesture unit**: A drag, a sweep, a category addition, and a keyboard nudge each form their own transaction.
-- **Redo branch**: Performing a new edit after undoing drops the previous redo branch.
-- **Reseed**: Calling `chart.setData()` establishes a fresh baseline and clears the undo stack.
+- **Gesture unit**: a drag, a sweep, a category addition and a keyboard nudge are each one transaction.
+- **Redo branch**: a new edit after an undo drops the redo branch.
+- **Reseed**: `chart.setData()` sets a new baseline and clears the undo stack.
 
 </Section>

@@ -22,7 +22,7 @@ export default function Layout({ children }) {
 
 # Hierarchy
 
-<Lead>A **hierarchy** is nodes that sit inside each other, declared with `structure: "hierarchy"`. The nodes are one table and each "this is inside that" is a row of a second, `nesting`. Any mark that draws a node shape can draw a container: a `contains` channel says which rows hold others, and `fit: true` on a size channel makes a container follow its contents. `edit.hierarchy.nest` drops a node into a container or out of one.</Lead>
+<Lead>A **hierarchy** is nodes that sit inside each other, declared with `structure: "hierarchy"`: one table of nodes, and a `nesting` table with one row per containment. Any mark that draws a node shape can be a container. A `contains` channel picks the rows that hold others, `fit: true` on a size channel sizes a container to its contents, and `edit.hierarchy.nest` drops a node into a container or out of one.</Lead>
 
 <ApiReference entries={api} />
 
@@ -80,7 +80,7 @@ nesting: {
 }
 ```
 
-One row is one membership. A node with no row is at the top level. A node has one container at most, and is never inside itself or its own contents. A seeded row that breaks either rule is ignored with a warning, and so is a row that names a missing node.
+One row is one membership. A node with no row is at the top level. A node has at most one container, and cannot contain itself or any node inside it. A row from `data` or `setData` that breaks either rule is dropped with a warning, and so is a row that names a missing node.
 
 Add any other columns you want to record about a membership. They take a `type`, a `domain` and a `default` like columns anywhere else. A row made by a drop takes each column's `default`, or the value you pass in `edit.hierarchy.nest({ defaults })`.
 
@@ -127,11 +127,11 @@ tables: {
 
 <Section id="containers" title="Containers">
 
-A container is a row of an ordinary mark. Two statements in the channel map set it up.
+A container is a row of an ordinary mark. Two channels set it up.
 
-`contains` says which rows hold other nodes. `{ value: true }` is every row. `{ fn }` or `{ field }` decides per row, so a chart can let groups receive and notes not.
+`contains` picks the rows that hold other nodes. `{ value: true }` is every row. `{ fn }` or `{ field }` decides per row, so groups can hold notes while notes hold nothing.
 
-`fit: true` on a size channel says the column follows the row's contents. It applies to rows that hold other nodes. The channel names a `field`, and the fitted size is written to it.
+`fit: true` on a size channel sizes the row to its contents. It applies to rows that hold other nodes. The channel names a `field`, and the fitted size is written to it.
 
 ```js
 rect({
@@ -147,9 +147,9 @@ rect({
 
 `scale: null` reads the column as pixels. `padding` is the room between a container's edge and its contents; see [Padding and spacing](#spacing).
 
-A row with contents has its fitted columns set for it, so a resize edit leaves them alone. A row without contents keeps its own size and stays editable.
+A row with contents gets its fitted columns from them, so a resize edit leaves those columns alone. A row without contents keeps its own size and stays editable.
 
-Because the size is in the data, other channels can read it. The examples here place a group's name from its `h` column.
+The fitted size is in the data, so other channels can read it. The examples here place a group's name from its `h` column.
 
 <Example
   code={levels}
@@ -188,15 +188,15 @@ contains: { fn: (d) => d.kind === "group", padding: { top: 30, right: 12, bottom
 
 A fitted container is sized to leave that room. A container with a size of its own moves its contents inside it.
 
-`dodge` keeps nodes from overlapping. It is a channel like `contains`: `true` is every row, and `{ fn }` or `{ field }` picks the rows that take part. `gap` is the space they keep, 8px by default.
+`dodge` keeps nodes from overlapping. It is a channel like `contains`: `true` is every row, and `{ fn }` or `{ field }` picks the rows that take part. `gap` is the space they keep, 8px by default. Round nodes keep it edge to edge. A `composite` dodges as a whole, with every part, its label included.
 
 ```js
 dodge: { value: true, gap: 10 }
 ```
 
-Nodes are compared with their siblings: the contents of one container with each other, and the top-level nodes with each other. When two overlap, the node you just dropped stays put and the other moves the shortest distance that clears it. A container that grows pushes its neighbours the same way, and they take their contents along. A pushed node stays inside its container's padding, or inside the plot at the top level. Where there is no room left, nodes are moved as far apart as the space allows.
+Nodes dodge their siblings: the contents of one container dodge each other, and so do the top-level nodes. When two overlap, the node you just dropped stays put and the other moves the shortest distance that clears it. When that leaves no room, the contents are packed in reading order from the top-left. A container that grows pushes its neighbours the same way, and they take their contents along. A pushed node stays inside its container's padding, or inside the plot at the top level. Where the space runs out, nodes spread as far apart as it allows.
 
-Nothing is pushed while you drag. It happens on release, and when data arrives through `setData`. Seeded data is spaced once, at the start. Without `dodge`, nodes stay where they are put.
+Nodes are pushed apart on release, and when data arrives through `setData`. While you drag, they are drawn where the release will put them. Seeded data is spaced once, at the start. Without `dodge`, nodes stay where they are put.
 
 <Example
   code={spacing}
@@ -214,7 +214,7 @@ Nothing is pushed while you drag. It happens on release, and when data arrives t
 
 <Section id="fixed" title="Fixed containers">
 
-Leave `fit` off and a container keeps the size it was given. Use this for regions that are part of the question: buckets, lanes, zones. Lock them with `lock` so only the cards move. Cards stay inside the bucket's padding, and a locked row is never pushed.
+Leave `fit` off and a container keeps the size it was given. Use this for regions that are part of the question: buckets, lanes, zones. Lock them with `lock` so only the cards move. Cards stay inside the bucket's padding, and a locked row stays where it is when nodes dodge.
 
 The answer is the nesting table: one row per card, naming its bucket.
 
@@ -252,13 +252,17 @@ The answer is the nesting table: one row per card, naming its bucket.
 
 <Section id="gestures" title="Dragging in and out">
 
-`edit.hierarchy.nest()` goes on the mark you drag, beside `move({ mode: "relative" })`. The move carries the node. On release, the node joins the innermost container under the pointer. Released over no container, it leaves the one it was in.
+Put `edit.hierarchy.nest()` on the mark you drag, beside `move({ mode: "relative" })`. The move carries the node. On release, the node joins the innermost container under the pointer. Released over no container, it leaves the one it was in.
 
-While you drag, the container the node would join is outlined and drawn at the size it would take. The container it came from holds its size until you let go. Style the outline with the `target` state of `effects`.
+While you drag, the chart shows what a release would do. The container the node would join is outlined and grows to hold it. The container it came from keeps its size while the pointer is inside it, and shrinks once the pointer leaves. With `dodge`, other nodes move out of the way, inside a container and at the top level. The data changes on release. Style the outline with the `target` state of `effects`.
 
-Moving a container is the same `move`: its contents travel with it.
+A container stays where it is when you drag a node past it or out of it. Released against a container's edge, the node you dropped moves clear of it.
 
-A rule about which nodes may go where is a constraint on the nesting table. A drop the rule refuses shows no outline and changes nothing.
+The layout eases to its new place. Nodes make room first and a container resizes after them. The node you drag stays on the pointer. Set the time with `motion: { duration }` on the spec, in milliseconds, or `motion: false` to draw each change at once. Motion is off when the reader's system asks for reduced motion.
+
+The same `move` moves a container, and its contents travel with it.
+
+A rule about which nodes may go where is a constraint on the nesting table. A drop the rule refuses shows no outline and leaves the data unchanged.
 
 <Example
   code={rules}
@@ -295,7 +299,7 @@ Add a `links` table and the nodes can be connected as in a [network](/marks/netw
 
 <Section id="external" title="Reading and setting from outside">
 
-Containment is plain rows, so a program reads and writes it like any other data. `getData()` returns the nesting rows and each container's fitted size.
+Containment is stored as rows, so your code reads and writes it like any other data. `getData()` returns the nesting rows and each container's fitted size.
 
 `setData` takes the same shape. Change the nesting rows and every container re-fits. A node sent with no `x` and `y` is placed inside the container it joins. With `dodge`, it is also moved clear of the nodes already there.
 

@@ -14,7 +14,7 @@ export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Three new glyphs
+# A face, a plant and an hourglass
 
 <Lead>Three elicitation interfaces built from existing marks and edits: a face whose colour you slide, a plant you grow, and an hourglass you fill. Each follows the same steps: declare the fields, draw the parts, then put an edit on each channel a gesture should write.</Lead>
 
@@ -23,7 +23,7 @@ export default function Layout({ children }) {
 1. **Declare the answer.** One field per thing you ask. The `schema` gives each field its type and domain.
 2. **Draw the glyph.** A [`composite` in box mode](/marks/composite#box) places every part in the glyph's own units: `x` and `y` from `-1` to `1`, y up. The composite's `size` sets the box's half-size, so the whole glyph scales with it.
 3. **Bind the fields.** A channel with a `field` and a `frame: [lo, hi]` range maps the field's domain onto that slice of the box. Two parts that read the same field and range always line up.
-4. **Add the gestures.** An edit on a channel writes that channel's field: `move` for a position, `slide` for a size, colour or angle. A part with no edit can't be grabbed, so a drag passes through it.
+4. **Add the gestures.** An edit on a channel writes that channel's field: `move` for a position, `slide` for a size, colour or angle. A drag passes through any part with no edit.
 
 </Section>
 
@@ -31,7 +31,7 @@ export default function Layout({ children }) {
 
 [`face()`](/marks/face) already draws a head, eyes, brows and a mouth. Its `fill` channel colours the head, so binding it to a field adds a question with no new parts.
 
-`feeling` runs from `-1` (anger) to `1` (disgust). A diverging scale maps it from red through yellow to green. `slide({ axis: "x" })` on the head writes it, so you drag the head left for anger and right for disgust. `slide` works on a colour ramp because it moves along the domain rather than inverting a colour. The mouth keeps its own `slide` on valence, so the two answers come from two different parts.
+`feeling` runs from `-1` (anger) to `1` (disgust). A diverging scale maps it from red through yellow to green. `slide({ axis: "x" })` on the head writes it, so you drag the head left for anger and right for disgust. `slide` works on a colour ramp because it moves along the field's domain. The mouth keeps its own `slide` on valence, so the two answers come from two different parts.
 
 <Example
   code={angerOrDisgust}
@@ -50,7 +50,7 @@ export default function Layout({ children }) {
 
 Three answers about your week, one plant: `energy` is how tall it grows, `joy` how big it blooms, and `support` how full its leaves are.
 
-The stem's top and the flower both read `energy` over the same range, `frame: [-0.15, 0.65]`, so the flower always sits on the stem. Drag the flower up or down: `move({ channels: ["y"] })` writes `energy`. Drag it sideways: a `slide` on its `size` writes `joy`. The two edits read different directions of one drag, so they don't interfere.
+The stem's top and the flower both read `energy` over the same range, `frame: [-0.15, 0.65]`, so the flower always sits on the stem. Drag the flower up or down: `move({ channels: ["y"] })` writes `energy`. Drag it sideways: a `slide` on its `size` writes `joy`. Each edit reads its own direction of the drag, so one drag can set both.
 
 Each leaf's centre and width both read `support`. As the leaf widens, its centre moves out by the same amount, so its inner edge stays on the stem. Drag a leaf outward to make it fuller.
 
@@ -107,7 +107,7 @@ On a categorical axis the move snaps to the nearest category, so a plant dragged
   blurb="face() with x and y bound to fields: one face per person, placed by hours slept and worked. Shift-drag moves a face."
   try={(
     <>
-      <b>Drag a forehead</b> sideways to colour that face · <b>drag a mouth</b> up or down · <b>Shift-drag</b> a face to move it.
+      <b>Drag a head</b> sideways to colour that face · <b>drag a mouth</b> up or down · <b>Shift-drag</b> a face to move it.
     </>
   )}
 />

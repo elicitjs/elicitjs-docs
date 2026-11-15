@@ -4,7 +4,7 @@ import '../styles/next-docs.css';
 
 export const metadata: Metadata = {
   title: 'ElicitJS Docs',
-  description: 'Declarative visual belief elicitation — documentation',
+  description: 'Declarative visual elicitation — documentation',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

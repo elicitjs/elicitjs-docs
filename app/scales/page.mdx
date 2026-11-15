@@ -19,7 +19,7 @@ export default function Layout({ children }) {
 
 # Scales & channels
 
-<Lead>Two different words, kept apart. A **data type** says what a field _is_ — `quantitative`, `categorical`, `ordinal`, `temporal` — and is declared once, on the [schema](/schema). A **scale type** says how a channel _draws_ it — `linear`, `log`, `band`, `ordinal`, … — and is normally **derived**: a categorical field on a bar’s x is a band (a bar needs the interval), on a dot’s x it is a point (a dot wants the tick). So you rarely name a scale at all. When you do, `scale` takes a name, a spec, or a live d3 scale. Every positional scale is invertible — that is what makes editing possible.</Lead>
+<Lead>A **data type** says what a field _is_: `quantitative`, `categorical`, `ordinal` or `temporal`. You declare it once, on the [schema](/schema). A **scale type** says how a channel _draws_ it: `linear`, `log`, `band`, `ordinal`, and so on. The scale type is normally **derived**. A categorical field on a bar’s x is a band, because a bar needs an interval; on a dot’s x it is a point, because a dot sits on a tick. When you do name a scale, `scale` takes a name, a spec, or a live d3 scale. Every positional scale is invertible, which is what makes editing possible.</Lead>
 
 <ApiReference entries={api} />
 
@@ -54,7 +54,7 @@ The same numeric field through a colour channel becomes a ramp, and through the 
 
 <Section id="zero-crossing" title="Crossing zero — symlog & diverging">
 
-Elicited quantities are often _differences_: a revision, an error, a surprise. Those span orders of magnitude and go both ways, which breaks the usual two tools — `log` has nothing to say about 0 or −60, and a `sequential` ramp has no reference point. `symlog` is linear near zero and logarithmic beyond it; `diverging` colours by distance from a pivot, each side scaled on its own.
+Elicited quantities are often _differences_: a revision, an error, a surprise. They can span orders of magnitude in both directions. `log` is undefined at 0 and below, and a `sequential` ramp has no reference point. `symlog` is linear near zero and logarithmic beyond it. `diverging` colours by distance from a pivot, scaling each side on its own.
 
 <Example
   code={symlogAndADivergingRamp}
@@ -71,7 +71,7 @@ Elicited quantities are often _differences_: a revision, an error, a surprise. T
 
 <Section id="override" title="Naming a scale: by name, by spec, by d3">
 
-A log x, a sqrt size range, and a d3 band with custom padding — three forms, one option. The d3 scale is adopted as built; because it is positional and named no range, it is given the plot’s pixel range. Its padding survives, and so does its invertibility: the drag works.
+`scale` takes three forms: a name (log x), a spec (a sqrt size range), or a d3 scale (a band with custom padding). A d3 scale is used as built. A positional d3 scale with no range gets the plot’s pixel range. It keeps its padding and stays invertible, so the drag works.
 
 <Example
   code={logSqrtAnAdoptedD3Scale}
@@ -100,7 +100,7 @@ A categorical field on a colour channel resolves through the ordinal palette —
 
 <Section id="ordered-colour" title="Ordered data gets an ordered ramp">
 
-Colour follows the field's **measure**, not just its scale. `categorical` values are unordered, so they get distinct hues. `ordinal` values run low to high, so they get a **ramp sampled to one swatch per category** — light to dark, in order. A Likert scale reads as a scale rather than as four unrelated colours.
+Colour follows the field's data type as well as its scale. `categorical` values are unordered, so they get distinct hues. `ordinal` values run low to high, so they get a **ramp sampled to one swatch per category**, light to dark, in order. A Likert scale then reads as a scale rather than as four unrelated colours.
 
 Declare the difference and the colour follows:
 
@@ -115,21 +115,21 @@ team:  { type: "categorical", domain: ["north", "south", "east"] }
   blurb="One ramp for the ordered field, distinct hues for the unordered one."
 />
 
-Use `categorical` for a group identifier even when you happen to list it in an order — a series key is not an ordered scale.
+Use `categorical` for a group identifier, even when you list its values in an order. A series key is unordered.
 
 </Section>
 
 <Section id="two-encodings-colour" title="Two encodings on one channel">
 
-A scale belongs to one **encoding** — a (channel, field) pair — so two marks colouring by *different* fields get two scales, each with its own domain and its own legend. They also get different scheme **families**, so the two are perceptually distinct rather than sharing one palette's slots.
+A scale belongs to one **encoding**: a (channel, field) pair. Two marks colouring by *different* fields get two scales, each with its own domain and legend. They also get different scheme **families**, so the two stay perceptually distinct.
 
-Two marks colouring by the *same* field share one scale, one set of colours, and one legend: that is what makes a shared colour mean a shared value.
+Two marks colouring by the *same* field share one scale, one set of colours, and one legend, so a shared colour means a shared value.
 
 </Section>
 
 <Section id="categorical-position" title="Categorical position → point scale">
 
-When a positional channel is categorical, a dot resolves it to a point scale — the mark sits on the category’s tick. Two categorical axes make a discrete grid. Note `ordinal` vs `categorical` on `y`: an ordinal domain’s _order_ is meaningful.
+When a positional channel is categorical, a dot resolves it to a point scale and sits on the category’s tick. Two categorical axes make a discrete grid. Here `y` is `ordinal`, so its domain’s _order_ is meaningful.
 
 <Example
   code={aDiscreteGrid}

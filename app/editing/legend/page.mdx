@@ -16,18 +16,18 @@ export default function Layout({ children }) {
 
 # Legend pickers & editing
 
-<Lead>Legends are active input controls as well as visual keys. Click a swatch to set a categorical field, drag a ramp handle to set a continuous value, or double-click to modify the scale domain itself. When a chart contains multiple rows, pickers write to the active selection automatically.</Lead>
+<Lead>A legend can take input as well as label a scale. Click a swatch to set a categorical field, drag a ramp handle to set a continuous value, or double-click to edit the scale's domain. With more than one row, a picker writes to the selected rows.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="category-picker" title="Categorical swatch pickers">
 
-Pass `edit: edit.legend.category()` to make each legend swatch a click target. Clicking a swatch sets the channel's encoded field on the target row and recolours the mark.
+Pass `edit: edit.legend.category()` to make each swatch a click target. A click sets the channel's field on the target row and recolours the mark.
 
 <Example
   code={categoryPicker}
   title="Click a swatch to set category"
-  blurb="A one-row belief whose category is updated directly from the legend."
+  blurb="A one-row answer whose category is set from the legend."
   try={(
     <>
       <b>Click</b> a swatch to change the status.
@@ -39,7 +39,7 @@ Pass `edit: edit.legend.category()` to make each legend swatch a click target. C
 
 <Section id="selection-target" title="Targeting selected rows">
 
-When a dataset has multiple rows, a legend picker needs to know which row to write. The picker's `row` target **defaults to the selection**, so clicking a mark and then clicking a swatch updates exactly that mark.
+With several rows, a picker needs a row to write. Its `row` target **defaults to the selection**: click a mark, then a swatch, and that mark updates.
 
 With `edit.select({ multi: true })`, one swatch click updates every selected row at once.
 
@@ -58,7 +58,7 @@ With `edit.select({ multi: true })`, one swatch click updates every selected row
 
 <Section id="value-picker" title="Continuous ramp sliders">
 
-For continuous numerical fields, `edit: edit.legend.value()` adds a draggable handle directly onto the colour gradient ramp. Dragging the handle writes the corresponding value back into the datum.
+For a continuous field, `edit: edit.legend.value()` adds a draggable handle to the colour ramp. Dragging it writes that value to the row.
 
 <Example
   code={valuePickerRamp}
@@ -75,9 +75,9 @@ For continuous numerical fields, `edit: edit.legend.value()` adds a draggable ha
 
 <Section id="domain-authoring" title="Authoring categories on the scale">
 
-While swatch pickers write to a dataset row, `edit.scale.categories()` writes to the **scale domain** itself.
+A swatch picker writes to a row. `edit.scale.categories()` writes to the **scale's domain**.
 
-It adds three direct affordances to the legend: **double-click a swatch** to rename its category, **click the ×** to delete it, and **double-click the ＋** to append a new category. Renaming updates matching rows, and deleting removes them.
+It adds three controls to the legend: **double-click a swatch** to rename its category, **click the ×** to delete it, and **double-click the ＋** to add a category. A rename updates matching rows, and a delete removes them.
 
 <Example
   code={editTheCategoriesDomain}

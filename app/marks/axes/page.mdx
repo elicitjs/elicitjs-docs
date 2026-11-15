@@ -22,21 +22,21 @@ export default function Layout({ children }) {
 
 # Axis, Grid & Rule
 
-<Lead>Axes and gridlines are **chart elements** — they draw a scale rather than the data. Prefer <code className="inline">{"elicit.elements.*"}</code> (or <code className="inline">ElicitSpec.elements</code>); the same factories stay aliased on <code className="inline">{"plot.*"}</code>. Configure them via the global <code className="inline">{"axes: {…}"}</code> convenience, or compose <code className="inline">elements.axisX</code> / <code className="inline">gridY</code> explicitly. <code className="inline">ruleY</code> is still a data mark.</Lead>
+<Lead>Axes and gridlines are **chart elements**: they draw a scale, not data. Configure them with the spec's <code className="inline">{"axes: {…}"}</code> option, or compose <code className="inline">elements.axisX</code> / <code className="inline">elements.gridY</code> yourself. <code className="inline">ruleY</code> is a data mark.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="chart-elements" title="Chart elements are not data marks">
 
-`axis`, `grid`, `legend` and `axisRadial` are public as `elicit.elements.*`. They still work inside `marks` and on `plot.*`, and you can separate them with `elements: […]` on the spec (concatenated into the feature list). See [Mark & element contracts](/concepts/contracts).
+`axis`, `grid`, `legend` and `axisRadial` are exported on `elicit.elements.*`. Pass them in `elements: […]` on the spec, or in `marks`. See [Mark & element contracts](/concepts/contracts).
 
-A data mark views the dataset's columns through a `channels` map. A chart element views **one scale**, named by a singular `channel` (`'x'`, `'fill'`, `'angle'`), so it has no data-mark channel map and no fields of its own. (`axisRadial` may carry optional x/y **placement** channels for per-row rings — placement chrome, not elicitation encoding.)
+A data mark views the dataset's columns through a `channels` map. A chart element views **one scale**, named by a singular `channel` (`'x'`, `'fill'`, `'theta'`). It has no fields of its own. `axisRadial` is the exception: it can take `x`/`y` channels to place one ring per row.
 
-Its `stroke`, `fill` and `fontSize` paint a spine and its labels rather than a datum, so they stay plain options instead of becoming channels.
+An element's `stroke`, `fill` and `fontSize` paint its spine and labels, so they are plain options, not channels.
 
-An edit on a data mark writes a **row**; an edit on a chart element writes the **domain** (`edit.axis.*`). `create` therefore doesn't apply to an element — there is no row to mint. Since an element has no channel map, an edit on one recovers its field from the scale, which is how a legend picker knows what to write.
+An edit on a data mark writes a **row**. An edit on a chart element writes the **domain** (`edit.axis.*`), so `create` doesn't apply to an element. The edit takes its field from the scale, which is how a legend picker knows what to write.
 
-A legend also **reserves space**, shrinking the plot; nothing else does.
+A legend reserves space on its side, and so do an axis title and turned or multi-line tick labels. The plot shrinks to fit.
 
 Both halves have an implicit layer on the spec: `axes` for the positional scales, [`legends`](/marks/legend#legends-key) for the rest.
 
@@ -44,7 +44,7 @@ Both halves have an implicit layer on the spec: `axes` for the positional scales
 
 <Section id="elements-ns" title="elicit.elements and ElicitSpec.elements">
 
-Prefer `elements.axisX` over treating axes as data marks. Pass chrome through `elements: […]` on the spec (or keep them in `marks` — same factories).
+Compose axes with `elements.axisX`, `elements.axisY` and `elements.gridY`. Pass them in `elements: […]` on the spec, or in `marks`.
 
 <Example
   code={elementsNamespace}
@@ -69,7 +69,7 @@ Pass a per-channel config to shape ticks, formats and titles, or a transform to 
   blurb="y gets a grid and percent formatting; x a tick count and a title."
 />
 
-`origin: true` is the shorthand for crossing both axes at zero — declare it once instead of writing a `transform` on each channel by hand. It's the same frame [`trend`/`trendBand`](/marks/trend) draw automatically; `origin: false` states the ordinary left/bottom frame explicitly on a chart that would otherwise infer the origin frame from its marks. A per-channel `transform` still covers anything `origin` doesn't — crossing at a value other than zero, or on one axis only.
+`origin: true` crosses both axes at zero, in place of a `transform` on each channel. A chart with a [`trend`](/marks/trend) mark gets this frame by default when `axes` is unset. `origin: false` forces the ordinary left/bottom frame. Use a per-channel `transform` to cross at a value other than zero, or on one axis only.
 
 <Example
   code={originCrossingAxes}
@@ -92,7 +92,7 @@ Pass a per-channel config to shape ticks, formats and titles, or a transform to 
 
 <Section id="titles" title="Axis titles and band order">
 
-`title` labels an axis. An x title sits centred below the tick labels. A y title runs along the axis, reading bottom to top on the left, and sits past the widest tick label, so it never crosses one. Leave room for it in `margins`.
+`title` labels an axis. An x title sits centred below the tick labels. A y title runs along the axis, reading bottom to top on the left, and sits past the widest tick label, so it never crosses one. The plot shrinks to make room for it.
 
 A band or point y axis lists `domain[0]` at the bottom, the same direction a value increases. Set `scale: { reverse: true }` on the channel to list the categories top-down, as Vega-Lite and Observable Plot do for a horizontal bar chart.
 
@@ -150,7 +150,7 @@ Every axis option below defaults to the [theme's](/theming#chrome) `axis` token 
 
 <Section id="composable" title="Axis, grid & rule as marks">
 
-Turn the global axes off (`axes: false`) and compose reference marks into `marks` yourself — they render in z-order with your data, so you control exactly what draws and where.
+Turn the global axes off (`axes: false`) and compose axes, grids and rules in `marks` yourself. They draw in the order you list them, interleaved with your data marks.
 
 <Example
   code={explicitGridyAxisxAxisyRuley}

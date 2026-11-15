@@ -15,8 +15,9 @@ export default function Layout({ children }) {
 # Getting started
 
 <Lead>
-  Install ElicitJS, build a chart with `Elicit(spec)`, make it editable by putting
-  an `edit` on a channel, and read the answer back through `onChange`.
+  Install ElicitJS, build an elicitation interface with `Elicit(spec)`, make it
+  editable by putting an `edit` on a channel, and read the answer back through
+  `onChange`.
 </Lead>
 
 <Section id="install" title="Install">
@@ -53,13 +54,15 @@ For a plain HTML page, map both names in an import map:
 
 </Section>
 
-<Section id="spec" title="A chart is a spec">
+<Section id="spec" title="Built through a spec">
 
-`Elicit(spec)` takes one object and returns a DOM element you append. A spec has three required keys:
+An elicitation interface is built through a declarative spec. `Elicit(spec)` takes one object and returns a DOM element you append. A spec has three main keys:
 
 - `data` — the dataset. A chart elicits exactly one, and every mark is a view over those rows.
 - `schema` — each field's **type** and **domain**. Scales are derived from this, so no mark declares one.
 - `marks` — how the rows are drawn.
+
+Only `schema` is required. Leave out `data` to start from an empty chart.
 
 <Example
   code={aStaticChart}
@@ -67,7 +70,7 @@ For a plain HTML page, map both names in an import map:
   blurb="A complete spec: data, schema and one mark. Nothing here is editable yet."
 />
 
-A mark names its columns in `channels`. `x: { field: "cat" }` encodes `cat` on the x position. The schema declares `cat` as `categorical` and a bar needs an interval, so that resolves to a band scale. You never write the scale down.
+A mark names its columns in `channels`. `x: { field: "cat" }` encodes `cat` on the x position. The schema declares `cat` as `categorical` and a bar needs an interval, so that resolves to a band scale.
 
 </Section>
 
@@ -82,7 +85,7 @@ An edit is the inverse of encoding. A channel encodes data to pixels through a s
   try={<><b>Drag</b> any bar up or down.</>}
 />
 
-A mark is inert until an edit names the column it writes. No mark interacts by default, so the spec always says which column a gesture changes.
+A mark is inert until an edit names the column it writes.
 
 `move()` is one of the universal edits, which work on any mark. Others create and delete rows, draw a path, turn a needle, pick a category from a legend, or rewrite a scale's domain. See [Editing](/editing) for the vocabulary, or the [API index](/api) for every name.
 
@@ -90,10 +93,11 @@ A mark is inert until an edit names the column it writes. No mark interacts by d
 
 <Section id="reading" title="Read the answer back">
 
-Two ways to get the elicited data:
+Three ways to get the elicited data:
 
 - `onChange(data)` fires after every committed edit, with the whole dataset.
 - `chart.getData()` returns it on demand.
+- `chart.on("change", cb)` subscribes a listener to the same commits.
 
 <Example
   code={readingTheAnswer}
@@ -102,7 +106,7 @@ Two ways to get the elicited data:
   try={<><b>Drag</b> a bar — the numbers below follow.</>}
 />
 
-The returned element also carries `getSchema()`, `setData()`, `on("change" | "stage", cb)`, `undo()`, `redo()` and `destroy()`. Call `destroy()` when unmounting in a framework to release the resize observer and pointer handlers.
+The returned element also carries `getSchema()`, `setData()`, `on("stage" | "select", cb)`, `undo()`, `redo()` and `destroy()`. Call `destroy()` when you unmount it in a framework, to release its resize observer and pointer handlers.
 
 </Section>
 
@@ -123,7 +127,7 @@ A constraint can reject a proposed change, or repair it by returning corrected r
 
 <Section id="widgets" title="Widgets">
 
-Common survey instruments are one call each. Each returns a spec you pass to `Elicit`, so you can start from a widget and edit its spec when you need something it does not do.
+Common survey instruments are one call each. Each returns a spec you pass to `Elicit`, so you can start from a widget and edit its spec.
 
 ```javascript
 import { Elicit, widgets } from "elicitjs";
@@ -134,7 +138,7 @@ document.body.appendChild(Elicit(widgets.likert({
 })));
 ```
 
-`likert`, `slider`, `matrix`, `ranking`, `allocation`, `interval`, `thermometer` and `histogram` are documented on [Widgets](/widgets).
+`likert`, `multipleChoice`, `slider`, `matrix`, `lineCone`, `ranking`, `allocation`, `probabilityTokens`, `interval`, `histogram`, `region`, `thermometer` and `labeledValue` are documented on [Widgets](/widgets).
 
 </Section>
 

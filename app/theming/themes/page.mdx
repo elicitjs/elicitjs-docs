@@ -24,7 +24,7 @@ export default function Layout({ children }) {
 
 Pass the name as `theme`, or the object from `themes`. `theme: "nyt"` and `theme: themes.nyt` are the same. `setTheme("nyt")` makes it the default for every chart built afterwards.
 
-A named theme sets the surface, the ink and palettes, the fonts of the labels and the title, which axes draw a spine and ticks, which get gridlines, the zero line, the band padding, corner radii, line widths, point size, and the colour of the hover and selection outline. It does not move anything you place yourself.
+A named theme sets the surface, the ink and palettes, the fonts of the labels and the title, which axes draw a spine and ticks, which get gridlines, the zero line, the band padding, corner radii, line widths, point size, and the colour of the hover and selection outline. Anything you place yourself stays where you put it.
 
 <Example
   code={byName}
@@ -117,7 +117,7 @@ The palette is also available as colour schemes: `scheme: "dd"` for categories, 
 
 <Section id="extends" title="Extending a theme">
 
-`extends` starts a partial theme from a named one, and the rest of the object deep-merges over it — Flint's word for the same idea. Use it to keep a house style and change its colour, a radius or a font.
+`extends` starts a partial theme from a named one, and the rest of the object deep-merges over it. The name comes from Flint. Use it to keep a house style and change its colour, a radius or a font.
 
 <Example
   code={extendsTheme}
@@ -132,7 +132,7 @@ The palette is also available as colour schemes: `scheme: "dd"` for categories, 
 
 Each preset keeps Flint's colours, font stacks, weights and proportions. Flint's `bandFraction` becomes `bandPadding` (one minus it), a point's area becomes a radius, and its presence words become tokens: `omit` turns a spine off or sets `tickSize: 0`, and a value-axis grid becomes `grid.show: "continuous"`. Flint names type sizes with tokens (`text.100` to `text.500`), which these themes set as 11 to 24 px.
 
-Some of a Flint theme is layout that ElicitJS leaves to the spec: data labels on marks, series names at line ends, a value axis on the right, and furniture such as The Economist's red tab or the BBC's footer rule. Draw those with marks and [guides](/guides) where you need them.
+Some parts of a Flint theme are layout, which ElicitJS leaves to the spec: data labels on marks, series names at line ends, a value axis on the right, and furniture such as The Economist's red tab or the BBC's footer rule. Draw those with marks and [guides](/guides) where you need them.
 
 Flint is MIT-licensed. Its theme specification is at [docs/theme-spec.md](https://github.com/microsoft/flint-chart/blob/main/docs/theme-spec.md), and its theme gallery at [microsoft.github.io/flint-chart](https://microsoft.github.io/flint-chart/#/themes).
 

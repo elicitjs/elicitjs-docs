@@ -18,19 +18,21 @@ export default function Layout({ children }) {
 
 # Interaction effects
 
-<Lead>An **effect** is transient feedback for the state of an interaction: `hovered`, `selected`, `grabbed`. Set them in `effects: \{ ... \}` on the `Elicit` spec. Effects never write a mark's paint channels, so they can't clobber a data-driven `fill` or `stroke`. For the rules a gesture obeys — a clamp's bounds, a pick's reach — see [Guides](/guides).</Lead>
+<Lead>An **effect** is transient feedback for the state of an interaction: `hovered`, `selected`, `target`, `grabbed`. Set them in `effects: { ... }` on the `Elicit` spec. Effects style a mark on top of its paint, so a data-driven `fill` or `stroke` comes back when the state ends. To draw the rules a gesture obeys, such as a clamp's bounds or a pick's reach, see [Guides](/guides).</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="states" title="The three states">
+<Section id="states" title="The states">
 
 `effects` is keyed by state, and every state takes the same options.
 
-**`hovered`** applies when the pointer is over the mark, or when a proximity pick has resolved it. Both routes draw the same thing, whether you point at a mark or a `pick: "nearest"` edit picks it as the closest.
+**`hovered`** applies when the pointer is over the mark, or when a proximity pick resolves to it. Pointing at a mark and a `pick: "nearest"` edit choosing it draw the same thing.
 
-**`selected`** applies when the mark is in the chart's selection.
+**`selected`** applies when the mark is in the interface's selection.
 
-**`grabbed`** applies while a drag on it is in flight. Pass a string as shorthand for `\{ filter \}`.
+**`target`** outlines the container a dragged node would join if you released it now. See [Hierarchy](/marks/hierarchy). Its default outline is `#2563eb`, padded 3px out from the edge.
+
+**`grabbed`** applies while you drag the mark. Pass a string as shorthand for `{ filter }`.
 
 Set a state to `false` to switch it off.
 
@@ -38,8 +40,8 @@ Set a state to `false` to switch it off.
 
 <Section id="hover" title="Hover on an editable mark">
 
-`hovered` applies to every editable mark. You don't opt in, and it doesn't need a
-`pick` — point at a draggable bar and it responds before you press.
+`hovered` applies to every editable mark by default, with or without a `pick`.
+Point at a draggable bar and it responds before you press.
 
 <Example
   code={hoverAnyEditableMark}
@@ -59,17 +61,18 @@ Set a state to `false` to switch it off.
 Each state paints in one of two ways, and can use both at once.
 
 **Element props** restyle the mark itself: `filter`, `opacity`, `fill`, `stroke`,
-`strokeWidth`, `cursor`. They apply as CSS properties, which override a mark's own
-paint while the state holds and are removed when it ends. Your data-driven `fill`
-and `stroke` are never written. (`filter` and `cursor` are SVG-only — a canvas has no
-element to hover and no per-shape filter. Everything else paints in both renderers.)
+`strokeWidth`, `cursor`. They override the mark's own paint while the state holds,
+and the mark's paint returns when it ends. `filter` and `cursor` apply only under
+the SVG renderer. Every other prop paints in both [renderers](/renderers).
 
 **`outline`** draws an overlay on the mark's edge, above every other layer. It takes
 `color`, `darken`, `fallback`, `width`, `pad`, `dash` and `opacity`, and traces
 whatever shape the mark is: a ring on a circle or ellipse, the box on a rect (with its
 corner radius), the segment on a tick, the path itself on an arc slice, line or
-polygon, a ring at the anchor on a label. `pad` moves the trace out from the edge; it
-is 0 by default.
+polygon. `pad` moves the trace out from the edge, and is 0 by default.
+
+A text label gets no outline by default. The cursor change is its feedback. Set
+`outline` for a state in `effects` and labels get a box around the text in that state.
 
 The outline's colour comes from the mark. With the default `color: "auto"`, it is
 the mark's fill, or its stroke when the fill is missing or near-white, darkened by
@@ -79,11 +82,10 @@ that paint only. A CSS colour fixes the outline to that colour. A function
 `(color, node) => string` receives the derived colour and returns the one to paint.
 `fallback` is used when the mark's paint can't be read, such as a gradient fill.
 
-Restyling is the mark's own node, so it follows the mark wherever the mark goes. An
-outline is a separate node, and it copies the mark's rotation to keep up: spin a mark
-with an [`angle` channel](/marks/point#angle) and its outline turns with it rather
-than staying square to the axes. Proximity picking measures that same rotated
-geometry, so what lights up and what a drag actually grabs are always the same mark.
+Element props follow the mark wherever it goes. An outline copies the mark's
+rotation: rotate a mark with an [`angle` channel](/marks/point#angle) and its outline
+turns with it. Proximity picking measures the same rotated shape, so the mark that
+lights up is the mark a drag grabs.
 
 <Example
   code={theTwoMechanisms}
@@ -100,12 +102,12 @@ geometry, so what lights up and what a drag actually grabs are always the same m
 
 <Section id="precedence" title="Hovered and selected together">
 
-`selected` outranks `hovered`, so a selected mark is never also drawn as hovered.
-Give the two different weights: `hovered` says which mark a gesture would take,
-`selected` says which one you picked.
+`selected` outranks `hovered`: a selected mark draws as selected while you hover it.
+Give the two different weights. `hovered` shows which mark a gesture would take, and
+`selected` shows which one you picked.
 
-Selection is pipeline state, not a data column — `edit.select` writes no `selected`
-field. See [Editing a selected item](/marks/legend#dynamic-target).
+The interface holds the selection, separate from the data: `edit.select` writes no
+`selected` field. See [Editing a selected item](/marks/legend#dynamic-target).
 
 <Example
   code={hoveredThenSelected}
@@ -122,8 +124,8 @@ field. See [Editing a selected item](/marks/legend#dynamic-target).
 
 <Section id="off" title="Switching a state off">
 
-`false` disables a state. Turn one off where the mark already reads clearly enough
-on its own, such as a dense grid where an outline per cell adds noise.
+`false` disables a state. Turn one off where the mark reads clearly on its own, such
+as a dense grid where an outline per cell adds noise.
 
 <Example
   code={switchingAStateOff}
@@ -159,8 +161,8 @@ effect — the same one you get by pointing straight at a mark.
 
 <Section id="custom" title="Customized effects">
 
-The same edit, restyled. The states go in `effects`; the ring goes in the edit's
-`guide: \{ catchment \}`, since it describes the pick rather than the mark's state.
+The same edit, restyled. The states go in `effects`. The ring goes in the edit's
+`guide: { catchment }`, because it describes the pick, not the mark's state.
 The dots keep the `stroke` you set throughout.
 
 <Example

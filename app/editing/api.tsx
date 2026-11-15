@@ -98,6 +98,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "cursor",
+        type: "string",
+        default: "from the edit",
+        desc: (
+          <>
+            The CSS cursor over the edit&rsquo;s marks. The default follows the edit: a drag along x shows <code className="inline">ew-resize</code>, along y <code className="inline">ns-resize</code>, on both <code className="inline">move</code>; a click shows <code className="inline">pointer</code>; a typed edit shows <code className="inline">text</code>. Set it to override, e.g. <code className="inline">move({"{"} cursor: &quot;grab&quot; {"}"})</code>.
+          </>
+        ),
+      },
+      {
         name: "stage",
         type: "number",
         default: "null",

@@ -10,15 +10,15 @@ export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Renderers — the drawing backend is swappable
+# Renderers
 
-<Lead>A mark produces plain-data **scene nodes** — a circle at `cx,cy`, a rect, a path. The engine collects them and hands the whole scene to a **renderer**, which turns nodes into pixels and reports gestures back. This seam is the only coupling between the engine and the screen: marks, edits, scales, guides, and constraints all behave the same under any renderer. Swap the renderer through `renderer:` on the spec and nothing upstream changes.</Lead>
+<Lead>A mark produces plain-data **scene nodes**: a circle at `cx,cy`, a rect, a path. The engine hands the whole scene to a **renderer**, which draws the nodes and reports gestures back. The renderer is the only link between the engine and the screen, so marks, edits, scales, guides and constraints behave the same under any renderer. Set it with `renderer:` on the spec.</Lead>
 
-The default is `new D3Renderer()`, an SVG backend. `new CanvasRenderer()` implements the **same contract** (`render(context)` in, `onEvent` out) and draws to a `<canvas>`. The examples below run entirely on canvas — every edit behaves exactly as it does under SVG, because the interaction model lives in the engine.
+The default is `new D3Renderer()`, an SVG backend. `new CanvasRenderer()` implements the same contract (`render(context)` in, `onEvent` out) and draws to a `<canvas>`. The examples below run on canvas, and every edit behaves as it does under SVG, because the interaction model lives in the engine. Two [effect](/effects#mechanisms) props, `filter` and `cursor`, apply only under SVG. The default `grabbed` effect is a `filter`, so canvas shows no grab feedback unless you give `grabbed` an `opacity` or an `outline`.
 
 <Section id="direct" title="Direct-pick drag, on canvas">
 
-Under SVG, the browser hit-tests: it picks the element under the pointer. A canvas is a single element, so the canvas renderer finds the touched mark **geometrically**, using the same distance math as the `nearest` pick, then dispatches the same `move` edit. Drag a bar and the gesture inverts through the `y` scale and rewrites the value, as it does under SVG.
+Under SVG, the browser picks the element under the pointer. A canvas is a single element, so the canvas renderer finds the touched mark geometrically, with the same distance maths as the `nearest` pick. It then dispatches the same `move` edit. Drag a bar and the gesture inverts through the `y` scale and rewrites the value, as it does under SVG.
 
 <Example
   code={canvasDragABar}
@@ -35,7 +35,7 @@ Under SVG, the browser hit-tests: it picks the element under the pointer. A canv
 
 <Section id="plane" title="Plane gestures, on canvas">
 
-Plane-driven edits (`sweep`, `draw`, `nearest`, `create`) resolve their target straight from the pointer coordinates. The canvas renderer feeds those coordinates through the same pointer state machine, so a you-draw-it sweep works unchanged.
+Plane-driven edits (`sweep`, `draw`, `nearest`, `create`) resolve their target from the pointer coordinates. The canvas renderer feeds those coordinates through the same pointer state machine, so a you-draw-it sweep works unchanged.
 
 <Example
   code={canvasSweepALine}

@@ -20,13 +20,13 @@ export default function Layout({ children }) {
 
 # Rect
 
-<Lead>The generalized **bar**: each axis independently resolves its extent as a **span** (`x1`/`x2`, `y1`/`y2`), a fixed pixel **size** (`width`/`height`) centred on an anchor, a categorical **band**, or a baseline→value length — so a rectangle can span both axes at once, as in Observable Plot's `rect` (heatmap cells, 2-D regions, binned histograms, annotation boxes). `rect` spans both axes; `rectX` / `rectY` force one axis to a baseline→value length. Prefer `bar` when one axis is a category band and the other a value (classic elicitation bars); use `rect` when both axes are spans/bands, and pair it with `brushRect()` for edge/corner/body editing.</Lead>
+<Lead>`rect` draws a rectangle whose extent on each axis resolves separately: a **span** (`x1`/`x2`, `y1`/`y2`), a fixed pixel **size** (`width`/`height`) centred on an anchor, a categorical **band**, or a baseline→value length. Use it for heatmap cells, 2-D regions, binned histograms and annotation boxes, and edit it with `brushRect()`. `rectX` / `rectY` force one axis to a baseline→value length. When one axis is a band and the other a value, use [`bar`](/marks/bar).</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="basics" title="A 2-D rectangle (both axes are spans)">
 
-Give both axes explicit endpoints and each datum draws a rectangle spanning x1→x2 and y1→y2.
+Give both axes explicit endpoints and each row draws a rectangle from `x1` to `x2` and `y1` to `y2`.
 
 <Example
   code={regionBoxes}
@@ -38,7 +38,7 @@ Give both axes explicit endpoints and each datum draws a rectangle spanning x1�
 
 <Section id="heatmap" title="Heatmap (both axes categorical)">
 
-Put a category on **both** axes and each datum draws one cell at that (x, y) intersection — a heatmap. A quantitative `fill` resolves to a sequential colour ramp; a categorical `fill` to a palette. Band scales pad by default, so set `scale: { padding: 0 }` on each axis to close the gap and let the cells touch. Colour isn't gesture-invertible, so edit a cell's value through the ramp: `select()` on the cells makes the one you click the target row, and `legendColor({ edit: edit.legend.value() })` drags that row's value along the ramp.
+Put a category on both axes and each row draws one cell at that (`x`, `y`) intersection, giving a heatmap. A quantitative `fill` resolves to a sequential colour ramp, a categorical `fill` to a palette. Band scales pad by default; set `scale: { padding: 0 }` on each axis so the cells touch. A drag can't invert a colour, so edit a cell's value through the legend: `select()` on the cells makes the one you click the target row, and `legendColor({ edit: edit.legend.value() })` drags that row's value along the ramp.
 
 <Example
   code={heatmapCells}
@@ -55,7 +55,7 @@ Put a category on **both** axes and each datum draws one cell at that (x, y) int
 
 <Section id="fixed-size" title="Fixed-size boxes (width/height)">
 
-Give an axis an explicit pixel extent with `width` (x) or `height` (y) and the rect becomes a fixed-size box **centred** on its `x`/`y` anchor — the SVG-native parameterisation, alongside `x1`/`x2` spans and band cells. An explicit size overrides the band interval and the baseline→value length. The anchor is a positional channel, so a `move()` on `x` and `y` moves the whole box.
+Give an axis a pixel extent with `width` (x) or `height` (y) and the rect becomes a fixed-size box centred on its `x`/`y` anchor. An explicit size overrides the band interval and the baseline→value length. The anchor is a positional channel, so a `move()` on `x` and `y` moves the whole box.
 
 <Example
   code={fixedSizeBoxes}
@@ -72,7 +72,7 @@ Give an axis an explicit pixel extent with `width` (x) or `height` (y) and the r
 
 <Section id="histogram" title="Binned histogram (rectY)">
 
-A histogram is a vertical rect whose `x` is a quantitative bin span (`x1`/`x2`) and whose `y` is a count from the baseline — that is exactly `rectY`. Data must already be binned, one row per bin; there is no binning transform. Prefer `barY` when bins are categorical labels instead of numeric edges.
+`rectY` draws a histogram: `x` is a quantitative bin span (`x1`/`x2`) and `y` is a count from the baseline. Pass data already binned, one row per bin. Use `barY` when bins are categorical labels instead of numeric edges.
 
 <Example
   code={preBinnedCounts}
@@ -83,7 +83,7 @@ A histogram is a vertical rect whose `x` is a quantitative bin span (`x1`/`x2`) 
 <Example
   code={editableBinHeights}
   title="Editable bin heights"
-  blurb="Drag on y to reshape the belief distribution; clamp keeps counts ≥ 0."
+  blurb="Drag on y to reshape the distribution; clamp keeps counts ≥ 0."
   try={(
     <>
       <b>Drag</b> a bin’s top edge to change its count.
@@ -95,7 +95,7 @@ A histogram is a vertical rect whose `x` is a quantitative bin span (`x1`/`x2`) 
 
 <Section id="editing" title="Composable 2-D editing (brushRect)">
 
-`brushRect()` edits all four extents, opt-in and composable: grab an edge to resize one side, a corner to resize two extents, the body to move the whole rect. `resize` (`'both' | 'x' | 'y' | 'none'`) picks which axes resize; `move` (boolean) toggles body-drag — so you can ship resize-one-axis, move-only, or resize-only variants.
+`brushRect()` edits all four extents. Grab an edge to resize one side, a corner to resize two extents, or the body to move the whole rect. `resize` (`'both' | 'x' | 'y' | 'none'`) sets which axes resize. `move` (boolean) turns the body drag on or off. Together they give resize-one-axis, move-only and resize-only variants.
 
 <Example
   code={full2DEdgesCornersBody}
@@ -134,6 +134,6 @@ A histogram is a vertical rect whose `x` is a quantitative bin span (`x1`/`x2`) 
 
 <Section id="creating" title="Creating rects">
 
-A rect is a **data mark**, so it's creatable like any other (see [Create · Remove · Anchors](/editing/existence)) — with one wrinkle: a click gives a single point, but a rect needs a size, so a creator must seed the extent. A `rectY`-style rect (band or baseline→value length) gets its size from the axis and creates like a `bar`. A 2-D span rect (`x1`/`x2`, `y1`/`y2`) needs the opposite corner supplied through `create({ defaults: { x2, y2 } })`, then `brushRect()` shapes it. Skip the extent and the new row mints zero-size and invisible — the dev build warns you. Geo's `edit.geo.createRect()` is the purpose-built version: it mints a box sized from default spans around the click.
+`create()` works on a rect as on any data mark (see [Create · Remove · Anchors](/editing/existence)). A click gives one point and a rect needs a size, so the creator must seed the extent. A `rectY`-style rect (band or baseline→value length) takes its size from the axis and creates like a `bar`. A 2-D span rect (`x1`/`x2`, `y1`/`y2`) needs the opposite corner from `create({ defaults: { x2, y2 } })`; `brushRect()` then shapes it. Without an extent, the new row mints at zero size, invisible, and logs a warning. On a map, `edit.geo.createRect()` mints a box sized from default spans around the click.
 
 </Section>

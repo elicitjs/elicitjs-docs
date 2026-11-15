@@ -27,13 +27,13 @@ export default function Layout({ children }) {
 
 # Network
 
-<Lead>A **network** is two tables — nodes and the links between them — declared with `structure: "network"`. `node()` draws a labelled dot; `link()` draws one connector per link row, straight or curved, with arrowheads when directed. A `ports` channel on the node mark shows where links can meet a node. `edit.network.connect`, `rewire` and `reverse` build the topology; `create`, `move`, `editText` and `remove` work as on any other mark.</Lead>
+<Lead>A **network** is two tables, nodes and the links between them, declared with `structure: "network"`. `node()` draws a labelled dot, and `link()` draws one connector per link row, with arrowheads when directed; a `ports` channel marks where links can meet a node. `edit.network.connect`, `rewire` and `reverse` build the topology, and `create`, `move`, `editText` and `remove` work as on any other mark.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="schema" title="Declaring the structure">
 
-`structure: "network"` gives the dataset two tables in the roles `nodes` and `links`. The default `"table"` is one table — a bare field map, as on every other chart here.
+`structure: "network"` gives the dataset two tables in the roles `nodes` and `links`. The default, `"table"`, is a single table declared as a bare field map.
 
 ```js
 schema: {
@@ -54,9 +54,7 @@ schema: {
 }
 ```
 
-`key: true` marks the column that identifies a node. `type: "ref"` marks a column that names one. Its domain is the key column's values.
-
-Pair `key` with `open: true` so a gesture that mints a node can take a fresh identity.
+`key: true` marks the column that identifies a node. `type: "ref"` marks a column that names one; its domain is the key column's values. Pair `key` with `open: true` so a gesture that mints a node can give it a new identity.
 
 `data` is keyed by table name. A table you leave out starts empty.
 
@@ -118,11 +116,9 @@ tables: {
 
 `selfLoops: true` adds links from a node to itself to any of the four. See [Parallel links and loops](#multi).
 
-`directed: true` draws an arrowhead at the target, bows reciprocal links apart so `a → b` and `b → a` stay readable, and enables `edit.network.reverse`.
-
-`directed: false` treats the pair as unordered: `b → a` is the same link as `a → b`.
-
-Leave `directed` out and links draw without arrowheads. `a → b` and `b → a` are then two different links.
+- `directed: true` draws an arrowhead at the target and bows reciprocal links apart, so `a → b` and `b → a` stay readable. It also enables `edit.network.reverse`.
+- `directed: false` treats a pair as unordered: `b → a` is the same link as `a → b`.
+- With `directed` left out, links draw without arrowheads, and `a → b` and `b → a` are two different links.
 
 <Example
   code={directed}
@@ -144,9 +140,9 @@ Leave `directed` out and links draw without arrowheads. `a → b` and `b → a` 
 
 `selfLoops: true` lets them link a node to itself. Drag from a port to another port of the same node, or move off the port and release on the node's body.
 
-A link from a node to itself draws as a loop. It leaves and returns by one edge, or goes round the node from an `out` port to an `in` port. Further loops on one node take the free edges first, then nest outward. `loopRadius` sets how far a loop reaches (default `22`).
+A link from a node to itself draws as a loop. It leaves and returns by one edge, or goes round the node from an `out` port to an `in` port. More loops on the same node take the free edges first, then nest outward. `loopRadius` sets how far a loop reaches (default `22`).
 
-Rows holding a parallel pair or a loop always draw. `multi: false` or `selfLoops: false` also logs a warning for them.
+Rows holding a parallel pair or a loop always draw. With `multi: false` or `selfLoops: false`, they also log a warning.
 
 <Example
   code={stateMachine}
@@ -166,7 +162,7 @@ Rows holding a parallel pair or a loop always draw. `multi: false` or `selfLoops
 
 <Section id="naming" title="Naming the tables">
 
-Name the tables for your data. Give each a `role`:
+Name the tables for your data, and give each a `role`:
 
 ```js
 tables: {
@@ -175,15 +171,13 @@ tables: {
 }
 ```
 
-`data` and `getData()` are then keyed `claims` and `supports`. Marks and edits find their table by role, so `link()` draws `supports` by default. The [argument map](#draw) below is written that way.
+`data` and `getData()` are then keyed `claims` and `supports`. Marks and edits find their table by role, so `link()` draws `supports` by default. The [argument map](#draw) below uses these names.
 
 </Section>
 
 <Section id="draw" title="Drawing a network">
 
-Any ordinary mark draws the nodes — `point`, `rect`, `text`, or a `composite`. Channels, scales and edits work as usual. A mark draws the nodes table by default; see [which table a mark draws](/schema#table) to point one at the links.
-
-`node()` is the shorthand: a dot with a label above it. It takes `x` and `y` once for both, and draws the label from a `text` channel. It is a preset over `composite` and works on any table.
+`node()` draws a dot with a label above it. It takes `x` and `y` once for both, and draws the label from a `text` channel. It is a preset over `composite` and works on any table. Any other mark can draw the nodes too; see [What can be a node](#node-marks).
 
 `link()` draws the links table. Each end sits at the node its `ref` column names.
 
@@ -222,9 +216,9 @@ Any ordinary mark draws the nodes — `point`, `rect`, `text`, or a `composite`.
   </table>
 </div>
 
-The `"step"` kinds turn on the straight line between two node positions. `"orthogonal"` leaves and arrives perpendicular to an edge of the node's shape — see [where a link meets a node](#routing). `cornerRadius` rounds its turns (default `8`; `0` is square).
+The `"step"` kinds turn on the straight line between two node positions. `"orthogonal"` leaves and arrives perpendicular to an edge of the node's shape; see [Where a link meets a node](#routing). `cornerRadius` rounds its turns (default `8`; `0` is square).
 
-Give `curve` a column to mix them in one mark:
+Give `curve` a column to mix shapes in one mark:
 
 ```js
 link({ channels: { curve: { field: "kind" } } })
@@ -232,13 +226,13 @@ link({ channels: { curve: { field: "kind" } } })
 
 Any column works, or `{ fn: d => … }` to map one. `arrow` reads a column the same way, so one field can drive both shape and arrowheads.
 
-`curvature` sets how far a link bows; default `"auto"` fans links that share a pair of nodes and keeps a lone link straight. On a directed network every link bows to the same side of its travel, so `a → b` and `b → a` separate. Pass a number to bow every link equally, and `spread` to change the gap `"auto"` leaves between siblings.
+`curvature` sets how far a link bows. The default, `"auto"`, fans out links that share a pair of nodes and keeps a lone link straight. On a directed network every link bows to the same side of its direction, so `a → b` and `b → a` separate. Pass a number to bow every link equally, and `spread` to change the gap `"auto"` leaves between siblings.
 
-Under `"auto"` a lone `"arc"` draws straight. A `"line"` with curvature draws as an arc, so links sharing a pair fan apart on a plain `link()`.
+Under `"auto"`, a lone `"arc"` draws straight. A `"line"` with curvature draws as an arc, so links sharing a pair fan apart on a plain `link()`.
 
-A link whose source and target are the same node draws a loop — see [Parallel links and loops](#multi).
+A link whose source and target are the same node draws a loop; see [Parallel links and loops](#multi).
 
-A `click` edit like `reverse` or `remove` lands anywhere along the line.
+A `click` edit such as `reverse` or `remove` responds anywhere along the line.
 
 <Example
   code={curves}
@@ -261,12 +255,12 @@ A link meets the shape the node mark draws: a dot's circle, a rect's edges, a st
 
 How an end meets the shape depends on whether the node has [ports](#ports):
 
-- **With ports**, an end connects to a port. A pinned end uses the port on its side. An unpinned end uses the usable port facing the other node, and moves to another port when the nodes pass each other.
+- **With ports**, an end connects to a port. A pinned end uses the port on its side. An unpinned end uses the usable port facing the other node, and switches ports when the nodes pass each other.
 - **Without ports**, an unpinned end slides. It sits where the line between the two centres leaves the shape, and moves smoothly as the nodes move. A pinned end sits at the middle of its edge.
 
-`inset` is the connection buffer: how far from a node's shape a link stops, in px (default `0`). `sourceInset` and `targetInset` set each end. An end at a port touches the port. An arrowhead fits in the gap.
+`inset` sets how far from a node's shape a link stops, in px (default `0`). `sourceInset` and `targetInset` set each end. An end at a port touches the port. An arrowhead fits in the gap.
 
-An `"orthogonal"` connector leaves each end square to its edge and joins the two with the fewest turns. Two sliding ends nearly in line join with one straight leg; further apart they get a Z. It routes around a node in the way. Overlapping nodes get the plain route. A `"line"` or `"bezier"` connector meets the shape too, and a bezier leaves a pinned edge square-on.
+An `"orthogonal"` connector leaves each end square to its edge and joins the two with the fewest turns. Two sliding ends nearly in line join with one straight leg; further apart, they join with a Z. It routes around a node in the way. Overlapping nodes get the plain route. `"line"` and `"bezier"` connectors also meet the shape, and a bezier leaves a pinned edge square-on.
 
 `sourceOffset` and `targetOffset` move a pinned end along its edge, as a fraction from `-0.4` to `0.4`. Positive runs clockwise: right along the top, down the right, left along the bottom, up the left.
 
@@ -288,7 +282,7 @@ An `"orthogonal"` connector leaves each end square to its edge and joins the two
 
 <Section id="ports" title="Ports">
 
-A **port** is a dot on a node's edge where a link starts or ends. Declare ports with a `ports` channel on the mark that draws the nodes — any mark in [What can be a node](#node-marks) — and put `edit.network.connect()` on it:
+A **port** is a dot on a node's edge where a link starts or ends. Declare ports with a `ports` channel on the mark that draws the nodes (any mark in [What can be a node](#node-marks)), and put `edit.network.connect()` on it:
 
 ```js
 sticker({
@@ -304,7 +298,7 @@ sticker({
 })
 ```
 
-The value says which edges a link may use. Use `fn` or `field` instead of `value` to vary it per node.
+The value sets which edges a link may use. Use `fn` or `field` instead of `value` to vary it per node.
 
 <div className="api-table-wrap">
   <table className="api-table">
@@ -320,7 +314,7 @@ The value says which edges a link may use. Use `fn` or `field` instead of `value
   </table>
 </div>
 
-Ports show where a link can go. Hover a node to see the ports a link can leave by. Start a drag and the ports that accept it light up. Both follow the `out` and `in` edges and the dataset's constraints.
+Hover a node to see the ports a link can leave by. Start a drag and the ports that accept it light up. Both follow the `out` and `in` edges and the dataset's constraints.
 
 Drag from a port and a dashed connector follows the pointer. Release on a port to connect there, or on a node's body to connect at its facing port. Release on empty space to cancel. Drag the body to move the node.
 
@@ -355,7 +349,7 @@ Drag from a port and a dashed connector follows the pointer. Release on a port t
 
 <Section id="recording" title="Recording sides">
 
-To record which edge each end uses, name the columns on the `link` mark. Declare them in the links table as `categorical` over `"top"`, `"right"`, `"bottom"` and `"left"`:
+To record which edge each end uses, name the columns in `sourceSide` and `targetSide` channels on the `link` mark. Declare them in the links table as `categorical` over `"top"`, `"right"`, `"bottom"` and `"left"`:
 
 ```js
 link({
@@ -366,7 +360,7 @@ link({
 })
 ```
 
-The gestures write those columns, and `source`/`target` to the link table's `ref` columns:
+The gestures write those columns, and write `source` and `target` to the links table's `ref` columns:
 
 <div className="api-table-wrap">
   <table className="api-table">
@@ -382,7 +376,7 @@ The gestures write those columns, and `source`/`target` to the link table's `ref
   </table>
 </div>
 
-A `null` side is unpinned. It meets the facing port, or slides along a node that has no ports. With no side channels, every end is unpinned.
+A `null` side is unpinned. It meets the facing port, or slides along a node that has no ports. With no side channel or [side option](#sides), every end is unpinned.
 
 `edit.network.rewire()` in the `link` mark's `edits` puts a handle on each end while you hover the connector. Drag one to another node to reconnect it, or into empty space to disconnect it. `rewire({ channels: ["target"] })` handles one end only.
 
@@ -418,9 +412,9 @@ Constraints decide which ports show. Here each step shows an `out` port until it
 
 <Section id="sides" title="Pinned sides">
 
-`sourceSide` and `targetSide` as options pin every link's ends to `"top"`, `"right"`, `"bottom"` or `"left"`, so a diagram reads the same way however the boxes are arranged. Both default to `null`. A pinned end leaves its edge square-on and routes around its own box if the other node is behind it.
+As options, `sourceSide` and `targetSide` pin every link's ends to `"top"`, `"right"`, `"bottom"` or `"left"`, so a diagram reads the same way however the boxes are arranged. Both default to `null`. A pinned end leaves its edge square-on, and routes around its own box if the other node is behind it.
 
-As options they set how links draw. Give one `{ fn: d => … }` to derive a side from a column you already have.
+The options set how links draw and write nothing to the data. Give one `{ fn: d => … }` to derive a side from a column you already have. To record sides in the data, use channels; see [Recording sides](#recording).
 
 <Example
   code={sides}
@@ -439,7 +433,9 @@ As options they set how links draw. Give one `{ fn: d => … }` to derive a side
 
 <Section id="node-marks" title="What can be a node">
 
-Any mark that draws a shape at an `x` and a `y` can draw the nodes. Point it at the nodes table. Links meet the shape it draws, and a [`ports`](#ports) channel puts ports on that shape's edges:
+Any mark that draws a shape at an `x` and a `y` can draw the nodes: `point`, `rect`, `text`, a `composite`, and the rest. Point it at the nodes table; channels, scales and edits work as usual. See [Which table a mark draws](/schema#table).
+
+Links meet the shape the mark draws, and a [`ports`](#ports) channel puts ports on that shape's edges:
 
 <div className="api-table-wrap">
   <table className="api-table">
@@ -476,9 +472,7 @@ A glyph puts `ports` on its main shape: the box's circle, or its first shape par
 
 <Section id="faces" title="Faces as nodes">
 
-A [`face`](/marks/face) can draw the nodes too. Give it `x` and `y` columns on the nodes table. Links meet the head's circle.
-
-Put the `ports` channel on the face. Here a link leaves by the right or the bottom and arrives by the left or the top. The face keeps its own edits: `move` on the head, and `slide` on the mouth.
+To draw the nodes with [`face`](/marks/face), give it `x` and `y` columns on the nodes table and put the `ports` channel on it. Here a link leaves by the right or the bottom and arrives by the left or the top. The face keeps its own edits: `move` on the head, and `slide` on the mouth.
 
 <Example
   code={facesAsNodes}
@@ -496,13 +490,13 @@ Put the `ports` channel on the face. Here a link leaves by the right or the bott
 
 <Section id="gestures" title="Building the topology">
 
-Three gestures are network-specific; the rest is ordinary editing.
+Three edits are specific to networks. The rest is ordinary editing.
 
-`edit.network.connect()` creates a link. Put it on a [`ports`](#ports) channel, or in the node mark's `edits` to drag from a node's body. On the body, give it and `move` different drags with `when`: `connect({ when: when.shift })` beside `move({ when: when.noShift })`. With `selfLoops: true`, release on the node you started from to draw a loop. When the nodes draw no shape, a drop within `threshold` px of a node's centre connects.
+`edit.network.connect()` creates a link. Put it on a [`ports`](#ports) channel, or in the node mark's `edits` to drag from a node's body. On the body, separate it from `move` with `when`: `connect({ when: when.shift })` beside `move({ when: when.noShift })`. With `selfLoops: true`, release on the starting node to draw a loop. When the nodes draw no shape, a drop within `threshold` px of a node's centre connects.
 
-`edit.network.rewire()` moves a link's ends — see [Recording sides](#recording).
+`edit.network.rewire()` moves a link's ends; see [Recording sides](#recording).
 
-`edit.network.reverse()` on the `link` mark swaps the two ends on a click, keeping every other column. Give it a `when` if the mark carries another click edit. On `directed: false` it logs a warning and leaves the row as it is.
+`edit.network.reverse()` on the `link` mark swaps the two ends on a click and keeps every other column. Give it a `when` if the mark carries another click edit. On `directed: false` it leaves the row unchanged and logs a warning.
 
 `create()` mints a node where you click. The node table's `key` gives it an identity, so you can link it straight away.
 
@@ -524,9 +518,9 @@ Three gestures are network-specific; the rest is ordinary editing.
 
 <Section id="attributes" title="Link attributes">
 
-A link row is a row like any other. Give the link table columns and encode them on `link()`'s style channels, or edit them with `set`, `cycle` and `editText`.
+A link row is a row like any other. Give the links table columns, then encode them on `link()`'s style channels or edit them with `set`, `cycle` and `editText`.
 
-`channels.text` draws a label at the midpoint and takes `editText()` the same way a `text` mark does. Double-click anywhere along the connector to open the editor.
+`channels.text` draws a label at the midpoint, and takes `editText()` as a `text` mark does. Double-click anywhere along the connector to open the editor.
 
 `stroke` and `strokeWidth` paint the connector and its arrowhead. `fill` paints the label (default: the theme's ink).
 
@@ -536,7 +530,7 @@ A label sits on its connector. `labelBackground` puts a plate behind it:
 link({ labelBackground: true, channels: { text: { field: "note" } } })
 ```
 
-`true` uses the theme's backdrop, which reads as a gap in the line; pass a colour string for anything else. `labelOpacity` (default `0.9`) sets how much of the connector shows through; `labelPadding` and `labelRadius` size the plate.
+`true` uses the theme's backdrop, which reads as a gap in the line. Pass a colour string for any other plate. `labelOpacity` (default `0.9`) sets how much of the connector shows through. `labelPadding` and `labelRadius` size the plate.
 
 <Example
   code={linkAttributes}

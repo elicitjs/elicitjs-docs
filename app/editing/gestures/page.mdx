@@ -19,15 +19,15 @@ export default function Layout({ children }) {
 
 # Transforms & Modalities
 
-<Lead>A transform maps input into a channel's value through that channel's own scale. `move` translates position, `resize` adjusts radial magnitude, `slide` adjusts magnitude along an axis, `rotate` turns angles, `cycle` advances discrete categories, `toggle` picks a slot on and off, `set` writes a value outright, and `rank` reorders rows. `custom` takes anything else. A mark that accepts pointer drags also accepts keyboard arrow keys, through the same edit and the same constraints.</Lead>
+<Lead>A transform maps input to a channel's value through that channel's scale. `move` sets position, `resize` and `slide` set magnitude, `rotate` sets an angle, and `cycle` steps through categories. `toggle` adds or removes a row in a slot, `set` writes a value outright, `rank` reorders rows, and `custom` does anything else. A mark that takes a drag also takes the arrow keys, through the same edit and constraints.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="move" title="Position — move">
 
-`move()` inverts the pointer coordinates on each positional channel it governs. On `x` and `y` together it performs a 2D translation; on `y` alone it is a 1D bar drag.
+`move()` inverts the pointer on each positional channel it governs. On `x` and `y` together it is a 2D drag. On `y` alone it is a 1D bar drag.
 
-By default, the mark's centre snaps to the pointer. On marks with area (such as `rect` or `sticker`), pass `mode: "relative"` so the mark moves by the drag distance without jumping.
+By default, the mark's centre snaps to the pointer. On marks with area, such as `rect` or `sticker`, pass `mode: "relative"`: the mark moves by the drag distance and keeps its grab offset.
 
 <Example
   code={moveAPoint}
@@ -44,9 +44,9 @@ By default, the mark's centre snaps to the pointer. On marks with area (such as 
 
 <Section id="keyboard" title="Keyboard modality — arrow key nudging">
 
-Every mark that accepts a drag also accepts keyboard input through the same edit and constraints. Press <kbd>Tab</kbd> to focus a mark, then use **arrow keys** to nudge values by 1% of the scale domain (or <kbd>Shift</kbd>+arrow for 10%).
+Press <kbd>Tab</kbd> to focus a mark, then press the **arrow keys** to nudge its value by 1% of the scale domain. <kbd>Shift</kbd>+arrow nudges by 10%.
 
-The keyboard shares the same domain clamping and validation as mouse drags. Enable `focusOutline: true` to display the browser's native focus ring.
+A nudge runs through the same edit, clamping and constraints as a drag. Set `focusOutline: true` to show the browser's native focus ring.
 
 <Example
   code={keyboardNudge}
@@ -63,7 +63,7 @@ The keyboard shares the same domain clamping and validation as mouse drags. Enab
 
 <Section id="resize" title="Magnitude — resize (radial)">
 
-`resize()` inverts the drag radius from the mark's centre back into the channel's value (`size: { edit: resize() }`). Stroke widths remain constant while resizing.
+`resize()` inverts the pointer's distance from the mark's centre into the channel's value (`size: { edit: resize() }`). Stroke widths stay constant as the mark grows.
 
 <Example
   code={dragOutwardToGrow}
@@ -80,9 +80,9 @@ The keyboard shares the same domain clamping and validation as mouse drags. Enab
 
 <Section id="slide" title="Magnitude — slide (linear)">
 
-`slide()` is the linear counterpart to `resize`. It reads how far the pointer moves along one **axis** and maps that onto the value's domain. Set `axis` to `'x'` or `'y'`, and `increase` to `'left'`, `'right'`, `'up'`, or `'down'`.
+`slide()` is the linear counterpart to `resize`. It maps the pointer's travel along one **axis** onto the value's domain. Set `axis` to `'x'` or `'y'`, and `increase` to `'left'`, `'right'`, `'up'` or `'down'`.
 
-The default `mode: "relative"` alters the value by the drag delta from where you pressed. `extent` sets the drag distance required to sweep the full domain.
+The default `mode: "relative"` changes the value by the distance dragged since the press. `extent` sets the drag distance that covers the full domain.
 
 <Example
   code={slideAlongAnAxis}
@@ -99,7 +99,7 @@ The default `mode: "relative"` alters the value by the drag delta from where you
 
 <Section id="rotate" title="Angle — rotate">
 
-`rotate()` inverts the pointer's angle about a pivot into angular degrees. Set `pivot: "mark"` to rotate around the mark's centre, or `pivot: "plot"` for the chart centre. Set `fold: false` for a full 360° dial, or `fold: true` for a directional cone.
+`rotate()` inverts the pointer's angle about a pivot into degrees. Set `pivot: "mark"` to rotate about the mark's centre, or `pivot: "plot"` for the plot's centre. Set `fold: false` for a full 360° dial, or `fold: true` for a directional cone.
 
 <Example
   code={rotateABox}
@@ -116,7 +116,7 @@ The default `mode: "relative"` alters the value by the drag delta from where you
 
 <Section id="multi" title="Discrete — cycle, and combining gestures">
 
-`cycle()` advances an ordinal channel to the next value in its domain on a `click`. When multiple edits share a mark, `when` arbitrates which edit fires based on modifier keys.
+`cycle()` steps an ordinal channel to the next value in its domain on a `click`. When several edits share a mark, `when` picks which one fires by modifier key.
 
 <Example
   code={moveShiftResizeClickCycle}
@@ -133,7 +133,7 @@ The default `mode: "relative"` alters the value by the drag delta from where you
 
 <Section id="custom" title="Custom transforms">
 
-`custom(fn)` sets `fn` as the edit's `apply` function. It receives an `EditContext` (`ctx.datum`, `ctx.event`, `ctx.pointer`, `ctx.scales`) and returns the updated datum or dataset.
+`custom(fn)` sets `fn` as the edit's `apply`. It fires on a gesture (`drag` by default). `fn` receives an `EditContext` (`ctx.datum`, `ctx.event`, `ctx.pointer`, `ctx.scales`). Return a new datum, or an array of data; the fields you set are written back.
 
 <Example
   code={invertYYourself}

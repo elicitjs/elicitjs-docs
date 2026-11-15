@@ -16,7 +16,7 @@ export default function Layout({ children }) {
 
 # Zoom & pan
 
-<Lead>`edit.axis.zoom()` lets the wheel narrow or widen an axis's **domain** about the value under the pointer, and `edit.axis.pan()` lets a drag slide it along. Both are schema changes, like [an editable axis](/editing/axis): the dataset is untouched, and scales, axes, marks and guides reflow from the new domain. `el.setDomain(field, domain)` does the same from a button.</Lead>
+<Lead>`edit.axis.zoom()` lets the wheel narrow or widen an axis's **domain** about the value under the pointer. `edit.axis.pan()` lets a drag slide it along. Both change the schema, like [an editable axis](/editing/axis): the dataset is unchanged, and scales, axes, marks and guides follow the new domain. `el.setDomain(field, domain)` does the same from a button.</Lead>
 
 <ApiReference entries={api} />
 
@@ -45,13 +45,13 @@ Zoom works on numeric and temporal axes. Mark edits keep working at every zoom l
 
 <Section id="pan" title="Pan by dragging">
 
-Add `edit.axis.pan()` to the same axis. Drag the plot and the domain follows the pointer. A drag on x pans by the pointer's horizontal travel, and one on y by its vertical travel, so a pan on both axes moves the view diagonally.
+Add `edit.axis.pan()` to the same axis. Drag the plot and the domain follows the pointer. A pan on `x` follows horizontal travel and a pan on `y` follows vertical travel, so a pan on both moves the view diagonally.
 
 A press on a mark with an edit of its own still edits that mark. A press anywhere else on the plot pans.
 
 Pan stops at the declared domain, keeping the span. Set `limit` as on zoom. One drag is one undo step.
 
-Zoom and pan compose because both write the same domain. Each starts from wherever the other left it, and you can scroll to zoom in the middle of a drag.
+Zoom and pan write the same domain, so they combine. Each starts from where the other left it, and you can scroll to zoom in the middle of a drag.
 
 <Example
   code={panAndZoom}

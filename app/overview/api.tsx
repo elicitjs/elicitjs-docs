@@ -101,6 +101,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "motion",
+        type: "false | { duration }",
+        default: "{ duration: 220 }",
+        desc: (
+          <>
+            Eased drawing. A hierarchy&apos;s layout glides to its new place over <code>duration</code> ms. <code>false</code> draws every change at once. Off when the reader&apos;s system asks for reduced motion. See <a href="/marks/hierarchy#gestures">Hierarchy</a>.
+          </>
+        ),
+      },
+      {
         name: "focusOutline",
         type: "boolean",
         default: "false",

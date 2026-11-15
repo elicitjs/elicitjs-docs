@@ -19,7 +19,7 @@ export default function Layout({ children }) {
 
 # Arc · Pie · Donut
 
-<Lead>Data-driven **pie** and **donut** slices. Each row’s magnitude (the `theta` channel) is stacked and normalized to a circle (or partial arc). Shares path math with `axisRadial`. Wire `edits: [edit.stack.edge()]` to **drag a slice boundary** and redistribute the two adjacent shares (the total stays fixed). A `radius` channel gives each slice its own rim, for a rose plot.</Lead>
+<Lead>`arc` and `donut` draw **pie** and **donut** slices. Each row's magnitude, on the `theta` channel, is stacked and normalised to a full circle or a partial arc. `edit.stack.edge()`, `cut()` and `merge()` reshape the slices while keeping the total fixed. `x`/`y` scatter one donut per value, and a `radius` channel gives each slice its own rim for a rose plot.</Lead>
 
 <ApiReference entries={api} />
 
@@ -37,11 +37,11 @@ Full circle, zero inner radius.
 
 <Section id="donut" title="Donut">
 
-Same layout with an inner hole — room for a center label.
+The same layout with an inner hole, which leaves room for a centre label.
 
 <Example
   code={donutWithCenterText}
-  title="Donut with center text"
+  title="Donut with centre text"
   blurb="Static proportions; text is a sibling mark."
 />
 
@@ -49,9 +49,9 @@ Same layout with an inner hole — room for a center label.
 
 <Section id="edit" title="Editable slice boundaries">
 
-Wire `edit.stack.edge()` and every **interior** boundary gets a draggable handle, so _n_ slices give _n_ − 1 handles. The seam where the last slice meets the first is the layout's fixed anchor: with the orientation and the total both fixed, those _n_ − 1 boundaries are all that can move independently.
+Add `edit.stack.edge()` and every interior boundary gets a draggable handle, so _n_ slices give _n_ − 1 handles. The seam where the last slice meets the first stays fixed, since the orientation and the total are both fixed.
 
-Dragging one moves value between exactly the two slices it separates. One grows by what the other loses, so the total is preserved.
+Dragging a boundary moves value between the two slices it separates. One grows by what the other loses, so the total is preserved.
 
 <Example
   code={dragAnyBoundary}
@@ -79,13 +79,13 @@ Dragging one moves value between exactly the two slices it separates. One grows 
 
 <Section id="slice" title="Cutting and merging slices">
 
-A pie divides one total among its rows, which is what a stacked `bar` does along an axis — so the same three gestures work on both:
+A pie divides one total among its rows, as a stacked `bar` does along an axis. The same three gestures work on both:
 
 - `edit.stack.cut()` — **click** inside a slice to divide it in two at the pointer angle.
 - `edit.stack.edge()` — **drag** a boundary to move value across it.
 - `edit.stack.merge()` — **double-click** a boundary to fuse those two slices back into one.
 
-Each preserves the pie's total. A cut takes its category from the schema's domain, so it needs no typing: a closed domain hands out the values this pie doesn't yet use and refuses the cut once they run out, while `open: true` lets each cut append a new one. See [Slicing a stack](/marks/bar#slice) for the bar form.
+Each preserves the pie's total. A cut takes its category from the schema's domain, so it needs no typing. A closed domain hands out the values this pie doesn't yet use, and refuses the cut once they run out. `open: true` lets each cut append a new one. See [Slicing a stack](/marks/bar#slice) for the bar form.
 
 <Example
   code={cutASlice}
@@ -98,9 +98,9 @@ Each preserves the pie's total. A cut takes its category from the schema's domai
 
 <Section id="grid" title="A grid of donuts">
 
-A donut is a view over a **group** of rows the way a `face` is a view over one row — so it scatters into the plane the same way. Bind `x` (and optionally `y`) to a field and each distinct value becomes a **slot** holding its own donut; the rows at that slot are its slices. There is no group transform — the **encoding is the grouping**. (A `size` field scales each donut independently; `outerRadius` pins one radius for all; otherwise the radius fits the slot.)
+Bind `x` (and optionally `y`) to a field and each distinct value becomes a **slot** with its own donut. The rows at that slot are its slices, so the encoding does the grouping. A `size` field scales each donut separately, and `outerRadius` sets one radius for all. Otherwise the radius fits the slot.
 
-Here `x: { field: 'state' }` gives a band axis, so `IL` / `NY` / `NC` each get a donut of their own party split. A boundary drag redistributes share **within that state only** — the per-slot sum a pie holds by construction — and never disturbs another state.
+Here `x: { field: 'state' }` gives a band axis, so `IL`, `NY` and `NC` each get a donut of their own party split. A boundary drag moves share within that state only, and the other states keep their totals.
 
 <Example
   code={donutGrid}
@@ -117,7 +117,7 @@ Here `x: { field: 'state' }` gives a band axis, so `IL` / `NY` / `NC` each get a
 
 <Section id="radius" title="Rose plots (radius)">
 
-The `radius` channel gives each slice its own outer radius, between `innerRadius` and `outerRadius` — a rose, or Vega-Lite's radial plot. `theta` still sets each slice's angle; `theta: { value: 1 }` makes every slice the same width, so the value reads from the rim alone. With no `outerRadius`, the ring's extent is 40% of the smaller plot dimension.
+The `radius` channel gives each slice its own outer radius, between `innerRadius` and `outerRadius`, for a rose or radial plot. `theta` still sets each slice's angle. `theta: { value: 1 }` makes every slice the same width, so the value reads from the rim alone. With no `outerRadius`, the ring's extent is 40% of the smaller plot dimension.
 
 `scale: 'sqrt'` makes a slice's area grow with its value; the default linear scale makes its radius grow with it. Put `edit: move()` on the channel to drag a slice's rim in or out. `axisRadial({ channel: 'radius' })` draws concentric rings as its key.
 
@@ -132,6 +132,6 @@ The `radius` channel gives each slice its own outer radius, between `innerRadius
   )}
 />
 
-A `radius` channel replaces a per-donut `size`, and it applies to a single ring. On a grid of donuts, every slot uses the one ring's extent.
+A `radius` channel replaces a per-donut `size` and sets one ring's extent. On a grid of donuts, every slot uses that extent.
 
 </Section>

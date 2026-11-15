@@ -20,13 +20,13 @@ export default function Layout({ children }) {
 
 # Theming & style
 
-<Lead>Every default colour, font, and affordance token lives in one place — the **theme**. Pass a partial `theme` on `Elicit` (or on any widget) and it deep-merges over the built-in defaults, so you name only what you change. It sits alongside, and under, the two style hooks you already have: a per-datum paint **channel** (`fill`, `stroke`) still wins over any theme token, and the [effects](/effects) layer still owns interaction feedback. Eighteen [named themes](/theming/themes) ship with the library — `theme: "nyt"` restyles a whole chart from one word.</Lead>
+<Lead>The **theme** holds every default colour, font and affordance token. Pass a partial `theme` on `Elicit` or on any widget. It deep-merges over the built-in defaults, so you name only what you change. A per-datum paint channel (`fill`, `stroke`) wins over any theme token. A theme can also set [effects](/effects) defaults, and `effects` on the spec overrides them. Eighteen [named themes](/theming/themes) ship with the library: `theme: "nyt"` restyles a whole chart from one word.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="survey" title="A themed instrument">
 
-`themes.survey` is a built-in professional look. Pass it to any widget and the answer ink, the chrome, and the affordance rings/track/labels all follow it — the behaviour is unchanged, only the style.
+`themes.survey` is a built-in theme for survey widgets. Pass it to any widget to restyle the answer ink, the chrome, and the rings, track and labels. The behaviour stays the same.
 
 <Example
   code={surveyTheme}
@@ -39,7 +39,7 @@ export default function Layout({ children }) {
 
 <Section id="dark" title="Dark mode">
 
-Yes — a theme can produce a fully dark chart. The `background` token paints the chart's own surface (svg / canvas, margin band included), so `themes.dark` is self-contained: light ink, light labels, a slate grid, no host CSS required. The same spec renders light or dark; only the `theme` changes.
+The `background` token paints the chart's own surface, margins included. `themes.dark` uses it with light ink, light labels and a slate grid, so it needs no host CSS. The same spec renders light or dark by changing only the `theme`.
 
 <Example
   code={darkMode}
@@ -52,7 +52,7 @@ Yes — a theme can produce a fully dark chart. The `background` token paints th
 
 <Section id="tokens" title="A theme on a plain chart">
 
-A theme is plain data — no functions, no classes — so it merges cleanly. `ink` is the primary mark colour (every mark with no explicit paint channel reads it); `axis` and `grid` are the chrome. Name a token and it changes; leave one out and it inherits the default.
+A theme is a plain object, so it deep-merges cleanly. `ink` is the primary mark colour, used by every mark with no paint channel of its own. `axis` and `grid` style the chrome. A token you name changes, and a token you leave out keeps its default.
 
 <Example
   code={perChartTheme}
@@ -65,7 +65,7 @@ A theme is plain data — no functions, no classes — so it merges cleanly. `in
 
 <Section id="chrome" title="Axes, grids and the plot panel">
 
-The `axis` tokens style every axis: `stroke` and `strokeWidth` for the spine and ticks, `line: false` to drop the spine, `tickSize` (0 for none) and `tickPadding` for the gap to the label, `labelAngle` to turn the labels. Each is also an [`axis()` option](/marks/axes#styling), which wins. `grid.show` adds gridlines you did not ask for. `panel` paints the plot area under the grid and can frame it; `background` covers the margins too. `bandPadding` sets the gap between bars.
+The `axis` tokens style every axis: `stroke` and `strokeWidth` for the spine and ticks, `line: false` to drop the spine, `tickSize` (0 for none) and `tickPadding` for the gap to the label, `labelAngle` to turn the labels. Each is also an [`axis()` option](/marks/axes#styling), and the option wins. `grid.show` adds gridlines without a `grid()` element. `panel` paints the plot area under the grid and can frame it; `background` covers the margins too. `bandPadding` sets the gap between bars.
 
 <Example
   code={chromeTokens}
@@ -74,7 +74,7 @@ The `axis` tokens style every axis: `stroke` and `strokeWidth` for the spine and
   try={"drag a bar."}
 />
 
-`axis.discrete` and `axis.continuous` override any axis token for axes of that kind. That is how a house drops the spine on the value axis and keeps it under the categories. `grid.show: "value"` grids the axis the value runs along: the continuous one, or y when both are. `grid.zero` draws an emphasised line at 0.
+`axis.discrete` and `axis.continuous` override any axis token for axes of that kind. Use them to drop the spine on the value axis and keep it under the categories. `grid.show: "value"` grids the axis the value runs along: the continuous one, or y when both are. `grid.zero` draws an emphasised line at 0.
 
 <Example
   code={perKindAxes}
@@ -87,7 +87,7 @@ The `axis` tokens style every axis: `stroke` and `strokeWidth` for the spine and
 
 <Section id="typography" title="Typography">
 
-`font.family` sets the chart's typeface; null inherits the page's. `title`, `subtitle` and `caption` each take `fontFamily`, `fontStyle`, `fontWeight`, `fontSize` and `fill`, so a headline can be a serif over sans-serif labels. The axis takes `fontFamily` and `fontWeight` for its labels and `titleFill`, `titleFontSize` and `titleFontWeight` for its title. A [`text`](/marks/text) mark takes `fontWeight`, `fontStyle` and `fontFamily`, each a constant or a channel.
+`font.family` sets the chart's typeface. `null` inherits the page's. `title`, `subtitle` and `caption` each take `fontFamily`, `fontStyle`, `fontWeight`, `fontSize` and `fill`, so a headline can be a serif over sans-serif labels. The axis takes `fontFamily` and `fontWeight` for its labels and `titleFill`, `titleFontSize` and `titleFontWeight` for its title. A [`text`](/marks/text) mark takes `fontWeight`, `fontStyle` and `fontFamily`, each a constant or a channel.
 
 <Example
   code={typography}
@@ -100,7 +100,7 @@ The `axis` tokens style every axis: `stroke` and `strokeWidth` for the spine and
 
 <Section id="titles" title="Titles and captions">
 
-`title`, `subtitle` and `caption` on the `Elicit` spec draw text above and below the plot, left-aligned with it. They reserve layout space the way a legend does: the chart keeps its declared `width` and `height`, and the plot shrinks to make room. The theme's `title`, `subtitle` and `caption` tokens style them, each `{ fill, fontSize, fontWeight }`. A token with no `fill` takes the axis label colour, so the titles follow a dark theme.
+`title`, `subtitle` and `caption` on the `Elicit` spec draw text above and below the plot, left-aligned with it. They reserve space the way a legend does: the chart keeps its declared `width` and `height`, and the plot shrinks to make room. The theme's `title`, `subtitle` and `caption` tokens style them, each with `fill`, `fontSize`, `fontWeight`, `fontFamily` and `fontStyle` (see [Typography](#typography)). A token with no `fill` takes the axis label colour, so the titles follow a dark theme.
 
 <Example
   code={titledChartWithACaption}
@@ -113,7 +113,7 @@ The `axis` tokens style every axis: `stroke` and `strokeWidth` for the spine and
 
 <Section id="precedence" title="Overrides & precedence">
 
-Resolution is layered, most specific first: a per-datum **channel** or option beats `theme.marks[name]`, which beats the theme **token** (`ink`), which beats the renderer default. So a theme sets the family look while a single mark can still opt out.
+The most specific setting wins. A per-datum channel or mark option beats `theme.marks[name]`, which beats the theme token (`ink`), which beats the renderer default. A theme sets the overall look, and a single mark can still override it.
 
 <Example
   code={perMarkOverride}
@@ -126,7 +126,7 @@ Resolution is layered, most specific first: a per-datum **channel** or option be
 
 <Section id="app-wide" title="App-wide defaults">
 
-To theme a whole application without threading `theme` through every chart, call `setTheme(partial)` once at startup — every chart built afterwards inherits it, and a chart's own `theme` still layers on top. `setTheme(themes.survey)` makes the survey look the default; `setTheme(null)` resets to the built-in.
+Call `setTheme(partial)` once at startup to theme a whole application. Every chart built afterwards inherits it, and a chart's own `theme` layers on top. `setTheme(themes.survey)` makes the survey look the default. `setTheme(null)` resets to the built-in theme.
 
 ```js
 import { setTheme, themes } from "elicit-js";

@@ -55,7 +55,7 @@ export function DocShell({ children, chromeless }: Props) {
         <div className="brand">
           <Link href="/">ElicitJS</Link>
         </div>
-        <div className="tag">declarative visual belief elicitation</div>
+        <div className="tag">declarative visual elicitation</div>
         {SITE.map((grp) => (
           <div className="group" key={grp.group}>
             <div className="group-title">{grp.group}</div>

@@ -15,17 +15,17 @@ export default function Layout({ children }) {
 
 # Handles & affordances
 
-<Lead>Handles give continuous geometries — curves, envelopes, partition seams, and interval spans — explicit grab targets. They bridge visual clarity and physical affordance: use visible circular grips, enlarged invisible hit targets (`handles: 'hit'`), or boundary seams. All marks share the same sizing, colour, and hit-testing contract.</Lead>
+<Lead>Handles are grab targets on continuous shapes: curves, envelopes, partition seams and interval spans. They can be visible grips, invisible hit targets (`handles: 'hit'`) or boundary seams. Every mark sizes, colours and hit-tests them the same way.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="contract" title="Visible grips vs. invisible hit targets">
 
-Continuous geometries like lines and area fills have no natural individual nodes to grab. Handles supply the grab targets.
+A line or area has no separate node per point to grab. Handles supply one.
 
-`handles: true` draws visible circular grips on each vertex. `handles: 'hit'` renders no visible circles, but keeps the enlarged pointer hit targets along the path — keeping editorial charts uncluttered while remaining easy to drag. `handles: false` disables interaction on that mark.
+`handles: true` draws a circular grip on each vertex. `handles: 'hit'` draws no circles but keeps the enlarged hit targets along the path, so the chart stays uncluttered and still easy to drag. `handles: false` draws no handles, so an edit that targets them, such as a sweep or a nearest pick, has nothing to grab, and the chart warns.
 
-On a `line` or `area`, a grip is filled with its series' colour — the row's resolved `stroke` — and ringed with the theme's `handleStroke`, so on a multi-series chart each line's grips match it. `handleColor` sets one fill for every grip.
+On a `line` or `area`, a grip is filled with the row's resolved `fill` when the mark encodes one, otherwise its `stroke`. It is ringed with the theme's `handleStroke`. On a multi-series chart, each line's grips match it. `handleColor` sets one fill for every grip.
 
 <Example
   code={visibleVsInvisibleHandles}
@@ -42,9 +42,9 @@ On a `line` or `area`, a grip is filled with its series' colour — the row's re
 
 <Section id="seams" title="Boundary seams (arcs & stacked bars)">
 
-On partitions and shares, handles appear at the **interior boundaries** between adjacent slices. An _n_-slice pie or stacked bar carries _n_ − 1 boundary handles.
+On a partition, handles sit at the **interior boundaries** between adjacent slices. An _n_-slice pie or stacked bar has _n_ − 1 boundary handles.
 
-`edit.stack.edge()` lets you drag any interior boundary to redistribute value between the two adjacent slices. The shared total remains constant.
+`edit.stack.edge()` lets you drag a boundary to move value between the two slices beside it. The total stays constant.
 
 <Example
   code={boundaryHandlesPie}
@@ -61,9 +61,9 @@ On partitions and shares, handles appear at the **interior boundaries** between 
 
 <Section id="spans" title="Span endpoints & body brushes">
 
-On marks with explicit ranges (`x1`/`x2` or `y1`/`y2`), handles sit at the span endpoints.
+On a mark with a range (`x1`/`x2` or `y1`/`y2`), handles sit at the span's endpoints.
 
-`brushSpan()` provides two distinct behaviours on one mark: grab near an edge handle to resize just that bound, or grab the middle body to translate the entire span. Dragging the lower handle past the upper handle automatically flips the fields to preserve ordering without visual jumps.
+`brushSpan()` gives one mark two drags. Grab near an end to resize that bound, or grab the body to move the whole span. Drag the lower end past the upper one and the fields swap on release, so the order holds without a jump.
 
 <Example
   code={brushSpanHandles}

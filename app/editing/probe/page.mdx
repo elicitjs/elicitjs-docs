@@ -7,23 +7,22 @@ import { api } from './api';
 
 import probeASingleValue from './_examples/probe-a-single-value.example.txt';
 import aimThenOpen from './_examples/aim-then-open.example.txt';
-import twoStagePoint from './_examples/two-stage-point.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Probe & multi-step stages
+# Probe
 
-<Lead>The probe flow lets respondents inspect ephemeral proposals before committing: pointer movement renders an uncommitted ghost while `getData()` reports only the last settled belief. Combining `pick: "probe"` with numeric `stage` values enables progressive multi-step elicitation pipelines.</Lead>
+<Lead>`pick: "probe"` previews an edit before it commits. Moving the pointer draws an uncommitted ghost, and `getData()` reports only the last settled answer. A staged probe edit advances to the next [stage](/editing/stages) when it commits.</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="preview" title="Ephemeral ghost proposals">
+<Section id="preview" title="Ghost proposals">
 
-Setting `pick: "probe"` on any edit splits interaction into preview and commit. As the cursor moves, marks render an inert **ghost** showing what a commit would produce.
+`pick: "probe"` splits an edit into preview and commit. As the pointer moves, the marks draw an inert **ghost** of what a commit would produce.
 
-Because proposals operate on the dataset rather than a single mark, every mark reading those rows reflects the ghost in real time. `getData()` and `onChange` remain untouched until commit.
+The proposal applies to the dataset, so every mark reading those rows shows the ghost. `getData()` and `onChange` stay unchanged until you commit.
 
 <Example
   code={probeASingleValue}
@@ -34,32 +33,23 @@ Because proposals operate on the dataset rather than a single mark, every mark r
 
 </Section>
 
-<Section id="commit-modes" title="Dual commit gestures">
+<Section id="commit-modes" title="Two ways to commit">
 
-`pick: "probe"` accepts two natural gestures interchangeably:
-1. **Move-then-click**: Move the pointer without pressing a button to position the ghost, then click to settle.
-2. **Grab-and-drag**: Press on the mark, drag to the target value, and release.
+A probe edit commits on either gesture:
+1. **Move, then click**: move the pointer without pressing to place the ghost, then click to settle it.
+2. **Grab and drag**: press on the mark, drag to the value, and release.
 
 </Section>
 
-<Section id="stages" title="Multi-step stages (progressive elicitation)">
+<Section id="stages" title="Probe across stages">
 
-For multi-part questions ("first set the mean, then specify your confidence"), assign a numeric `stage` to each edit. An edit is active only when its `stage` matches the chart's current stage.
-
-Edits with `pick: "probe"` advance to the next stage automatically upon commit. You can also control stages programmatically with `chart.nextStage()`, `chart.setStage(n)`, and `chart.getStage()`.
+A probe edit with a `stage` advances to the next stage when it commits, unless it sets `advance: false`. See [Stages](/editing/stages) for the stage API.
 
 <Example
   code={aimThenOpen}
-  title="Two-step pipeline: slope, then spread"
+  title="Two steps: slope, then spread"
   blurb="Stage 0 sets the trend slope; stage 1 opens the confidence cone."
-  try={"Move the mouse to aim the line and click; then move to open the confidence cone and click."}
-/>
-
-<Example
-  code={twoStagePoint}
-  title="Progression via nextStage()"
-  blurb="Stage 0 moves position along x; stage 1 resizes the magnitude."
-  try={"Drag horizontally, click Next, then drag outward to resize."}
+  try={"Move the pointer to aim the line and click; then move to open the confidence cone and click."}
 />
 
 </Section>

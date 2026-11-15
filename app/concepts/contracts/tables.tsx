@@ -16,7 +16,7 @@ export function KindsTable() {
           </tr>
           <tr>
             <td><b>parametric</b></td>
-            <td>Belief parameters (trend); not free create targets</td>
+            <td>Channels are curve parameters (trend); rows are not created freely</td>
           </tr>
           <tr>
             <td><b>map chrome</b></td>
@@ -25,8 +25,7 @@ export function KindsTable() {
           <tr>
             <td><b>element</b></td>
             <td>
-              Views a SCALE (<code className="inline">views: &apos;scale&apos;</code>); domain
-              edits, not row creates
+              Views a scale; its edits write the domain, not rows
             </td>
           </tr>
         </tbody>
@@ -51,6 +50,11 @@ export function DataMarksTable() {
             <td><code className="inline">point</code></td>
             <td>natural</td>
             <td>the mark</td>
+          </tr>
+          <tr>
+            <td><code className="inline">shape</code></td>
+            <td>natural</td>
+            <td>the shape</td>
           </tr>
           <tr>
             <td>
@@ -106,7 +110,8 @@ export function DataMarksTable() {
           </tr>
           <tr>
             <td>
-              <code className="inline">line</code> / <code className="inline">area</code> (+ X/Y)
+              <code className="inline">line</code> / <code className="inline">path</code> /{' '}
+              <code className="inline">area</code> (+ X/Y)
             </td>
             <td>
               natural (<code className="inline">edit.line.*</code>)
@@ -142,8 +147,7 @@ export function DataMarksTable() {
           </tr>
           <tr>
             <td>
-              <code className="inline">arc</code> / <code className="inline">pie</code> /{' '}
-              <code className="inline">donut</code>
+              <code className="inline">arc</code> / <code className="inline">donut</code>
             </td>
             <td>
               <code className="inline">edit.stack.cut</code> /{' '}
@@ -154,14 +158,25 @@ export function DataMarksTable() {
           <tr>
             <td><code className="inline">composite</code></td>
             <td>depends on parts</td>
-            <td>each part is its own feature</td>
+            <td>
+              each part is its own feature; in box mode, placed in a per-datum <b>local frame</b>
+            </td>
           </tr>
           <tr>
-            <td><code className="inline">group</code></td>
+            <td>
+              <code className="inline">node</code> / <code className="inline">sticker</code>
+            </td>
             <td>depends on parts</td>
             <td>
-              each part is its own feature, placed in a per-datum <b>local frame</b>
+              presets over <code className="inline">composite</code>; the dot or the note
             </td>
+          </tr>
+          <tr>
+            <td><code className="inline">link</code></td>
+            <td>
+              <code className="inline">edit.network.connect</code> / <code className="inline">remove</code>
+            </td>
+            <td>a transparent hit path; endpoint handles where an edit writes that end</td>
           </tr>
         </tbody>
       </table>
@@ -200,8 +215,8 @@ export function ParametricTable() {
           <tr>
             <td><code className="inline">face</code></td>
             <td>
-              a <b>preset</b>, not a mark: it returns a <code className="inline">group</code> of
-              ordinary marks. Emotion preset binds valence/arousal if unbound
+              a <b>preset</b> that returns a box-mode <code className="inline">composite</code> of
+              ordinary marks. The emotion preset binds valence/arousal if unbound
             </td>
             <td>
               <b>shape is the control</b> — each feature is its own mark, so the universal edits
@@ -268,7 +283,8 @@ export function ElementsTable() {
               <code className="inline">axisY</code>
             </td>
             <td>
-              <code className="inline">edit.axis.scale</code> / <code className="inline">categories</code>
+              <code className="inline">edit.axis.scale</code> / <code className="inline">zoom</code> /{' '}
+              <code className="inline">pan</code>, <code className="inline">edit.scale.categories</code>
             </td>
             <td>domain end grips / category labels</td>
           </tr>
@@ -285,7 +301,8 @@ export function ElementsTable() {
               <code className="inline">legend</code> / …
             </td>
             <td>
-              <code className="inline">edit.legend</code> / <code className="inline">legendValue</code>
+              <code className="inline">edit.legend.category</code> /{' '}
+              <code className="inline">edit.legend.value</code>
             </td>
             <td>ramp grip / swatches</td>
           </tr>

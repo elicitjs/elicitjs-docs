@@ -13,13 +13,15 @@ export default function Layout({ children }) {
 
 # Stages
 
-<Lead>Multi-step elicitation: "first do X, then do Y". An edit may carry a numeric `stage`; it is active only when it equals the chart's current stage (edits with no stage are always active). This is a uniform gate applied to every edit — the same shape as gesture matching, not a new interaction mode — so stages compose with every mark and edit. Advance from the container: `nextStage()`, `setStage(n)`, `getStage()`, `on("stage", cb)`.</Lead>
+<Lead>Stages split a question into steps: first do X, then do Y. Give an edit a numeric `stage` and it is active only in that stage; an edit with no `stage` is always active. Stages work with every mark and edit. Move between them with `nextStage()`, `setStage(n)` and `getStage()`, and listen with `on("stage", cb)`.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="basics" title="Place, then size">
 
-Stage 0 drags the point along x (where); stage 1 resizes it (how confident). Only one edit is live at a time.
+Stage 0 drags the point along `x` (where). Stage 1 resizes it (how confident). Only one edit is live at a time.
+
+A staged [probe](/editing/probe) edit advances the stage when it commits. Set `advance: false` on it to advance by hand instead.
 
 <Example
   code={twoStagePoint}

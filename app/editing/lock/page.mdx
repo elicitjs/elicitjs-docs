@@ -15,13 +15,13 @@ export default function Layout({ children }) {
 
 # Locked rows (read-only data)
 
-<Lead>Some of a chart’s rows are **given** rather than elicited: the record so far, the points you already measured, last quarter’s actuals. `lock` on the spec marks those rows read-only — no gesture can change or delete them — while every row an edit _adds_ stays free. It is the “here is what we know; you supply the rest” policy behind a you-draw-it chart.</Lead>
+<Lead>`lock` on the spec makes **given** rows read-only: the record so far, points already measured, last quarter’s actuals. No gesture can change or delete a locked row. Rows an edit _adds_ stay editable. Locked rows are still part of `getData()`; to leave given rows out of the answer, use [`context`](/editing/existence#context).</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="seed" title="Locked seed, free additions">
 
-`lock: "seed"` fixes exactly the rows you passed as `data`. Everything a `create` mints afterwards is ordinary, editable data — so a scatter plot can show what was observed and collect what you believe, in one dataset.
+`lock: "seed"` locks exactly the rows you passed as `data`. Rows a `create` mints afterwards are ordinary, editable data. One dataset can hold the observed points and your answer.
 
 <Example
   code={scatterObservedPointsYours}
@@ -38,7 +38,7 @@ export default function Layout({ children }) {
 
 <Section id="predicate" title="Locking rows by what they are">
 
-A lock does not have to mean “seeded”. Give it a predicate and it reads the row: the quarters that already happened are actuals, the rest are your forecast — one dataset, one bar mark, two very different kinds of row.
+Pass a predicate to lock rows by their fields. Here the quarters that already happened are actuals, and the rest are your forecast. Both live in one dataset and one bar mark.
 
 <Example
   code={actualsForecast}
@@ -55,7 +55,9 @@ A lock does not have to mean “seeded”. Give it a predicate and it reads the 
 
 <Section id="you-draw-it" title="You draw it">
 
-The New York Times’ “You Draw It” (2017): the record runs to 1990 and you draw the rest. Both halves are the same dataset, the same line mark, the same y field — the lock is the whole difference between them. Because the seeded line is locked, proximity picking cannot see it: a drag beside it does not grab a frozen line, it starts drawing.
+This recreates the New York Times’ “You Draw It” (2017): the record runs to 1990 and you draw the rest. Both halves use the same dataset, line mark and `y` field; only the lock differs. Proximity picks skip locked rows, so a drag beside the record starts drawing instead of grabbing it.
+
+`edit.line.draw({ stage: 0 })` draws the missing years in stage 0. `chart.nextStage()` moves to stage 1, which retires the edit and shows the answer key.
 
 <Example
   code={drawTheLineForTheMissingYears}

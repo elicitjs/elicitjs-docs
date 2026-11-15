@@ -17,13 +17,22 @@ export default function Layout({ children }) {
 
 # Authoring SDK
 
-<Lead>Build new elicitation devices without forking the engine. Marks use `authoring.encodeChannel` / `resolveStyle`; edits use `authoring.makeEdit` + `invertChannel`; multi-event lifecycles register via `authoring.registerDriver`. Attach edits on a channel (`y: { field, edit: move() }`) or at mark level (`edits: [...]`) — never as a fake `channels.edit` key. For the model these extend, see [Core concepts](/concepts); for the stock catalogue, see [Editing](/editing).</Lead>
+<Lead>Extend ElicitJS with new marks, edits and gestures. Marks use `authoring.encodeChannel` and `resolveStyle`. Edits use `authoring.makeEdit` and `invertChannel`. Multi-event lifecycles register with `authoring.registerDriver`. Edits go on a channel (`y: { field, edit: move() }`) or in a mark's `edits: [...]`. For the model these extend, see [Core concepts](/concepts). For the stock edits, see [Editing](/editing).</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="custom-mark" title="A custom mark">
 
-A mark is a view over the chart’s one dataset. The factory returns a feature object; the only required method is `build(data, scales, width, height)`. Call `normalizeMarkOptions` first, resolve every channel through `encodeChannel` / `resolveStyle`, spread `authoring.markCommon(opts)` to pass `id` / `edits` / `constraints` / `table` through verbatim, and set `discreteScale` when discrete data needs a band or a point. Don’t set mark-wide `pointerEvents` — leave that to the engine. To let a datum’s [derived channels (`{ fn }`)](/concepts#derived) see their row index and the dataset, pass the optional `index` and `data` args when you resolve per datum: `authoring.resolveStyle(scales, channels, d, defaults, i, data)`.
+A mark is a view over the interface’s one dataset. The factory returns a feature object, and its only required method is `build(data, scales, width, height)`.
+
+- Call `normalizeMarkOptions` first.
+- Resolve every channel through `encodeChannel` and `resolveStyle`.
+- Spread `authoring.markCommon(opts)` to pass `id`, `edits`, `table`, `tip` and `clip` through unchanged.
+- Set `discreteScale` when discrete data needs a band or a point scale.
+- Set `type` on the feature. Every feature carries one; the example uses `"square"`.
+- Leave mark-wide `pointerEvents` to the engine.
+
+To let a datum’s [derived channels (`{ fn }`)](/concepts#derived) see their row index and the dataset, pass the optional `index` and `data` arguments when you resolve per datum: `authoring.resolveStyle(scales, channels, d, defaults, i, data)`.
 
 <Example
   code={aCustomSquareMark}
@@ -75,7 +84,7 @@ Reach for the smallest tool that fits:
 
 <Section id="apply-array" title="When apply returns a full array">
 
-Most edits return one datum and the engine splices it at `index`. Whole-dataset edits return a new array — reorder, create, remove. `rank()` is the built-in example: drag swaps discrete rank slots.
+Most edits return one datum, which replaces the row at `index`. Whole-dataset edits, such as reorder, create and remove, return a new array. `rank()` is the built-in example: drag swaps discrete rank slots.
 
 <Example
   code={dragToReorder}
@@ -92,7 +101,9 @@ Most edits return one datum and the engine splices it at `index`. Whole-dataset 
 
 <Section id="drivers" title="Register a driver">
 
-Stock `pick` values (`direct`, `nearest`, `plane`, `probe`, `sweep`, …) already cover most lifecycles. When you need a new one, register a driver. An edit reaches it by naming it — `pick: "clickNearest"` — and every edit reaches exactly one driver; `wants(edit)` is only for claiming an edit by capability (a relative slide) and never re-tests `pick`. `onEvent` owns hover/click/drag, and `runEdit` / `previewEdit` commit or preview through the same constraint and undo path. Declare `sessionKeys`: the per-feature session is shared with every other driver on the mark, and the `session.clear()` you are handed nulls exactly those keys. Declare `options` for any knob your driver reads off the edit, or the engine reports it as an unknown option. Set `selects: true` if `guide: true` should draw a snap ring.
+Stock `pick` values (`direct`, `nearest`, `plane`, `probe`, `sweep`, …) cover most lifecycles. For a new one, register a driver. An edit reaches a driver by naming it, as in `pick: "clickNearest"`, and each edit reaches exactly one driver. `wants(edit)` claims an edit by capability, such as a relative slide, and doesn't re-test `pick`.
+
+`onEvent` handles hover, click and drag. `runEdit` and `previewEdit` commit or preview through the same constraint and undo path as stock edits. Declare `sessionKeys`. Every driver on the mark shares the per-feature session, and the `session.clear()` you receive nulls only your keys. Declare `options` for any setting your driver reads off the edit, or the engine reports it as an unknown option. Set `selects: true` if `guide: true` should draw a snap ring. Set `targetsRow: true` if the driver only chooses a row, so that `el.control(name, index)` can run its edits on a given row.
 
 <Example
   code={clickNearestDriver}
@@ -109,22 +120,22 @@ Stock `pick` values (`direct`, `nearest`, `plane`, `probe`, `sweep`, …) alread
 
 <Section id="glyphs" title="Glyphs: prefer a group of marks">
 
-If a glyph’s handles map to distinct **fields** of a row, build it as a [`composite`](/marks/composite) — ordinary marks over the same rows — so direct-pick dispatch keeps one handle from touching another. Only when several handles must live on **one** feature over **one** datum (positions are derived, not fields) do you need `node.channel` plus a `when` guard. Reach for that last.
+If a glyph’s handles map to distinct fields of a row, build it as a [`composite`](/marks/composite): ordinary marks over the same rows. Direct picks then keep each handle to its own field. Use `node.channel` with a `when` guard only when several handles must live on one feature over one datum, because their positions are derived rather than stored as fields.
 
-A whole-dataset plane gesture (`create`, `rotate`, …) belongs on **exactly one** mark — two marks with the same plane edit would fire twice per click.
+Put a whole-dataset plane gesture (`create`, `rotate`, …) on exactly one mark. Two marks with the same plane edit fire twice per click.
 
 </Section>
 
 <Section id="helpers" title="Helpers to reuse">
 
-Don’t reinvent proximity or minting:
+Reuse these for proximity and minting:
 
-- `invertChannel` / `recenterSpan` / `markCenter` — pointer ↔ data for positional edits
-- `schemaDefaults(schema)` — mint a row with every field set to its default (or `null`)
-- `authoring.nextSeriesKey(data, seriesField)` — next free series id for a new line
-- `nearestMark` / `nearestSeries` / `nearestMarkOnAxis` — shared distance pickers
+- `invertChannel` / `recenterSpan` / `markCenter`: pointer ↔ data for positional edits
+- `schemaDefaults(schema)`: mint a row with every field set to its default (or `null`)
+- `authoring.nextSeriesKey(data, seriesField, schema?)`: the next free series id for a new line
+- `nearestMark` / `nearestSeries` / `nearestMarkOnAxis`: shared distance pickers
 
-For create-like customs, set `cardinality: "append"` so constraints know which row is new; for an edit that runs the pointer back through a scale, set `inverts: true` so the dead-drag guard can check the channel. A custom mark stamps `type: "square"` — the one identity key every feature kind carries. For external UI, give the edit a `name` and drive it with [`el.control(name)`](/editing/external-controls).
+For a custom edit that creates rows, set `cardinality: "append"` so constraints know which row is new. For an edit that runs the pointer back through a scale, set `inverts: true` so the dead-drag guard can check the channel. To drive an edit from external UI, give it a `name` and call [`el.control(name)`](/editing/external-controls).
 
 </Section>
 
@@ -133,7 +144,7 @@ For create-like customs, set `cardinality: "append"` so constraints know which r
 - **[Marks](/marks/bar)** — reference implementations (`point`, `bar`, `rule`) to mirror.
 - **[Editing](/editing)** — stock gestures, pick modes, stages, history.
 - **[Composite](/marks/composite)** — multi-handle glyphs as grouped marks.
-- **[Constraints](/constraints)** — dataset invariants your `apply` must respect.
+- **[Constraints](/constraints)** — dataset rules your `apply` must respect.
 - **[Gestures · Custom](/editing/gestures#custom)** — more `custom(fn)` patterns with `when`.
 
 </Section>

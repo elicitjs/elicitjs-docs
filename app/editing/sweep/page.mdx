@@ -18,13 +18,13 @@ export default function Layout({ children }) {
 
 # Mark-specific & path edits
 
-<Lead>Certain marks maintain multi-row or geometric invariants that require specialised edits. `edit.line.sweep()` repaints points across columns, `edit.line.anchor()` builds connected paths, and `edit.stack.edge()` and `edit.stack.cut()` reallocate slices in pies and stacked bars.</Lead>
+<Lead>Some edits work on a whole line or stack rather than one row. `edit.line.sweep()` repaints points across columns, and `edit.line.anchor()` builds connected paths. `edit.stack.edge()` and `edit.stack.cut()` reallocate slices in pies and stacked bars.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="sweep" title="Line sweep (you-draw-it)">
 
-`edit.line.sweep()` updates each point's value as the pointer crosses its horizontal column — the canonical "you-draw-it" interaction. The $x$ coordinates remain fixed while the curve conforms to the gesture.
+`edit.line.sweep()` sets each point's value as the pointer crosses its column. The `x` positions stay fixed and the curve follows the drag. It is shorthand for `move({ pick: "sweep", guide: true })` on a line, the form the first two examples use.
 
 <Example
   code={drawACurve}
@@ -41,7 +41,7 @@ export default function Layout({ children }) {
 
 <Section id="series" title="Series-scoped multi-line sweeps">
 
-When multiple lines share a plot, a sweep locks onto the nearest line at drag-start and paints only that series. Other series remain untouched.
+When several lines share a plot, a sweep locks onto the nearest line when the drag starts and paints only that series. The other series stay as they are.
 
 <Example
   code={twoLinesSweptIndependently}
@@ -77,7 +77,7 @@ Place the sweep on the channel it paints. A mark-level `edits: [edit.line.sweep(
 
 <Section id="anchors" title="Line anchors & freehand paths">
 
-`edit.line.anchor()` appends new points to the nearest line or starts a fresh series in empty space. `edit.line.draw()` samples pointer movement to record freehand continuous strokes.
+`edit.line.anchor()` adds a point to the nearest line, or starts a new series in empty space. `edit.line.draw()` samples the pointer as you drag to record a freehand stroke.
 
 <Example
   code={clickToAddAnAnchor}
@@ -94,9 +94,9 @@ Place the sweep on the channel it paints. A mark-level `edits: [edit.line.sweep(
 
 <Section id="stacks-and-arcs" title="Arc slices & stacked bars">
 
-Stacked marks (such as `pie`, `donut`, and `barY`) use `edit.stack.edge()` and `edit.stack.cut()` to modify proportions while holding the total constant.
+On a partition (a pie `arc`, a `donut` or a stacked `barY`), `edit.stack.edge()` and `edit.stack.cut()` change the proportions and keep the total constant.
 
-`edit.stack.edge()` lets you drag interior seams between segments. `edit.stack.cut()` clicks inside a segment to split it into distinct categories drawn from the schema domain.
+`edit.stack.edge()` lets you drag the seams between segments. With `edit.stack.cut()`, click inside a segment to split it there; the new piece takes the next unused category from the schema's domain.
 
 <Example
   code={cutAStack}

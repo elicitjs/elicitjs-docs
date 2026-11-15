@@ -20,13 +20,13 @@ export default function Layout({ children }) {
 
 # Point
 
-<Lead>`point` is the channel-driven scatter mark: every channel — x, y, size, fill, stroke, angle — resolves through the global scales. Default shape is a circle; `shape: 'square'` emits a centred rect (side `2 × size`) that can rotate about its centre.</Lead>
+<Lead>`point` draws one dot per row at `x`/`y`, for scatter plots and creatable points. `size`, `fill`, `stroke` and `angle` are channels like any other. The default shape is a circle; `shape: 'square'` draws a centred square of side `2 × size` that rotates about its centre.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="channels" title="Channels: size, fill, colour">
 
-A numeric field can drive the radius (size) and a continuous colour ramp at once; a categorical field drives the ordinal palette. Constants and fields mix freely on the same mark.
+A numeric field can drive the radius (`size`) and a continuous colour ramp at once. A categorical field drives the ordinal palette. Constants and fields mix on the same mark.
 
 <Example
   code={sequentialFillSizeFromANumber}
@@ -40,15 +40,15 @@ A numeric field can drive the radius (size) and a continuous colour ramp at once
   blurb="Outlined, semi-transparent dots via top-level stroke / strokeWidth / opacity."
 />
 
-A `symbol` channel draws each point as a glyph — an emoji or a unicode shape — sized by `size`; see [Symbol](/marks/symbol). An SVG path string as a symbol logs a warning, because `point` draws a symbol as text. For path shapes, use [`plot.shape()`](/marks/shape).
+A `symbol` channel draws each point as a glyph, an emoji or a unicode shape, sized by `size`; see [Symbol](/marks/symbol). `point` draws a symbol as text, so an SVG path string as a symbol logs a warning. For path shapes, use [`plot.shape()`](/marks/shape).
 
-`tip: true` shows a tooltip of the row under the pointer, on `point` and every other mark. It never blocks a drag. See [Tooltips](/guides#tips).
+`tip: true` shows a tooltip of the row under the pointer, on `point` and every other mark. Drags work through it. See [Tooltips](/guides#tips).
 
 </Section>
 
 <Section id="heatmap" title="Heatmap of circles / squares">
 
-Put a category on **both** x and y and each dot centres at that intersection — a grid heatmap. `fill` encodes the value as colour and `size` as radius, so magnitude reads twice; `shape: 'square'` swaps circles for centred squares. Reach for `rect` instead when you want filled cells that tile the plane. The `size` scale is invertible, so `resize()` on it drags a dot's radius back to a value — its colour re-derives from the same field.
+Put a category on both `x` and `y` and each dot centres at that intersection, giving a grid heatmap. `fill` encodes the value as colour and `size` as radius, so magnitude reads twice. `shape: 'square'` swaps circles for centred squares. Use `rect` for filled cells that tile the plane. The `size` scale is invertible, so `resize()` on it drags a dot's radius back to a value, and its colour re-derives from the same field.
 
 <Example
   code={heatmapOfCircles}
@@ -65,7 +65,7 @@ Put a category on **both** x and y and each dot centres at that intersection —
 
 <Section id="editing" title="Moving points in 2D">
 
-When both x and y carry a drag, a gesture inverts the pointer through both positional scales.
+When both `x` and `y` carry a drag, the pointer inverts through both positional scales.
 
 <Example
   code={ex2dMoveScatter}
@@ -82,7 +82,7 @@ When both x and y carry a drag, a gesture inverts the pointer through both posit
 
 <Section id="creating" title="Adding points">
 
-`point` is the canonical creatable mark: a plane gesture inverts the pointer through the x and y scales to mint a datum, exactly the inverse of how those channels encode it. Because a move-drag lives on the same mark here, the creator uses `gesture: "dblclick"` so it doesn't race the drag. See [Create · Remove · Anchors](/editing/existence) for the full model and the can/can't-create matrix.
+`create()` on a `point` inverts the pointer through the `x` and `y` scales to mint a datum. A move-drag is on the same mark here, so the creator uses `gesture: "dblclick"` to keep the two gestures apart. See [Create · Remove · Anchors](/editing/existence) for the full model and which marks can create.
 
 <Example
   code={clickToAddPoints}
@@ -99,9 +99,9 @@ When both x and y carry a drag, a gesture inverts the pointer through both posit
 
 <Section id="angle" title="Rotating squares and ticks">
 
-An `angle` channel orients a mark about its centre. Degrees are math convention (0° = +x, counterclockwise); `rotate()` inverts the pointer through the same scale. Squares use `point({ shape: 'square' })`; short `tickX` / `tickY` segments (with `length`) rotate the same way — useful for directional markers on a scatter.
+An `angle` channel orients a mark about its centre. Degrees follow the math convention (0° = +x, counter-clockwise). `rotate()` inverts the pointer through the same scale. Squares use `point({ shape: 'square' })`. Short `tickX` / `tickY` segments (with `length`) rotate the same way, as directional markers on a scatter.
 
-Rotation is a transform, not a change of geometry: the mark keeps its upright coordinates and the renderer spins it about its centre. Everything that answers the pointer follows that transform — proximity picking measures the tick where it is **drawn**, and an interaction effect (a hover or selection outline) turns with the mark it belongs to.
+Picking follows the rotation: a proximity pick measures a tick where it is drawn, and hover and selection outlines turn with the mark.
 
 <Example
   code={scatterOfRotatableSquares}

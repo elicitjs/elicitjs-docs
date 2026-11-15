@@ -15,13 +15,13 @@ export default function Layout({ children }) {
 
 # Responsive sizing
 
-<Lead>By default a chart draws at the exact `width` / `height` you give it, in pixels. The `responsive` option makes it fit its parent instead. `"scale"` wraps the SVG in a **viewBox**, so the browser stretches one drawing to the container and the aspect ratio holds. `"reflow"` measures the parent and **redraws at native pixels** on resize, so text stays crisp, the width tracks the container, and the height stays the value you set. Either way, the `width` / `height` you pass is the design size.</Lead>
+<Lead>By default an interface draws at the exact `width` / `height` you give it, in pixels (600×400 if unset). The `responsive` option makes it fit its parent instead. `"scale"` stretches one drawing to the container through a **viewBox** and keeps the aspect ratio. `"reflow"` **redraws at native pixels** on resize: text stays crisp, the width tracks the container, and the height stays fixed. `responsive: true` is the same as `"reflow"`. In every mode, the `width` / `height` you pass is the design size.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="scale" title="Scale (viewBox)">
 
-`responsive: "scale"` keeps the chart's 480×300 aspect ratio and stretches it to fill the column; text and strokes scale with it. Reach for it when a chart should grow and shrink with its container and some drift in aspect is fine.
+`responsive: "scale"` keeps the chart's 480×300 aspect ratio and stretches it to fill the column. Text and strokes scale with it. Use it when a chart should grow and shrink with its container, and text and strokes can scale too.
 
 <Example
   code={fillsTheParentWidth}
@@ -33,7 +33,7 @@ export default function Layout({ children }) {
 
 <Section id="reflow" title="Reflow (ResizeObserver)">
 
-`responsive: "reflow"` measures this card and redraws at native pixels: the width tracks the container while the height stays 300. Resize the window and the bars re-lay out crisply, with no scaling blur. Call `el.destroy()` on unmount.
+`responsive: "reflow"` redraws at native pixels to fit this card. The width tracks the container and the height stays 300. Resize the window and the bars lay out again at full sharpness. Call `el.destroy()` on unmount.
 
 <Example
   code={redrawsToTheParentWidth}
@@ -46,7 +46,7 @@ export default function Layout({ children }) {
 
 <Section id="fixed" title="Fixed (default)">
 
-With no `responsive` option (or `responsive: "fixed"`) the chart is exactly 320×240 pixels, whatever the container. Use it when a chart must be a precise size.
+With no `responsive` option, or `responsive: "fixed"`, the chart below is exactly 320×240 pixels at any container width. Use it when a chart must be a precise size.
 
 <Example
   code={exactPixels}

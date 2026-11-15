@@ -21,13 +21,13 @@ export default function Layout({ children }) {
 
 # Constraints
 
-<Lead>A constraint is a rule over the dataset. It applies to every edit and every mark, regardless of which one declared it. It can reject a proposed change, or repair it by returning corrected rows — a repair shows up everywhere on the next render, since every mark reads the same rows. Declare it in `constraints: [...]` on the `Elicit` spec — the one place it goes, because it is a rule about the data, not about any one mark. `clamp` bounds a field, `maintainSum` fixes a total, `count` caps the size, and `unique` forbids duplicate keys. Three more constrain shape: `ordering` keeps a row's fields in order (lo ≤ mean ≤ hi), `monotonic` keeps a cumulative curve from dipping, and `spacing` keeps neighbours from colliding. `follow` and `symmetric` couple a range to its centre.</Lead>
+<Lead>A constraint is a rule over the dataset, so it applies to every edit on every mark. It can reject a proposed change, or repair it by returning corrected rows. Every mark reads the same rows, so a repair shows up everywhere on the next render. Declare constraints in `constraints: [...]` on the `Elicit` spec. `clamp` and `snap` bound a field, `maintainSum` fixes a total, `count` caps the number of rows, and `unique` forbids duplicate keys. `ordering` keeps a row's fields in order (lo ≤ mean ≤ hi), `monotonic` keeps a cumulative curve from dipping, and `spacing` keeps neighbours apart. `follow` and `symmetric` couple a range to its centre. `constraints.custom` defines your own.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="sum" title="maintainSum — a total held at 100">
 
-The sum rule is a dataset invariant, so it holds for every edit from every mark. Bars give way to keep the total at 100; `guide: true` draws the live bound.
+`maintainSum` holds the total for every edit on every mark. Drag one bar and the others give way to keep the total at 100. `guide: true` draws the live bound.
 
 <Example
   code={barsThatCompensate}
@@ -44,9 +44,9 @@ The sum rule is a dataset invariant, so it holds for every edit from every mark.
 
 <Section id="clamp" title="clamp — bound a field">
 
-`clamp` holds a field inside `[min, max]` — the field you name, or, with none named, whichever column the edit is writing. An omitted bound falls back to the field's declared domain. `field` also takes a list, so one `clamp` bounds every column of a glyph. Pair it with a nearest pick and a self-drawn guide to make the bounds visible while dragging.
+`clamp` holds a field inside `[min, max]`. It bounds the field you name, or the column the edit writes when you name none. An omitted bound falls back to the field's declared domain. `field` also takes a list, so one `clamp` can bound every column of a glyph. Pair it with a nearest pick and `guide: true` to show the bounds while you drag.
 
-`clamp` and `snap` repair every cell the proposal changed, not only the one you dragged. A neighbour that `ordering` or `monotonic` pushed is bounded too, and both rows of a stack edge land on the grid together, so the stack keeps its total. `snap` keeps a temporal field a `Date`: its `step` is in milliseconds.
+`clamp` and `snap` repair every cell the proposal changed. A neighbour that `ordering` or `monotonic` pushed is bounded too. Both rows of a stack edge land on the grid together, so the stack keeps its total. `snap` keeps a temporal field a `Date`, and its `step` is in milliseconds.
 
 <Example
   code={clampedDragWithAGuide}
@@ -63,7 +63,7 @@ The sum rule is a dataset invariant, so it holds for every edit from every mark.
 
 <Section id="unique" title="unique — one per key">
 
-`unique` forbids two rows with the same key. A single field guards one axis; an array is a composite key — at most one mark per cell, for both create and move.
+`unique` forbids two rows with the same key. A single field guards one axis. An array is a composite key: at most one mark per cell, for both create and move.
 
 <Example
   code={oneBarPerCategory}
@@ -91,7 +91,7 @@ The sum rule is a dataset invariant, so it holds for every edit from every mark.
 
 <Section id="ordering" title="ordering — fields of a row, in order">
 
-An error bar's caps and mean are separate marks over separate fields of one row. Without this rule, dragging the low cap above the high one draws the glyph inside-out and reverses what the interval means. `ordering` holds across all three marks, whichever handle you drag.
+An error bar's caps and mean are separate marks over separate fields of one row. `ordering` keeps those fields in order across all three marks, whichever handle you drag. A low cap dragged above the high one would otherwise turn the interval inside-out.
 
 <Example
   code={anIntervalThatStaysInOrder}
@@ -99,7 +99,7 @@ An error bar's caps and mean are separate marks over separate fields of one row.
   blurb={"ordering({ field: [\"lo\", \"mean\", \"hi\"] }) — one rule across three marks."}
   try={(
     <>
-      <b>Drag</b> the low cap up past the mean: the mean and the high cap are carried along rather than the cap sticking. The handle you grabbed is the one you meant.
+      <b>Drag</b> the low cap up past the mean: the mean and the high cap move up with it.
     </>
   )}
 />
@@ -140,7 +140,7 @@ Declare them in the order `[follow, symmetric, ordering, clamp]`. Constraints ru
 
 <Section id="monotonic" title="monotonic — a curve that can’t go back on itself">
 
-A CDF, a survival function, a dose-response curve — none of these can dip, but a you-draw-it stroke doesn't know that and will draw one anyway. `monotonic` repairs the drag instead of rejecting it: it pushes the rows the moved point would have crossed, rather than freezing the curve against its own history.
+A CDF, a survival function or a dose-response curve can't dip, but a drawn stroke can. `monotonic` repairs the drag: it pushes the rows the moved point would have crossed.
 
 <Example
   code={aCurveThatOnlyRises}
@@ -148,7 +148,7 @@ A CDF, a survival function, a dose-response curve — none of these can dip, but
   blurb={"monotonic({ field: \"p\", along: \"year\" }) — the rule behind every CDF."}
   try={(
     <>
-      <b>Drag</b> a middle point up hard: the points to its right rise to meet it, because “it reaches this level by here” says something about later years too. Drag it down and the left-hand points give way instead.
+      <b>Drag</b> a middle point up hard: the points to its right rise to meet it. Drag it down and the points to its left drop instead.
     </>
   )}
 />
@@ -159,7 +159,7 @@ A [locked](/editing/lock) row stays where it is. The dragged value stops at the 
 
 <Section id="spacing" title="spacing — neighbours that keep their distance">
 
-For elicitations where "distinct" is part of the claim: thresholds of a scale, breakpoints of a piecewise curve, tiers of a rubric. Two coincident points are occasionally a genuine belief, but more often a slip of the hand — and once overlapped, the topmost point takes every subsequent grab and the two can't be separated again.
+`spacing` keeps values a minimum distance apart. Use it where the values must stay distinct: thresholds of a scale, breakpoints of a piecewise curve, tiers of a rubric. Two points at the same value are usually a slip. Once they overlap, the top one takes every grab and you can't separate them.
 
 <Example
   code={thresholdsThatStayApart}
@@ -167,11 +167,11 @@ For elicitations where "distinct" is part of the claim: thresholds of a scale, b
   blurb={"spacing({ field: \"at\", min: 8 }) — no two boundaries closer than 8 points."}
   try={(
     <>
-      <b>Drag</b> one threshold into its neighbour: it pushes rather than overlaps, and the shove carries down the line. Pushing apart preserves the order, so this field needs no <code className="inline">ordering</code> as well.
+      <b>Drag</b> one threshold into its neighbour: it pushes its neighbour, and the push carries down the line. The push keeps the values in order, so this field doesn't need <code className="inline">ordering</code> as well.
     </>
   )}
 />
 
-The chain always fits inside the field's domain. With three thresholds beyond the one you drag, it stops `3 × min` short of the domain's edge, so the pushed thresholds never pile up against the wall.
+The chain always fits inside the field's domain. With three thresholds beyond the one you drag, the dragged one stops `3 × min` short of the domain's edge, which leaves room for the three it pushes.
 
 </Section>

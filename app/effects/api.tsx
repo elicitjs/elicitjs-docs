@@ -9,7 +9,7 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "effects: { hovered, selected, grabbed }",
+      "effects: { hovered, selected, target, grabbed }",
     ],
     options: [
       {
@@ -27,6 +27,12 @@ export const api: ApiEntry[] = [
         type: "false | object",
         default: "outline",
         desc: "The mark is in the chart's selection (edit.select / el.select). Outranks hovered.",
+      },
+      {
+        name: "target",
+        type: "false | object",
+        default: "outline #2563eb, pad 3",
+        desc: "The container a dragged node would join if released now (see Hierarchy).",
       },
       {
         name: "grabbed",
@@ -56,7 +62,7 @@ export const api: ApiEntry[] = [
         default: "{ color: 'auto', pad: 0, width: 3 }",
         desc: (
           <>
-            An outline overlay traced on the mark&rsquo;s edge, above every other layer. Handles every node type &mdash; circle, rect, line, path and text. <code className="inline">color: &apos;auto&apos;</code> reads the mark&rsquo;s fill (or its stroke, when the fill is missing or near-white) and darkens it by <code className="inline">darken</code> (0.6 hovered, 1.5 selected; negative lightens). <code className="inline">&apos;fill&apos;</code> / <code className="inline">&apos;stroke&apos;</code> pick that paint; a CSS colour fixes it; a function <code className="inline">(color, node) =&gt; string</code> rewrites it. <code className="inline">fallback</code> paints when nothing can be read. <code className="inline">pad</code> moves the trace out from the edge.
+            An outline overlay traced on the mark&rsquo;s edge, above every other layer. Handles every node type &mdash; circle, rect, line and path. Text is outlined only when the spec sets <code className="inline">outline</code>, as a box around the label. <code className="inline">color: &apos;auto&apos;</code> reads the mark&rsquo;s fill (or its stroke, when the fill is missing or near-white) and darkens it by <code className="inline">darken</code> (0.6 hovered, 1.5 selected; negative lightens). <code className="inline">&apos;fill&apos;</code> / <code className="inline">&apos;stroke&apos;</code> pick that paint; a CSS colour fixes it; a function <code className="inline">(color, node) =&gt; string</code> rewrites it. <code className="inline">fallback</code> paints when nothing can be read. <code className="inline">pad</code> moves the trace out from the edge.
           </>
         ),
       },

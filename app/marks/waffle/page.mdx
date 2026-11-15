@@ -19,25 +19,25 @@ export default function Layout({ children }) {
 
 # Waffle
 
-<Lead>Like a **bar**, a waffle shows a quantity for a category — but subdivides the block into a grid of **cells** where **one cell is a fixed quantity** (`unit`), so a reader can literally count amounts and a gesture can pick a proportion cell-by-cell. `value / unit` cells fill; cells sit `multiple` across the band, so each row spans `multiple · unit` and its band is read from the value scale — rows land on axis ticks and the filled height matches the value. Pair with `snap` (step = `unit`) to land drags on whole cells.</Lead>
+<Lead>A waffle shows a quantity per category as a block of countable **cells**. One cell is worth `unit` of the field, so `value / unit` cells fill, laid out `multiple` across the band. The `count` channel holds the value. Edit it with `edit.waffle.fill()`, which fills up to the cell under the pointer, so the value is always a whole number of cells.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="counts" title="Counting quantities">
 
-A waffle over four categories — each cell is a fixed count (here 10), so amounts read exactly: count the cells and multiply by the unit. Rows land on the y-axis ticks.
+A waffle over four categories. Each cell is 10 fruit, so count the cells and multiply by the unit to read an amount.
 
 <Example
   code={fruitCounts}
   title="Fruit counts"
-  blurb="Static waffle; y domain 0–320, one cell = 10 fruit (32 cells tall), multiple auto-picked square."
+  blurb="Static waffle; count domain 0–320, one cell = 10 fruit (32 cells), multiple picked automatically."
 />
 
 </Section>
 
 <Section id="proportion" title="Picking a proportion">
 
-One category on a 0–1 axis; each cell is 1/50, so 50 cells fill the block. edit.waffle.fill() fills up to the exact cell under the pointer — click or drag — so the value is always a whole number of cells.
+One category over a 0–1 domain. Each cell is 1/50, so 50 cells fill the block. Click or drag, and `edit.waffle.fill()` fills up to the cell under the pointer.
 
 <Example
   code={proportionPicker}
@@ -50,7 +50,7 @@ One category on a 0–1 axis; each cell is 1/50, so 50 cells fill the block. edi
 
 <Section id="shapes-and-click" title="Dots, click-to-set & hidden track">
 
-Cells can be circles (`shape: "circle"`) — uniform squares that touch, packed to fill the band width and height. A click-gesture edit sets the count to the clicked cell in one tap, and `showEmpty: false` hides the track while keeping it grabbable.
+`shape: "circle"` draws a dot in each square cell. A `click` gesture sets the count to the clicked cell in one tap. `showEmpty: false` hides the empty cells, and they stay grabbable.
 
 <Example
   code={clickADotToSetTheCount}
@@ -63,7 +63,7 @@ Cells can be circles (`shape: "circle"`) — uniform squares that touch, packed 
 
 <Section id="small-counts" title="Small counts (unit = 1)">
 
-With `unit: 1` each cell is exactly one item, so small counts read directly — one cell means one. The grid is only as wide as it needs to be, never wider than the band, and is centred, so a category of 1 shows a single cell.
+With `unit: 1` each cell is one item, so small counts read directly. The grid is centred in the band and only as wide as it needs to be.
 
 <Example
   code={talliesOf16}
@@ -75,11 +75,11 @@ With `unit: 1` each cell is exactly one item, so small counts read directly — 
 
 <Section id="count-axis" title="The count axis">
 
-A waffle's magnitude is the `count` channel, and it sits on a **count axis** — not on `y`. "How many cells" and "how far up the y axis" are different questions about different quantities, so they get different domains; a waffle and a bar in one chart never union theirs.
+A waffle's magnitude is the `count` channel, and it has its own **count axis**, separate from `y`. A waffle and a bar in one chart keep separate domains.
 
-The axis is **opt-in**. Ask for it with `axes: \{ count: true \}`. It defaults off for the same reason legends do — it reserves layout space for a scale the mark already makes countable by eye — and it reports **data units**, so it agrees with the column that fed it.
+Ask for the axis with `axes: { count: true }`. The cells already make the count readable, so it is off by default. It reports data units, matching the column it reads.
 
-`unit` is the exchange rate: one cell is worth `unit` of the field, so with the default `unit: 1` the column value *is* the number of cells. Pick a `unit` that divides the declared domain; when it doesn't, the top cell is a fraction and the mark says so.
+One cell is worth `unit` of the field. With the default `unit: 1`, the column value is the number of cells. Pick a `unit` that divides the declared domain. Otherwise the top cell is a fraction and the mark logs a warning.
 
 <Example
   code={aCountAxis}
@@ -104,7 +104,7 @@ The axis is **opt-in**. Ask for it with `axes: \{ count: true \}`. It defaults o
 
 <Section id="orientation" title="Orientation">
 
-Put the category on `y` and the blocks grow rightward instead of up. `waffleY` and `waffleX` force a direction; bare `waffle` takes it from the channel map, since the category's axis is the band and `count` runs along the other one. `orientation: "horizontal" | "vertical"` is the explicit form, the same option `bar` takes.
+Put the category on `y` and the blocks grow rightward. `waffleY` and `waffleX` set the direction. A bare `waffle` takes it from the channel map: the category's axis is the band, and `count` runs along the other. `orientation: "horizontal" | "vertical"` is the explicit form, the same option `bar` takes.
 
 <Example
   code={blocksThatGrowRightward}

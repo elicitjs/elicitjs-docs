@@ -21,13 +21,13 @@ export default function Layout({ children }) {
 
 # Composite
 
-<Lead>A composite is a glyph: a group of ordinary marks over the chart's one dataset. Each part encodes some fields of the same rows, and a part whose channel carries an `edit` is a handle. Give a part a `frame:` channel and the composite becomes a box its parts sit inside; `group` is an alias of `composite`.</Lead>
+<Lead>A composite is a glyph: a group of ordinary marks, its `parts`, over the same rows of the dataset. Each part encodes some fields, and a part whose channel carries an `edit` is a handle. Give a part a `frame:` channel and the composite becomes a box that its parts sit inside.</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="lollipop" title="Lollipop — drag the tip">
+<Section id="lollipop" title="Lollipop">
 
-A stem (a span rule from the baseline to the value) plus a draggable tip. Two marks: the `ruleX` draws the stem and carries no edit, so it is inert; the `point` is the handle and edits `value`. Drag a tip and its stem re-derives, because both marks read the same row.
+A lollipop is a stem plus a draggable tip. The stem is a `ruleX` spanning the baseline to the value. It carries no edit, so it is inert. The tip is a `point` that edits `value`. Drag a tip and its stem re-derives, because both marks read the same row.
 
 <Example
   code={oneEditableFieldTheTip}
@@ -42,9 +42,9 @@ A stem (a span rule from the baseline to the value) plus a draggable tip. Two ma
 
 </Section>
 
-<Section id="error-bar" title="Error bar — move the dot, resize the interval">
+<Section id="error-bar" title="Error bar">
 
-Three editable fields on one row: `mean` (the dot), `lo` and `hi` (the caps). Each is a separate mark, so each edits a plain `y` channel and dragging a cap moves only that end — no handle arbitration to write. The whisker is a `ruleX` spanning lo..hi; it follows the caps because it reads the same rows.
+One row holds three editable fields: `mean` (the dot), `lo` and `hi` (the caps). Each is its own mark with an edit on a plain `y` channel, so dragging a cap moves only that end. The whisker is a `ruleX` spanning `lo` to `hi`, and follows the caps because it reads the same rows.
 
 <Example
   code={independentHandlesPerField}
@@ -59,8 +59,8 @@ Three editable fields on one row: `mean` (the dot), `lo` and `hi` (the caps). Ea
 
 <Example
   code={coupledMoveCenterWithinEnds}
-  title="Coupled move + center-within-ends"
-  blurb={"Two behaviours, two layers. The dot uses a joint edit (edit.custom): its new value comes from the pointer, and it shifts lo/hi by the same delta, so moving the centre carries the whole bar. \"Centre stays within the ends\" is a constraint — a pure data rule on the dataset. Declared once on the composite, it runs on every commit from every part, so a cap can never cross the centre, no matter which handle you grabbed."}
+  title="Coupled move, centre within ends"
+  blurb={"The dot's edit.custom sets mean from the pointer and shifts lo and hi by the same amount, so the whole bar moves. A constraint declared once on the spec keeps the centre within the ends. It applies to every part's edits, so a cap stops at the centre whichever handle you drag."}
   try={(
     <>
       <b>Drag the dot</b> — the whole bar travels. <b>Drag a cap</b> past the dot — it stops at the centre.
@@ -72,12 +72,12 @@ Three editable fields on one row: `mean` (the dot), `lo` and `hi` (the caps). Ea
 
 <Section id="plus" title="Composite channels + per-part channels">
 
-Two layers of binding. **Composite** `channels` (here `x`, `y`, `angle`) trickle into every part so the glyph shares one position and one orientation. **Each part** still declares its own channels and shorthands — arm length, stroke colour, a hub’s `fill` / `size`. A part key wins on conflict. Inherited `edit`s attach to the last part only, so one `rotate()` spins the whole glyph without double-applying.
+Channels bind at two levels. The composite's `channels` (here `x`, `y`, `angle`) pass down to every part, so the glyph shares one position and one orientation. Each part still declares its own channels and shorthands: arm length, stroke colour, a hub's `fill` and `size`. A part's key wins on conflict. Inherited `edit`s attach to the last part only, so one `rotate()` spins the whole glyph once.
 
 <Example
   code={compositeChannelsTrickleDown}
   title="Shared x/y/angle; per-part stroke on crossing ticks"
-  blurb="A + from tickY (horizontal) + tickX (vertical). Composite channels bind position and angle once; each tick keeps its own stroke / length. The last part holds the inherited rotate() edit."
+  blurb="A + made of tickY (horizontal) and tickX (vertical). Composite channels bind position and angle once; each tick keeps its own stroke and length. The last part holds the inherited rotate() edit."
   try={(
     <>
       <b>Drag</b> the darker (vertical) arm of a + to spin it.
@@ -88,7 +88,7 @@ Two layers of binding. **Composite** `channels` (here `x`, `y`, `angle`) trickle
 <Example
   code={hubPointOwnFillSize}
   title="Same composite angle; hub point with its own fill/size"
-  blurb="Add a square hub as a third part. It inherits x/y/angle from the composite but sets its own shape, fill, and size — part channels win for those names. rotate() still lives on the last part."
+  blurb="A square hub is the third part. It inherits x/y/angle from the composite and sets its own shape, fill and size; part channels win for those names. rotate() is still on the last part."
   try={(
     <>
       <b>Drag</b> the hub (last part) to spin the whole glyph.
@@ -100,12 +100,12 @@ Two layers of binding. **Composite** `channels` (here `x`, `y`, `angle`) trickle
 
 <Section id="creating" title="Creating a whole glyph at once">
 
-Creation is [mark-agnostic](/editing/existence#what-can-create): a plane gesture mints one row, and every part of the glyph encodes it — so one create makes a whole composite appear. The rule that a whole-dataset edit belongs on **exactly one mark** is what makes this clean: put `create` on a **single part** (here the tip), and a click appends one row, not one per part. The inert stem re-derives from the same row, so the stem and tip show up together.
+A create gesture mints one row, and every part of the glyph encodes it, so one click adds a whole composite. See [what can be created](/editing/existence#what-can-create). Put `create` on one part only (here the tip). A click then appends one row, not one per part. The inert stem re-derives from the same row, so the stem and tip appear together.
 
 <Example
   code={createAWholeGlyph}
   title="Double-click to add a lollipop"
-  blurb={"create() lives on the tip only; the stem (an inert ruleX from baseline → value) re-derives from the same new row. One row in, a whole glyph out. count({ max }) caps the dataset."}
+  blurb={"create() is on the tip only; the stem (an inert ruleX from baseline → value) re-derives from the same new row. One row in, one whole glyph out. count({ max }) caps the dataset."}
   try={(
     <>
       <b>Double-click</b> empty space to add a lollipop · <b>drag</b> a tip to move it.
@@ -117,18 +117,18 @@ Creation is [mark-agnostic](/editing/existence#what-can-create): a plane gesture
 
 <Section id="box" title="A glyph with its own units">
 
-The parts above sit on the chart's axes. Some glyphs need the opposite: a face's eye is 16% of the way up *the face*, not at `y = 0.16` of the data.
+The parts above sit on the chart's axes. Some glyphs need their own units: a face's eye sits 16% of the way up *the face*, not at `y = 0.16` in the data.
 
-Give a part a `frame:` channel and the composite becomes a **box**. Its own `x` / `y` / `size` set that box's centre and half-size for each row, and `frame:` values are read inside it:
+Give a part a `frame:` channel and the composite becomes a **box**. The composite's `x` / `y` / `size` set each row's box centre and half-size, and `frame:` values are read inside that box:
 
-- `x` / `y` — `[-1, 1]` from the centre, y up. `{ frame: -0.4 }` is 40% of the way to the left edge.
-- `size` / `rx` / `ry` / `strokeWidth` — `[0, 1]`, a fraction of the half-size.
-- `angle` / `curvature` — the channel's own units. The scale belongs to its own part, so two parts can take opposite ranges.
+- `x` / `y`: `[-1, 1]` from the centre, y up. `{ frame: -0.4 }` is 40% of the way to the left edge.
+- `size` / `rx` / `ry` / `strokeWidth`: `[0, 1]`, a fraction of the half-size.
+- `angle` / `curvature`: the channel's own units. Each part has its own scale, so two parts can take opposite ranges.
 - `{ field: "f", frame: [lo, hi] }` maps the field's schema domain onto that slice of the box. The domain stays on the schema.
 - A categorical field spreads its categories evenly over `[lo, hi]`, and an edit snaps to the nearest one.
-- `{ fn: (d) => …, frame: true }` is derived in local units. It places a part where another part's value puts it, such as a forearm at the end of an upper arm.
+- `{ fn: (d) => …, frame: true }` is derived in local units. Use it to place a part where another part's value puts it, such as a forearm at the end of an upper arm.
 
-`x` / `y` / `size` describe the box, so they don't trickle into the parts. A part that states no position sits at the centre. `{ value }` still means pixels, so use `frame:` for anything that should scale with the glyph.
+`x` / `y` / `size` describe the box, so they stay off the parts. A part that states no position sits at the centre. `{ value }` is in pixels, so use `frame:` for anything that should scale with the glyph.
 
 <Example
   code={aLocalFrame}
@@ -141,15 +141,15 @@ Give a part a `frame:` channel and the composite becomes a **box**. Its own `x` 
   )}
 />
 
-For a single software knob — donut-slice ring fill + needle, Ableton-style — see [Needle → Ableton-style knob](/marks/needle#ableton).
+For a single knob with a ring fill and a needle, see [Needle → Ableton-style knob](/marks/needle#ableton).
 
 </Section>
 
 <Section id="why-scales" title="Why they're real scales">
 
-A `frame:` channel is a real scale, built once per row. So the ordinary edits work inside a box unchanged: `move`, `slide`, `rotate` and `resize` invert a gesture back through the same mapping that placed the part, and `.accepts()` reports the field's real range to an [external control](/editing/external-controls).
+A `frame:` channel is a real scale, built once per row, so the ordinary edits work inside a box. `move`, `slide`, `rotate` and `resize` invert a gesture through the same mapping that placed the part, and `.accepts()` reports the field's real range to an [external control](/editing/external-controls).
 
-A `frame:` channel is also invisible to the chart's axes. An eye at `{ frame: -0.4 }` never widens the x domain or adds an axis for coordinates that aren't in the data's units.
+The chart's axes ignore `frame:` channels. An eye at `{ frame: -0.4 }` leaves the x domain and the axes unchanged.
 
 </Section>
 
@@ -157,7 +157,7 @@ A `frame:` channel is also invisible to the chart's axes. An eye at `{ frame: -0
 
 A part's geometry is a fraction of the box, so resizing the glyph resizes its contents. An edit on an inner part still writes its own field on its own domain.
 
-An edit on the composite's own `x` / `y` / `size` moves or resizes the whole glyph. The box covers the glyph, so you can grab it anywhere, including between the parts. A part carrying its own edit takes the drag first.
+An edit on the composite's own `x` / `y` / `size` moves or resizes the whole glyph. The box covers the glyph, so you can grab it anywhere, including between the parts. A part with its own edit takes the drag first.
 
 <Example
   code={itScales}
@@ -174,12 +174,12 @@ An edit on the composite's own `x` / `y` / `size` moves or resizes the whole gly
 
 <Section id="parts" title="What box mode returns">
 
-The box first, then the parts, all as plain marks. The box carries the composite's `x` / `y` / `size`, so those fields still build the chart's axes; a composite with no edit on them draws nothing you can grab.
+Box mode returns the box first, then the parts, all as plain marks. The box carries the composite's `x` / `y` / `size`, so those fields still build the chart's axes. Without an edit on them, the box is inert.
 
 Two limits apply to a part placed in the box:
 
-- A `{ fn }` channel is called once per row, as `(d, 0, [d])`, so it can't look across rows. Read the field instead. Its result is in pixels; add `frame: true` to return local units.
-- A line-family mark can't span rows inside a box. Position it on the global scales, or move it out of the composite.
+- A `{ fn }` channel is called once per row, as `(d, 0, [d])`, so it sees only its own row. Read the field instead. Its result is in pixels; add `frame: true` to return local units.
+- A line-family mark inside a box is built one row at a time, so it cannot join rows into a series, and it logs a warning. To connect rows, position it on the global scales, or move it out of the composite.
 
 A part with no `frame:` channel keeps the global scales, so one part of a glyph can still span to a data value.
 
@@ -187,9 +187,9 @@ A part with no `frame:` channel keeps the global scales, so one part of a glyph 
 
 <Section id="face" title="Build a face with one brow">
 
-[`face()`](/marks/face) is a composite in box mode: a `point` head, two [`ellipse`](/marks/ellipse) eyes, two `tickY` brows and a [`curveY`](/marks/curve) mouth. It's a preset, so you can assemble a different anatomy from the same parts — here, one brow instead of two.
+[`face()`](/marks/face) is a composite in box mode: a `point` head, two [`ellipse`](/marks/ellipse) eyes, two `tickY` brows and a [`curveY`](/marks/curve) mouth. It is a preset, so you can build a different face from the same parts. Here it has one brow instead of two.
 
-The brow and the mouth are both [`curve`](/marks/curve) marks. `curvature` is the apex's offset from the chord, as a fraction of the half-chord, so it scales with the glyph. Positive curvature bows to the left of travel, which arches a rightward chord upward. A descending `frame:` range reverses that, so a rising `grump` dips the brow and a rising `mood` deepens the smile.
+The brow and the mouth are both [`curve`](/marks/curve) marks. `curvature` is the apex's offset from the chord, as a fraction of the half-chord, so it scales with the glyph. Positive curvature bows to the left of the curve's direction, which arches a rightward chord upward. A descending `frame:` range reverses that, so a rising `grump` dips the brow and a rising `mood` deepens the smile.
 
 <Example
   code={unibrow}
@@ -202,6 +202,6 @@ The brow and the mouth are both [`curve`](/marks/curve) marks. `curvature` is th
   )}
 />
 
-The [face page](/marks/face) writes the preset's own anatomy out the same way.
+The [face page](/marks/face) builds the preset's own parts the same way.
 
 </Section>

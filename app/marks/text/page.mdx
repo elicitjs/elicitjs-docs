@@ -19,13 +19,13 @@ export default function Layout({ children }) {
 
 # Text
 
-<Lead>A per-datum **label**, as in Observable Plot's `text`. It places a string at a position (x, y); `text`/`fontSize`/`textAnchor`/`lineAnchor`/`dx`/`dy` are read as-is — a field or a constant — `angle` is degrees, and `format` is a d3-format string or function (display-only). A text mark is editable like any other: drag to reposition, drag a value to update a numeric readout, `cycle()` a label, `rotate()` it, or `editText()` to retype its content.</Lead>
+<Lead>`text` draws one **label** per row at (`x`, `y`). `format` sets how a number displays, as a d3-format string or a function, without changing the data. It takes the universal edits (`move()`, `cycle()`, `rotate()`), and `editText()` lets you retype a label.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="basics" title="Labels from data">
 
-x/y position the label; text is its string. Offset and anchor keep it clear of the mark it labels.
+`x`/`y` position the label, and `text` is its string. `text`, `fontSize`, `textAnchor`, `lineAnchor`, `dx` and `dy` take a field or a constant and are used as-is. `angle` is in degrees. Offset and anchor keep a label clear of the mark it labels.
 
 <Example
   code={aLabelledScatter}
@@ -49,12 +49,12 @@ x/y position the label; text is its string. Offset and anchor keep it clear of t
 
 <Section id="editing" title="Editing labels">
 
-A direct-pick edit makes a label interactive. Reuse the universal edits — nothing text-specific — or `editText()` to retype the content.
+A direct-pick edit makes a label interactive. Use the universal edits to drag, rotate or cycle a label, or `editText()` to retype its content.
 
 <Example
   code={dragToReposition}
   title="Drag to reposition"
-  blurb={"Mark-level move({ channels: [\"x\",\"y\"] }) moves the label; writes x/y back through the scales. (Do not put <code class=\"inline\">edit</code> as a channel key — attach it on a channel or via <code class=\"inline\">edits</code>.)"}
+  blurb={"Mark-level move({ channels: [\"x\",\"y\"] }) moves the label and writes x/y back through the scales. Attach an edit on a channel or in <code class=\"inline\">edits</code>."}
   try={(
     <>
       <b>Drag</b> a label to move it.
@@ -65,7 +65,7 @@ A direct-pick edit makes a label interactive. Reuse the universal edits — noth
 <Example
   code={draggableNumericReadout}
   title="Draggable numeric readout"
-  blurb="The label is the value itself: text and y read the same field, and move() on y rewrites it — so the number updates as you drag. format keeps the display tidy."
+  blurb="text and y read the same field, and move() on y rewrites it, so the number updates as you drag. format sets how it displays."
   try={(
     <>
       <b>Drag</b> the number up or down.

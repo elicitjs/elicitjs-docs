@@ -20,7 +20,7 @@ export default function Layout({ children }) {
 
 # Guides
 
-<Lead>A guide draws the **rule** and the **state** — what a gesture is allowed to do, and what is left to do. It views chart state rather than rows, so it has no channels, no table and no `edit`, and can never write data. Declare one in `guides: [...]` (`guides.rule`, `guides.region`, `guides.remaining`, `guides.proximity`, `guides.tip`, `guides.crosshair`, `guides.custom`), or let an edit draw its own with `guide:`. Guides rebuild every render and never capture a gesture. For feedback on interaction state — hovered, selected, grabbed — see [Effects](/effects).</Lead>
+<Lead>A guide draws the **rule** and the **state**: what a gesture is allowed to do, and what is left to do. It views the interface's state rather than rows, so it has no channels, no table and no `edit`, and writes no data. Declare one in `guides: [...]` (`guides.rule`, `guides.region`, `guides.remaining`, `guides.proximity`, `guides.tip`, `guides.crosshair`, `guides.custom`), or let an edit draw its own with `guide:`. Survey widgets use their own [widget guides](#widget-guides). Guides rebuild every render and let every gesture pass through. For hovered, selected and grabbed feedback, see [Effects](/effects).</Lead>
 
 <ApiReference entries={api} />
 
@@ -32,7 +32,7 @@ The two differ in who declares them.
 
 **`guides: [...]` on the spec** draws an annotation you choose — a target line, a shaded range — from whatever you compute out of the guide context.
 
-Reach for the edit-owned form when the thing you want to draw is already known to the edit. A `guides.rule` at a `clamp` limit restates that limit in two places, and the two drift apart.
+Use the edit-owned form when the edit already knows what you want to draw. A `guides.rule` at a `clamp` limit restates that limit in a second place, and the two can drift apart.
 
 </Section>
 
@@ -87,7 +87,7 @@ A `snap`'s stops draw as short ticks at the plot edge, where the axis also sits.
 
 **`bounds`** draws the constraint boundaries: a `clamp`'s band and limits, a `snap`'s stops, a `maintainSum` cap. On with `guide: true`.
 
-**`catchment`** draws the radius in which a proximity pick resolves a free pointer to a mark. On with `guide: true`. Proximity picks that select a target (`nearest`, `sweep`, brush*) also turn catchment on when you **omit** `guide` — set `guide: false` to silence it.
+**`catchment`** draws the radius in which a proximity pick resolves a free pointer to a mark. On with `guide: true`. Edits that select a target (`pick: "nearest"`, `pick: "sweep"`, `brushSpan`, `brushRect`, `edit.geo.brush`) also turn catchment on when you **omit** `guide`. Set `guide: false` to turn it off.
 
 **`track`** draws where a handle can travel, for handles whose range isn't a scale. Off by default — turn it on where that range isn't obvious from the mark, as on [a face's parameters](/marks/face#track).
 
@@ -144,7 +144,7 @@ Every option takes a literal or a function of the guide context (`{ data, scales
 
 `tip: true` on any mark shows a tooltip of the row under the pointer: one `column: value` line per column. Pass a list of columns (`tip: ["city", "rain"]`) to show only those, or a function of the row (`tip: (d) => string`) for your own wording.
 
-A tip is a guide, so it never blocks editing. It makes no mark pointer-active and captures no gesture: drag a bar under its tooltip as if the tip were not there. It also shows on read-only rows — a locked seed, a [context row](/editing/existence#context).
+A tip is a guide, so gestures pass through it: drag a bar while its tooltip is showing. It also shows on read-only rows, such as a locked seed or a [context row](/editing/existence#context).
 
 <Example
   code={aTipOnEveryBar}
@@ -176,7 +176,7 @@ A tip is a guide, so it never blocks editing. It makes no mark pointer-active an
 
 `guides.crosshair()` draws dashed rules through the pointer across the plot. Each rule reads the value under the pointer off its axis, at the plot's bottom and left edges. Set `x: false` or `y: false` to draw one rule, and `readout: false` to drop the labels. `format` sets how the readouts print.
 
-The rules hide when the pointer leaves the plot, and never capture a gesture.
+The rules hide when the pointer leaves the plot. Gestures pass through them.
 
 <Example
   code={aCrosshairWithReadouts}
@@ -188,5 +188,19 @@ The rules hide when the pointer leaves the plot, and never capture a gesture.
     </>
   )}
 />
+
+</Section>
+
+<Section id="widget-guides" title="Widget guides">
+
+The [widgets](/widgets) draw their chrome with guides you can also use in your own spec:
+
+- `guides.prompt(text, { y })` draws the question in the top margin.
+- `guides.optionRings({ labelOffset, radius })` draws a Likert scale's rings and labels.
+- `guides.cellGrid({ pad })` draws a matrix's cells and headers.
+- `guides.sliderTrack({ format })` draws a slider's track with end labels.
+- `guides.quadrants({ x, y })` draws centred axes with a label at each end.
+
+Each reads its colours from `theme.widget`.
 
 </Section>

@@ -22,13 +22,13 @@ export default function Layout({ children }) {
 
 # Geo
 
-<Lead>Geographic marks for map elicitation. Set a chart-level `projection` — `"mercator"`, `{ type, domain, … }`, or a live `d3.geo*` instance. Position goes through that projection's apply/invert, not x/y scales. Provide basemap topology with `geoBasemap({ geojson })`, a GeoJSON FeatureCollection, Feature, or Geometry. Editable overlays live on the dataset, like every other mark. Examples below use Vancouver's 22 local areas (`vancouver` in the docs scope) — swap in your own file.</Lead>
+<Lead>Geo marks place rows by longitude and latitude through a chart-level `projection`: `"mercator"`, `{ type, domain, … }`, or a `d3.geo*` instance. Positions go through the projection, not x/y scales. `geoBasemap({ geojson })` draws the map from a GeoJSON FeatureCollection, Feature or Geometry, and `geoTile()` lays raster tiles under it. The examples use Vancouver's 22 local areas (`vancouver` in the docs scope); swap in your own file.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="basemap" title="Providing basemap data">
 
-The basemap is chrome. Pass GeoJSON into `geoBasemap`, and fit the projection with that same object as `domain` so the map fills the frame. Below, `vancouver` is the docs sample (22 local areas) — your app would import or fetch its own.
+`geoBasemap` draws the map and cannot be edited. Pass it GeoJSON, and pass the same object as the projection's `domain` so the map fills the frame. Here `vancouver` is the docs sample; your app imports or fetches its own.
 
 <Example
   code={vancouverLocalAreas}
@@ -40,12 +40,12 @@ The basemap is chrome. Pass GeoJSON into `geoBasemap`, and fit the projection wi
 
 <Section id="tiles" title="Real basemaps (OSM raster tiles)">
 
-`geoTile()` lays a raster basemap — a pyramid of 256px tiles from a tile server — behind your marks. Tiles are pre-rendered in Web Mercator, so it requires `projection: "mercator"`; other projections draw nothing and log a warning instead of a misaligned map. Your lon/lat marks and `edit.geo.*` gestures work the same on top, since they still go through the same projection. Attribution is a licence condition of every tile service, and is drawn by default. Public OSM tiles are rate-limited — point `url` at your own server or a paid provider in production.
+`geoTile()` lays a raster basemap — a pyramid of 256px tiles from a tile server — behind your marks. Tiles are pre-rendered in Web Mercator, so it requires `projection: "mercator"`; other projections draw nothing and log a warning instead of a misaligned map. Lon/lat marks and `edit.geo.*` gestures work the same on top, because they use the same projection. Every tile service requires attribution as a licence condition, and `geoTile()` draws it by default. Public OSM tiles are rate-limited, so in production point `url` at your own server or a paid provider.
 
 <Example
   code={pinsOnOpenstreetmap}
   title="Pins on OpenStreetMap"
-  blurb="geoTile() replaces geoBasemap entirely — no GeoJSON needed. The projection still needs a domain to know where to look; a bbox works when you have no topology to fit."
+  blurb="geoTile() replaces geoBasemap, so no GeoJSON is needed. The projection still needs a domain to set the view; a bbox works when you have no geometry to fit."
   try={(
     <>
       <b>Click</b> to drop a pin; <b>drag</b> it. Lon/lat come back as data.
@@ -55,8 +55,8 @@ The basemap is chrome. Pass GeoJSON into `geoBasemap`, and fit the projection wi
 
 <Example
   code={tilesUnderTheNeighborhoodOutlines}
-  title="Tiles under the neighborhood outlines"
-  blurb={"Raster and vector chrome compose: geoTile() lays the imagery, geoBasemap() draws the boundaries over it (fill \"none\"), and the elicited marks sit on top of both. Dim the tiles with opacity so your data still reads."}
+  title="Tiles under the neighbourhood outlines"
+  blurb={"geoTile() lays the imagery, geoBasemap() draws the boundaries over it (fill \"none\"), and the elicited marks sit on top of both. Dim the tiles with opacity so your data stays readable."}
   try={(
     <>
       <b>Drag</b> a study box; <b>click</b> open map to add one.
@@ -66,13 +66,13 @@ The basemap is chrome. Pass GeoJSON into `geoBasemap`, and fit the projection wi
 
 </Section>
 
-<Section id="points" title="Place / move points on the map">
+<Section id="points" title="Place and move points on the map">
 
-`geoPoint` overlays sit on the same projection. Click empty space to add; drag to move. Lon/lat come back through `onChange` / `getData()`.
+`geoPoint` places a row at its lon/lat through the projection. Click empty space to add a point, and drag one to move it. Lon/lat come back through `onChange` and `getData()`.
 
 <Example
   code={beliefPinsOnVancouver}
-  title="Belief pins on Vancouver"
+  title="Pins on Vancouver"
   blurb="Seeded near Downtown & Kitsilano; click elsewhere to add more."
   try={(
     <>
@@ -85,7 +85,7 @@ The basemap is chrome. Pass GeoJSON into `geoBasemap`, and fit the projection wi
 
 <Section id="labels" title="Label and rename places">
 
-`geoText` is a text mark positioned by the projection instead of x/y scales — that's the only geo-specific part, so every other text behaviour carries over: `editText()` to retype the content, `cycle()` to advance a categorical label, `rotate()` on `angle`. Pair it with a `geoPoint` as a separate mark reading the same rows, and dragging the dot moves the label along with it. `dx`/`dy` offset the glyph from its anchor without touching the lon/lat a drag writes.
+`geoText` is a text mark positioned by the projection instead of x/y scales. Every other text behaviour carries over: `editText()` to retype the content, `cycle()` to advance a categorical label, `rotate()` on `angle`. Pair it with a `geoPoint` that reads the same rows, and the label follows when you drag the dot. `dx`/`dy` offset the text from its anchor and leave the lon/lat unchanged.
 
 <Example
   code={namedPinsYouCanRename}
@@ -100,9 +100,9 @@ The basemap is chrome. Pass GeoJSON into `geoBasemap`, and fit the projection wi
 
 </Section>
 
-<Section id="polygons" title="Recolour neighborhoods">
+<Section id="polygons" title="Recolour neighbourhoods">
 
-Editable regions are dataset rows with a geometry field, a subset of the basemap features promoted into data. The basemap stays inert chrome underneath.
+Editable regions are dataset rows with a geometry field: the basemap features you want answers for, copied into the data. The basemap underneath stays as it is.
 
 <Example
   code={cycleFillOnSelectedLocalAreas}
@@ -110,7 +110,7 @@ Editable regions are dataset rows with a geometry field, a subset of the basemap
   blurb="Kitsilano, Fairview, Mount Pleasant, Downtown — click to cycle category."
   try={(
     <>
-      <b>Click</b> a shaded neighborhood to cycle its colour.
+      <b>Click</b> a shaded neighbourhood to cycle its colour.
     </>
   )}
 />
@@ -119,7 +119,7 @@ Editable regions are dataset rows with a geometry field, a subset of the basemap
 
 <Section id="lines" title="Draw lines over the city">
 
-Author a route as `[lon, lat]` pairs on top of the neighborhoods. Reshape vertices with `edit.geo.dragVertex` on a seeded line. Keep draw and vertex-drag on separate charts — draw raises the plane above the marks.
+`edit.geo.draw` records a route as `[lon, lat]` pairs as you drag across the map. `edit.geo.dragVertex` reshapes a line by its vertices. Both can share one interface: press a vertex handle to reshape, or drag anywhere else to draw.
 
 <Example
   code={drawAPathAcrossVancouver}
@@ -133,7 +133,7 @@ Author a route as `[lon, lat]` pairs on top of the neighborhoods. Reshape vertic
 
 <Example
   code={reshapeASeededBroadwayIshLine}
-  title="Reshape a seeded Broadway-ish line"
+  title="Reshape a seeded Broadway line"
   blurb="Drag vertex handles on a pre-drawn path."
   try={(
     <>
@@ -146,7 +146,7 @@ Author a route as `[lon, lat]` pairs on top of the neighborhoods. Reshape vertic
 
 <Section id="connected" title="Connected scatter over the map">
 
-Give `geoLine` `lon`/`lat` channels instead of `coordinates` and it connects the dataset's rows into one path, the geographic sibling of `path`. Points are a separate `geoPoint` mark reading the same rows, so dragging a stop re-derives the trail on the next render. Order defaults to `"sequence"` (array order); pass a field name to sort by it, or `series` to draw one trail per group.
+Give `geoLine` `lon`/`lat` channels instead of `coordinates` and it connects the dataset's rows into one path, the geographic counterpart of `path`. Draw the points with a separate `geoPoint` mark over the same rows; dragging a stop re-derives the trail. Rows connect in array order (`connect: "sequence"`, the default). An `order` channel sorts them by a column, and a `series` channel draws one trail per group.
 
 <Example
   code={aRouteAcrossVancouver}
@@ -163,12 +163,12 @@ Give `geoLine` `lon`/`lat` channels instead of `coordinates` and it connects the
 
 <Section id="rects" title="Geographic rectangles">
 
-Boxes are axis-aligned in lon/lat — they can look slightly curved under Mercator. Grab an edge or corner to reshape, the body to move, or click empty space to mint another. The zone you grab is fixed for the whole gesture, so a move never turns into a resize halfway through. The cursor shows which zone you're in before you press.
+`geoRect` boxes are aligned to lon/lat, so they can look slightly curved under Mercator. Drag an edge or corner to reshape a box, drag its body to move it, or click empty space to add another. The zone you press in holds for the whole drag. The cursor shows the zone before you press.
 
 <Example
   code={studyAreasOverTheCity}
   title="Study areas over the city"
-  blurb={"edit.geo.brush() resizes + moves; edit.geo.createRect() mints a new box on a click in open space (clicking an existing box grabs it instead). Pass move:false for resize-only, or { edgeInset } to widen the grab band."}
+  blurb={"edit.geo.brush() resizes and moves; edit.geo.createRect() mints a new box on a click in open space (a click on an existing box grabs it). Pass move: false for resize only, or { edgeInset } to widen the grab band."}
   try={(
     <>
       <b>Drag</b> a corner or edge to reshape · <b>drag</b> the middle to move · <b>click</b> empty map to add a box.

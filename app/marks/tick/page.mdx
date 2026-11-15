@@ -15,13 +15,13 @@ export default function Layout({ children }) {
 
 # Tick
 
-<Lead>A tick is bar’s zero-thickness sibling: a thin line marking a value on the linear axis and spanning the other axis. Over a category band it reads as a value marker (like a bar without the fill); over a full continuous extent it reads as a rug / strip. `inset` shrinks each end, `length` fixes a centred length.</Lead>
+<Lead>`tick` draws a line at a value on one axis, spanning the other axis. Over a category band it marks a value per category; with no band it spans the full extent, as a rug or strip plot. `tickY` and `tickX` force the value axis; `tick` infers it. `inset` shrinks each end, and `length` sets a fixed, centred length.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="value-marker" title="A value marker across bands">
 
-`tickY` marks a `y` value spanning each category's band — the same channel/edit model as a `bar`, so it drags identically.
+`tickY` marks a `y` value across each category's band. It takes the same channels and edits as a `bar`, and drags the same way.
 
 <Example
   code={ticksOverABandAxis}
@@ -44,7 +44,7 @@ export default function Layout({ children }) {
 
 <Section id="rug" title="A rug / strip plot">
 
-With no band on the other axis, a tick spans the full extent — a strip of marks at each datum's position. `inset` trims the ends so the strip floats off the frame.
+With no band on the other axis, a tick spans the full extent, giving a strip of marks at each row's position. `inset` trims the ends so the strip sits clear of the frame.
 
 <Example
   code={tickxADistributionStrip}

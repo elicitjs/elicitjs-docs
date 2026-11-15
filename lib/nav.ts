@@ -57,7 +57,8 @@ export const SITE: NavGroup[] = [
       { href: "/editing/handles", title: "Handles & affordances" },
       { href: "/editing/legend", title: "Legend pickers & editing" },
       { href: "/editing/existence", title: "Row lifecycle & lock" },
-      { href: "/editing/probe", title: "Probe & multi-step stages" },
+      { href: "/editing/probe", title: "Probe" },
+      { href: "/editing/stages", title: "Stages" },
       { href: "/editing/selection", title: "Selection" },
       { href: "/editing/history", title: "History & undo" },
       {
@@ -74,7 +75,7 @@ export const SITE: NavGroup[] = [
   },
   {
     group: "Case studies",
-    pages: [{ href: "/case-studies/glyphs", title: "Three new glyphs" }],
+    pages: [{ href: "/case-studies/glyphs", title: "A face, a plant and an hourglass" }],
   },
   {
     group: "Scales & data",

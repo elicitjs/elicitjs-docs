@@ -18,19 +18,19 @@ export default function Layout({ children }) {
 
 # External controls
 
-<Lead>Bind an edit to any external controller — a `<select>`, sliders, a rotate icon, a plain function — and drive it from outside the SVG. Give the edit a `name`, then call `el.control(name).set(value)`. Nothing about how edits work changes: the control synthesizes the **same** events a pointer produces and hands them to the one dispatch, so constraints, undo/redo, guides, and `on("change")` all run identically. It is a new input *source*, not a second interaction system — the same move the keyboard already makes when it turns an arrow key into a drag.</Lead>
+<Lead>Drive an edit from a control outside the interface: a `<select>`, a slider, a rotate icon or a plain function. Give the edit a `name`, then call `el.control(name).set(value)`. The control synthesises the **same** events a pointer does, so constraints, undo/redo, guides and `on("change")` behave the same.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="how" title="Name an edit, then drive it">
 
-The value flows the opposite way through the same scale. An edit maps a gesture → data by *inverting* a channel's scale; `control(name).set(value)` maps data → a gesture by running that scale *forward*, then dispatches the ordinary edit. For a value edit (`set`/`editText`) there is no pixel at all — the value is carried straight through. `control(name).accepts()` reports what the channel's scale allows, so a picker or slider can offer only valid values.
+An edit maps a gesture to data by *inverting* a channel's scale. `control(name).set(value)` runs that scale *forward* to find the gesture, then runs the ordinary edit. A value edit (`set`, `editText`) takes the value directly, with no pixel step. `control(name).accepts()` reports what the channel's scale allows, so a picker or slider can offer only valid values.
 
 </Section>
 
 <Section id="scatter" title="A picker and a drag pad">
 
-The `<select>` writes the point's category through a `set()` edit; its options come from `control("category", 0).accepts().values`. The pad drives a two-axis `move` live — `begin() … set({x,y}) … end()` collapses into one undo entry. The `clamp` on `y` gates the pad exactly as it gates a mouse drag: external control is not a bypass.
+The `<select>` writes the point's category through a `set()` edit. Its options come from `control("category", 0).accepts().values`. The pad drives a two-axis `move` live, and `begin() … set({x,y}) … end()` is one undo entry. The `clamp` on `y` limits the pad exactly as it limits a mouse drag.
 
 <Example
   code={scatterPickerAndHandle}
@@ -43,7 +43,7 @@ The `<select>` writes the point's category through a `set()` edit; its options c
 
 <Section id="pick" title="Pick vs. cycle: driving other gestures">
 
-`.set(value)` covers the value edits (`set`/`editText`) and the positional ones (`move`/`rotate`/`resize`). The click-triggered edits — `cycle`, `remove`, `toggle` — take no value; they just fire. `.fire()` drives those, dispatching the edit's own gesture on the datum. So one circle can offer a **picker** (`set` — jump straight to a value) *and* a **cycle** (`fire` — step to the next), on the same field, alongside the native click.
+`.set(value)` drives the value edits (`set`, `editText`) and the positional ones (`move`, `rotate`, `resize`). The click edits (`cycle`, `remove`, `toggle`) take no value. `.fire()` drives them by running the edit's own gesture on the row. One circle can offer a **picker** (`set`, to jump to a value) and a **cycle** (`fire`, to step to the next) on the same field, beside the native click.
 
 <Example
   code={pickVsCycle}
@@ -56,7 +56,7 @@ The `<select>` writes the point's category through a `set()` edit; its options c
 
 <Section id="face" title="Sliders for facial features">
 
-Each facial parameter is a channel; bind it to a field with a named `set()` edit and a slider can write it — while the face stays directly draggable (grab the mouth, pull a smile). One dataset, two input sources, the same edits. Each slider's range comes from `control(field).accepts().domain`.
+Each facial parameter is a channel. Bind it to a field with a named `set()` edit and a slider can write it. The face stays draggable: grab the mouth to pull a smile. Each slider's range comes from `control(field).accepts().domain`.
 
 <Example
   code={faceSliders}
@@ -69,12 +69,12 @@ Each facial parameter is a channel; bind it to a field with a named `set()` edit
 
 <Section id="rotate" title="A rotate icon for a box">
 
-`rotate` reads a pointer angle about the mark; driving it by degrees is the inverse. `control("spin", 0).set(deg)` forward-encodes the angle to the pointer that would produce it, then runs the ordinary rotate edit. The box also rotates by direct drag.
+`rotate` reads a pointer angle about the mark. `control("spin", 0).set(deg)` encodes the angle to the pointer position that would produce it, then runs the ordinary rotate edit. The box also rotates by direct drag.
 
 <Example
   code={rotateBox}
   title="Rotate a box by an icon"
-  blurb="Buttons step the angle in data space; the façade forward-encodes to the rotate edit."
+  blurb="Buttons step the angle in data space; the control encodes each angle for the rotate edit."
   try={"press the rotate buttons, or drag the box itself."}
 />
 
@@ -99,9 +99,9 @@ Each facial parameter is a channel; bind it to a field with a named `set()` edit
 
 <Section id="selection" title="Driving the selection">
 
-Selection is **pipeline state**, not a data column — so it has its own external API beside `getData`/`setData`, and its own `select` event. `el.select(index)` picks a **specific item**; `el.selectWhere(field, value)` picks by **category** (the first row matching, or every one with `{ all: true }`). Both go through the same path a click on a mark does (`edit.select()`), so the selected row gets the highlight outline and a legend picker edits it — whichever input moved the selection. `on("select")` reports the change; `getData` and `on("change")` stay silent, because no belief data moved.
+The selection is interface state, kept beside the data, so it has its own API and its own `select` event. `el.select(index)` picks a **specific row**. `el.selectWhere(field, value)` picks by **category**: the first matching row, or every match with `{ all: true }`. Both set the selection as a click with `edit.select()` does. The selected row gets the highlight outline, and a legend picker edits it. `on("select")` reports the change. `getData` and `on("change")` stay silent, because no answer data changed.
 
-Pass an array to `el.select` for several rows at once. See [Selection](/editing/selection) for the whole model — multi-select, the `selected` effect, and the edits that read it.
+Pass an array to `el.select` for several rows at once. See [Selection](/editing/selection) for multi-select, the `selected` effect and the edits that read the selection.
 
 <Example
   code={selectItemOrCategory}
@@ -114,7 +114,7 @@ Pass an array to `el.select` for several rows at once. See [Selection](/editing/
 
 <Section id="domain" title="Driving a domain">
 
-`el.setDomain(field, domain)` writes a field's domain from outside the chart — a zoom button, a "reset view" control. It commits like [`edit.axis.zoom()`](/editing/zoom) and `edit.axis.pan()`: one undo step, a `change` notification, and every scale reflows. Pass `null` to restore the domain declared in the schema.
+`el.setDomain(field, domain)` writes a field's domain from outside the chart, for a zoom button or a "reset view" control. It commits like [`edit.axis.zoom()`](/editing/zoom) and `edit.axis.pan()`: one undo step, a `change` notification, and every scale updates. Pass `null` to restore the domain declared in the schema.
 
 ```js
 chart.setDomain("x", [20, 40]);   // zoom to 20–40

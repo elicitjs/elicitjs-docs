@@ -14,15 +14,15 @@ export default function Layout({ children }) {
 
 # Ellipse
 
-<Lead>`ellipse` is a dot with **two independent radii**. A `point` has one `size` channel because a circle has one radius; splitting it into `rx` and `ry` means each is its own magnitude channel — each can carry its own field, and each can carry its own edit. A shape that widens on one drag and flattens on another is **two elicited numbers in one mark**.</Lead>
+<Lead>`ellipse` draws a dot with two radii, `rx` and `ry`. Each is its own channel, with its own field and its own edit, so one mark elicits two numbers. `size` sets any radius you leave unset.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="uncertainty" title="Two uncertainties, one blob">
 
-The classic use is an estimate with per-axis uncertainty: the centre is what someone believes, and the two radii are how sure they are along each axis separately. A circle can only say "unsure overall"; this can say "confident about cost, vague about benefit".
+Use an ellipse for an estimate with per-axis uncertainty. The centre is the estimate, and each radius is the uncertainty along its axis.
 
-Both radius edits live on the same mark, so a single diagonal drag reshapes the blob. That's fine here — `slide({ axis: 'x' })` and `slide({ axis: 'y' })` read different components of the gesture, so neither fights the other.
+Both radius edits are on the same mark, so one diagonal drag reshapes the blob. `slide({ axis: 'x' })` and `slide({ axis: 'y' })` read different components of the drag, so they work together.
 
 <Example
   code={twoUncertainties}
@@ -39,7 +39,7 @@ Both radius edits live on the same mark, so a single diagonal drag reshapes the 
 
 <Section id="movable" title="Moving it as well">
 
-Two edits that read the *same* component of a drag can't share one mark — one gesture would fire both, and a `move()` on the centre would fight a radius `slide`. Give them a mark each with a [composite](/marks/composite): an `ellipse` that resizes, and a `point` at its centre that moves. Direct-pick routes a gesture to the mark you touched, so nothing has to arbitrate.
+Two edits that read the same component of a drag conflict on one mark: a `move()` on the centre and a radius `slide` would both fire. Gate one with `when` (for example `when.shift`, as on [Shape](/marks/shape#path)), or give each its own mark in a [composite](/marks/composite): an `ellipse` that resizes, and a `point` at its centre that moves. Direct pick sends each drag to the mark you touched.
 
 <Example
   code={aMovableBlob}
@@ -56,6 +56,6 @@ Two edits that read the *same* component of a drag can't share one mark — one 
 
 <Section id="glyphs" title="Inside a glyph">
 
-`ellipse` is what a [face](/marks/face)'s eyes are: an `rx` that opens and an `ry` that squints, both stated as fractions of the glyph's frame so they scale with the head. See [composite](/marks/composite#box) for how a mark places itself in a glyph's local coordinates.
+A [face](/marks/face) draws its eyes with `ellipse`: an `rx` that opens and an `ry` that squints, both set as fractions of the glyph's frame so they scale with the head. See [composite](/marks/composite#box) for how a mark places itself in a glyph's local coordinates.
 
 </Section>

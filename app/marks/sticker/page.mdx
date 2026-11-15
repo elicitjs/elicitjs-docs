@@ -16,13 +16,13 @@ export default function Layout({ children }) {
 
 # Sticker
 
-<Lead>`sticker()` draws a rounded box with text inside, and **sizes the box to the text**: a long note wraps at `maxWidth` and grows taller instead of wider. Pair it with `editText({ multiline: true })` to double-click and type into it. It is a preset over `composite` — an ordinary `rect` and `text` — so every channel, scale, edit and constraint works as elsewhere.</Lead>
+<Lead>`sticker()` draws a rounded box with text inside and **sizes the box to the text**. A long note wraps at `maxWidth` and grows taller. Add `editText({ multiline: true })` to double-click and type into it. It is a preset over `composite`, made of a `rect` and a `text`, so every channel, scale, edit and constraint works as on other marks.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="sizing" title="Sizing">
 
-The box is measured from the `text` channel string, at the `fontSize` and `fontFamily` it will be drawn in, plus `padding` on every side. Size does not live in your data.
+The box is measured from the `text` channel string, at the `fontSize` and `fontFamily` it is drawn in, plus `padding` on every side.
 
 `maxWidth` is both the ceiling and the wrap width. A longer note breaks onto more lines and the box gets taller. `minWidth` keeps a one-word note from collapsing.
 
@@ -40,7 +40,7 @@ A pinned `width` is also the wrap width, in place of `maxWidth`. Narrow a note a
 
 <Section id="resizing" title="Resizing">
 
-A `width` channel with a field behind it is a resize handle. The channel is in pixels, so give it an identity scale — a `range` matching the field's domain — and the column holds the box's width directly:
+Bind `width` to a field and give it an edit to make a resize handle. The channel is in pixels, so give it a `range` that matches the field's domain. The column then holds the box's width directly:
 
 ```js
 width: {
@@ -50,9 +50,9 @@ width: {
 }
 ```
 
-`slide` moves the value by how far you drag, so the box does not jump when you press it. `extent` is the drag distance that sweeps the whole domain. The box grows about its centre, so half the domain's span (`95` for a 190-wide domain) makes the edge you are dragging track the pointer.
+`slide` changes the value by how far you drag, so the box stays put when you press it. `extent` is the drag distance that sweeps the whole domain. The box grows about its centre, so an `extent` of half the domain's span (`95` for a 190-wide domain) keeps the dragged edge under the pointer.
 
-Gate the two drags with `when`. A `move` on `x` and a `slide` on `width` both read horizontal travel, so without `when.shift` / `when.noShift` they fight over the same gesture.
+A `move` on `x` and a `slide` on `width` both read horizontal travel. Gate them with `when.shift` and `when.noShift` so each gets its own gesture.
 
 Pin `height` the same way for a fixed-size card. Leave it off and height keeps following the text.
 
@@ -84,17 +84,17 @@ sticker({
 
 Double-click a note to open an editor filling the box. `multiline: true` makes it a textarea: Enter inserts a newline, and Cmd/Ctrl+Enter or clicking away commits. Escape cancels either way. Without it you get a single-line field where Enter commits.
 
-Both the drag and the double-click land on the **box**, not the letters, so you can pick up a note by any part of it — including the gaps between words.
+Drag or double-click anywhere on the box, including the gaps between words.
 
-Typing is only wired in the SVG renderer. Under `CanvasRenderer` a sticker draws and drags, but double-click does nothing.
+Typing needs the SVG renderer. Under `CanvasRenderer` a sticker draws and drags only.
 
 </Section>
 
 <Section id="editing" title="Editing a board">
 
-Nothing here is sticker-specific. The universal edits do the rest:
+The universal edits do the rest:
 
-- `move({ channels: ["x", "y"], mode: "relative" })` on `x` drags a note. Use `mode: "relative"` on anything with area: it moves by how far you drag, keeping the grab point under the pointer. The default `"absolute"` puts the note's centre at the pointer, which snaps a big box the moment you press it.
+- `move({ channels: ["x", "y"], mode: "relative" })` on `x` drags a note. Use `mode: "relative"` on anything with area: it moves by how far you drag and keeps the grab point under the pointer. The default `"absolute"` puts the note's centre at the pointer, so a big box jumps when you press it.
 - `create()` in `edits` mints one where you click. Give it `defaults` so a new note arrives with a colour and a placeholder.
 - `remove({ when: when.alt })` deletes the note under the pointer.
 - `cycle()` on `fill` steps through the colours in that field's domain.
@@ -116,9 +116,9 @@ Nothing here is sticker-specific. The universal edits do the rest:
 
 <Section id="diagram" title="Diagram board">
 
-A board you draw on is a `network` schema with a `sticker` over the nodes and a `link` over the links — there is no diagram mark. Draw `link()` first so connectors sit behind the boxes.
+A diagram board is a `network` schema with a `sticker` over the nodes and a `link` over the links. List `link()` first so connectors sit behind the boxes.
 
-Give the connectors `curve: "orthogonal"` and each one leaves a box square out of one of its edges. It docks to the sticker's own box, however the text sized it, and routes around any note in the way — see [where a link meets a node](/marks/network#routing).
+With `curve: "orthogonal"`, each connector leaves a box at a right angle from one of its edges. It docks to the sticker's measured box and routes around any note in the way. See [where a link meets a node](/marks/network#routing).
 
 Give the sticker a `ports` channel with `edit.network.connect()` on it. Hover a box and a port appears on each edge. Drag from one to another box to connect them; drop on a port to pin that end, or on the box to connect at its facing port. The `link` mark's `sourceSide` and `targetSide` channels name the columns the sides are written to — see [Ports](/marks/network#ports). Dragging a box's body still moves it.
 
@@ -146,9 +146,9 @@ Give the sticker a `ports` channel with `edit.network.connect()` on it. Hover a 
 
 <Section id="lanes" title="Notes on a scale">
 
-A sticker places itself through the same scales as any other mark, so point `x` at a categorical field and the notes sit in columns. `move` inverts the drag back through that band scale, so dropping a note in another column writes the new category into the row.
+A sticker is placed through the same scales as any mark. Point `x` at a categorical field and the notes sit in columns. `move` inverts the drag through that band scale, so dropping a note in another column writes the new category into the row.
 
-Which lane a note ends in is the belief — `getData()` returns it as `lane`. Sort within a lane by pointing `y` at a quantitative field, as here with `rank`.
+The lane a note ends in is the answer. `getData()` returns it as `lane`. Sort within a lane by pointing `y` at a quantitative field, as here with `rank`.
 
 <Example
   code={lanes}

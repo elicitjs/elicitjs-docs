@@ -21,7 +21,7 @@ export default function Layout({ children }) {
 
 # Line
 
-<Lead>A connected path over an ordered set of points, with a draggable handle on each once the line carries an edit. It is deliberately general — a you-draw-it curve, a multi-series line chart, and a connected scatter are the same mark along four orthogonal knobs: **grouping** (the `series` channel), **ordering** (the `order` channel, or the `connect` mode), **editing** (the edit on the handles), and **creation** (`anchor` / `newSeries` / `draw`). `lineY`/`lineX` fix the value axis; `path` defaults to `connect: "sequence"`.</Lead>
+<Lead>`line` draws a connected path through ordered points, with a draggable handle on each point once the line carries an edit. One mark covers a you-draw-it curve, a multi-series chart and a connected scatter: `series` groups rows into lines, `order` or `connect` orders them, and `edit.line.anchor` / `newSeries` / `draw` create them. `lineY`/`lineX` fix the value axis; `path` defaults to `connect: "sequence"`.</Lead>
 
 <ApiReference entries={api} />
 
@@ -56,7 +56,7 @@ A row whose value is `null`, `undefined` or `NaN` breaks the line there. The seg
 
 <Section id="dashes" title="Dashed lines">
 
-`strokeDash` sets the dash pattern. A constant is an SVG dash array (`strokeDash: '4 2'`). A field maps each category onto a dash pattern (solid, dashed, dotted, dash-dot, long dash), the way `stroke` maps one onto a colour. Add `legend: true` to the channel for a key of dashed segments.
+`strokeDash` sets the dash pattern. A constant is an SVG dash array (`strokeDash: '4 2'`). A field maps each category onto a dash pattern (solid, dashed, dotted, dash-dot, long dash), as `stroke` maps one onto a colour. Add `legend: true` to the channel for a key of dashed segments.
 
 <Example
   code={dashedByField}
@@ -69,13 +69,13 @@ A row whose value is `null`, `undefined` or `NaN` breaks the line there. The seg
   )}
 />
 
-Rows group into lines by `series`, `fill` or `stroke`, so a dashed chart names its grouping with `series`, as here, or puts the same field on `stroke`.
+Rows group into lines by `series`. Without it, they group by the field on `fill`, `stroke` or `strokeDash`, so a `strokeDash` field alone also splits the lines.
 
 </Section>
 
 <Section id="you-draw-it" title="You-draw-it (sweep)">
 
-Put `edit: move(\{ pick: "sweep" \})` on the value channel for the NYT-style "you-draw-it" interaction: press and sweep horizontally to paint each point's `y` as the pointer crosses its column. The `x` positions stay fixed.
+Put `edit: move({ pick: "sweep" })` on the value channel for a you-draw-it line. Press and sweep horizontally to paint each point's `y` as the pointer crosses its column. The `x` positions stay fixed.
 
 <Example
   code={sweepToDrawTheCurve}
@@ -92,7 +92,7 @@ Put `edit: move(\{ pick: "sweep" \})` on the value channel for the NYT-style "yo
 
 <Section id="handles" title="Hiding the handles">
 
-The per-point handles draw only where an edit can move the row. A line with no edit draws none, and neither does a `lock`ed or `context` row, or a line whose edits wait for a later `stage`. To draw points on a line with no edit, set `handles: true`; they then draw on every row. `handles: 'hit'` keeps them invisible but targetable, so a sweep or nearest pick still finds the line; `handles: false` removes them, and a proximity edit then has nothing to aim at (the chart warns). `handleSize` sizes them when shown.
+By default, handles draw only where an edit can move the row. A line with no edit has none, and neither does a `lock`ed or `context` row, or a line whose edits wait for a later `stage`. `handles: true` draws them on every row, with or without an edit. `handles: 'hit'` keeps them grabbable but invisible, so a sweep or nearest pick still finds the line. `handles: false` removes them entirely; a proximity edit then has nothing to target and logs a warning. `handleSize` sizes them when shown.
 
 <Example
   code={aCleanLineStillSweepable}
@@ -109,7 +109,7 @@ The per-point handles draw only where an edit can move the row. A line with no e
 
 <Section id="series" title="Multiple lines (series)">
 
-A stroke field groups points into separate lines (Observable Plot’s z), so one mark holds many series and each auto-colours from the ordinal palette. A sweep locks onto the nearest line at drag-start and paints only that one.
+The `series` channel groups points into separate lines, so one mark holds many series. Without `series`, the field on `fill`, `stroke` or `strokeDash` groups them. A `stroke` field both groups and colours the lines from the ordinal palette. A sweep locks onto the nearest line when the drag starts and paints only that one.
 
 <Example
   code={twoSeriesSweptIndependently}
@@ -126,7 +126,7 @@ A stroke field groups points into separate lines (Observable Plot’s z), so one
 
 <Section id="connected-scatter" title="Connected scatter (connect: sequence)">
 
-With `connect: "sequence"` the points connect in creation order, not by domain — a connected scatter, or a free 2D path. Both axes carry a drag, so each point moves in 2D and the links follow. `edit.line.anchor()` adds a point to the path — near the line or far, it extends the same single line in click order, so the path stays one sequence.
+With `connect: "sequence"`, points connect in row order instead of domain order, giving a connected scatter or a free 2D path. Both axes carry a drag here, so each point moves in 2D and the links follow. `edit.line.anchor()` appends a point wherever you click, extending the one path in click order.
 
 <Example
   code={a2dPathYouCanReshape}
@@ -143,7 +143,7 @@ With `connect: "sequence"` the points connect in creation order, not by domain �
 
 <Section id="samples" title="Draw from scratch (samples)">
 
-`newSeries` seeds a whole line at once — one anchor per sampled domain position (the scale's ticks by default, or a count, explicit list, or time interval), flat at the click value. Double-click empty space to drop a fresh line, then sweep it.
+`newSeries` seeds a whole line at once, flat at the clicked value. It places one anchor per sampled domain position: the scale's ticks by default, or a count, an explicit list, or a time interval. Double-click empty space to drop a fresh line, then sweep it.
 
 <Example
   code={doubleClickToSeedThenSweep}
@@ -160,7 +160,7 @@ With `connect: "sequence"` the points connect in creation order, not by domain �
 
 <Section id="draw" title="Draw it in one drag (draw)">
 
-`draw` authors lines by dragging, and it's edit-aware. On a domain-ordered line, a drag in empty space is you-draw-it from scratch — the pointer crossing each sample column lays that point down at the pointer value, so one stroke draws the curve. A later drag near the drawn line (within `threshold`) reshapes it with a sweep instead of making a new one; a drag farther away draws another. Pass `into: "new"` to always draw a fresh line.
+`draw` creates lines by dragging. On a domain-ordered line, a drag in empty space draws from scratch: as the pointer crosses each sample column, it lays that point down at the pointer value, so one stroke draws the curve. A later drag within `threshold` of the drawn line reshapes it with a sweep. A drag farther away draws another line. Pass `into: "new"` to always draw a fresh line.
 
 <Example
   code={drawThenReshape}

@@ -18,13 +18,13 @@ export default function Layout({ children }) {
 
 # Needle
 
-<Lead>A pivoted **needle** (NYT-style gauge or software dial). It encodes a value on the `theta` channel — the polar angular *position*, in degrees via the channel’s scale — and draws a tapered pointer + hub. The default semicircle is **horizontal** (left → right through the top, like a speedometer). Use `orient` (`top`·`right`·`bottom`·`left`), `arc: "full"`, or explicit `start`/`end` — and keep `scale.range` in sync. Optional `x`/`y` place the pivot on categorical or linear axes (many small needles in one chart).</Lead>
+<Lead>`needle` draws a tapered pointer and hub for a gauge or dial. Its value is on the `theta` channel, and the `theta` scale's `range` sets the sweep in degrees: the default `[180, 0]` runs left to right through the top. Set `orient`, `arc` or `start`/`end` on the companion `axisRadial`, and keep its range matched to the needle's. `x`/`y` place the pivot, for many small needles in one chart.</Lead>
 
 <ApiReference entries={api} />
 
-<Section id="gauge" title="Semicircle gauge + center text">
+<Section id="gauge" title="Semicircle gauge + centre text">
 
-A composite of `axisRadial` (ticks), `needle`, and `text`. Default orient is top: 0 on the left, max on the right.
+A gauge combines `axisRadial` for the ticks, `needle`, and `text`. The default range `[180, 0]` puts 0 on the left and the maximum on the right.
 
 <Example
   code={quantitativeGauge}
@@ -40,22 +40,22 @@ A composite of `axisRadial` (ticks), `needle`, and `text`. Default orient is top
 <Example
   code={rightFacingOrientRight}
   title={"Right-facing (orient: \"right\")"}
-  blurb="Same data; arc on the right — set scale.range to [-90, 90]."
+  blurb={"Same data; axisRadial takes orient: \"right\" and the needle's scale.range is [-90, 90]."}
 />
 
 </Section>
 
 <Section id="grid" title="Many needles on x × y">
 
-Each row is a pivot: `x` categorical, `y` quantitative, `theta` a third numeric belief. Drag any needle — direct-pick writes that row only.
+Each row is a pivot: `x` is categorical, `y` quantitative, and `theta` a third numeric answer. Drag a needle to write that row only.
 
 <Example
   code={smallNeedlesInAScatterOfPivots}
   title="Small needles in a scatter of pivots"
-  blurb="Group on x, layer on y, belief on theta. Cartesian axes frame the pivots."
+  blurb="Group on x, layer on y, answer on theta. Cartesian axes frame the pivots."
   try={(
     <>
-      <b>Drag</b> any small needle to change that cell’s belief.
+      <b>Drag</b> any small needle to change that cell’s answer.
     </>
   )}
 />
@@ -64,7 +64,7 @@ Each row is a pivot: `x` categorical, `y` quantitative, `theta` a third numeric 
 
 <Section id="dial" title="Full-circle dial">
 
-A knob: full 360° with `fold: false`.
+For a full 360° knob, set the `theta` range to `[-180, 180]` and `arc: "full"` on `axisRadial`. `rotate({ fold: false })` lets the needle travel the whole circle.
 
 <Example
   code={quantitativeDial}
@@ -81,9 +81,9 @@ A knob: full 360° with `fold: false`.
 
 <Section id="ableton" title="Ableton-style knob">
 
-A software knob is a [composite](/marks/composite): a **donut-slice ring** (dark track + value fill) and a thin **needle** that shares the same `theta` scale. The ring is a tiny mark over `authoring.arcPath` — stock `arc` / `donut` partition a total among rows, while a knob's fill is one value swept from the arc's start. The needle carries `rotate({ pivot: "mark", fold: false, pick: "direct" })`; the ring stays inert and re-derives.
+A software knob is a [composite](/marks/composite) of a ring (a dark track and a value fill) and a thin `needle` on the same `theta` scale. `arc` and `donut` divide a total among rows, but a knob's fill is one value swept from the arc's start, so the ring is a small custom mark built on `authoring.arcPath`. The needle carries `rotate({ pivot: "mark", fold: false, pick: "direct" })`. The ring has no edit and re-derives as you drag.
 
-The span is Ableton's 270° arc with a gap at the bottom: `start: 225` (~7 o'clock) to `end: -45` (~5 o'clock). Keep `scale.range` in sync with that span.
+The span is a 270° arc with a gap at the bottom: `start: 225` (about 7 o'clock) to `end: -45` (about 5 o'clock). Set the needle's `scale.range` to the same span.
 
 <Example
   code={abletonStyleKnob}
@@ -100,7 +100,7 @@ The span is Ableton's 270° arc with a gap at the bottom: `start: 225` (~7 o'clo
 
 <Section id="categorical" title="Categorical needle">
 
-A discrete `theta` field uses a point scale — drag snaps to the nearest category. Coloured bands come from `axisRadial({ bands: true })`.
+A discrete `theta` field uses a point scale, so a drag snaps to the nearest category. `axisRadial({ bands: true })` draws the coloured bands.
 
 <Example
   code={likelihoodGauge}

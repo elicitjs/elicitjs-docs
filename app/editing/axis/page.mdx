@@ -16,13 +16,13 @@ export default function Layout({ children }) {
 
 # Editable axes (domain)
 
-<Lead>An axis is normally inert. Give it an `edit` and it becomes interactive — but where a mark edit rewrites a **datum**, an axis edit rewrites the field's **domain** on the schema. A numeric axis is **dragged** to grow or shrink its range; a categorical axis gains **add / rename / remove** affordances. Because the domain lives on the schema and scales re-resolve every render, the grid, guides and marks follow along automatically. Read the new domain with `el.getSchema()` (the dataset is untouched, except that removing a category also deletes its rows).</Lead>
+<Lead>An axis with an `edit` rewrites the field's **domain** on the schema, where a mark edit rewrites a **datum**. Drag a numeric axis to change its range. A categorical axis gains controls to **add, rename and remove** categories. The grid, guides and marks follow the new domain. Read it with `el.getSchema()`. The dataset is unchanged, except that removing a category deletes its rows.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="numeric" title="Drag a numeric axis to rescale">
 
-`axisX(\{ edit: edit.axis.scale() \})` grows a draggable handle at each end of the axis. Drag the max handle inward to widen the range (data compresses into the same chart), outward to tighten it. The min stays anchored; the dataset never changes.
+`axisX({ edit: edit.axis.scale() })` adds a draggable handle at each end of the axis. Drag a handle toward the middle to widen the range, so the data compresses into the same chart. Drag it outward to narrow the range. The opposite end stays fixed, and the dataset is unchanged.
 
 <Example
   code={rescaleInPlace}
@@ -50,9 +50,9 @@ export default function Layout({ children }) {
 
 <Section id="categorical" title="Add, rename & remove categories">
 
-`axisX(\{ edit: edit.scale.categories() \})` turns each category label into a rename target (double-click to type), gives each an × to remove, and adds a ＋ at the end to append a new one. Renaming relabels matching rows; removing deletes them — schema and data stay in step.
+`axisX({ edit: edit.scale.categories() })` makes each category label a rename target (double-click to type). Each label gets an × to remove it, and a ＋ at the end adds a new one. A rename relabels matching rows, and a removal deletes them, so the schema and data stay in step.
 
-The domain belongs to the **scale**, not to the axis, so the same edit works on any element drawing that scale — a [legend](/marks/legend#categories) takes it too. Where one scale spans several columns, or several tables, every one is written.
+The domain belongs to the **scale**, so the same edit works on any element that draws it, including a [legend](/editing/legend#domain-authoring). When one scale spans several columns or tables, it writes all of them.
 
 <Example
   code={editTheCategoryList}

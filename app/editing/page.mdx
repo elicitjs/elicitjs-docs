@@ -12,15 +12,15 @@ export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Editing — the inverse of encoding
+# Editing
 
-<Lead>Attach an edit to a channel and a gesture writes that channel back to the data through the same scale. An edit is a descriptor — `gesture` (`drag` / `click` / `dblclick`), `pick` (`direct` / `nearest` / `plane` / `probe` / `sweep`), `when` (arbitration), `constrain`, and `guide` — with an `apply` that performs the inversion. Declare edits on a channel (`channels.y.edit`), at mark level (`edits: [...]`), or on [legends](/editing/legend) and [axes](/editing/axis).</Lead>
+<Lead>An edit writes a gesture back to the data, through the same scale that encodes it. It sets a `gesture` (`drag`, `click`, `dblclick`, `commit` or `wheel`), a `pick` (`direct`, `nearest`, `plane`, `probe` or `sweep`), and optionally `when`, `constrain` and `guide`; its `apply` performs the inversion. Declare it on a channel (`channels.y.edit`), at mark level (`edits: [...]`), or on a [legend](/editing/legend) or [axis](/editing/axis).</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="move" title="Move a value">
 
-The canonical edit: `move()` inverts the pointer on each positional channel it governs. On a bar's `y`, a drag rewrites the value.
+`move()` inverts the pointer on each positional channel it governs. On a bar's `y`, a drag rewrites the value.
 
 <Example
   code={dragAValueBars}
@@ -37,7 +37,7 @@ The canonical edit: `move()` inverts the pointer on each positional channel it g
 
 <Section id="pick" title="Pick — how an edit finds its target">
 
-`pick: "direct"` uses the mark under the pointer; `pick: "nearest"` grabs the closest mark within a pixel threshold, so small marks are reachable from nearby empty space. `guide: true` self-draws the snap ring.
+`pick: "direct"` uses the mark under the pointer. `pick: "nearest"` takes the closest mark within a pixel threshold, so you can grab small marks from nearby empty space. `guide: true` draws the snap ring.
 
 <Example
   code={nearestPickFromEmptySpace}

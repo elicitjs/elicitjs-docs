@@ -24,7 +24,7 @@ export default function Layout({ children }) {
 
 Put a categorical field on `symbol` and each category takes a named shape: `circle`, `square`, `triangle`, `diamond`, `star`, `cross`, `wye`, in that order. `legends: true` keys each category with its shape.
 
-The shape is picked inside its whole body, so you can grab a star by any point of it.
+You can grab a shape anywhere inside its outline.
 
 <Example
   code={namedShapes}
@@ -41,9 +41,9 @@ The shape is picked inside its whole body, so you can grab a star by any point o
 
 <Section id="pictograms" title="Pictograms from SVG paths">
 
-Give `symbol` a `scale: { range: [...] }` of SVG path strings, and each category draws its own pictogram. A path can use any coordinates: it is fitted to the box of radius `size` around its row's position.
+Give `symbol` a `scale: { range: [...] }` of SVG path strings, and each category draws its own pictogram. A path can use any coordinates. It is fitted to the box of radius `size` around its row's position.
 
-The elicited value is still the category. The path is its encoding, like a colour on `fill`.
+The elicited value is the category. The path encodes it, as a colour does on `fill`.
 
 <Example
   code={pictograms}
@@ -62,7 +62,7 @@ The elicited value is still the category. The path is its encoding, like a colou
 
 With no `symbol` channel, the `path` option sets the shape: a name, an SVG path, or `(d, i, data) => string` for a shape chosen per row. It defaults to `"circle"`. A string that is neither a name nor a readable path draws a circle and logs a warning.
 
-`angle` rotates the shape in degrees, counter-clockwise from east. `rotate()` on `angle` turns it about its centre, and `resize()` on `size` grows it. Here a plain drag turns an arrow and Shift-drag sets its speed.
+`angle` rotates the shape in degrees, counter-clockwise from east. `rotate()` on `angle` turns it about its centre, and `resize()` on `size` grows it. Both read the same drag, so `when` separates them: with `when.noShift` and `when.shift`, a plain drag turns an arrow and Shift-drag sets its speed.
 
 <Example
   code={rotateAndResize}
