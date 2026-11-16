@@ -11,6 +11,8 @@ import hoverAnyEditableMark from './_examples/hover-any-editable-mark.example.tx
 import theTwoMechanisms from './_examples/the-two-mechanisms.example.txt';
 import hoveredThenSelected from './_examples/hovered-then-selected.example.txt';
 import switchingAStateOff from './_examples/switching-a-state-off.example.txt';
+import muteTheRest from './_examples/mute-the-rest.example.txt';
+import hoverAFactor from './_examples/hover-a-factor.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -119,6 +121,52 @@ The interface holds the selection, separate from the data: `edit.select` writes 
     </>
   )}
 />
+
+</Section>
+
+<Section id="mute" title="Highlight and mute">
+
+A state's own options are its highlight: how a mark in that state looks. `others` is its mute. It restyles every mark that is in no state, for as long as the state holds on at least one row. It takes the element props `opacity`, `filter`, `fill`, `stroke` and `strokeWidth`.
+
+Every state takes `others`. On `selected` it gives a highlight that stays until you clear the selection.
+
+<Example
+  code={muteTheRest}
+  title="Select one, fade the rest"
+  blurb="selected keeps its default outline. others fades the unselected bars."
+  try={(
+    <>
+      <b>Click</b> a bar to select it. Click it again to clear.
+    </>
+  )}
+/>
+
+Setting `others` on `hovered` makes hover apply to the row: every mark that draws the row lights up, on view-only marks too.
+
+</Section>
+
+<Section id="neighbours" title="Neighbours in a network">
+
+`neighbours: true` extends a state's highlight to the rows linked to it. Hover a node and its links light up; hover a link and its two nodes do. In a [hierarchy](/marks/hierarchy), a node also lights everything nested inside it.
+
+`neighbours` applies to network and hierarchy datasets, where a `ref` column links one row to another. On a dataset with a single table it does nothing and logs a warning.
+
+<Example
+  code={hoverAFactor}
+  title="What a factor touches"
+  blurb="neighbours lights the hovered factor's links. others fades every other factor and link."
+  try={(
+    <>
+      <b>Hover</b> a factor, then a link.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="link" title="Hover across charts">
+
+`hovered` takes one more option, `link`. With `link: true` the chart's hover is the dataset's: the hovered row lights up in every chart on that dataset, and the other rows fade. It is on by default when two or more charts share a dataset. See [Linked hover](/dataset#hover).
 
 </Section>
 

@@ -11,6 +11,7 @@ import aCausalMapWithWeights from './_examples/a-causal-map-with-weights.example
 import rentChangeByArea from './_examples/rent-change-by-area.example.txt';
 import aSliderBesideTwoCharts from './_examples/a-slider-beside-two-charts.example.txt';
 import floodPins from './_examples/flood-pins.example.txt';
+import hoverAcrossCharts from './_examples/hover-across-charts.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -147,16 +148,45 @@ The selection belongs to the dataset too. Select a row in one chart and every ch
 
 </Section>
 
+<Section id="hover" title="Linked hover">
+
+Charts on one dataset link their hover. Point at a row in one chart and every chart outlines that row and fades the others. A chart with no edits takes part: every mark that draws rows answers the pointer. Hover writes no data and adds no undo step.
+
+<Example
+  code={hoverAcrossCharts}
+  title="Rent and income, by district"
+  blurb="Two charts, no effects in either spec. The bars are draggable and the dots are view-only."
+  try={(
+    <>
+      <b>Hover</b> a bar or a dot. The same district lights up in the other chart.
+    </>
+  )}
+/>
+
+`effects.hovered.link` sets a chart's part in it. `true` sends the chart's hover and shows the others'. `"receive"` shows the others' hover and sends none. `false` keeps hover inside the chart. The default is `true` when two or more charts draw the dataset.
+
+```js
+ds.chart({ marks, effects: { hovered: { link: "receive" } } });
+```
+
+`effects.hovered.others` styles the faded rows, and `others: false` keeps the outline alone. See [Highlight and mute](/effects#mute).
+
+`ds.getHover()` returns the hovered row, and `ds.on("hover", cb)` fires when it changes. The row is an index, or `{ table, index }` on a dataset with several tables. `ds.hover(index)` sets it from outside a chart, such as a table row beside the charts, and `ds.hover(null)` clears it.
+
+For a highlight that stays, use the selection: `edit.select()` on the mark and `effects: { selected: { others: { opacity: 0.25 } } }`.
+
+</Section>
+
 <Section id="shared" title="What each chart keeps">
 
 Every chart on a dataset shares:
 
 - the rows, the schema and its domains, so a zoom in one chart zooms every chart;
 - `constraints`, `lock` and `context`;
-- the undo history and the selection;
+- the undo history, the selection and the [linked hover](#hover);
 - `onChange` and `on("change")`, which fire once per commit, whichever chart made it.
 
-Each chart keeps its own marks, size, `theme`, `guides`, `effects`, stages and hover. `chart.on("stage")` and the stage methods are the chart's own. `chart.control` and `chart.emit` replay a gesture on that chart, through its edits and its scales.
+Each chart keeps its own marks, size, `theme`, `guides`, `effects` and stages. `chart.on("stage")` and the stage methods are the chart's own. `chart.control` and `chart.emit` replay a gesture on that chart, through its edits and its scales.
 
 A chart also carries the dataset's methods, so `chart.getData()` and `chart.undo()` work on a chart from `Elicit(spec)`. `chart.dataset` is the dataset itself. A dataset key passed to `ds.chart()`, such as `constraints`, is ignored with a warning that points to `Elicit.dataset`.
 

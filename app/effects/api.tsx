@@ -57,6 +57,32 @@ export const api: ApiEntry[] = [
         desc: "Element effects, applied as CSS properties so they override the mark's paint while set and are removed cleanly on exit.",
       },
       {
+        name: "<state>.others",
+        type: "false | { opacity, filter, fill, stroke, strokeWidth }",
+        default: "— (a linked hover: { opacity: 0.3 })",
+        desc: (
+          <>
+            The mute: a restyle for every mark in no state, while this state holds on at least one row. <code className="inline">false</code> turns it off.
+          </>
+        ),
+      },
+      {
+        name: "<state>.neighbours",
+        type: "boolean",
+        default: "false",
+        desc: "Network and hierarchy datasets only. The highlight also covers the rows linked to the row in this state: a node's links, a link's two nodes, and everything nested inside a hierarchy node.",
+      },
+      {
+        name: "hovered.link",
+        type: "true | 'receive' | false",
+        default: "true with two or more charts on the dataset",
+        desc: (
+          <>
+            Whether this chart&rsquo;s hover is the dataset&rsquo;s. <code className="inline">true</code> sends it and shows the other charts&rsquo; hover. <code className="inline">&apos;receive&apos;</code> shows theirs and sends none. <code className="inline">false</code> keeps hover in this chart.
+          </>
+        ),
+      },
+      {
         name: "<state>.outline",
         type: "false | { color, darken, fallback, width, pad, dash, opacity }",
         default: "{ color: 'auto', pad: 0, width: 3 }",

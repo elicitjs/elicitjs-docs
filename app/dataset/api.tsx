@@ -114,4 +114,23 @@ export const api: ApiEntry[] = [
       </>
     ),
   },
+  {
+    name: "ds.hover(index) / ds.getHover()",
+    summary: (
+      <>
+        The dataset&rsquo;s hovered row, which every chart with a <a href="#hover">linked hover</a> shows. It is interface state: no <code className="inline">change</code> event and no undo step.
+      </>
+    ),
+    signatures: [
+      "ds.hover(2)          // hover row 2 of the primary table",
+      "ds.hover(null)       // clear it",
+      "ds.getHover()        // 2, or { table, index } with several tables, or null",
+      "ds.on(\"hover\", (row) => { … })",
+    ],
+    returns: (
+      <>
+        <code className="inline">hover</code> returns <code className="inline">true</code> when the hovered row changed.
+      </>
+    ),
+  },
 ];

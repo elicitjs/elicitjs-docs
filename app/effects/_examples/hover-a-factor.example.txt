@@ -1,0 +1,48 @@
+// A network: factors (nodes) and what causes what (links).
+const chart = Elicit({
+  width: 440, height: 260,
+  margins: { top: 24, right: 44, bottom: 24, left: 44 },
+  axes: false,
+  schema: {
+    structure: "network",
+    tables: {
+      nodes: {
+        id: { type: "categorical",  key: true },
+        x:  { type: "quantitative", domain: [0, 100] },
+        y:  { type: "quantitative", domain: [0, 100] },
+      },
+      links: {
+        role: "links",
+        directed: true,
+        fields: { source: { type: "ref" }, target: { type: "ref" } },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "Interest rates", x: 16, y: 80 },
+      { id: "Migration",      x: 16, y: 20 },
+      { id: "New supply",     x: 50, y: 88 },
+      { id: "Speculation",    x: 50, y: 12 },
+      { id: "House prices",   x: 84, y: 50 },
+    ],
+    links: [
+      { source: "Interest rates", target: "House prices" },
+      { source: "Interest rates", target: "New supply" },
+      { source: "Migration",      target: "House prices" },
+      { source: "Speculation",    target: "House prices" },
+    ],
+  },
+  // Hover a factor: its links light up with it, and everything else fades.
+  effects: {
+    hovered: { neighbours: true, others: { opacity: 0.2 } },
+  },
+  marks: [
+    link({ inset: 3, stroke: "#94A5B3", strokeWidth: 1.5 }),
+    node({
+      fill: "#50AEB7", size: 9,
+      channels: { x: { field: "x" }, y: { field: "y" }, text: { field: "id" } },
+    }),
+  ],
+});
+mount(chart.dom());

@@ -1,0 +1,45 @@
+// Six districts: what people pay, and what they earn.
+const ds = Elicit.dataset({
+  schema: {
+    district: { type: "categorical",  domain: ["Ash", "Birch", "Cedar", "Dale", "Elm", "Fern"] },
+    rent:     { type: "quantitative", domain: [0, 3000] },
+    income:   { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { district: "Ash",   rent: 2400, income: 82 },
+    { district: "Birch", rent: 1500, income: 48 },
+    { district: "Cedar", rent: 1900, income: 71 },
+    { district: "Dale",  rent: 900,  income: 35 },
+    { district: "Elm",   rent: 2100, income: 55 },
+    { district: "Fern",  rent: 1200, income: 62 },
+  ],
+});
+
+// Neither chart sets `effects`. Two charts on one dataset link their hover.
+const bars = ds.chart({
+  width: 440, height: 200,
+  margins: { top: 10, right: 16, bottom: 30, left: 44 },
+  axes: { y: { title: "Rent" } },
+  marks: [
+    bar({
+      fill: "#50AEB7",
+      channels: { x: { field: "district" }, y: { field: "rent", edit: move() } },
+    }),
+  ],
+});
+
+// A view-only chart takes part too.
+const scatter = ds.chart({
+  width: 440, height: 220,
+  margins: { top: 10, right: 16, bottom: 36, left: 44 },
+  axes: { x: { title: "Income" }, y: { title: "Rent" } },
+  marks: [
+    point({
+      fill: "#F4A259", size: 7,
+      channels: { x: { field: "income" }, y: { field: "rent" } },
+    }),
+  ],
+});
+
+mount(bars.dom());
+mount(scatter.dom());
