@@ -21,7 +21,7 @@ export default function Layout({ children }) {
 
 # Constraints
 
-<Lead>A constraint is a rule over the dataset, so it applies to every edit on every mark. It can reject a proposed change, or repair it by returning corrected rows. Every mark reads the same rows, so a repair shows up everywhere on the next render. Declare constraints in `constraints: [...]` on the `Elicit` spec. `clamp` and `snap` bound a field, `maintainSum` fixes a total, `count` caps the number of rows, and `unique` forbids duplicate keys. `ordering` keeps a row's fields in order (lo ≤ mean ≤ hi), `monotonic` keeps a cumulative curve from dipping, and `spacing` keeps neighbours apart. `follow` and `symmetric` couple a range to its centre. `constraints.custom` defines your own.</Lead>
+<Lead>A constraint is a rule over the dataset, so it applies to every edit on every mark. It can reject a proposed change, or repair it by returning corrected rows. Every mark reads the same rows, so a repair shows up everywhere on the next render. Declare constraints in `constraints: [...]` on the `Elicit` spec, or on `Elicit.dataset` for [several charts](/dataset). `clamp` and `snap` bound a field, `maintainSum` fixes a total, `count` caps the number of rows, and `unique` forbids duplicate keys. `ordering` keeps a row's fields in order (lo ≤ mean ≤ hi), `monotonic` keeps a cumulative curve from dipping, and `spacing` keeps neighbours apart. `follow` and `symmetric` couple a range to its centre. `constraints.custom` defines your own.</Lead>
 
 <ApiReference entries={api} />
 

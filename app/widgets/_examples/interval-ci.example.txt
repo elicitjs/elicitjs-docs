@@ -1,4 +1,5 @@
-mount(Elicit(widgets.interval({
+const chart = Elicit(widgets.interval({
   question: "Your estimate and range",
   mean: 50, lo: 30, hi: 70,
-})));
+}));
+mount(chart.dom());

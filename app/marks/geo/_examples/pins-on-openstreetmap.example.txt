@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 520, height: 360,
   margins: { top: 8, right: 8, bottom: 8, left: 8 },
   // No GeoJSON: fit the projection to a lon/lat box. Mind the ring winding —
@@ -35,4 +35,5 @@ mount(Elicit({
       edits: [edit.geo.move(), edit.geo.create({ defaults: { place: "new pin" } })],
     }),
   ],
-}));
+});
+mount(chart.dom());

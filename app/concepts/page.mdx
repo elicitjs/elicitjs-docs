@@ -21,7 +21,7 @@ export default function Layout({ children }) {
 # Core concepts
 
 <Lead>
-  The model behind every elicitation interface: one dataset, marks that encode
+  The model behind every elicitation interface: a dataset, marks that encode
   it, and edits that write it back.
 </Lead>
 
@@ -29,7 +29,7 @@ export default function Layout({ children }) {
 
 <Section id="one-dataset" title="Marks are views over one dataset">
 
-An elicitation interface elicits one dataset. Each mark is a _view_ over that dataset: it encodes some fields onto visual channels, and where a channel carries an `edit`, it writes them back. Two marks over the same rows stay in sync — an edit on one commits to the shared data, and the other re-renders from it.
+A chart draws one dataset. Each mark is a _view_ over that dataset: it encodes some fields onto visual channels, and where a channel carries an `edit`, it writes them back. Two marks over the same rows stay in sync — an edit on one commits to the shared data, and the other re-renders from it. Several charts can share one dataset in the same way; see [Datasets & linked charts](/dataset).
 
 <Example
   code={twoMarksOneDataset}

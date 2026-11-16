@@ -1,7 +1,7 @@
 // Wind at three stations: drag an arrow to turn it, Shift-drag to set its speed.
 const arrow = "M0 7 L12 7 L12 2 L20 10 L12 18 L12 13 L0 13 Z";   // points right (0°)
 
-mount(Elicit({
+const chart = Elicit({
   width: 400, height: 260,
   margins: { top: 16, right: 16, bottom: 32, left: 36 },
   schema: {
@@ -34,4 +34,5 @@ mount(Elicit({
       edits: [resize({ channel: "size", when: when.shift })],
     }),
   ],
-}));
+});
+mount(chart.dom());

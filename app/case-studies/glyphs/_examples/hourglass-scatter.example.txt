@@ -37,7 +37,7 @@ const hourglass = (channels) => composite({
   ],
 });
 
-mount(Elicit({
+const chart = Elicit({
   width: 400, height: 340,
   axes: { y: { title: "Team size" } },
   // How long will each task take? Tasks run along x, and the team on each sits
@@ -60,4 +60,5 @@ mount(Elicit({
     y: { field: "team" },
     size: { value: 30 },
   })],
-}))
+});
+mount(chart.dom());

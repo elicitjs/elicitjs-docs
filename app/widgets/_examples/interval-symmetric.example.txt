@@ -1,5 +1,6 @@
-mount(Elicit(widgets.interval({
+const chart = Elicit(widgets.interval({
   question: "Your estimate, ± the same either way",
   mean: 50, lo: 35, hi: 65,
   symmetric: true,
-})));
+}));
+mount(chart.dom());

@@ -5,7 +5,7 @@ const bumpY = custom((ctx) => {
   return { ...ctx.datum, y: Math.round(y) };
 });
 
-mount(Elicit({
+const chart = Elicit({
   width: 380, height: 240,
   margins: { top: 14, right: 14, bottom: 26, left: 30 },
   data: [{ x: 30, y: 40 }, { x: 70, y: 65 }],
@@ -23,4 +23,5 @@ mount(Elicit({
       edits: [ bumpY ],
     }),
   ],
-}))
+});
+mount(chart.dom());

@@ -1,3 +1,4 @@
-mount(Elicit(widgets.region({
+const chart = Elicit(widgets.region({
   question: "Where do you expect the outcome?",
-})));
+}));
+mount(chart.dom());

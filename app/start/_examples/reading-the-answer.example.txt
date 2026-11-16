@@ -25,5 +25,5 @@ const readout = document.createElement("pre");
 readout.style.cssText = "font-size:12px;margin:8px 0 0;color:#6F8294";
 readout.textContent = chart.getData().map((d) => `${d.cat}: ${d.n}`).join("   ");
 
-mount(chart);
+mount(chart.dom());
 mount(readout);

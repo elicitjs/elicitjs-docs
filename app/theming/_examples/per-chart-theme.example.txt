@@ -1,7 +1,7 @@
 // A theme on a plain chart. `ink` recolours every mark that has no explicit
 // paint channel; `axis`/`grid` restyle the chrome. A partial — you name only
 // the tokens you change, the rest inherit the default.
-mount(Elicit({
+const chart = Elicit({
   width: 440, height: 240,
   margins: { top: 20, right: 20, bottom: 30, left: 36 },
   data: [{ cat: "A", n: 30 }, { cat: "B", n: 55 }, { cat: "C", n: 40 }, { cat: "D", n: 22 }],
@@ -18,4 +18,5 @@ mount(Elicit({
   marks: [
     barY({ channels: { x: { field: "cat" }, y: { field: "n", edit: move() } } }),
   ],
-}));
+});
+mount(chart.dom());

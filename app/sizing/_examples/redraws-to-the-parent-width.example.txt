@@ -1,5 +1,5 @@
 const cats = ["A","B","C","D","E"];
-mount(Elicit({
+const chart = Elicit({
   width: 480, height: 300,
   responsive: "reflow",
   margins: { top: 16, right: 12, bottom: 28, left: 34 },
@@ -15,4 +15,5 @@ mount(Elicit({
       y: { field: "value", edit: move() },
     } }),
   ],
-}));
+});
+mount(chart.dom());

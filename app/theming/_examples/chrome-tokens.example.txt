@@ -1,6 +1,6 @@
 // The ggplot2 look from tokens alone: a grey panel under white gridlines,
 // no spines or ticks, and wider gaps between the bars.
-mount(Elicit({
+const chart = Elicit({
   width: 440, height: 260,
   theme: {
     panel: { fill: "#EAF0F4" },
@@ -16,4 +16,5 @@ mount(Elicit({
   },
   axes: { y: { title: "count" } },
   marks: [barY({ channels: { x: { field: "cat" }, y: { field: "n", edit: move() } } })],
-}));
+});
+mount(chart.dom());

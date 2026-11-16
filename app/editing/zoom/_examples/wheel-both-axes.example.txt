@@ -22,7 +22,7 @@ const chart = Elicit({
     }),
   ],
 });
-mount(chart);
+mount(chart.dom());
 
 // Buttons zoom both axes about the centre of the view, clamped to the
 // declared domains.

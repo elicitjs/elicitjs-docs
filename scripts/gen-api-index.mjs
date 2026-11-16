@@ -240,14 +240,27 @@ for (const ns of GRAMMAR) {
 }
 
 // Top-level exports that are not namespaces: Elicit, setWarnings, themes, …
+// A function's own function-valued properties are listed after it, dotted
+// (`Elicit.dataset`), since they are called the same way.
+const topLink = (k) =>
+  callLinks.get(k) || bareLinks.get(k) || weakLinks.get(k) || null;
 const topLevel = Object.keys(lib)
   .filter((k) => !GRAMMAR.includes(k) && k !== "authoring")
   .sort()
-  .map((k) => ({
-    name: k,
-    kind: typeof lib[k],
-    docs: callLinks.get(k) || bareLinks.get(k) || weakLinks.get(k) || null,
-  }));
+  .flatMap((k) => {
+    const statics =
+      typeof lib[k] === "function"
+        ? Object.keys(lib[k])
+            .filter((p) => typeof lib[k][p] === "function")
+            .sort()
+            .map((p) => ({
+              name: `${k}.${p}`,
+              kind: "function",
+              docs: topLink(`${k}.${p}`),
+            }))
+        : [];
+    return [{ name: k, kind: typeof lib[k], docs: topLink(k) }, ...statics];
+  });
 
 // ---- Emit ------------------------------------------------------------------
 const byNamespace = GRAMMAR.map((ns) => ({

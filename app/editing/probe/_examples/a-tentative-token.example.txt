@@ -1,5 +1,5 @@
 const bins = [0, 0.2, 0.4, 0.6, 0.8, 1];
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 220,
   margins: { top: 16, right: 20, bottom: 28, left: 20 },
   axes: { x: {}, y: false },
@@ -18,4 +18,5 @@ mount(Elicit({
       ],
     }),
   ],
-}));
+});
+mount(chart.dom());

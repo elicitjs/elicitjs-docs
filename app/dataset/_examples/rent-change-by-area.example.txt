@@ -1,0 +1,55 @@
+// One row per Vancouver local area: its outline and your estimate.
+const guess = {
+  "Kitsilano": -3, "West Point Grey": -4, "Dunbar-Southlands": -3, "Kerrisdale": -5,
+  "Arbutus Ridge": -4, "Shaughnessy": -6, "Fairview": 1, "West End": 2,
+  "Downtown": 3, "South Cambie": 0, "Oakridge": -1, "Marpole": 2,
+  "Riley Park": 3, "Mount Pleasant": 5, "Strathcona": 7, "Grandview-Woodland": 6,
+  "Kensington-Cedar Cottage": 4, "Sunset": 3, "Victoria-Fraserview": 4,
+  "Hastings-Sunrise": 6, "Renfrew-Collingwood": 5, "Killarney": 4,
+};
+const areas = vancouver.features
+  .map((f) => ({ area: f.properties.name, geometry: f.geometry, change: guess[f.properties.name] ?? 0 }))
+  .sort((a, b) => a.area.localeCompare(b.area));
+
+const ds = Elicit.dataset({
+  schema: {
+    area:     { type: "categorical" },
+    geometry: { type: "categorical" },
+    change:   { type: "quantitative", domain: [-10, 10] },
+  },
+  data: areas,
+});
+
+const colour = { field: "change", scale: { type: "diverging", scheme: "dddiverging" } };
+
+// Set each estimate here.
+const bars = ds.chart({
+  width: 440, height: 400,
+  margins: { top: 10, right: 16, bottom: 30, left: 160 },
+  axes: { x: { title: "Rent change next year (%)" } },
+  marks: [
+    barX({
+      channels: {
+        y: { field: "area", scale: { reverse: true } },
+        x: { field: "change", edit: move() },
+        fill: colour,
+      },
+    }),
+  ],
+});
+
+// The map has no edits. It recolours on every change.
+const map = ds.chart({
+  width: 440, height: 300,
+  margins: { top: 8, right: 8, bottom: 8, left: 8 },
+  projection: { type: "mercator", domain: vancouver, inset: 6 },
+  marks: [
+    geoPolygon({
+      stroke: "#fff", strokeWidth: 1,
+      channels: { geometry: { field: "geometry", scale: null }, fill: colour },
+    }),
+  ],
+});
+
+mount(map.dom());
+mount(bars.dom());

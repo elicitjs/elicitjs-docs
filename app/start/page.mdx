@@ -56,13 +56,13 @@ For a plain HTML page, map both names in an import map:
 
 <Section id="spec" title="Built through a spec">
 
-An elicitation interface is built through a declarative spec. `Elicit(spec)` takes one object and returns a DOM element you append. A spec has three main keys:
+An elicitation interface is built through a declarative spec. `Elicit(spec)` takes one object and returns a chart. Append `chart.dom()` to the page. A spec has three main keys:
 
-- `data` — the dataset. A chart elicits exactly one, and every mark is a view over those rows.
+- `data` — the rows of the dataset. Every mark is a view over them.
 - `schema` — each field's **type** and **domain**. Scales are derived from this, so no mark declares one.
 - `marks` — how the rows are drawn.
 
-Only `schema` is required. Leave out `data` to start from an empty chart.
+Only `schema` is required. Leave out `data` to start from an empty chart. To draw one dataset in several charts, see [Datasets & linked charts](/dataset).
 
 <Example
   code={aStaticChart}
@@ -106,7 +106,7 @@ Three ways to get the elicited data:
   try={<><b>Drag</b> a bar — the numbers below follow.</>}
 />
 
-The returned element also carries `getSchema()`, `setData()`, `on("stage" | "select", cb)`, `undo()`, `redo()` and `destroy()`. Call `destroy()` when you unmount it in a framework, to release its resize observer and pointer handlers.
+The chart also carries `getSchema()`, `setData()`, `on("stage" | "select", cb)`, `undo()`, `redo()` and `destroy()`. Call `destroy()` when you unmount it in a framework, to release its resize observer and pointer handlers.
 
 </Section>
 
@@ -132,10 +132,11 @@ Common survey instruments are one call each. Each returns a spec you pass to `El
 ```javascript
 import { Elicit, widgets } from "elicitjs";
 
-document.body.appendChild(Elicit(widgets.likert({
+const chart = Elicit(widgets.likert({
   question: "How confident are you?",
   scale: ["Not at all", "Slightly", "Moderately", "Very", "Extremely"],
-})));
+}));
+document.body.append(chart.dom());
 ```
 
 `likert`, `multipleChoice`, `slider`, `matrix`, `lineCone`, `ranking`, `allocation`, `probabilityTokens`, `interval`, `histogram`, `region`, `thermometer` and `labeledValue` are documented on [Widgets](/widgets).

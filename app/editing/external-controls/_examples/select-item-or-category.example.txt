@@ -29,7 +29,7 @@ const chart = Elicit({
     legendColor({ anchor: "right", title: "group", edit: edit.legend.category() }),
   ],
 });
-mount(chart);
+mount(chart.dom());
 
 const controls = document.createElement("div");
 controls.style.cssText = "display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px;font:13px system-ui";

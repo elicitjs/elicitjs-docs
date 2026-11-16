@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 360, height: 200,
   margins: { top: 16, right: 20, bottom: 24, left: 20 },
   axes: {
@@ -18,4 +18,5 @@ mount(Elicit({
       edits: [ move({ channels: ["x"] }) ],
     }),
   ],
-}))
+});
+mount(chart.dom());

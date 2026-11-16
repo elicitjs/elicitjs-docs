@@ -1,6 +1,6 @@
 // A space-saving y axis: no spine or ticks, labels moved inside the plot above
 // each bar, gridlines between the bands, and a flat title at the top left.
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 230,
   margins: { top: 22, right: 12, bottom: 34, left: 6 },
   data: [{ team: "Design", n: 12 }, { team: "Engineering", n: 31 }, { team: "Research", n: 8 }],
@@ -24,4 +24,5 @@ mount(Elicit({
       height: { value: 22 },
     } }),
   ],
-}));
+});
+mount(chart.dom());

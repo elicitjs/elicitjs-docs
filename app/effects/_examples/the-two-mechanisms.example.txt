@@ -36,7 +36,7 @@ mount(Elicit({
     selected: false,
   },
   marks: [ dots() ],
-}));
+}).dom());
 
 // Outline: the dot is untouched, and a ring is drawn around it.
 mount(Elicit({
@@ -48,4 +48,4 @@ mount(Elicit({
     selected: false,
   },
   marks: [ dots() ],
-}));
+}).dom());

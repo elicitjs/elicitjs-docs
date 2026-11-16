@@ -4,7 +4,7 @@ const house = "M0 10 L10 0 L20 10 L17 10 L17 20 L3 20 L3 10 Z";
 const car = "M1 12 L4 6 L16 6 L19 12 L19 16 L1 16 Z M4 16 A2 2 0 0 0 8 16 Z M12 16 A2 2 0 0 0 16 16 Z";
 const heart = "M10 18 L2.5 10 A5 5 0 0 1 10 4.5 A5 5 0 0 1 17.5 10 Z";
 
-mount(Elicit({
+const chart = Elicit({
   width: 380, height: 260,
   margins: { top: 20, right: 16, bottom: 32, left: 36 },
   schema: {
@@ -27,4 +27,5 @@ mount(Elicit({
       },
     }),
   ],
-}));
+});
+mount(chart.dom());

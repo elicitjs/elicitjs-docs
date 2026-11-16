@@ -10,11 +10,11 @@ export const api: ApiEntry[] = [
     ),
     signatures: [
       "move({ stage: 1 })            // active only in stage 1",
-      "const el = Elicit({ stage: 0, ... });",
-      "el.getStage() → number",
-      "el.setStage(n)               // set, emit \"stage\", re-render",
-      "el.nextStage()               // setStage(current + 1)",
-      "el.on(\"stage\", (n) => …)     // subscribe; returns an unsubscribe fn",
+      "const chart = Elicit({ stage: 0, ... });",
+      "chart.getStage() → number",
+      "chart.setStage(n)            // set, emit \"stage\", re-render",
+      "chart.nextStage()            // setStage(current + 1)",
+      "chart.on(\"stage\", (n) => …)  // subscribe; returns an unsubscribe fn",
     ],
     options: [
       {

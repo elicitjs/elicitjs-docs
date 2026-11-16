@@ -44,11 +44,11 @@ export const api: ApiEntry[] = [
       </>
     ),
     signatures: [
-      "el.getSelection() → number | null      ·   el.getSelectionAll() → number[]",
-      "el.select(i | number[] | null) → boolean",
-      "el.toggleSelection(i) → boolean        ·   el.selectAll() → boolean",
-      "el.selectWhere(field, value, { all }) → boolean",
-      "el.clearSelection() → boolean          ·   el.on('select', (first, all) => …)",
+      "chart.getSelection() → number | null      ·   chart.getSelectionAll() → number[]",
+      "chart.select(i | number[] | null) → boolean",
+      "chart.toggleSelection(i) → boolean        ·   chart.selectAll() → boolean",
+      "chart.selectWhere(field, value, { all }) → boolean",
+      "chart.clearSelection() → boolean          ·   chart.on('select', (first, all) => …)",
     ],
     options: [
       {

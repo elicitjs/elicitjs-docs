@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 400, height: 340,
   axes: { x: { title: "Hours slept" }, y: { title: "Hours worked" } },
   // How does each person feel? Where each face sits is data you already have:
@@ -34,4 +34,5 @@ mount(Elicit({
       },
     }),
   ],
-}))
+});
+mount(chart.dom());

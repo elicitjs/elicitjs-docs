@@ -132,16 +132,16 @@ export const api: ApiEntry[] = [
     ],
   },
   {
-    name: "el.setDomain(field, domain, options)",
+    name: "chart.setDomain(field, domain, options)",
     summary: (
       <>
         Write a field&rsquo;s domain from outside the chart — a zoom button, a reset control. The same commit a wheel tick or a pan makes: undoable, notified through <code className="inline">change</code>, and every scale reflows.
       </>
     ),
     signatures: [
-      "el.setDomain(\"x\", [20, 40])   // → true",
-      "el.setDomain(\"x\", null)       // restore the declared domain",
-      "el.setDomain(\"weight\", [0, 5], { table: \"links\" })",
+      "chart.setDomain(\"x\", [20, 40])   // → true",
+      "chart.setDomain(\"x\", null)       // restore the declared domain",
+      "chart.setDomain(\"weight\", [0, 5], { table: \"links\" })",
     ],
     options: [
       {

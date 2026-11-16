@@ -1,0 +1,76 @@
+// A network: factors (nodes) and what causes what (links).
+const ds = Elicit.dataset({
+  schema: {
+    structure: "network",
+    tables: {
+      nodes: {
+        id:         { type: "categorical",  key: true, open: true },
+        x:          { type: "quantitative", domain: [0, 100] },
+        y:          { type: "quantitative", domain: [0, 100] },
+        importance: { type: "quantitative", domain: [0, 10], default: 5 },
+      },
+      links: {
+        role: "links",
+        directed: true,
+        fields: {
+          source: { type: "ref" },
+          target: { type: "ref" },
+        },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "Interest rates", x: 16, y: 80, importance: 8 },
+      { id: "Migration",      x: 16, y: 20, importance: 5 },
+      { id: "New supply",     x: 50, y: 88, importance: 6 },
+      { id: "Speculation",    x: 50, y: 12, importance: 3 },
+      { id: "House prices",   x: 84, y: 50, importance: 9 },
+    ],
+    links: [
+      { source: "Interest rates", target: "House prices" },
+      { source: "Migration",      target: "House prices" },
+    ],
+  },
+});
+
+// Draw the structure. Drag a factor to move it, shift-drag from one to another
+// to say it causes it, click empty space to add a factor.
+const graph = ds.chart({
+  width: 440, height: 260,
+  margins: { top: 24, right: 44, bottom: 24, left: 44 },
+  axes: false,
+  marks: [
+    link({ inset: 3, stroke: "#94A5B3", strokeWidth: 1.5 }),
+    node({
+      fill: "#50AEB7",
+      channels: {
+        x:    { field: "x", edit: move({ channels: ["x", "y"], when: when.noShift }) },
+        y:    { field: "y" },
+        size: { field: "importance", scale: { range: [4, 16] } },
+        text: { field: "id" },
+      },
+      edits: [
+        edit.network.connect({ when: when.shift }),
+        create(),
+      ],
+    }),
+  ],
+});
+
+// Weigh each factor. The bars draw the nodes table.
+const weights = ds.chart({
+  width: 440, height: 200,
+  margins: { top: 10, right: 16, bottom: 30, left: 100 },
+  axes: { x: { title: "Importance" } },
+  marks: [
+    barX({
+      table: "nodes",
+      fill: "#50AEB7",
+      channels: { y: { field: "id" }, x: { field: "importance", edit: move() } },
+    }),
+  ],
+});
+
+mount(graph.dom());
+mount(weights.dom());

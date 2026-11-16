@@ -1,7 +1,7 @@
 // docs inject `vancouver`; your app loads GeoJSON then passes it in:
 // const vancouver = await fetch("data/vancouver-neighborhoods.json").then(r => r.json());
 
-mount(Elicit({
+const chart = Elicit({
   width: 520, height: 360,
   margins: { top: 8, right: 8, bottom: 8, left: 8 },
   projection: { type: "mercator", domain: vancouver, inset: 6 },
@@ -15,4 +15,5 @@ mount(Elicit({
       strokeWidth: 0.8,
     }),
   ],
-}));
+});
+mount(chart.dom());

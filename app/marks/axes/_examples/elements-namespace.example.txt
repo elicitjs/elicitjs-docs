@@ -1,5 +1,5 @@
 // Chart elements via elicit.elements + ElicitSpec.elements (also still work in marks).
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 220,
   margins: { top: 16, right: 16, bottom: 42, left: 52 },
   schema: {
@@ -25,4 +25,5 @@ mount(Elicit({
       },
     }),
   ],
-}));
+});
+mount(chart.dom());

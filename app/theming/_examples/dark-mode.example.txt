@@ -1,7 +1,7 @@
 // themes.dark carries a `background` token, so the chart paints its own dark
 // surface — light ink, light labels, slate grid, no host CSS required. The same
 // spec renders identically light or dark; only the theme changes.
-mount(Elicit({
+const chart = Elicit({
   width: 440, height: 240,
   margins: { top: 20, right: 20, bottom: 30, left: 36 },
   data: [{ cat: "A", n: 30 }, { cat: "B", n: 55 }, { cat: "C", n: 40 }, { cat: "D", n: 22 }],
@@ -14,4 +14,5 @@ mount(Elicit({
   marks: [
     barY({ channels: { x: { field: "cat" }, y: { field: "n", edit: move() } } }),
   ],
-}));
+});
+mount(chart.dom());

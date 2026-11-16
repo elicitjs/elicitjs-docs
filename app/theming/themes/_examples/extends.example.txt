@@ -1,6 +1,6 @@
 // Start from a named theme and change what you need. `extends` names the base;
 // the rest deep-merges over it.
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 260,
   theme: {
     extends: "swiss",
@@ -16,4 +16,5 @@ mount(Elicit({
     v: { type: "quantitative", domain: [0, 60] },
   },
   marks: [barY({ channels: { x: { field: "line" }, y: { field: "v", edit: move() } } })],
-}));
+});
+mount(chart.dom());

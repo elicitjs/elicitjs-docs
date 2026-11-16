@@ -32,7 +32,7 @@ const optionRings = () => guides.custom((ctx) => {
   return nodes;
 });
 
-mount(Elicit({
+const chart = Elicit({
   width: 560, height: 130,
   margins: { top: 34, right: 60, bottom: 44, left: 60 },
   axes: false,
@@ -50,4 +50,5 @@ mount(Elicit({
       edits: [ create({ pick: "probe", channels: ["x"], advance: false }) ],
     }),
   ],
-}));
+});
+mount(chart.dom());

@@ -5,13 +5,13 @@ export const api: ApiEntry[] = [
     name: "Where things live on the spec",
     summary: (
       <>
-        One chart, one place for each concern. Marks are views — they never own <code className="inline">data</code> or domains.
+        One place for each concern. The dataset spec holds the data; a chart spec holds the views. <code className="inline">Elicit(spec)</code> takes both in one object. Marks are views — they never own <code className="inline">data</code> or domains.
       </>
     ),
     options: [
       {
         name: "schema",
-        type: "on Elicit",
+        type: "on the dataset",
         default: "required",
         desc: (
           <>
@@ -21,19 +21,19 @@ export const api: ApiEntry[] = [
       },
       {
         name: "data",
-        type: "on Elicit",
+        type: "on the dataset",
         default: "[]",
-        desc: "The one elicited dataset. Every mark reads these rows.",
+        desc: "The elicited rows. Every mark in every chart over the dataset reads them.",
       },
       {
         name: "marks",
-        type: "on Elicit",
+        type: "on a chart",
         default: "[]",
         desc: "Marks (views) that encode — and optionally edit — columns of that dataset.",
       },
       {
         name: "constraints",
-        type: "on Elicit",
+        type: "on the dataset",
         default: "[]",
         desc: (
           <>

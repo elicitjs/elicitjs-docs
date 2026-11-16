@@ -1,5 +1,5 @@
 const bins = ["never","rarely","sometimes","often","always"];
-mount(Elicit({
+const chart = Elicit({
   width: 460, height: 260,
   margins: { top: 16, right: 16, bottom: 28, left: 84 },
   data: [
@@ -18,4 +18,5 @@ mount(Elicit({
       edits: [ create({ gesture: "click", channels: ["y"] }), remove() ],
     }),
   ],
-}));
+});
+mount(chart.dom());

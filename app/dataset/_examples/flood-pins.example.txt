@@ -1,0 +1,72 @@
+// Up to eight places you expect to flood, and how deep.
+const ds = Elicit.dataset({
+  schema: {
+    id:    { type: "categorical",  key: true },
+    lon:   { type: "quantitative", domain: [-123.27, -123.02] },
+    lat:   { type: "quantitative", domain: [49.20, 49.32] },
+    depth: { type: "quantitative", domain: [0, 3], default: 0.5 },
+  },
+  data: [
+    { id: "Item 1", lon: -123.115, lat: 49.272, depth: 1.2 },
+    { id: "Item 2", lon: -123.130, lat: 49.206, depth: 0.8 },
+  ],
+  constraints: [count({ max: 8 })],
+});
+
+// Click the map to add a place. Drag a pin to move it.
+// Its circle grows with the depth you set below.
+const map = ds.chart({
+  width: 440, height: 300,
+  margins: { top: 8, right: 8, bottom: 8, left: 8 },
+  projection: { type: "mercator", domain: vancouver, inset: 6 },
+  marks: [
+    geoBasemap({ geojson: vancouver, fill: "#EDF7F8", stroke: "#6F8294", strokeWidth: 0.7 }),
+    geoPoint({
+      fill: "#2B5D87", fillOpacity: 0.7, stroke: "#fff", strokeWidth: 1.5,
+      channels: {
+        lon:  { field: "lon" },
+        lat:  { field: "lat" },
+        size: { field: "depth", scale: { range: [3, 18] } },
+      },
+      edits: [edit.geo.move(), edit.geo.create()],
+    }),
+    geoText({
+      dy: -14, fontSize: 11, fill: "#20555A",
+      channels: { lon: { field: "lon" }, lat: { field: "lat" }, text: { field: "id" } },
+    }),
+  ],
+});
+
+// Each place gets a bar as soon as it exists. Drag it to set the depth.
+const depths = ds.chart({
+  width: 440, height: 200,
+  margins: { top: 10, right: 16, bottom: 30, left: 56 },
+  axes: { x: { title: "Flood depth (m)" } },
+  marks: [
+    barX({
+      fill: "#2B5D87",
+      channels: { y: { field: "id" }, x: { field: "depth", edit: move() } },
+    }),
+  ],
+});
+
+mount(map.dom());
+mount(depths.dom());
+
+// One history for both charts.
+const controls = document.createElement("div");
+controls.style.cssText = "display:flex;gap:8px;margin-top:10px;font:12px system-ui";
+const undo = document.createElement("button");
+const redo = document.createElement("button");
+undo.textContent = "↶ Undo";
+redo.textContent = "↷ Redo";
+undo.onclick = () => ds.undo();
+redo.onclick = () => ds.redo();
+const sync = () => {
+  undo.disabled = !ds.canUndo();
+  redo.disabled = !ds.canRedo();
+};
+ds.on("change", sync);
+sync();
+controls.append(undo, redo);
+mount(controls);

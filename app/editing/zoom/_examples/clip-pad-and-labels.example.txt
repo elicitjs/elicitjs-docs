@@ -38,4 +38,4 @@ const chart = Elicit({
     }),
   ],
 });
-mount(chart);
+mount(chart.dom());

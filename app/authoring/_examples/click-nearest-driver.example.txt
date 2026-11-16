@@ -43,7 +43,7 @@ const bump = authoring.makeEdit({
   },
 });
 
-mount(Elicit({
+const chart = Elicit({
   width: 380, height: 240,
   margins: { top: 14, right: 14, bottom: 26, left: 30 },
   data: [{ x: 25, y: 30 }, { x: 55, y: 55 }, { x: 80, y: 40 }],
@@ -61,4 +61,5 @@ mount(Elicit({
       edits: [ bump ],
     }),
   ],
-}))
+});
+mount(chart.dom());

@@ -1,5 +1,5 @@
 const cats = ["apples","bananas","oranges","pears"];
-mount(Elicit({
+const chart = Elicit({
   width: 460, height: 300,
   margins: { top: 16, right: 12, bottom: 28, left: 34 },
   data: [
@@ -21,4 +21,5 @@ mount(Elicit({
       unit: 10,
     }),
   ],
-}));
+});
+mount(chart.dom());

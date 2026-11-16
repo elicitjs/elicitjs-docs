@@ -50,11 +50,16 @@ function fmtRow(d: Record<string, unknown>, i: number, pad: number) {
 type Rows = Record<string, unknown>[];
 type ElicitData = Rows | Record<string, Rows>;
 
-type ElicitEl = HTMLElement & {
+/** What `Elicit(spec)` and `dataset.chart(spec)` return: a chart, whose node is `dom()`. */
+type ElicitChart = {
+  dom: () => HTMLElement;
   getData: () => ElicitData;
   on: (ev: string, cb: () => void) => () => void;
-  destroy?: () => void;
+  destroy: () => void;
 };
+
+const isChart = (x: unknown): x is ElicitChart =>
+  x != null && typeof x === 'object' && typeof (x as ElicitChart).dom === 'function';
 
 /**
  * `getData()` is shaped like the spec's `data`: a bare array for a single-table
@@ -80,7 +85,7 @@ function fmtGroup(group: { name: string | null; rows: Rows }) {
     : `<span class="tbl">${esc(group.name)}</span>\n${body}`;
 }
 
-function DataPanel({ chart }: { chart: ElicitEl | null }) {
+function DataPanel({ chart }: { chart: ElicitChart | null }) {
   const [html, setHtml] = useState('<span class="empty">no rows</span>');
   const [count, setCount] = useState('0 rows');
 
@@ -116,6 +121,10 @@ function DataPanel({ chart }: { chart: ElicitEl | null }) {
       <pre className="data-body" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
+}
+
+function destroyAll(charts: ElicitChart[]) {
+  for (const c of charts) c.destroy();
 }
 
 /**
@@ -233,7 +242,8 @@ type Props = {
 };
 
 /**
- * Live example: harness-style `mount(Elicit(…))` eval with chart + getData panel.
+ * Live example: harness-style `mount(chart.dom())` eval with chart + getData panel.
+ * `mount` takes a DOM node; the first chart mounted feeds the panel.
  * `codeMode` controls whether source is editable, always-visible read-only, or
  * collapsed behind a toggle (intro gallery).
  */
@@ -248,12 +258,12 @@ export function ExampleLive({
   const [evalCode, setEvalCode] = useState(baseCode);
   const [editorKey, setEditorKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [elicited, setElicited] = useState<ElicitEl | null>(null);
+  const [elicited, setElicited] = useState<ElicitChart | null>(null);
   const [fluid, setFluid] = useState(false);
   const [resultWidth, setResultWidth] = useState<string | undefined>();
   const [codeOpen, setCodeOpen] = useState(codeMode === 'readonly');
   const chartRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef<ElicitEl | null>(null);
+  const activeRef = useRef<ElicitChart[]>([]);
   const debounceRef = useRef<number | null>(null);
   const scope = useMemo(() => createElicitScope(), []);
 
@@ -304,62 +314,91 @@ export function ExampleLive({
 
     let cancelled = false;
 
-    activeRef.current?.destroy?.();
-    activeRef.current = null;
+    destroyAll(activeRef.current);
+    activeRef.current = [];
     chart.replaceChildren();
     setElicited(null);
     setFluid(false);
     setResultWidth(undefined);
 
-    // Mutable box so assignments inside `mount` (called via new Function) stay visible to TS.
-    const mounted: { el: ElicitEl | null } = { el: null };
-    const mount = (node: HTMLElement) => {
-      chart.appendChild(node);
-      if (
-        !mounted.el &&
-        node &&
-        typeof (node as ElicitEl).getData === 'function' &&
-        typeof (node as ElicitEl).on === 'function'
-      ) {
-        mounted.el = node as ElicitEl;
+    // Every chart the example builds is recorded here, through `Elicit` and
+    // `ds.chart`, so a re-run destroys it. Its node carries it as `__chart`, so
+    // browser checks can reach the chart.
+    const created: ElicitChart[] = [];
+    const patched = new WeakSet<object>();
+    type Ds = { chart: (spec: unknown) => ElicitChart };
+    const track = (c: ElicitChart) => {
+      (c.dom() as HTMLElement & { __chart?: ElicitChart }).__chart = c;
+      created.push(c);
+      patch((c as unknown as { dataset?: Ds }).dataset);
+      return c;
+    };
+    const patch = (ds: Ds | undefined) => {
+      if (!ds || patched.has(ds)) return;
+      patched.add(ds);
+      const make = ds.chart;
+      ds.chart = (spec) => track(make(spec));
+    };
+    const RealElicit = scope.Elicit as unknown as ((spec: unknown) => ElicitChart) & {
+      dataset: (spec: unknown) => Ds;
+    };
+    const Elicit = Object.assign((spec: unknown) => track(RealElicit(spec)), RealElicit, {
+      dataset: (spec: unknown) => {
+        const ds = RealElicit.dataset(spec);
+        patch(ds);
+        return ds;
+      },
+    });
+
+    // `mount` appends a node, like `parent.append`. A chart is mounted as
+    // `chart.dom()`; the first one mounted feeds the data panel.
+    const mounted: ElicitChart[] = [];
+    const mount = <T,>(node: T): T => {
+      if (isChart(node)) {
+        throw new Error('mount() takes a DOM node. Pass chart.dom().');
       }
+      chart.appendChild(node as unknown as Node);
+      const owner = created.find((c) => c.dom() === (node as unknown));
+      if (owner) mounted.push(owner);
       return node;
     };
 
     try {
       const names = Object.keys(scope);
-      const vals = Object.values(scope);
+      const vals = names.map((n) => (n === 'Elicit' ? Elicit : scope[n as keyof typeof scope]));
       // eslint-disable-next-line no-new-func
       const run = new Function(...names, 'mount', evalCode);
       run(...vals, mount);
       if (cancelled) {
-        mounted.el?.destroy?.();
+        destroyAll(created);
         chart.replaceChildren();
         return;
       }
-      activeRef.current = mounted.el;
+      activeRef.current = created;
+      const first = mounted[0] ?? null;
       setError(null);
-      setElicited(mounted.el);
-      if (mounted.el) {
-        if (mounted.el.style.width && mounted.el.style.width.endsWith('px')) {
-          setResultWidth(mounted.el.style.width);
+      setElicited(first);
+      if (first) {
+        const width = first.dom().style.width;
+        if (width && width.endsWith('px')) {
+          setResultWidth(width);
         } else {
           setFluid(true);
         }
       }
     } catch (err) {
       if (cancelled) return;
-      mounted.el?.destroy?.();
+      destroyAll(created);
       chart.replaceChildren();
-      activeRef.current = null;
+      activeRef.current = [];
       setElicited(null);
       setError(formatEvalError(err));
     }
 
     return () => {
       cancelled = true;
-      activeRef.current?.destroy?.();
-      activeRef.current = null;
+      destroyAll(activeRef.current);
+      activeRef.current = [];
     };
   }, [evalCode, scope]);
 

@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 440, height: 220,
   margins: { top: 16, right: 24, bottom: 34, left: 88 },
   schema: {
@@ -34,4 +34,5 @@ mount(Elicit({
     // would put it 0 pixels from the left edge).
     ruleX({ channels: { x: { datum: 0 } }, stroke: "#94A5B3", strokeDash: "3 3" }),
   ],
-}))
+});
+mount(chart.dom());

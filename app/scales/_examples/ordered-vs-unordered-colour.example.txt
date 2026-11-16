@@ -4,7 +4,7 @@ const rows = [
   { q: "Q3", agree: "agree",    team: "north" },
   { q: "Q4", agree: "strongly agree", team: "east" },
 ];
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 210,
   margins: { top: 14, right: 14, bottom: 26, left: 30 },
   schema: {
@@ -28,4 +28,5 @@ mount(Elicit({
       fill: { field: "team" },
     } }),
   ],
-}))
+});
+mount(chart.dom());

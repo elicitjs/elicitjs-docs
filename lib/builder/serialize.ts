@@ -230,7 +230,13 @@ function themeLiteral(state: BuilderState): Raw | undefined {
   return raw(`{\n${lines.join(',\n')}\n}`);
 }
 
+/** The live example: build the chart, mount its node. */
 export function buildSpecCode(state: BuilderState): string {
+  return `const chart = ${buildChartExpr(state)};\nmount(chart.dom());\n`;
+}
+
+/** The `Elicit({...})` call alone. */
+function buildChartExpr(state: BuilderState): string {
   const schema = schemaLiteral(state);
   const scales = scalesLiteral(state);
   const theme = themeLiteral(state);
@@ -290,11 +296,11 @@ export function buildSpecCode(state: BuilderState): string {
   if (effects) specEntries.effects = effects;
   if (theme) specEntries.theme = theme;
 
-  return `mount(Elicit(${jsLiteral(specEntries)}));\n`;
+  return `Elicit(${jsLiteral(specEntries)})`;
 }
 
 export function buildStandaloneHtml(state: BuilderState): string {
-  const code = buildSpecCode(state);
+  const code = buildChartExpr(state);
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -325,11 +331,11 @@ export function buildStandaloneHtml(state: BuilderState): string {
     // In production, import * as elicit from '@elicitjs/elicit';
     // const { Elicit, barY, line, move, maintainSum, guides, themes } = elicit;
     
-    // Mount the elicitation chart into #chart-container
-    const chart = ${code.replace('mount(', 'document.getElementById("chart-container").appendChild(')};
-    
+    const chart = ${code};
+    document.getElementById("chart-container").append(chart.dom());
+
     // Listen to respondent updates
-    chart.on?.('change', (data) => {
+    chart.on('change', (data) => {
       console.log('Elicited belief update:', data);
     });
   </script>
@@ -338,7 +344,7 @@ export function buildStandaloneHtml(state: BuilderState): string {
 }
 
 export function buildReactComponentCode(state: BuilderState): string {
-  const code = buildSpecCode(state);
+  const code = buildChartExpr(state);
   return `import React, { useEffect, useRef } from 'react';
 import * as elicit from '@elicitjs/elicit';
 
@@ -348,11 +354,6 @@ export function ElicitationDevice({ onBeliefChange }) {
   useEffect(() => {
     if (!containerRef.current) return;
     containerRef.current.innerHTML = '';
-    
-    const mount = (el: HTMLElement) => {
-      containerRef.current?.appendChild(el);
-      return el;
-    };
 
     const {
       Elicit,
@@ -362,13 +363,14 @@ export function ElicitationDevice({ onBeliefChange }) {
     } = elicit;
 
     const chart = ${code};
+    containerRef.current.appendChild(chart.dom());
 
-    chart.on?.('change', (data) => {
+    chart.on('change', (data) => {
       onBeliefChange?.(data);
     });
 
     return () => {
-      chart.destroy?.();
+      chart.destroy();
     };
   }, [onBeliefChange]);
 

@@ -1,5 +1,6 @@
-mount(Elicit(widgets.multipleChoice({
+const chart = Elicit(widgets.multipleChoice({
   question: "Which apply?",
   options: ["Fast","Cheap","Reliable","Simple"],
   max: 2,
-})));
+}));
+mount(chart.dom());

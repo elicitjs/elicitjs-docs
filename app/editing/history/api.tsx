@@ -5,7 +5,7 @@ export const api: ApiEntry[] = [
     name: "chart.undo() · chart.redo()",
     summary: (
       <>
-        On the element <code className="inline">Elicit</code> returns. Snapshots, not inverse operations: an edit’s <code className="inline">apply()</code> is already a pure data → data function, so the state <i>before</i> it is the undo, and no edit ever has to describe how to reverse itself.
+        On the dataset, and on every chart through it. Snapshots, not inverse operations: an edit’s <code className="inline">apply()</code> is already a pure data → data function, so the state <i>before</i> it is the undo, and no edit ever has to describe how to reverse itself.
       </>
     ),
     signatures: [
@@ -76,7 +76,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        History is <b>per chart</b> and lives on the element, so a page of several charts gives each its own — which is what you want when they elicit different questions.
+        History belongs to the <b>dataset</b>. Charts over one dataset share one history, so an undo steps back the last gesture in any of them; a chart&rsquo;s size is put back on the chart that changed it. Charts over separate datasets each keep their own. See <a href="/dataset#history">Datasets &amp; linked charts</a>.
       </>
     ),
   },

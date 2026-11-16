@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 380, height: 260,
   margins: { top: 14, right: 14, bottom: 26, left: 30 },
   guides: [
@@ -33,4 +33,5 @@ mount(Elicit({
       },
     }),
   ],
-}))
+});
+mount(chart.dom());

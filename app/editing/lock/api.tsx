@@ -5,7 +5,7 @@ export const api: ApiEntry[] = [
     name: "ElicitSpec.lock",
     summary: (
       <>
-        Which rows of the chart’s one dataset are read-only. A lock is a property of the <b>data</b> — not of a mark or an edit — so it lives on the spec beside <code className="inline">data</code> and <code className="inline">schema</code>, and holds for every edit from every mark.
+        Which rows of the dataset are read-only. A lock is a property of the <b>data</b> — not of a mark or an edit — so it lives on the dataset spec beside <code className="inline">data</code> and <code className="inline">schema</code>, and holds for every edit from every mark in every chart.
       </>
     ),
     signatures: [

@@ -14,9 +14,9 @@ const chart = Elicit({
                        y: { field: "n", edit: move() } } }),
   ],
 });
-mount(chart);
+mount(chart.dom());
 
-// Nothing here is special to undo: it is the ordinary element API.
+// Nothing here is special to undo: it is the ordinary chart API.
 const controls = document.createElement("div");
 controls.style.cssText = "display:flex;gap:8px;margin-top:10px;font:12px system-ui";
 const undo = document.createElement("button");

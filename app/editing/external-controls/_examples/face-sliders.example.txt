@@ -26,7 +26,7 @@ const chart = Elicit({
   data: [ { smile: 0.7, eyes: 0.5, brow: 0.4 } ],
   marks: [ face({ channels }) ],
 });
-mount(chart);
+mount(chart.dom());
 
 const controls = document.createElement("div");
 controls.style.cssText = "display:flex;flex-direction:column;gap:8px;margin-top:10px;font:12px system-ui;max-width:300px";

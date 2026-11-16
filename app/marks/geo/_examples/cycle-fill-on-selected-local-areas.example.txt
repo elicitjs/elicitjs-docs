@@ -6,7 +6,7 @@ const editable = vancouver.features
     fill: "A",
   }));
 
-mount(Elicit({
+const chart = Elicit({
   width: 520, height: 360,
   margins: { top: 8, right: 8, bottom: 8, left: 8 },
   projection: { type: "mercator", domain: vancouver, inset: 6 },
@@ -30,4 +30,5 @@ mount(Elicit({
       },
     }),
   ],
-}));
+});
+mount(chart.dom());

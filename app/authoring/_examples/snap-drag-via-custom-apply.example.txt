@@ -9,7 +9,7 @@ const snapDrag = authoring.makeEdit({
     return { ...ctx.datum, [ch.field]: Math.round(v / 10) * 10 };
   },
 });
-mount(Elicit({
+const chart = Elicit({
   width: 360, height: 240,
   margins: { top: 16, right: 16, bottom: 28, left: 34 },
   data: [ { cat: "A", n: 40 } ],
@@ -24,4 +24,5 @@ mount(Elicit({
       edits: [ snapDrag ],
     }),
   ],
-}));
+});
+mount(chart.dom());

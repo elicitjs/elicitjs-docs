@@ -1,0 +1,169 @@
+import { DocShell } from '../../components/DocShell';
+import { ApiReference } from '../../components/ApiReference';
+import { Section } from '../../components/Section';
+import { Example } from '../../components/Example';
+import { Lead } from '../../components/Lead';
+import { api } from './api';
+
+import outOf100Patients from './_examples/out-of-100-patients.example.txt';
+import drawAnEconomy from './_examples/draw-an-economy.example.txt';
+import aCausalMapWithWeights from './_examples/a-causal-map-with-weights.example.txt';
+import rentChangeByArea from './_examples/rent-change-by-area.example.txt';
+import aSliderBesideTwoCharts from './_examples/a-slider-beside-two-charts.example.txt';
+import floodPins from './_examples/flood-pins.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Datasets & linked charts
+
+<Lead>`Elicit.dataset(spec)` makes a dataset: the rows, the schema, the constraints and the undo history. `ds.chart(spec)` draws it, and any number of charts can read and write one dataset: an edit in one chart redraws every other. `Elicit(spec)` is the one-call form, a dataset and one chart from one spec.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="linked" title="Two charts, one dataset">
+
+Split the spec in two. `Elicit.dataset` takes `schema`, `data`, `constraints`, `lock`, `context` and `onChange`. `ds.chart` takes everything else: `marks`, size, `axes`, `theme`, `guides`. A chart is a plain object, so append `chart.dom()` to the page.
+
+```js
+const ds = Elicit.dataset({ schema, data, constraints });
+const split = ds.chart({ marks: [barX({ … })] });
+const people = ds.chart({ marks: [waffleY({ … })] });
+document.body.append(split.dom(), people.dom());
+```
+
+Give each chart the gesture it is best at. Here one bar of 100 patients takes `edit.stack.edge()`: drag the edge between two outcomes to trade one for the other. A waffle of the same counts takes `edit.waffle.fill()`: paint a block to say how many people land in it. An edit in either chart commits to the dataset, and both charts redraw from the new rows. `maintainSum` keeps the total at 100 in both, because it is the dataset's.
+
+<Example
+  code={outOf100Patients}
+  title="Out of 100 patients"
+  blurb="The bar trades one outcome for its neighbour. The waffle sets one outcome's count, and maintainSum takes the difference from the others."
+  try={(
+    <>
+      <b>Drag</b> an edge in the bar, or <b>paint</b> a block of people. The other chart follows.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="share-a-column" title="Three charts, two columns">
+
+A chart writes the columns its channels encode. Two line charts each draw one column over `year`, and `move({ pick: "sweep" })` writes it as you sweep. A third chart plots `unemployment` against `inflation`, one dot per year, joined by `path` in year order. `move({ channels: ["x", "y"] })` writes both columns of the dot you drag.
+
+Draw the two lines over time and the third chart shows the trade-off they imply. Drag a year in the trade-off and both lines bend at that year.
+
+<Example
+  code={drawAnEconomy}
+  title="Unemployment, inflation and the trade-off"
+  blurb="The lines write one column each. The scatter writes both."
+  try={(
+    <>
+      <b>Sweep</b> across a line chart, or <b>drag</b> a year in the scatter.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="tables" title="One chart per table">
+
+A dataset with `structure: "network"` holds two tables, `nodes` and `links`. Each mark draws one table, and `table:` names it. Here a network chart draws both tables, and a bar chart draws `nodes` alone. Add a factor in the graph and it gets a bar. Its circle grows with the weight you give it.
+
+`create()` gives a new node the key `"Item 1"`, `"Item 2"` and so on, and each new node starts at the `default` you declare for `importance`.
+
+<Example
+  code={aCausalMapWithWeights}
+  title="A causal map with weights"
+  blurb="The graph writes nodes and links. The bars write each node's importance."
+  try={(
+    <>
+      <b>Shift-drag</b> from one factor to another to add a cause. <b>Click</b> empty space to add a factor. <b>Drag</b> a bar to weigh it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="view" title="A chart that only shows">
+
+A chart with no edits is a view. It redraws on every commit like any other chart. Here you set a rent estimate for each Vancouver local area on the bars, and the map shows where your estimates rise and fall. Both charts colour by `change` on a diverging scale, so a bar and its area share a colour.
+
+<Example
+  code={rentChangeByArea}
+  title="Rent change by local area"
+  blurb="The bars take move(). The map takes no edits."
+  try={(
+    <>
+      <b>Drag</b> a bar left or right. Its area on the map recolours.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="set" title="Write from outside a chart">
+
+`ds.set(field, value, { index, table })` writes one cell from your own code: a slider, an input or a script. `index` counts the rows `getData()` reports, from 0, and defaults to 0. `table` defaults to the primary table. The value is stored as the field's type, so a slider's `"40"` becomes the number `40`.
+
+The write runs the dataset's constraints and then the lock, as an edit does. An edit's own `constrain` doesn't run, because no edit is involved. Each `set` is one undo step, fires `change` once and redraws every chart.
+
+`set` returns `true` when it commits. It returns `false` when a constraint rejects the value, the row is locked or the value is unchanged. An undeclared field, an index out of range or a value the field's type can't hold also logs a warning.
+
+`set` writes rows that exist. To add rows from code, call `setData`, or replay a `create` gesture with `chart.emit`. To drive a named edit through a chart's scales, use [`chart.control`](/editing/external-controls).
+
+<Example
+  code={aSliderBesideTwoCharts}
+  title="A slider beside two charts"
+  blurb={"The slider calls ds.set(\"share\", value, { index: 0 }). maintainSum repairs the other shares."}
+  try={(
+    <>
+      <b>Move</b> the slider, or <b>drag</b> a bar. The pie, the bars and the slider stay in step.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="history" title="One history, one selection">
+
+The undo history belongs to the dataset. A gesture in any chart is one step, and `ds.undo()` steps back the last gesture, whichever chart it happened in. `setData` clears the history.
+
+Here you click the map to add a place you expect to flood, and its bar appears below. Drag the bar to set the depth, and the place's circle grows on the map. Undo steps back the depth, then the place, in both charts. `count({ max: 8 })` caps the number of places.
+
+<Example
+  code={floodPins}
+  title="Where it floods, and how deep"
+  blurb="The map writes lon and lat. The bars write depth. ds.undo() steps back either."
+  try={(
+    <>
+      <b>Click</b> the map to add a place, <b>drag</b> its bar, then press <b>Undo</b> twice.
+    </>
+  )}
+/>
+
+The selection belongs to the dataset too. Select a row in one chart and every chart outlines it. `ds.on("select")` fires once per change. See [Selection](/editing/selection).
+
+</Section>
+
+<Section id="shared" title="What each chart keeps">
+
+Every chart on a dataset shares:
+
+- the rows, the schema and its domains, so a zoom in one chart zooms every chart;
+- `constraints`, `lock` and `context`;
+- the undo history and the selection;
+- `onChange` and `on("change")`, which fire once per commit, whichever chart made it.
+
+Each chart keeps its own marks, size, `theme`, `guides`, `effects`, stages and hover. `chart.on("stage")` and the stage methods are the chart's own. `chart.control` and `chart.emit` replay a gesture on that chart, through its edits and its scales.
+
+A chart also carries the dataset's methods, so `chart.getData()` and `chart.undo()` work on a chart from `Elicit(spec)`. `chart.dataset` is the dataset itself. A dataset key passed to `ds.chart()`, such as `constraints`, is ignored with a warning that points to `Elicit.dataset`.
+
+`chart.destroy()` detaches one chart. The other charts keep working, and the dataset keeps its rows and history.
+
+A chart draws the dataset's rows as they are. A [view](#view) shows the same rows another way. To show a summary of them, such as a histogram of another chart's points, compute it in a `change` listener and give it a dataset of its own.
+
+A [hierarchy](/marks/hierarchy) fits its node boxes in one chart's pixels: the chart where the last gesture happened, or, for seed data, `setData` and `set`, the first chart that draws the boxes. Other charts draw the stored boxes as they are.
+
+</Section>

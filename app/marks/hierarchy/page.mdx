@@ -304,8 +304,8 @@ Containment is stored as rows, so your code reads and writes it like any other d
 `setData` takes the same shape. Change the nesting rows and every container re-fits. A node sent with no `x` and `y` is placed inside the container it joins. With `dodge`, it is also moved clear of the nodes already there.
 
 ```js
-const data = el.getData();
-el.setData({ ...data, nesting: [...data.nesting, { child: "n4", parent: "g2" }] });
+const data = chart.getData();
+chart.setData({ ...data, nesting: [...data.nesting, { child: "n4", parent: "g2" }] });
 ```
 
 <Example

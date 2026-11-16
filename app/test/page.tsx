@@ -61,6 +61,7 @@ export default function TestPage() {
     if (!host) return;
 
     const chart = buildChart();
+    host.append(chart.dom());
     const updateRows = () => {
       const data = chart.getData();
       setRows(Array.isArray(data) ? (data as Record<string, unknown>[]) : []);
@@ -70,7 +71,7 @@ export default function TestPage() {
 
     return () => {
       unsub();
-      chart.destroy?.();
+      chart.destroy();
       host.replaceChildren();
     };
   }, [buildChart]);

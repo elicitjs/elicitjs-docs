@@ -25,7 +25,7 @@ const chart = Elicit({
     }),
   ],
 });
-mount(chart);
+mount(chart.dom());
 
 const [LO, HI] = [0, 52];   // the declared week domain
 const zoomBy = (k) => {

@@ -1,5 +1,5 @@
 const cats = ["apples","bananas","oranges","pears"];
-mount(Elicit({
+const chart = Elicit({
   width: 460, height: 300,
   margins: { top: 16, right: 12, bottom: 28, left: 44 },
   // The count axis is opt-in: it reserves layout space for a scale these marks
@@ -25,4 +25,5 @@ mount(Elicit({
       unit: 10,          // one cell is worth 10, so 320 spans 32 cells
     }),
   ],
-}));
+});
+mount(chart.dom());

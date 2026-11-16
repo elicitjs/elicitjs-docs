@@ -1,5 +1,5 @@
 // A built-in theme by NAME. `theme: themes.nyt` is the same thing.
-mount(Elicit({
+const chart = Elicit({
   width: 480, height: 300,
   theme: "nyt",
   title: "Where will unemployment go next?",
@@ -21,4 +21,5 @@ mount(Elicit({
     lineY({ channels: { x: { field: "year" }, y: { field: "rate" } } }),
     point({ channels: { x: { field: "year" }, y: { field: "rate", edit: move() } } }),
   ],
-}));
+});
+mount(chart.dom());

@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 380, height: 240,
   margins: { top: 16, right: 16, bottom: 28, left: 40 },
   // The DATA — one dataset, and every mark is a view over it.
@@ -18,4 +18,5 @@ mount(Elicit({
       channels: { x: { field: "cat" }, y: { field: "n" } },
     }),
   ],
-}))
+});
+mount(chart.dom());

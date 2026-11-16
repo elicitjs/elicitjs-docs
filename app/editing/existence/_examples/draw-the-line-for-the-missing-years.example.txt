@@ -19,7 +19,7 @@ const truth = [
   [2015, 35485], [2016, 37806],
 ].map(([year, deaths]) => ({ year, deaths }));
 
-const chart = mount(Elicit({
+const chart = Elicit({
   width: 560, height: 340,
   margins: { top: 20, right: 24, bottom: 32, left: 56 },
   schema: {
@@ -59,7 +59,8 @@ const chart = mount(Elicit({
       edits: [ edit.line.draw({ samples: d3.range(1991, 2017), stage: 0 }) ],
     }),
   ],
-}));
+});
+mount(chart.dom());
 
 const btn = mount(document.createElement("button"));
 btn.textContent = "Show me how I did";

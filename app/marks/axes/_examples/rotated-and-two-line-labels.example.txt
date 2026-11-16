@@ -1,6 +1,6 @@
 // Turned labels and two-line labels. `labelAngle` turns the tick labels (the
 // axis makes room for them); a `\n` in a formatted label starts a second line.
-mount(Elicit({
+const chart = Elicit({
   width: 460, height: 280,
   margins: { top: 16, right: 16, bottom: 20, left: 40 },
   axes: {
@@ -17,4 +17,5 @@ mount(Elicit({
     v: { type: "quantitative", domain: [0, 50] },
   },
   marks: [barY({ channels: { x: { field: "brand" }, y: { field: "v", edit: move() } } })],
-}));
+});
+mount(chart.dom());

@@ -264,7 +264,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Address it from outside with <code className="inline">el.control(name).set(value)</code>. <code className="inline">accepts()</code> reports what the channel&rsquo;s scale allows.
+            Address it from outside with <code className="inline">chart.control(name).set(value)</code>. <code className="inline">accepts()</code> reports what the channel&rsquo;s scale allows.
           </>
         ),
       },

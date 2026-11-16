@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 320, height: 170,
   margins: { top: 20, right: 16, bottom: 20, left: 20 },
   data: [ { group: "A" } ],
@@ -10,4 +10,5 @@ mount(Elicit({
     // edit.legend.category() makes each swatch a click target that sets `group`.
     legendColor({ anchor: "right", edit: edit.legend.category() }),
   ],
-}))
+});
+mount(chart.dom());

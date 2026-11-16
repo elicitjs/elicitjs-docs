@@ -11,6 +11,7 @@ import faceSliders from './_examples/face-sliders.example.txt';
 import rotateBox from './_examples/rotate-box.example.txt';
 import selectItemOrCategory from './_examples/select-item-or-category.example.txt';
 import inputsBesideASweep from './_examples/inputs-beside-a-sweep.example.txt';
+import typeAValue from './_examples/type-a-value.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -18,11 +19,30 @@ export default function Layout({ children }) {
 
 # External controls
 
-<Lead>Drive an edit from a control outside the interface: a `<select>`, a slider, a rotate icon or a plain function. Give the edit a `name`, then call `el.control(name).set(value)`. The control synthesises the **same** events a pointer does, so constraints, undo/redo, guides and `on("change")` behave the same.</Lead>
+<Lead>Drive a chart from a control outside it: an input, a `<select>`, a slider, a rotate icon or a plain function. `set(field, value, { index })` writes a value straight into the dataset. `chart.control(name).set(value)` replays a gesture through a named edit and the chart's scales. Both run constraints and undo, and fire `on("change")`.</Lead>
 
 <ApiReference entries={api} />
 
+<Section id="write" title="Write a value with set">
+
+`set(field, value, { index, table })` is a dataset method, and every chart carries it. It writes one cell, runs the dataset's constraints and then the lock, and is one undo step. `index` counts the rows `getData()` reports and defaults to 0. The value is stored as the field's type, so an input's `"62"` becomes the number `62`. No edit runs, so `set` works on any declared field, with or without a chart. See [Datasets & linked charts](/dataset#set).
+
+<Example
+  code={typeAValue}
+  title="Type a value per bar"
+  blurb={"Each input calls chart.set(\"n\", value, { index: i }). The clamp on the dataset caps a typed 95 at 80."}
+  try={(
+    <>
+      <b>Type</b> a value under a quarter, or <b>drag</b> a bar.
+    </>
+  )}
+/>
+
+</Section>
+
 <Section id="how" title="Name an edit, then drive it">
+
+Use `control` when the write should act like the gesture: an edit's own `constrain`, a click edit such as `cycle`, a rotate about the mark. Give the edit a `name`, then call `chart.control(name)`.
 
 An edit maps a gesture to data by *inverting* a channel's scale. `control(name).set(value)` runs that scale *forward* to find the gesture, then runs the ordinary edit. A value edit (`set`, `editText`) takes the value directly, with no pixel step. `control(name).accepts()` reports what the channel's scale allows, so a picker or slider can offer only valid values.
 
@@ -82,7 +102,7 @@ Each facial parameter is a channel. Bind it to a field with a named `set()` edit
 
 <Section id="plane" title="Sweep and nearest edits">
 
-`control(name, index)` names its row, so it also drives an edit whose pick only chooses a row: `nearest` and `sweep`. `.set(v)` writes row `index`, whichever row the pointer would have found. An edit that needs a pointer path or position, such as `edit.line.draw()`, a brush or `create()`, logs a warning and writes nothing. Drive those with `el.emit({ type, x, y })` in plot pixels.
+`control(name, index)` names its row, so it also drives an edit whose pick only chooses a row: `nearest` and `sweep`. `.set(v)` writes row `index`, whichever row the pointer would have found. An edit that needs a pointer path or position, such as `edit.line.draw()`, a brush or `create()`, logs a warning and writes nothing. Drive those with `chart.emit({ type, x, y })` in plot pixels.
 
 <Example
   code={inputsBesideASweep}
@@ -99,9 +119,9 @@ Each facial parameter is a channel. Bind it to a field with a named `set()` edit
 
 <Section id="selection" title="Driving the selection">
 
-The selection is interface state, kept beside the data, so it has its own API and its own `select` event. `el.select(index)` picks a **specific row**. `el.selectWhere(field, value)` picks by **category**: the first matching row, or every match with `{ all: true }`. Both set the selection as a click with `edit.select()` does. The selected row gets the highlight outline, and a legend picker edits it. `on("select")` reports the change. `getData` and `on("change")` stay silent, because no answer data changed.
+The selection is interface state, kept beside the data, so it has its own API and its own `select` event. `chart.select(index)` picks a **specific row**. `chart.selectWhere(field, value)` picks by **category**: the first matching row, or every match with `{ all: true }`. Both set the selection as a click with `edit.select()` does. The selected row gets the highlight outline, and a legend picker edits it. `on("select")` reports the change. `getData` and `on("change")` stay silent, because no answer data changed.
 
-Pass an array to `el.select` for several rows at once. See [Selection](/editing/selection) for multi-select, the `selected` effect and the edits that read the selection.
+Pass an array to `chart.select` for several rows at once. See [Selection](/editing/selection) for multi-select, the `selected` effect and the edits that read the selection.
 
 <Example
   code={selectItemOrCategory}
@@ -114,7 +134,7 @@ Pass an array to `el.select` for several rows at once. See [Selection](/editing/
 
 <Section id="domain" title="Driving a domain">
 
-`el.setDomain(field, domain)` writes a field's domain from outside the chart, for a zoom button or a "reset view" control. It commits like [`edit.axis.zoom()`](/editing/zoom) and `edit.axis.pan()`: one undo step, a `change` notification, and every scale updates. Pass `null` to restore the domain declared in the schema.
+`chart.setDomain(field, domain)` writes a field's domain from outside the chart, for a zoom button or a "reset view" control. It commits like [`edit.axis.zoom()`](/editing/zoom) and `edit.axis.pan()`: one undo step, a `change` notification, and every scale updates. Pass `null` to restore the domain declared in the schema.
 
 ```js
 chart.setDomain("x", [20, 40]);   // zoom to 20–40

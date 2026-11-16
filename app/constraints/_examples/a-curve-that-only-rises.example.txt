@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 260,
   margins: { top: 16, right: 16, bottom: 32, left: 42 },
   schema: {
@@ -25,4 +25,5 @@ mount(Elicit({
                   y: { field: "p", edit: move() } },
     }),
   ],
-}))
+});
+mount(chart.dom());

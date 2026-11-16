@@ -1,4 +1,5 @@
-mount(Elicit(widgets.slider({
+const chart = Elicit(widgets.slider({
   question: "How likely is it? (%)",
   domain: [0, 100], step: 5, value: 40,
-})));
+}));
+mount(chart.dom());

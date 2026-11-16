@@ -5,11 +5,29 @@ export const api: ApiEntry[] = [
     name: "Elicit(spec)",
     summary: (
       <>
-        The entry point (<code className="inline">elicit.Elicit</code>). Returns a DOM element you append. A chart is one <code className="inline">schema</code>, one <code className="inline">data</code>set, and a list of <code className="inline">marks</code> — plus optional constraints, axes, and guides.
+        The entry point (<code className="inline">elicit.Elicit</code>). Builds a dataset and one chart over it from one spec, and returns the <b>chart</b>. Append <code className="inline">chart.dom()</code> to the page. The spec takes the dataset keys and the chart keys below. For several charts over one dataset, call <code className="inline">Elicit.dataset</code> and <code className="inline">ds.chart</code> instead — see <a href="/dataset">Datasets &amp; linked charts</a>.
       </>
     ),
     signatures: [
-      "Elicit({ schema, data?, marks, width?, height?, … }) → ElicitElement",
+      "Elicit({ schema, data?, marks, width?, height?, … }) → Chart",
+      "parent.append(chart.dom())",
+      "Elicit.dataset({ schema, data?, … }).chart({ marks, … })   // the same thing, in two calls",
+    ],
+    returns: (
+      <>
+        A <b>Chart</b>, which also carries the dataset&rsquo;s methods. The dataset deep-copies <code className="inline">data</code> and owns it; marks re-derive from the committed rows on every render.
+      </>
+    ),
+  },
+  {
+    name: "Dataset keys",
+    summary: (
+      <>
+        What <code className="inline">Elicit.dataset(spec)</code> reads, and the part of an <code className="inline">Elicit(spec)</code> spec that describes the data. Every chart over the dataset shares these.
+      </>
+    ),
+    signatures: [
+      "Elicit.dataset({ schema, data?, constraints?, lock?, context?, onChange? }) → Dataset",
     ],
     options: [
       {
@@ -28,10 +46,59 @@ export const api: ApiEntry[] = [
         default: "[]",
         desc: (
           <>
-            The one elicited dataset. Seed rows are a starting point; every mark is a <i>view</i> over these rows. May be empty when <code className="inline">create</code> will mint rows from the schema.
+            The seed rows. Every mark in every chart is a <i>view</i> over them. May be empty when <code className="inline">create</code> will mint rows from the schema.
           </>
         ),
       },
+      {
+        name: "constraints",
+        type: "Constraint[]",
+        default: "[]",
+        desc: (
+          <>
+            Dataset invariants that gate or repair every edit, from every chart. The only place they go. See <a href="/constraints">Constraints</a>.
+          </>
+        ),
+      },
+      {
+        name: "lock",
+        type: "LockSpec",
+        default: "—",
+        desc: (
+          <>
+            Read-only rows. See <a href="/editing/lock">Locked rows</a>.
+          </>
+        ),
+      },
+      {
+        name: "context",
+        type: "ContextSpec",
+        default: "—",
+        desc: (
+          <>
+            Reference rows: drawn, read-only, and left out of <code className="inline">getData()</code>. See <a href="/editing/existence#context">Context rows</a>.
+          </>
+        ),
+      },
+      {
+        name: "onChange",
+        type: "(data) => void",
+        default: "—",
+        desc: "Called with the committed data once per commit, whichever chart made it. Hover previews never fire it.",
+      },
+    ],
+  },
+  {
+    name: "Chart keys",
+    summary: (
+      <>
+        What <code className="inline">ds.chart(spec)</code> reads: how one chart draws and edits the dataset. Each chart over a dataset has its own.
+      </>
+    ),
+    signatures: [
+      "ds.chart({ marks, width?, height?, … }) → Chart",
+    ],
+    options: [
       {
         name: "marks",
         type: "Mark[]",
@@ -53,22 +120,6 @@ export const api: ApiEntry[] = [
         ),
       },
       {
-        name: "constraints",
-        type: "Constraint[]",
-        default: "[]",
-        desc: (
-          <>
-            Dataset invariants that gate or repair every edit. The only place they go. See <a href="/constraints">Constraints</a>.
-          </>
-        ),
-      },
-      {
-        name: "onChange",
-        type: "(data) => void",
-        default: "—",
-        desc: "Called with the committed dataset after each edit. Hover previews never fire it.",
-      },
-      {
         name: "scales",
         type: "Record<channel, ScaleSpec>",
         default: "derived",
@@ -82,7 +133,7 @@ export const api: ApiEntry[] = [
         name: "width / height",
         type: "number",
         default: "600 / 400",
-        desc: "Outer pixel size of the chart element.",
+        desc: "Outer pixel size of the chart.",
       },
       {
         name: "margins",
@@ -117,26 +168,6 @@ export const api: ApiEntry[] = [
         desc: (
           <>
             Browser focus ring on editable marks. Off by default — Tab / arrow keys still work. See <a href="/editing/history#keyboard">History &amp; keyboard</a>.
-          </>
-        ),
-      },
-      {
-        name: "lock",
-        type: "LockSpec",
-        default: "—",
-        desc: (
-          <>
-            Read-only rows. See <a href="/editing/lock">Locked rows</a>.
-          </>
-        ),
-      },
-      {
-        name: "context",
-        type: "ContextSpec",
-        default: "—",
-        desc: (
-          <>
-            Reference rows: drawn, read-only, and left out of <code className="inline">getData()</code>. See <a href="/editing/existence#context">Context rows</a>.
           </>
         ),
       },
@@ -225,36 +256,44 @@ export const api: ApiEntry[] = [
         desc: "The scene-graph renderer; swappable for Canvas/WebGL.",
       },
     ],
-    returns: (
-      <>
-        An <b>ElicitElement</b> (a positioned container) carrying the methods below. The engine deep-copies <code className="inline">data</code> and owns it; marks re-derive from the committed rows on every render.
-      </>
-    ),
   },
   {
-    name: "The element Elicit returns",
-    summary: "An ordinary DOM node — append it where you like — with the chart’s API hung off it. There is no separate handle object to keep in sync, and no global registry: everything a caller needs is on the element.",
+    name: "The dataset",
+    summary: (
+      <>
+        What <code className="inline">Elicit.dataset</code> returns. It reads and writes the data from outside any chart, and every chart over it redraws on a change. A chart carries the same methods, so <code className="inline">chart.getData()</code> is <code className="inline">chart.dataset.getData()</code>.
+      </>
+    ),
     signatures: [
-      "chart.getData() → Datum[]",
-      "chart.getSchema() → Schema",
-      "chart.setData(data) → void",
-      "chart.on(\"change\" | \"stage\", cb) → () => void",
-      "chart.undo() · chart.redo() · chart.canUndo() · chart.canRedo()",
-      "chart.getStage() · chart.setStage(i) · chart.nextStage() · chart.getStageLabel()",
-      "chart.select(i) · selectWhere · toggleSelection · selectAll · clearSelection",
-      "chart.getSelection() · chart.getSelectionAll()",
-      "chart.control(name, index?) → EditControl",
-      "chart.emit(event) → void",
-      "chart.destroy() → void",
+      "ds.chart(spec) → Chart",
+      "ds.getData() → Datum[]",
+      "ds.getSchema() → Schema",
+      "ds.setData(data) → void",
+      "ds.setDomain(field, domain, { table? }) → boolean",
+      "ds.set(field, value, { index?, table? }) → boolean",
+      "ds.on(\"change\" | \"select\", cb) → () => void",
+      "ds.undo() · ds.redo() · ds.canUndo() · ds.canRedo()",
+      "ds.select(i) · selectWhere · toggleSelection · selectAll · clearSelection",
+      "ds.getSelection() · ds.getSelectionAll()",
     ],
     options: [
+      {
+        name: "chart(spec)",
+        type: "→ Chart",
+        default: "—",
+        desc: (
+          <>
+            A chart over this dataset. Make as many as you need. See <a href="/dataset">Datasets &amp; linked charts</a>.
+          </>
+        ),
+      },
       {
         name: "getData()",
         type: "→ Datum[]",
         default: "—",
         desc: (
           <>
-            A deep <b>copy</b> of the committed dataset — the elicited answer. Copy, because handing out the live rows would let a caller mutate past every constraint the chart just enforced.
+            A deep <b>copy</b> of the committed data — the elicited answer. Copy, because handing out the live rows would let a caller mutate past every constraint the dataset just enforced.
           </>
         ),
       },
@@ -264,7 +303,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            A deep copy of the engine-owned schema, including any domain an <a href="/editing/axis">editable axis</a> reshaped. Your original <code className="inline">spec.schema</code> is never mutated.
+            A deep copy of the dataset&rsquo;s schema, including any domain an <a href="/editing/axis">editable axis</a> reshaped. Your original <code className="inline">spec.schema</code> is never mutated.
           </>
         ),
       },
@@ -274,7 +313,27 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Replace the dataset and re-render. Bypasses constraints — it is a trusted seed or reset, not an edit — and clears the <a href="/editing/history">undo history</a> for the same reason.
+            Replace the rows and redraw every chart. Bypasses constraints — it is a trusted seed or reset, not an edit — and clears the <a href="/editing/history">undo history</a> for the same reason.
+          </>
+        ),
+      },
+      {
+        name: "setDomain(field, domain)",
+        type: "→ boolean",
+        default: "—",
+        desc: (
+          <>
+            Set a field&rsquo;s domain, for a zoom button or a reset. One undo step; <code className="inline">null</code> restores the declared domain. Every chart shares the domain. See <a href="/editing/zoom#set-domain">Zoom &amp; pan</a>.
+          </>
+        ),
+      },
+      {
+        name: "set(field, value, options?)",
+        type: "→ boolean",
+        default: "—",
+        desc: (
+          <>
+            Write one cell from outside any chart. Runs the dataset&rsquo;s constraints and the lock; one undo step. See <a href="/dataset#set">Write from outside a chart</a>.
           </>
         ),
       },
@@ -284,7 +343,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            <code className="inline">change</code> fires on every committed edit with the new data; <code className="inline">stage</code> fires when a <a href="/editing/stages">stage</a> advances. Returns a function that removes the listener.
+            <code className="inline">change</code> fires once per commit with the new data; <code className="inline">select</code> fires when the <a href="/editing/selection">selection</a> moves. Returns a function that removes the listener.
           </>
         ),
       },
@@ -294,27 +353,17 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Step one <b>gesture</b>, and report whether they moved. See <a href="/editing/history">History & keyboard</a>.
-          </>
-        ),
-      },
-      {
-        name: "getStage() / setStage(i) / nextStage() / getStageLabel()",
-        type: "→ number | string | void",
-        default: "—",
-        desc: (
-          <>
-            Read and drive a multi-step elicitation from outside. See <a href="/editing/stages">Stages</a>.
+            Step one <b>gesture</b>, whichever chart it happened in, and report whether they moved. See <a href="/editing/history">History & keyboard</a>.
           </>
         ),
       },
       {
         name: "select(i) / selectWhere / toggleSelection / selectAll / clearSelection",
-        type: "void",
+        type: "→ boolean",
         default: "—",
         desc: (
           <>
-            Set which rows the chart considers selected, by index or by a field match. See <a href="/editing/selection">Selection</a>.
+            Set which rows are selected, by index or by a field match. Every chart shows the selection. See <a href="/editing/selection">Selection</a>.
           </>
         ),
       },
@@ -324,13 +373,73 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: "The selected row, and every selected row when the selection is multiple.",
       },
+    ],
+    returns: (
+      <>
+        <code className="inline">change</code> is the seam to the rest of your app: a survey posts <code className="inline">getData()</code> on submit, a live app writes it through on every commit.
+      </>
+    ),
+  },
+  {
+    name: "The chart",
+    summary: (
+      <>
+        What <code className="inline">Elicit</code> and <code className="inline">ds.chart</code> return: a plain object, not a DOM node. <code className="inline">dom()</code> is the node to append. It carries every dataset method above, plus its own.
+      </>
+    ),
+    signatures: [
+      "chart.dom() → HTMLDivElement",
+      "chart.dataset → Dataset",
+      "chart.on(\"change\" | \"select\" | \"stage\", cb) → () => void",
+      "chart.getStage() · chart.setStage(i) · chart.nextStage() · chart.getStageLabel()",
+      "chart.control(name, index?) → EditControl",
+      "chart.emit(event) → void",
+      "chart.destroy() → void",
+    ],
+    options: [
+      {
+        name: "dom()",
+        type: "→ HTMLDivElement",
+        default: "—",
+        desc: "The chart's container. Append it where you like; it is the same node on every call.",
+      },
+      {
+        name: "dataset",
+        type: "Dataset",
+        default: "—",
+        desc: (
+          <>
+            The dataset this chart reads and writes. For <code className="inline">Elicit(spec)</code>, the one built from the same spec.
+          </>
+        ),
+      },
+      {
+        name: "on(\"stage\", cb)",
+        type: "→ unsubscribe",
+        default: "—",
+        desc: (
+          <>
+            Fires when this chart&rsquo;s <a href="/editing/stages">stage</a> changes. <code className="inline">change</code> and <code className="inline">select</code> are the dataset&rsquo;s.
+          </>
+        ),
+      },
+      {
+        name: "getStage() / setStage(i) / nextStage() / getStageLabel()",
+        type: "→ number | string | void",
+        default: "—",
+        desc: (
+          <>
+            Read and drive a multi-step elicitation from outside. Stages are per chart. See <a href="/editing/stages">Stages</a>.
+          </>
+        ),
+      },
       {
         name: "control(name, index?)",
         type: "→ EditControl",
         default: "—",
         desc: (
           <>
-            Drive a named edit from outside the chart (a slider, a picker). Same dispatch as the pointer — constraints, undo, and <code className="inline">change</code> all run. See <a href="/editing/external-controls">External controls</a>.
+            Replay a gesture on this chart through a named edit (a slider, a picker). Same dispatch as the pointer — constraints, undo, and <code className="inline">change</code> all run. See <a href="/editing/external-controls">External controls</a>.
           </>
         ),
       },
@@ -348,13 +457,8 @@ export const api: ApiEntry[] = [
         name: "destroy()",
         type: "void",
         default: "—",
-        desc: "Tear down listeners and observers. Call it when you unmount the element — a resize-observing chart outlives its node otherwise.",
+        desc: "Detach the chart from its dataset and stop its observers. Call it when you unmount the chart — a resize-observing chart outlives its node otherwise. Other charts on the dataset keep working.",
       },
     ],
-    returns: (
-      <>
-        <code className="inline">change</code> is the seam to the rest of your app: a survey posts <code className="inline">getData()</code> on submit, a live app writes it through on every commit.
-      </>
-    ),
   },
 ];

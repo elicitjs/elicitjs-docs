@@ -83,7 +83,7 @@ export const api: ApiEntry[] = [
         default: "null",
         desc: (
           <>
-            The handle an external control addresses this edit by — <code className="inline">el.control(name)</code>. See <a href="/editing/external-controls">External controls</a>. Unnamed edits stay pointer- and keyboard-driven.
+            The handle an external control addresses this edit by — <code className="inline">chart.control(name)</code>. See <a href="/editing/external-controls">External controls</a>. Unnamed edits stay pointer- and keyboard-driven.
           </>
         ),
       },

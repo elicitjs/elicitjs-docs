@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 320, height: 320,
   margins: { top: 12, right: 12, bottom: 28, left: 12 },
   data: [{ valence: -0.4, feeling: 0 }],
@@ -24,4 +24,5 @@ mount(Elicit({
     text({ channels: { x: { value: 20 }, y: { value: 304 }, text: { value: "← anger" }, textAnchor: { value: "start" }, fill: { value: "#d62728" } } }),
     text({ channels: { x: { value: 288 }, y: { value: 304 }, text: { value: "disgust →" }, textAnchor: { value: "end" }, fill: { value: "#2ca02c" } } }),
   ],
-}))
+});
+mount(chart.dom());

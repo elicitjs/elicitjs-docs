@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 220, height: 300,
   margins: { top: 16, right: 12, bottom: 24, left: 34 },
   data: [{ cat: "belief", value: 0.4 }],
@@ -20,4 +20,5 @@ mount(Elicit({
       edits: [ edit.waffle.fill({ channels: ["count"], gesture: "click" }) ],
     }),
   ],
-}));
+});
+mount(chart.dom());

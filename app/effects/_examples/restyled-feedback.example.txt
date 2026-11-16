@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 340, height: 240,
   margins: { top: 14, right: 14, bottom: 26, left: 30 },
   // EFFECTS are interaction STATE. Each state takes the same vocabulary:
@@ -30,4 +30,5 @@ mount(Elicit({
       }) ],
     }),
   ],
-}))
+});
+mount(chart.dom());

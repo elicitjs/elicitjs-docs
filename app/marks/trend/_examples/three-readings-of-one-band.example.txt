@@ -23,5 +23,5 @@ for (const render of ["region", "gradient", "samples"]) {
       // Three renderings of the SAME belief, so all three share one edit set.
       trend({ stroke: "#1B3F60", channels: lineParams }),
     ],
-  }));
+  }).dom());
 }

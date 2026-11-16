@@ -16,7 +16,7 @@ export default function Layout({ children }) {
 
 # Zoom & pan
 
-<Lead>`edit.axis.zoom()` lets the wheel narrow or widen an axis's **domain** about the value under the pointer. `edit.axis.pan()` lets a drag slide it along. Both change the schema, like [an editable axis](/editing/axis): the dataset is unchanged, and scales, axes, marks and guides follow the new domain. `el.setDomain(field, domain)` does the same from a button.</Lead>
+<Lead>`edit.axis.zoom()` lets the wheel narrow or widen an axis's **domain** about the value under the pointer. `edit.axis.pan()` lets a drag slide it along. Both change the schema, like [an editable axis](/editing/axis): the dataset is unchanged, and scales, axes, marks and guides follow the new domain. `chart.setDomain(field, domain)` does the same from a button.</Lead>
 
 <ApiReference entries={api} />
 
@@ -26,9 +26,9 @@ Put `edit.axis.zoom()` on an axis in `axes`, one per axis you want to zoom. Scro
 
 The declared domain is the zoom-out ceiling, so you can always scroll back to the full view and no further. Set `limit` to an explicit `[lo, hi]` for a different ceiling, or `false` for none.
 
-A burst of wheel ticks is one step in [history](/editing/history), so one undo restores the domain from before you scrolled. Each tick notifies `change`, and `el.getSchema()` reads the current domain.
+A burst of wheel ticks is one step in [history](/editing/history), so one undo restores the domain from before you scrolled. Each tick notifies `change`, and `chart.getSchema()` reads the current domain. The domain is the dataset's, so [charts that share a dataset](/dataset) zoom together.
 
-Zoom works on numeric and temporal axes. Mark edits keep working at every zoom level: drag a point and it inverts through the zoomed scale. The buttons call `el.setDomain` for each axis (see [below](#set-domain)).
+Zoom works on numeric and temporal axes. Mark edits keep working at every zoom level: drag a point and it inverts through the zoomed scale. The buttons call `chart.setDomain` for each axis (see [below](#set-domain)).
 
 <Example
   code={wheelBothAxes}
@@ -110,7 +110,7 @@ A plain wheel zooms every axis carrying `edit.axis.zoom()`. Give each a `when` t
 
 <Section id="set-domain" title="Set a domain from outside">
 
-`el.setDomain(field, domain)` writes a field's domain. It takes the same path as a wheel tick or a pan: one undo step, a `change` notification, and every scale reflows. Pass `null` to restore the domain declared in the schema.
+`chart.setDomain(field, domain)` writes a field's domain. It takes the same path as a wheel tick or a pan: one undo step, a `change` notification, and every scale reflows. Pass `null` to restore the domain declared in the schema.
 
 `setDomain` returns `false` and logs a warning when the table declares no such field. Pass `{ table }` to name a field of a table other than the primary one.
 

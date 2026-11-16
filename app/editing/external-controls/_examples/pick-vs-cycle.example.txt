@@ -27,7 +27,7 @@ const chart = Elicit({
     }),
   ],
 });
-mount(chart);
+mount(chart.dom());
 
 const controls = document.createElement("div");
 controls.style.cssText = "display:flex;gap:12px;align-items:center;margin-top:10px;font:13px system-ui";

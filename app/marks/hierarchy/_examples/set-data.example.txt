@@ -61,7 +61,7 @@ const el = Elicit({
     }),
   ],
 });
-mount(el);
+mount(el.dom());
 
 // What a program (or a model) does: read the tables, write them back.
 const button = (label, run) => {
@@ -93,4 +93,4 @@ toolbar.append(
   }),
   button("Ungroup all", () => el.setData({ ...el.getData(), nesting: [] })),
 );
-if (el.parentNode) el.parentNode.insertBefore(toolbar, el);
+if (el.dom().parentNode) el.dom().parentNode.insertBefore(toolbar, el.dom());

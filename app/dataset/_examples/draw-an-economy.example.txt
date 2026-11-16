@@ -1,0 +1,57 @@
+// Seven years, two columns to forecast.
+const ds = Elicit.dataset({
+  schema: {
+    year:         { type: "quantitative", domain: [2026, 2032] },
+    unemployment: { type: "quantitative", domain: [3, 8] },
+    inflation:    { type: "quantitative", domain: [1, 6] },
+  },
+  data: [
+    { year: 2026, unemployment: 7.4, inflation: 1.6 },
+    { year: 2027, unemployment: 6.6, inflation: 1.9 },
+    { year: 2028, unemployment: 5.8, inflation: 2.4 },
+    { year: 2029, unemployment: 5.1, inflation: 3.0 },
+    { year: 2030, unemployment: 4.6, inflation: 3.7 },
+    { year: 2031, unemployment: 4.3, inflation: 4.4 },
+    { year: 2032, unemployment: 4.1, inflation: 5.0 },
+  ],
+});
+
+// Sweep across a chart to draw one column over time.
+const overTime = (field, title, stroke) => ds.chart({
+  width: 440, height: 150,
+  margins: { top: 10, right: 16, bottom: 26, left: 44 },
+  axes: { x: { tickFormat: "d" }, y: { title } },
+  marks: [
+    lineY({
+      stroke, strokeWidth: 2.5,
+      channels: { x: { field: "year" }, y: { field, edit: move({ pick: "sweep" }) } },
+    }),
+  ],
+});
+
+// Both columns at once, one dot per year, joined in year order.
+// Drag a dot to set that year's unemployment and inflation together.
+const tradeOff = ds.chart({
+  width: 440, height: 260,
+  margins: { top: 14, right: 16, bottom: 34, left: 44 },
+  axes: { x: { title: "Unemployment (%)" }, y: { title: "Inflation (%)" } },
+  marks: [
+    path({
+      stroke: "#94A5B3", strokeWidth: 1.5,
+      channels: { x: { field: "unemployment" }, y: { field: "inflation" } },
+    }),
+    point({
+      fill: "#1B3F60", size: 6,
+      channels: { x: { field: "unemployment" }, y: { field: "inflation" } },
+      edits: [move({ channels: ["x", "y"] })],
+    }),
+    text({
+      dx: 10, dy: -8, fontSize: 11, textAnchor: "start", fill: "#46596B", format: "d",
+      channels: { x: { field: "unemployment" }, y: { field: "inflation" }, text: { field: "year" } },
+    }),
+  ],
+});
+
+mount(overTime("unemployment", "Unemployment (%)", "#50AEB7").dom());
+mount(overTime("inflation", "Inflation (%)", "#EE7B5E").dom());
+mount(tradeOff.dom());

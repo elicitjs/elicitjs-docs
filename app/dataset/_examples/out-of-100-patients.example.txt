@@ -1,0 +1,57 @@
+// Four outcomes for 100 patients. The counts always sum to 100.
+const outcomes = ["Recovers", "Improves", "No change", "Worse"];
+const ds = Elicit.dataset({
+  schema: {
+    cohort:  { type: "categorical",  domain: ["100 patients"] },
+    outcome: { type: "categorical",  domain: outcomes },
+    count:   { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { cohort: "100 patients", outcome: "Recovers",  count: 40 },
+    { cohort: "100 patients", outcome: "Improves",  count: 30 },
+    { cohort: "100 patients", outcome: "No change", count: 20 },
+    { cohort: "100 patients", outcome: "Worse",     count: 10 },
+  ],
+  constraints: [
+    clamp({ min: 0, field: "count" }),
+    maintainSum({ total: 100, field: "count", strategy: "redistribute" }),
+  ],
+});
+
+// One bar of 100. Drag the edge between two outcomes to trade one for the other.
+const split = ds.chart({
+  width: 440, height: 140,
+  margins: { top: 8, right: 16, bottom: 26, left: 16 },
+  axes: { y: false },
+  elements: [legendColor({ anchor: "top" })],
+  marks: [
+    barX({
+      stack: true,
+      channels: {
+        y:    { field: "cohort" },
+        x:    { field: "count" },
+        fill: { field: "outcome" },
+      },
+      edits: [edit.stack.edge()],
+    }),
+  ],
+});
+
+// The same counts as people. Paint a block to set how many land in it.
+const people = ds.chart({
+  width: 440, height: 170,
+  margins: { top: 8, right: 16, bottom: 26, left: 16 },
+  marks: [
+    waffleY({
+      multiple: 10,
+      channels: {
+        x:     { field: "outcome" },
+        count: { field: "count", edit: edit.waffle.fill() },
+        fill:  { field: "outcome" },
+      },
+    }),
+  ],
+});
+
+mount(split.dom());
+mount(people.dom());

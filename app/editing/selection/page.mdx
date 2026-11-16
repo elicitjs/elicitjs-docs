@@ -70,19 +70,19 @@ An edit that writes the selected row writes **all** selected rows, so one swatch
 
 <Section id="external" title="Driving it from outside">
 
-An external call and a click set the selection the same way. See [External controls](/editing/external-controls#selection) for the related API.
+An external call and a click set the selection the same way. The selection belongs to the dataset, so [charts that share a dataset](/dataset#history) show one selection. See [External controls](/editing/external-controls#selection) for the related API.
 
 ```js
-el.select(2);                                 // replace with row 2
-el.select([0, 2]);                            // replace with rows 0 and 2
-el.toggleSelection(3);                        // add or remove row 3
-el.selectAll();
-el.selectWhere("group", "North", { all: true });   // a whole category
-el.clearSelection();
+chart.select(2);                                 // replace with row 2
+chart.select([0, 2]);                            // replace with rows 0 and 2
+chart.toggleSelection(3);                        // add or remove row 3
+chart.selectAll();
+chart.selectWhere("group", "North", { all: true });   // a whole category
+chart.clearSelection();
 
-el.getSelection();                            // 0  (the first, or null)
-el.getSelectionAll();                         // [0, 2]
-el.on("select", (first, all) => …);
+chart.getSelection();                            // 0  (the first, or null)
+chart.getSelectionAll();                         // [0, 2]
+chart.on("select", (first, all) => …);
 ```
 
 `selectWhere` takes the first match by default. Pass `{ all: true }` for every row of a category, which is usually what a control that names a value wants.

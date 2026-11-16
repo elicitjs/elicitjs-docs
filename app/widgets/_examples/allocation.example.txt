@@ -1,5 +1,6 @@
-mount(Elicit(widgets.allocation({
+const chart = Elicit(widgets.allocation({
   question: "Allocate 100 points",
   categories: ["A", "B", "C", "D"],
   total: 100,
-})));
+}));
+mount(chart.dom());

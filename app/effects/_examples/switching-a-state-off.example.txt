@@ -1,6 +1,6 @@
 // `false` disables a state. Here hover and selection are off, so only the drag
 // reads back.
-mount(Elicit({
+const chart = Elicit({
   width: 380, height: 240,
   margins: { top: 14, right: 14, bottom: 28, left: 34 },
   data: [
@@ -19,4 +19,5 @@ mount(Elicit({
   marks: [
     bar({ channels: { x: { field: "cat" }, y: { field: "n", edit: move() } } }),
   ],
-}))
+});
+mount(chart.dom());

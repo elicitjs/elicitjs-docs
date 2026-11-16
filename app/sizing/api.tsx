@@ -32,7 +32,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        The same <b>ElicitElement</b>. A <code className="inline">"reflow"</code> chart also wires a <code className="inline">ResizeObserver</code>; call <code className="inline">el.destroy()</code> when you unmount it to detach the observer (a no-op in the other modes).
+        The same <b>Chart</b>. A <code className="inline">"reflow"</code> chart also wires a <code className="inline">ResizeObserver</code>; call <code className="inline">chart.destroy()</code> when you unmount it to detach the observer (a no-op in the other modes).
       </>
     ),
   },

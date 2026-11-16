@@ -20,7 +20,7 @@ const chart = Elicit({
     }),
   ],
 });
-mount(chart);
+mount(chart.dom());
 const btn = document.createElement("button");
 btn.textContent = "Next: set the slope";
 btn.style.marginTop = "8px";

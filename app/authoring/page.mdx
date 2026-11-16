@@ -23,7 +23,7 @@ export default function Layout({ children }) {
 
 <Section id="custom-mark" title="A custom mark">
 
-A mark is a view over the interface’s one dataset. The factory returns a feature object, and its only required method is `build(data, scales, width, height)`.
+A mark is a view over the chart’s dataset. The factory returns a feature object, and its only required method is `build(data, scales, width, height)`.
 
 - Call `normalizeMarkOptions` first.
 - Resolve every channel through `encodeChannel` and `resolveStyle`.
@@ -103,7 +103,7 @@ Most edits return one datum, which replaces the row at `index`. Whole-dataset ed
 
 Stock `pick` values (`direct`, `nearest`, `plane`, `probe`, `sweep`, …) cover most lifecycles. For a new one, register a driver. An edit reaches a driver by naming it, as in `pick: "clickNearest"`, and each edit reaches exactly one driver. `wants(edit)` claims an edit by capability, such as a relative slide, and doesn't re-test `pick`.
 
-`onEvent` handles hover, click and drag. `runEdit` and `previewEdit` commit or preview through the same constraint and undo path as stock edits. Declare `sessionKeys`. Every driver on the mark shares the per-feature session, and the `session.clear()` you receive nulls only your keys. Declare `options` for any setting your driver reads off the edit, or the engine reports it as an unknown option. Set `selects: true` if `guide: true` should draw a snap ring. Set `targetsRow: true` if the driver only chooses a row, so that `el.control(name, index)` can run its edits on a given row.
+`onEvent` handles hover, click and drag. `runEdit` and `previewEdit` commit or preview through the same constraint and undo path as stock edits. Declare `sessionKeys`. Every driver on the mark shares the per-feature session, and the `session.clear()` you receive nulls only your keys. Declare `options` for any setting your driver reads off the edit, or the engine reports it as an unknown option. Set `selects: true` if `guide: true` should draw a snap ring. Set `targetsRow: true` if the driver only chooses a row, so that `chart.control(name, index)` can run its edits on a given row.
 
 <Example
   code={clickNearestDriver}
@@ -135,7 +135,7 @@ Reuse these for proximity and minting:
 - `authoring.nextSeriesKey(data, seriesField, schema?)`: the next free series id for a new line
 - `nearestMark` / `nearestSeries` / `nearestMarkOnAxis`: shared distance pickers
 
-For a custom edit that creates rows, set `cardinality: "append"` so constraints know which row is new. For an edit that runs the pointer back through a scale, set `inverts: true` so the dead-drag guard can check the channel. To drive an edit from external UI, give it a `name` and call [`el.control(name)`](/editing/external-controls).
+For a custom edit that creates rows, set `cardinality: "append"` so constraints know which row is new. For an edit that runs the pointer back through a scale, set `inverts: true` so the dead-drag guard can check the channel. To drive an edit from external UI, give it a `name` and call [`chart.control(name)`](/editing/external-controls).
 
 </Section>
 

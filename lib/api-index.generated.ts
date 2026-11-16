@@ -15,8 +15,8 @@ export type ApiIndexEntry = {
 
 export type ApiNamespace = { namespace: string; blurb: string; count: number };
 
-export const API_LIBRARY_VERSION = "0.1.0-alpha.2";
-export const API_GENERATED_AT = "2026-11-08T17:44:16.696Z";
+export const API_LIBRARY_VERSION = "0.1.0-alpha.3";
+export const API_GENERATED_AT = "2026-11-15T21:08:58.689Z";
 export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "plot",
@@ -31,7 +31,7 @@ export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "edit",
     "blurb": "Edits map a gesture back through a scale to write a column.",
-    "count": 54
+    "count": 55
   },
   {
     "namespace": "constraints",
@@ -74,6 +74,11 @@ export const API_TOP_LEVEL = [
     "name": "Elicit",
     "kind": "function",
     "docs": "/overview"
+  },
+  {
+    "name": "Elicit.dataset",
+    "kind": "function",
+    "docs": "/dataset"
   },
   {
     "name": "resolveTheme",
@@ -195,7 +200,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "handles",
       "handleSize",
       "handleColor",
-      "gradient"
+      "gradient",
+      "rx"
     ],
     "universal": [
       "channels",
@@ -676,7 +682,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "handles",
       "handleSize",
       "handleColor",
-      "baseWidth"
+      "baseWidth",
+      "tipWidth"
     ],
     "universal": [
       "channels",
@@ -888,7 +895,6 @@ export const API_INDEX: ApiIndexEntry[] = [
       "minWidth",
       "minHeight",
       "lineHeight",
-      "fontFamily",
       "format"
     ],
     "universal": [
@@ -1139,11 +1145,25 @@ export const API_INDEX: ApiIndexEntry[] = [
       "tickValues",
       "tickFormat",
       "tickSize",
+      "tickPadding",
       "title",
       "titleAngle",
       "stroke",
+      "strokeWidth",
+      "line",
       "fill",
       "fontSize",
+      "fontFamily",
+      "fontWeight",
+      "labelAngle",
+      "titleFill",
+      "titleFontSize",
+      "titleFontWeight",
+      "titlePadding",
+      "titleAnchor",
+      "labelAlign",
+      "labelOffset",
+      "offset",
       "grid",
       "handleColor",
       "handleSize"
@@ -1237,7 +1257,11 @@ export const API_INDEX: ApiIndexEntry[] = [
       "ticks",
       "tickValues",
       "stroke",
-      "strokeWidth"
+      "strokeWidth",
+      "strokeDash",
+      "opacity",
+      "zero",
+      "bandPosition"
     ],
     "universal": [
       "id",
@@ -1397,7 +1421,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/zoom"
   },
@@ -1436,7 +1462,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/axis"
   },
@@ -1477,7 +1505,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/zoom"
   },
@@ -1517,7 +1547,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/handles"
   },
@@ -1555,7 +1587,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/handles"
   },
@@ -1591,7 +1625,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/existence"
   },
@@ -1627,7 +1663,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/gestures"
   },
@@ -1663,7 +1701,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/gestures"
   },
@@ -1699,7 +1739,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/marks/sticker"
   },
@@ -1738,7 +1780,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -1774,7 +1818,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -1814,7 +1860,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -1850,7 +1898,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -1888,7 +1938,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -1924,7 +1976,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -1962,9 +2016,49 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
+  },
+  {
+    "namespace": "edit",
+    "group": "edit.hierarchy",
+    "name": "nest",
+    "qualified": "edit.hierarchy.nest",
+    "call": "edit.hierarchy.nest(options)",
+    "own": [],
+    "universal": [
+      "type",
+      "name",
+      "gesture",
+      "channel",
+      "channels",
+      "when",
+      "pick",
+      "threshold",
+      "scope",
+      "into",
+      "constrain",
+      "guide",
+      "stage",
+      "advance",
+      "target",
+      "cardinality",
+      "inverts",
+      "viewport",
+      "spans",
+      "table",
+      "inline",
+      "multiline",
+      "defaults",
+      "apply",
+      "targets",
+      "cursor",
+      "grabs"
+    ],
+    "docs": "/marks/hierarchy"
   },
   {
     "namespace": "edit",
@@ -1998,7 +2092,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/legend"
   },
@@ -2034,7 +2130,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/legend"
   },
@@ -2072,7 +2170,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/sweep"
   },
@@ -2114,7 +2214,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/sweep"
   },
@@ -2155,7 +2257,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/sweep"
   },
@@ -2193,7 +2297,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/sweep"
   },
@@ -2231,7 +2337,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/sweep"
   },
@@ -2269,7 +2377,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/gestures"
   },
@@ -2305,7 +2415,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/handles"
   },
@@ -2341,7 +2453,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/marks/network"
   },
@@ -2377,7 +2491,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/marks/network"
   },
@@ -2413,7 +2529,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/marks/network"
   },
@@ -2449,7 +2567,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/gestures"
   },
@@ -2485,7 +2605,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/existence"
   },
@@ -2521,7 +2643,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/gestures"
   },
@@ -2561,7 +2685,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/gestures"
   },
@@ -2597,7 +2723,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/axis"
   },
@@ -2637,7 +2765,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/external-controls"
   },
@@ -2673,7 +2803,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/external-controls"
   },
@@ -2714,7 +2846,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/gestures"
   },
@@ -2753,7 +2887,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/sweep"
   },
@@ -2789,7 +2925,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/handles"
   },
@@ -2825,7 +2963,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/sweep"
   },
@@ -2861,7 +3001,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing/gestures"
   },
@@ -2900,7 +3042,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -2939,7 +3083,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -2978,7 +3124,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3017,7 +3165,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3053,7 +3203,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3089,7 +3241,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3125,7 +3279,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3161,7 +3317,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3197,7 +3355,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3233,7 +3393,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3269,7 +3431,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3305,7 +3469,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3341,7 +3507,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3377,7 +3545,9 @@ export const API_INDEX: ApiIndexEntry[] = [
       "multiline",
       "defaults",
       "apply",
-      "targets"
+      "targets",
+      "cursor",
+      "grabs"
     ],
     "docs": "/editing"
   },
@@ -3568,7 +3738,9 @@ export const API_INDEX: ApiIndexEntry[] = [
     "name": "custom",
     "qualified": "guides.custom",
     "call": "guides.custom(options)",
-    "own": [],
+    "own": [
+      "tracksPointer"
+    ],
     "universal": [
       "id"
     ],

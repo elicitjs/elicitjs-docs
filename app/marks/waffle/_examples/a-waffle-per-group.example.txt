@@ -1,5 +1,5 @@
 const sports = ["rowing", "cycling", "judo"];
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 260,
   margins: { top: 16, right: 12, bottom: 28, left: 28 },
   data: sports.flatMap((sport) => [
@@ -22,4 +22,5 @@ mount(Elicit({
       },
     }),
   ],
-}));
+});
+mount(chart.dom());

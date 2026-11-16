@@ -27,7 +27,7 @@ mount(Elicit({
       },
     }),
   ],
-}));
+}).dom());
 
 // Or one per part. `snap` stops draw as short ticks at the plot edge, where the
 // axis sits — `tickLength` and `tickOpacity` pull them clear of it.
@@ -53,4 +53,4 @@ mount(Elicit({
       },
     }),
   ],
-}));
+}).dom());

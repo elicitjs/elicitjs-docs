@@ -1,0 +1,57 @@
+// Three shares that always sum to 100. The rule is the dataset's, so it holds
+// for a drag in either chart and for the slider below.
+const ds = Elicit.dataset({
+  schema: {
+    party: { type: "categorical",  domain: ["D", "R", "O"] },
+    share: { type: "quantitative", domain: [0, 100] },
+  },
+  data: [
+    { party: "D", share: 45 },
+    { party: "R", share: 40 },
+    { party: "O", share: 15 },
+  ],
+  constraints: [clamp({ min: 0, field: "share" }), maintainSum({ total: 100, strategy: "redistribute" })],
+});
+
+const pie = ds.chart({
+  width: 340, height: 200,
+  margins: { top: 10, right: 10, bottom: 10, left: 10 },
+  axes: false,
+  marks: [
+    arc({
+      outerRadius: 85,
+      channels: { theta: { field: "share" }, fill: { field: "party" } },
+    }),
+  ],
+});
+const bars = ds.chart({
+  width: 340, height: 180,
+  margins: { top: 10, right: 16, bottom: 28, left: 36 },
+  marks: [
+    barY({
+      channels: {
+        x: { field: "party" },
+        y: { field: "share", edit: move() },
+        fill: { field: "party" },
+      },
+    }),
+  ],
+});
+mount(pie.dom());
+mount(bars.dom());
+
+// A plain HTML slider. `ds.set` writes row 0's share; the constraints repair
+// the other rows, and both charts redraw.
+const label = document.createElement("label");
+label.style.cssText = "display:flex;gap:10px;align-items:center;margin-top:10px;font:13px system-ui";
+label.textContent = "D's share";
+const slider = document.createElement("input");
+slider.type = "range"; slider.min = 0; slider.max = 100; slider.step = 1;
+slider.oninput = () => ds.set("share", slider.value, { index: 0 });
+label.append(slider);
+mount(label);
+
+// A drag in either chart moves the slider too.
+const sync = () => { slider.value = ds.getData()[0].share; };
+ds.on("change", sync);
+sync();

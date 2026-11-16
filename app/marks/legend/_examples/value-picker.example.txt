@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 320, height: 210,
   margins: { top: 20, right: 16, bottom: 20, left: 20 },
   data: [ { temp: 15 } ],
@@ -11,4 +11,5 @@ mount(Elicit({
     // A colour scale isn't invertible, so the edit maps the drag to [0,30] by hand.
     legendColor({ anchor: "right", edit: edit.legend.value() }),
   ],
-}))
+});
+mount(chart.dom());

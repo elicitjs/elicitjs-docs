@@ -4,7 +4,7 @@ const rows = [
   { city: "C", x: 85, y: 76, people: 980 },
   { city: "D", x: 38, y: 22, people: 320 },
 ];
-mount(Elicit({
+const chart = Elicit({
   width: 400, height: 230,
   margins: { top: 20, right: 20, bottom: 24, left: 24 },
   axes: false,
@@ -21,4 +21,5 @@ mount(Elicit({
     } }),
     legendSize({ anchor: "right" }),
   ],
-}))
+});
+mount(chart.dom());

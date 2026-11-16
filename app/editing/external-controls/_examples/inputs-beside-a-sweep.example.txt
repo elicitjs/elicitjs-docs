@@ -21,7 +21,7 @@ const chart = Elicit({
     }),
   ],
 });
-mount(chart);
+mount(chart.dom());
 
 const row = document.createElement("div");
 row.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font:13px system-ui";

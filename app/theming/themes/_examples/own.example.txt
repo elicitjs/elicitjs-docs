@@ -27,5 +27,5 @@ const chart = (name) => Elicit({
 });
 const row = document.createElement("div");
 row.style.cssText = "display:flex;flex-wrap:wrap;gap:20px;max-width:680px";
-for (const name of ["dd", "survey", "dark"]) row.append(chart(name));
+for (const name of ["dd", "survey", "dark"]) row.append(chart(name).dom());
 mount(row);

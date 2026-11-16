@@ -7,7 +7,7 @@ const GLASS = "M-0.42,-0.8 L0.42,-0.8 C0.42,-0.3 0.05,-0.12 0.05,0 C0.05,0.12 0.
 // background colour, it trims each bar to the shape of its bulb.
 const MASK = "M-0.46,-0.82 L-0.46,0.82 L0.46,0.82 L0.46,-0.82 Z " + GLASS;
 
-mount(Elicit({
+const chart = Elicit({
   width: 320, height: 340,
   margins: { top: 10, right: 10, bottom: 10, left: 10 },
   // How long will this work take? The timer holds 12 weeks of sand; the top
@@ -57,4 +57,5 @@ mount(Elicit({
       ],
     }),
   ],
-}))
+});
+mount(chart.dom());

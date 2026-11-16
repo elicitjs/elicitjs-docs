@@ -1,4 +1,5 @@
-mount(Elicit(widgets.likert({
+const chart = Elicit(widgets.likert({
   question: "This tool is easy to use",
   options: ["Strongly disagree","Disagree","Neutral","Agree","Strongly agree"],
-})));
+}));
+mount(chart.dom());

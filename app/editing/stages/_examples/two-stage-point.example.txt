@@ -18,7 +18,7 @@ const chart = Elicit({
     }),
   ],
 });
-mount(chart);
+mount(chart.dom());
 const label = document.createElement("div");
 const render = () => { label.textContent = "stage: " + chart.getStage(); };
 chart.on("stage", render); render();

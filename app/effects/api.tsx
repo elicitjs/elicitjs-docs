@@ -26,7 +26,7 @@ export const api: ApiEntry[] = [
         name: "selected",
         type: "false | object",
         default: "outline",
-        desc: "The mark is in the chart's selection (edit.select / el.select). Outranks hovered.",
+        desc: "The mark is in the chart's selection (edit.select / chart.select). Outranks hovered.",
       },
       {
         name: "target",

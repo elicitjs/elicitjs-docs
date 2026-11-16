@@ -150,7 +150,7 @@ export const api: ApiEntry[] = [
         default: "null",
         desc: (
           <>
-            Stable handle for <code className="inline">el.control(name)</code>. See <a href="/editing/external-controls">External controls</a>.
+            Stable handle for <code className="inline">chart.control(name)</code>. See <a href="/editing/external-controls">External controls</a>.
           </>
         ),
       },

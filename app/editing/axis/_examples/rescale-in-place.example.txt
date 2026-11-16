@@ -1,4 +1,4 @@
-mount(Elicit({
+const chart = Elicit({
   width: 420, height: 280,
   margins: { top: 16, right: 18, bottom: 40, left: 44 },
   data: [{ x: 20, y: 30 }, { x: 55, y: 65 }, { x: 90, y: 20 }],
@@ -13,4 +13,5 @@ mount(Elicit({
     point({ fill: "#8A78C0", size: 7,
       channels: { x: { field: "x" }, y: { field: "y" } } }),
   ],
-}))
+});
+mount(chart.dom());

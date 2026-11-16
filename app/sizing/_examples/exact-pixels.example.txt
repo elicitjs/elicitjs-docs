@@ -1,5 +1,5 @@
 const cats = ["A","B","C","D","E"];
-mount(Elicit({
+const chart = Elicit({
   width: 320, height: 240,
   margins: { top: 16, right: 12, bottom: 28, left: 34 },
   data: cats.map((c, i) => ({ cat: c, value: [30, 80, 45, 60, 20][i] })),
@@ -14,4 +14,5 @@ mount(Elicit({
       y: { field: "value", edit: move() },
     } }),
   ],
-}));
+});
+mount(chart.dom());

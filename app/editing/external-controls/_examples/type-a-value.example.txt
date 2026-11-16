@@ -1,0 +1,41 @@
+// `chart.set(field, value, { index })` writes one cell of the dataset. No edit
+// is involved, so the bars need none for the inputs to work; `move()` is here so
+// you can drag them too.
+const quarters = ["Q1", "Q2", "Q3", "Q4"];
+const chart = Elicit({
+  width: 380, height: 220,
+  margins: { top: 14, right: 16, bottom: 28, left: 36 },
+  schema: {
+    q: { type: "categorical",  domain: quarters },
+    n: { type: "quantitative", domain: [0, 100] },
+  },
+  data: quarters.map((q) => ({ q, n: 40 })),
+  // The dataset's rules hold for a typed value as they do for a drag.
+  constraints: [clamp({ min: 0, max: 80, field: "n" })],
+  marks: [
+    barY({
+      fill: "#50AEB7",
+      channels: { x: { field: "q" }, y: { field: "n", edit: move() } },
+    }),
+  ],
+});
+mount(chart.dom());
+
+const row = document.createElement("div");
+row.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;font:13px system-ui";
+const inputs = quarters.map((q, i) => {
+  const label = document.createElement("label");
+  label.style.cssText = "display:flex;flex-direction:column;gap:2px;color:#6F8294";
+  label.textContent = q;
+  const input = document.createElement("input");
+  input.type = "number"; input.min = 0; input.max = 100; input.style.width = "64px";
+  // The input's value is a string; `set` stores it as the field's type.
+  input.onchange = () => chart.set("n", input.value, { index: i });
+  label.append(input);
+  row.append(label);
+  return input;
+});
+const sync = () => chart.getData().forEach((d, i) => { inputs[i].value = Math.round(d.n); });
+chart.on("change", sync);
+sync();
+mount(row);

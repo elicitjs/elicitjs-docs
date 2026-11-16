@@ -1,6 +1,6 @@
 // `axis.discrete` / `axis.continuous` style each KIND of axis apart: a spine
 // under the categories, none on the values, a dotted value grid and a rule at 0.
-mount(Elicit({
+const chart = Elicit({
   width: 440, height: 260,
   theme: {
     axis: {
@@ -16,4 +16,5 @@ mount(Elicit({
     d: { type: "quantitative", domain: [-20, 30] },
   },
   marks: [barY({ channels: { x: { field: "q" }, y: { field: "d", edit: move() } } })],
-}));
+});
+mount(chart.dom());

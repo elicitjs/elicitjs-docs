@@ -3,7 +3,7 @@ const rows = [
   { site: "B", x: 140, bearing: 75,  flow: 6 },
   { site: "C", x: 220, bearing: 130, flow: 9 },
 ];
-mount(Elicit({
+const chart = Elicit({
   width: 460, height: 210,
   margins: { top: 18, right: 18, bottom: 22, left: 22 },
   axes: false,
@@ -23,4 +23,5 @@ mount(Elicit({
       strokeWidth: { field: "flow", legend: { anchor: "right" } },
     } }),
   ],
-}))
+});
+mount(chart.dom());

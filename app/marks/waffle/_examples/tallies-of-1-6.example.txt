@@ -1,5 +1,5 @@
 const cats = ["A","B","C","D"];
-mount(Elicit({
+const chart = Elicit({
   width: 460, height: 260,
   margins: { top: 16, right: 12, bottom: 28, left: 28 },
   data: [
@@ -20,4 +20,5 @@ mount(Elicit({
       channels: { x: { field: "cat" }, count: { field: "value" } },
     }),
   ],
-}));
+});
+mount(chart.dom());

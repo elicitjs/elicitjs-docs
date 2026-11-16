@@ -54,7 +54,7 @@ export const api: ApiEntry[] = [
         name: "row",
         type: "number | (data, { selection }) => number",
         default: "selection ?? (single row ? 0 : none)",
-        desc: "Which dataset row the picker writes into. Left unset it tracks the chart's selection (edit.select / el.select), falling back to the sole row of a one-row belief. A number pins a fixed row; a function computes one.",
+        desc: "Which dataset row the picker writes into. Left unset it tracks the chart's selection (edit.select / chart.select), falling back to the sole row of a one-row belief. A number pins a fixed row; a function computes one.",
       },
       {
         name: "title",

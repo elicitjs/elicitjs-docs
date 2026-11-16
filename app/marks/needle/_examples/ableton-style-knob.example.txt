@@ -57,7 +57,7 @@ function knobArc(options = {}) {
   };
 }
 
-mount(Elicit({
+const chart = Elicit({
   width: 260, height: 280,
   margins: { top: 40, right: 24, bottom: 44, left: 24 },
   axes: false,
@@ -111,4 +111,5 @@ mount(Elicit({
       ],
     }),
   ],
-}))
+});
+mount(chart.dom());
