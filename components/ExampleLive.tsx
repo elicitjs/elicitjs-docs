@@ -11,8 +11,10 @@ import {
 } from 'react';
 import { Highlight, themes } from 'prism-react-renderer';
 import { Editor } from 'react-live';
+import { Button } from '@/components/ui/button';
 import type { CodeMode, ExampleMeta, Prose } from '../lib/types';
 import { createElicitScope } from '../lib/elicitScope';
+import { chartThemeFor, currentChartMode, useChartMode } from '../lib/chartTheme';
 
 const EVAL_DEBOUNCE_MS = 280;
 
@@ -266,6 +268,8 @@ export function ExampleLive({
   const activeRef = useRef<ElicitChart[]>([]);
   const debounceRef = useRef<number | null>(null);
   const scope = useMemo(() => createElicitScope(), []);
+  // Charts follow the docs' light/dark mode: a mode switch re-runs the example.
+  const chartMode = useChartMode();
 
   const isEditable = codeMode === 'editable';
   const isVisual = codeMode === 'collapsed' || codeMode === 'readonly';
@@ -364,6 +368,10 @@ export function ExampleLive({
     };
 
     try {
+      // The app-wide chart theme for the docs' current mode. Read from the DOM,
+      // not `chartMode`, so the first render after hydration is already right.
+      // Set on every eval, so an example that calls `setTheme()` never leaks.
+      scope.setTheme(chartThemeFor(currentChartMode()) as Parameters<typeof scope.setTheme>[0]);
       const names = Object.keys(scope);
       const vals = names.map((n) => (n === 'Elicit' ? Elicit : scope[n as keyof typeof scope]));
       // eslint-disable-next-line no-new-func
@@ -400,7 +408,7 @@ export function ExampleLive({
       destroyAll(activeRef.current);
       activeRef.current = [];
     };
-  }, [evalCode, scope]);
+  }, [evalCode, scope, chartMode]);
 
   const cardClass = [
     'card',
@@ -412,6 +420,8 @@ export function ExampleLive({
 
   return (
     <div className={cardClass}>
+      {/* No icons in the card's buttons: the library's browser gate selects a
+          section's FIRST <svg> (`#edit svg`), which must be the chart's. */}
       <div className="card-head">
         <div>
           <h3>{meta.title}</h3>
@@ -419,23 +429,25 @@ export function ExampleLive({
         </div>
         <div className="card-actions">
           {codeMode === 'collapsed' ? (
-            <button
+            <Button
               type="button"
-              className="reset-btn"
+              variant="outline"
+              size="sm"
               onClick={() => setCodeOpen((o) => !o)}
               title={codeOpen ? 'Hide the source' : 'Show the source'}
             >
               {codeOpen ? 'Hide code' : 'Show code'}
-            </button>
+            </Button>
           ) : null}
-          <button
+          <Button
             type="button"
-            className="reset-btn"
+            variant="outline"
+            size="sm"
             onClick={reset}
             title="Restore the default example"
           >
             Reset
-          </button>
+          </Button>
         </div>
       </div>
       <div className={`body${isVisual ? ' body-visual' : ''}`}>

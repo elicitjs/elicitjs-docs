@@ -1,7 +1,7 @@
 # Writing elicitjs-docs
 
 Target: the terseness and directness of Observable Plot's and Vega-Lite's mark
-docs. A reader is building an elicitation chart, not extending ElicitJS — write
+docs. A reader is building an elicitation chart, not extending Elicit.js — write
 for the API they call, not the engine behind it. `concepts/page.mdx` is the
 calibration page — its density and tone is the target for every other page.
 
@@ -26,7 +26,9 @@ calibration page — its density and tone is the target for every other page.
    state what a gesture does and what you configure for it.
 6. **No analogy or scene-setting.** Skip framing like "the escape hatch,"
    "the Leaflet model," "a natural fit for." State the fact, then the API. Another one is. A chart is a Spec. It should say A chart is built through a declarative spec.
-7. **One voice across pages.** Same term for the same idea everywhere:
+7. **One voice across pages.** Write the library's name as **Elicit.js** in
+   prose (not ElicitJS or elicitJS); `elicitjs` stays as the package name in
+   code. Same term for the same idea everywhere:
    "mint" for creating a datum, "re-derives" for recomputing from committed
    rows, British spelling to match the existing corpus (colour, behaviour,
    licence, recolour). Backtick every identifier, option, and function name
@@ -142,6 +144,6 @@ escape hatch" from the section title itself, not just the prose:
 - `<Section id="...">` values — `scripts/verify-browser.mjs` roots
   assertions on them.
 - `_examples/*.example.txt` and `api.tsx` — code and data, not prose.
-- `authoring` and `renderers` target SDK authors extending ElicitJS, not
+- `authoring` and `renderers` target SDK authors extending Elicit.js, not
   chart authors — architecture vocabulary there is correct, not verbose.
   Tighten sentences; don't strip the depth.

@@ -1,0 +1,71 @@
+/* ==========================================================================
+   Brand palette — Data & Dialogue Lab
+   --------------------------------------------------------------------------
+   THE place to set the site's colours. Every other colour on the site is
+   derived from the seeds below, through the scales here and the semantic
+   tokens in app/globals.css. Change a seed and the whole site follows,
+   light and dark mode alike.
+
+   Seeds come from the lab logo:
+     teal  #50AEB7  — the "D", "U" and "Lab" strokes
+     blue  #2B5D87  — the "ata &", "Dialog", "e" strokes
+
+   Each scale is mixed from its seed in OKLab, so steps stay perceptually
+   even. The seed itself sits at the step whose lightness matches it
+   (teal-500, blue-600).
+   ========================================================================== */
+
+:root {
+  /* ── Seeds: edit these ─────────────────────────────────────────────────── */
+  --brand-teal: #50aeb7;
+  --brand-blue: #2b5d87;
+  /* Deep navy for text and code panels. Derived from the blue by default;
+     set a literal colour here to decouple it. */
+  --brand-ink: color-mix(in oklab, var(--brand-blue) 52%, black);
+
+  /* ── Teal scale (seed = 500) ───────────────────────────────────────────── */
+  --teal-50: color-mix(in oklab, var(--brand-teal) 7%, white);
+  --teal-100: color-mix(in oklab, var(--brand-teal) 14%, white);
+  --teal-200: color-mix(in oklab, var(--brand-teal) 28%, white);
+  --teal-300: color-mix(in oklab, var(--brand-teal) 48%, white);
+  --teal-400: color-mix(in oklab, var(--brand-teal) 74%, white);
+  --teal-500: var(--brand-teal);
+  --teal-600: color-mix(in oklab, var(--brand-teal) 84%, black);
+  --teal-700: color-mix(in oklab, var(--brand-teal) 68%, black);
+  --teal-800: color-mix(in oklab, var(--brand-teal) 53%, black);
+  --teal-900: color-mix(in oklab, var(--brand-teal) 40%, black);
+  --teal-950: color-mix(in oklab, var(--brand-teal) 27%, black);
+
+  /* ── Blue scale (seed = 600) ───────────────────────────────────────────── */
+  --blue-50: color-mix(in oklab, var(--brand-blue) 5%, white);
+  --blue-100: color-mix(in oklab, var(--brand-blue) 10%, white);
+  --blue-200: color-mix(in oklab, var(--brand-blue) 22%, white);
+  --blue-300: color-mix(in oklab, var(--brand-blue) 38%, white);
+  --blue-400: color-mix(in oklab, var(--brand-blue) 58%, white);
+  --blue-500: color-mix(in oklab, var(--brand-blue) 80%, white);
+  --blue-600: var(--brand-blue);
+  --blue-700: color-mix(in oklab, var(--brand-blue) 82%, black);
+  --blue-800: color-mix(in oklab, var(--brand-blue) 65%, black);
+  --blue-900: color-mix(in oklab, var(--brand-blue) 48%, black);
+  --blue-950: color-mix(in oklab, var(--brand-blue) 32%, black);
+
+  /* ── Neutral scale: the ink, tinted toward the brand blue ──────────────── */
+  --neutral-0: white;
+  --neutral-50: color-mix(in oklab, var(--brand-ink) 3%, white);
+  --neutral-100: color-mix(in oklab, var(--brand-ink) 6%, white);
+  --neutral-200: color-mix(in oklab, var(--brand-ink) 11%, white);
+  --neutral-300: color-mix(in oklab, var(--brand-ink) 19%, white);
+  --neutral-400: color-mix(in oklab, var(--brand-ink) 38%, white);
+  --neutral-500: color-mix(in oklab, var(--brand-ink) 56%, white);
+  --neutral-600: color-mix(in oklab, var(--brand-ink) 72%, white);
+  --neutral-700: color-mix(in oklab, var(--brand-ink) 84%, white);
+  --neutral-800: color-mix(in oklab, var(--brand-ink) 93%, white);
+  --neutral-900: var(--brand-ink);
+  --neutral-950: color-mix(in oklab, var(--brand-ink) 62%, black);
+
+  /* ── Support hues (not from the logo; used sparingly) ──────────────────── */
+  --amber-600: #b45309; /* numbers in data readouts */
+  --amber-400: #f2b25c;
+  --red-600: #c2392b; /* errors, destructive actions */
+  --red-400: #f07a6c;
+}

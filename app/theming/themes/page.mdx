@@ -18,7 +18,7 @@ export default function Layout({ children }) {
 
 # Named themes
 
-<Lead>A **named theme** restyles a whole chart from one word: `theme: "nyt"`. There are eighteen. Fourteen are the house styles of [Flint](https://github.com/microsoft/flint-chart), Microsoft's chart grammar, transcribed from its presets; `default`, `survey`, `dark` and `dd` are ElicitJS's own. Each is a partial [theme](/theming), so a chart can start from one and change any token.</Lead>
+<Lead>A **named theme** restyles a whole chart from one word: `theme: "nyt"`. There are eighteen. Fourteen are the house styles of [Flint](https://github.com/microsoft/flint-chart), Microsoft's chart grammar, transcribed from its presets; `default`, `survey`, `dark` and `dd` are Elicit.js's own. Each is a partial [theme](/theming), so a chart can start from one and change any token.</Lead>
 
 <Section id="by-name" title="Using a named theme">
 
@@ -100,7 +100,7 @@ A named theme sets the surface, the ink and palettes, the fonts of the labels an
 
 </Section>
 
-<Section id="own" title="ElicitJS's own">
+<Section id="own" title="Elicit.js's own">
 
 `default` is the built-in look. `survey` restyles the [survey widgets](/widgets) with an indigo accent and Inter. `dark` paints its own slate surface, so it reads on a dark page with no host CSS. `dd` is the Data & Dialogue Lab theme: the lab's teal as the ink, its blue for handles and answers, then coral, gold, violet, leaf and rose for categories. Shapes carry no stroke, and a stroke that does appear is the same hue a step darker. Every chart on this site is drawn with it.
 
@@ -109,7 +109,7 @@ The palette is also available as colour schemes: `scheme: "dd"` for categories, 
 <Example
   code={own}
   title="dd · survey · dark"
-  blurb="ElicitJS's own looks, side by side."
+  blurb="Elicit.js's own looks, side by side."
   try={"drag a bar."}
 />
 
@@ -132,7 +132,7 @@ The palette is also available as colour schemes: `scheme: "dd"` for categories, 
 
 Each preset keeps Flint's colours, font stacks, weights and proportions. Flint's `bandFraction` becomes `bandPadding` (one minus it), a point's area becomes a radius, and its presence words become tokens: `omit` turns a spine off or sets `tickSize: 0`, and a value-axis grid becomes `grid.show: "continuous"`. Flint names type sizes with tokens (`text.100` to `text.500`), which these themes set as 11 to 24 px.
 
-Some parts of a Flint theme are layout, which ElicitJS leaves to the spec: data labels on marks, series names at line ends, a value axis on the right, and furniture such as The Economist's red tab or the BBC's footer rule. Draw those with marks and [guides](/guides) where you need them.
+Some parts of a Flint theme are layout, which Elicit.js leaves to the spec: data labels on marks, series names at line ends, a value axis on the right, and furniture such as The Economist's red tab or the BBC's footer rule. Draw those with marks and [guides](/guides) where you need them.
 
 Flint is MIT-licensed. Its theme specification is at [docs/theme-spec.md](https://github.com/microsoft/flint-chart/blob/main/docs/theme-spec.md), and its theme gallery at [microsoft.github.io/flint-chart](https://microsoft.github.io/flint-chart/#/themes).
 

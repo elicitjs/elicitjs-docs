@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { ElicitMark } from '@/components/site/brand';
+import { ThemeToggle } from '@/components/site/theme';
 import { DocShell } from './DocShell';
 import { ExampleLive } from './ExampleLive';
 import { SpecBuilder } from './builder/SpecBuilder';
@@ -33,23 +36,26 @@ export function Playground({ presets }: Props) {
       <div className="playground-page">
         <div className="playground-bar">
           <Link href="/" className="playground-brand">
-            ← ElicitJS docs
+            <ArrowLeft className="size-4" />
+            <ElicitMark className="size-5" />
+            <span>Elicit.js docs</span>
           </Link>
-          <div className="playground-mode-tabs">
-            <button
-              type="button"
-              className={`playground-mode-tab${mode === 'build' ? ' active' : ''}`}
-              onClick={() => setMode('build')}
-            >
-              Build
-            </button>
-            <button
-              type="button"
-              className={`playground-mode-tab${mode === 'code' ? ' active' : ''}`}
-              onClick={() => setMode('code')}
-            >
-              Code
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="playground-mode-tabs" role="tablist" aria-label="Playground mode">
+              {(['build', 'code'] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  role="tab"
+                  aria-selected={mode === m}
+                  className={`playground-mode-tab${mode === m ? ' active' : ''}`}
+                  onClick={() => setMode(m)}
+                >
+                  {m === 'build' ? 'Build' : 'Code'}
+                </button>
+              ))}
+            </div>
+            <ThemeToggle />
           </div>
         </div>
 

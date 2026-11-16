@@ -2,6 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { DocShell } from '../../components/DocShell';
 import {
   API_INDEX,
@@ -61,39 +64,47 @@ export default function ApiPage() {
         Each entry links to the page documenting it.
       </p>
 
-      <div className="api-controls">
-        <input
-          className="api-search"
-          type="search"
-          placeholder="Search names and options…  (move, handleSize, network)"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          aria-label="Search the API"
-        />
-        <div className="api-chips">
-          <button
+      <div className="mt-5 mb-2 flex flex-col gap-3">
+        <div className="relative w-full max-w-xl">
+          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-faint-foreground" />
+          <Input
+            type="search"
+            placeholder="Search names and options…  (move, handleSize, network)"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            aria-label="Search the API"
+            className="h-10 pl-9 text-[0.92rem]"
+          />
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          <Button
             type="button"
-            className={`api-chip${ns === null ? ' on' : ''}`}
+            size="xs"
+            variant={ns === null ? 'default' : 'outline'}
+            className="rounded-full px-3"
             onClick={() => setNs(null)}
           >
             all
-          </button>
+          </Button>
           {API_NAMESPACES.map((n) => (
-            <button
+            <Button
               key={n.namespace}
               type="button"
-              className={`api-chip${ns === n.namespace ? ' on' : ''}`}
+              size="xs"
+              variant={ns === n.namespace ? 'default' : 'outline'}
+              className="rounded-full px-3 font-mono"
               onClick={() => setNs(ns === n.namespace ? null : n.namespace)}
               title={n.blurb}
             >
-              {n.namespace} <span className="api-chip-n">{n.count}</span>
-            </button>
+              {n.namespace}
+              <span className="tabular-nums opacity-60">{n.count}</span>
+            </Button>
           ))}
         </div>
       </div>
 
       {query || ns ? (
-        <p className="api-count">
+        <p className="mt-2 text-sm text-muted-foreground">
           {matches.length} {matches.length === 1 ? 'match' : 'matches'}
           {ns ? (
             <>

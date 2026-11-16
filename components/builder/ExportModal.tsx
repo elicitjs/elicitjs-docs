@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import type { BuilderState } from '../../lib/builder/types';
 import {
   buildSpecCode,
@@ -75,7 +76,7 @@ export function ExportModal({ isOpen, onClose, state }: Props) {
             className={`export-tab${format === 'spec' ? ' active' : ''}`}
             onClick={() => setFormat('spec')}
           >
-            Elicit JS Spec
+            Elicit.js Spec
           </button>
           <button
             type="button"
@@ -113,9 +114,9 @@ export function ExportModal({ isOpen, onClose, state }: Props) {
           <button type="button" className="secondary-btn" onClick={handleDownload}>
             ⬇ Download File
           </button>
-          <button type="button" className="reset-btn" onClick={onClose} style={{ marginLeft: 'auto' }}>
+          <Button type="button" variant="outline" size="sm" onClick={onClose} className="ml-auto">
             Close
-          </button>
+          </Button>
         </div>
       </div>
     </div>

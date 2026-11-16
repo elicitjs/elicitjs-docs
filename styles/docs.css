@@ -1,513 +1,954 @@
-:root {
-  --ink: #14283A;
-  --muted: #46596B;
-  --line: #E1E8EE;
-  --accent: #2B5D87;
-}
-* { box-sizing: border-box; }
-body {
-  font-family: system-ui, sans-serif;
-  margin: 0;
-  color: var(--ink);
-  line-height: 1.5;
-}
-.layout { display: flex; align-items: flex-start; }
+/* ==========================================================================
+   Docs component classes
+   --------------------------------------------------------------------------
+   The class names MDX pages and the live-example harness emit (`.lead`,
+   `.intro`, `code.inline`, `.card`, `.chart`, `.data-body`, `.api-*`, …).
+   They sit in the `components` layer, so a Tailwind utility on the same
+   element still wins, and they read colours only from semantic tokens
+   (app/globals.css), never hex.
 
-/* --- side nav --- */
-nav {
-  position: sticky;
-  top: 0;
-  align-self: flex-start;
-  width: 232px;
-  min-width: 232px;
-  height: 100vh;
-  overflow: auto;
-  padding: 1.4rem 1rem 2rem 1.4rem;
-  border-right: 1px solid var(--line);
-  background: #F6F9FB;
-}
-nav .brand { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.2rem; }
-nav .brand a { color: inherit; text-decoration: none; }
-nav .tag { font-size: 0.72rem; color: var(--muted); margin-bottom: 1.1rem; }
+   LOAD-BEARING class names — the library's verify-browser gate selects on
+   `.chart`, `.result`, `.grid`, `.data-body`, `.live-error` and section ids.
+   Restyle them freely; don't rename them.
+   ========================================================================== */
 
-/* grouped page list */
-nav .group { margin-top: 1.1rem; }
-nav .group-title {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #94A5B3;
-  font-weight: 700;
-  margin-bottom: 0.3rem;
-}
-nav a {
-  display: block;
-  font-size: 0.83rem;
-  color: var(--muted);
-  text-decoration: none;
-  padding: 0.2rem 0 0.2rem 0.55rem;
-  border-left: 2px solid transparent;
-}
-nav a:hover { color: var(--accent); }
-nav a.active {
-  color: var(--accent);
-  font-weight: 600;
-  border-left-color: var(--accent);
-}
-/* in-page section anchors under the active page */
-nav .anchors { margin: 0.15rem 0 0.2rem 0; }
-nav .anchors a {
-  font-size: 0.78rem;
-  padding: 0.12rem 0 0.12rem 1.2rem;
-  color: #7a8593;
-}
-nav .anchors a:hover { color: var(--accent); }
+@layer components {
+  /* ── Prose ─────────────────────────────────────────────────────────────
+     Tailwind's preflight zeroes element styles; this restores a reading
+     rhythm inside page content only. `:where()` keeps specificity at zero
+     so any component class below overrides it. */
+  :where(.docs-content) h1 {
+    font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.1rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.2;
+    margin: 0 0 0.5rem;
+  }
+  :where(.docs-content) h2 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+    margin: 2.4rem 0 0.4rem;
+  }
+  :where(.docs-content) h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 1.4rem 0 0.3rem;
+  }
+  :where(.docs-content) p {
+    margin: 0 0 0.75rem;
+  }
+  :where(.docs-content) :is(ul, ol) {
+    margin: 0.3rem 0 0.9rem;
+    padding-left: 1.3rem;
+    max-width: 78ch;
+    color: var(--muted-foreground);
+    font-size: 0.92rem;
+  }
+  :where(.docs-content) ul {
+    list-style: disc;
+  }
+  :where(.docs-content) ol {
+    list-style: decimal;
+  }
+  :where(.docs-content) li {
+    margin: 0.2rem 0;
+  }
+  :where(.docs-content) li::marker {
+    color: var(--brand);
+  }
+  :where(.docs-content) :is(b, strong) {
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  :where(.docs-content) a {
+    color: var(--link);
+    text-decoration: underline;
+    text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+    text-underline-offset: 0.18em;
+    transition: color 0.15s, text-decoration-color 0.15s;
+  }
+  :where(.docs-content) a:hover {
+    color: var(--link-hover);
+    text-decoration-color: currentColor;
+  }
+  :where(.docs-content) hr {
+    border: 0;
+    border-top: 1px solid var(--border);
+    margin: 2rem 0;
+  }
+  /* Markdown tables (not the API tables, which carry their own class). */
+  :where(.docs-content) table:not([class]) {
+    border-collapse: collapse;
+    font-size: 0.86rem;
+    margin: 0.6rem 0 1rem;
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+  }
+  :where(.docs-content) table:not([class]) :is(th, td) {
+    text-align: left;
+    padding: 0.4rem 0.9rem 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  :where(.docs-content) table:not([class]) th {
+    color: var(--faint-foreground);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
-nav .links { margin-top: 1.4rem; padding-top: 0.8rem; border-top: 1px solid var(--line); }
-nav .links a { font-size: 0.78rem; color: var(--accent); padding-left: 0; border-left: 0; }
+  section {
+    scroll-margin-top: 1.25rem;
+  }
+  .lead {
+    color: var(--muted-foreground);
+    font-size: 1.02rem;
+    line-height: 1.6;
+    max-width: 72ch;
+    margin: 0 0 0.75rem;
+  }
+  h2.section {
+    position: relative;
+    font-size: 1.25rem;
+    margin: 3rem 0 0.35rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  /* A short brand-teal rule over each section heading. */
+  h2.section::after {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 2.5rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--brand);
+  }
+  .intro {
+    color: var(--muted-foreground);
+    font-size: 0.93rem;
+    max-width: 78ch;
+    margin: 0.25rem 0 0.5rem;
+  }
+  code.inline {
+    font-family: var(--font-mono);
+    background: var(--surface-muted);
+    color: var(--foreground);
+    border: 1px solid var(--border);
+    padding: 0.05rem 0.3rem;
+    border-radius: calc(var(--radius) * 0.5);
+    font-size: 0.84em;
+    overflow-wrap: anywhere;
+  }
+  /* A link wrapping code keeps the link colour. */
+  a code.inline {
+    color: inherit;
+  }
+  kbd {
+    font-family: var(--font-mono);
+    background: var(--surface-muted);
+    color: var(--foreground);
+    border: 1px solid var(--border-strong);
+    border-bottom-width: 2px;
+    border-radius: calc(var(--radius) * 0.5);
+    padding: 0.02rem 0.35rem;
+    font-size: 0.74rem;
+  }
 
-/* --- main --- */
-main { flex: 1; padding: 1.6rem 2rem 5rem; max-width: 1200px; min-width: 0; }
-h1 { font-size: 1.5rem; margin: 0 0 0.3rem; }
-.lead { color: var(--muted); font-size: 0.95rem; max-width: 74ch; margin: 0 0 0.5rem; }
-section { scroll-margin-top: 1rem; }
-h2.section {
-  font-size: 1.15rem;
-  margin: 2.6rem 0 0.2rem;
-  padding-top: 0.7rem;
-  border-top: 2px solid #EAF0F4;
-}
-.intro { color: var(--muted); font-size: 0.9rem; max-width: 78ch; margin: 0.2rem 0 0.4rem; }
-code.inline {
-  background: #EAF0F4;
-  padding: 0.05rem 0.3rem;
-  border-radius: 4px;
-  font-size: 0.85em;
-}
-kbd {
-  background: var(--ink);
-  color: #fff;
-  border-radius: 4px;
-  padding: 0.02rem 0.35rem;
-  font-size: 0.72rem;
-}
-a { color: var(--accent); }
-
-/* --- cards --- */
-/* `minmax(0, 1fr)`, not `1fr`: a 1fr track's automatic minimum is min-content, so
-   the card would refuse to shrink below the longest code line plus the chart's
-   fixed pixel width — and push the whole page into a horizontal scroll. */
-.grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.3rem; margin-top: 0.9rem; }
-.card {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 0.9rem 1.1rem 1.1rem;
-  min-width: 0;
-}
-.card h3 { font-size: 0.98rem; margin: 0 0 0.2rem; }
-.card > p { color: var(--muted); font-size: 0.85rem; margin: 0 0 0.7rem; }
-.body { display: flex; gap: 1.1rem; align-items: flex-start; min-width: 0; }
-.code {
-  flex: 1 1 52%;
-  min-width: 0;
-  background: #14283A;
-  color: #D5DFE6;
-  font-size: 0.76rem;
-  line-height: 1.5;
-  padding: 0.75rem 0.85rem;
-  border-radius: 8px;
-  margin: 0;
-  /* Long lines wrap rather than scroll sideways; tall blocks still scroll down. */
-  overflow-x: hidden;
-  overflow-y: auto;
-  max-height: 460px;
-}
-/* Prose fences sit as direct children of <Section>; example panels live inside
-   `.body`, so this margin does not disturb the live-example layout. */
-section > pre.code {
-  margin: 0.55rem 0 0.75rem;
-}
-.code code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  white-space: pre-wrap;
-  overflow-wrap: break-word;
-}
-/* One block per source line, so a wrapped line hangs under its own indent
-   instead of restarting in column 0. */
-.code .ln { display: block; padding-left: 2.2ch; text-indent: -2.2ch; }
-.code .ln:empty::before { content: "\200b"; }
-/* The chart column. A fixed chart's width is pinned to its own pixels by the
-   harness, so the data readout below can't widen the card. A RESPONSIVE chart
-   (`.fluid`) instead shares the row with the code as a bounded, flexible column
-   the chart scales into — so it fills its parent without squishing the code. */
-.result { flex: 0 0 auto; min-width: 0; max-width: 100%; }
-.result.fluid { flex: 1 1 46%; }
-.chart { display: block; max-width: 100%; overflow-x: auto; }
-.result.fluid .chart { width: 100%; }
-.try {
-  display: block;
-  margin-top: 0.4rem;
-  font-size: 0.78rem;
-  color: #0d7a5f;
-}
-.try b { color: #075e48; }
-
-/* --- live data readout (every example shows what getData() returns) --- */
-.data {
-  margin-top: 0.55rem;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  overflow: hidden;
-}
-.data-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem;
-  padding: 0.3rem 0.55rem;
-  background: #F6F9FB;
-  border-bottom: 1px solid var(--line);
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #94A5B3;
-  font-weight: 700;
-}
-.data-count { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--muted); }
-/* A FIXED height, not max-height: rows appended by a create edit then scroll
-   inside the panel instead of growing the card and shifting the page. */
-.data-body {
-  margin: 0;
-  padding: 0.45rem 0.6rem;
-  height: 7.4em;
-  overflow: auto;
-  background: #fff;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.72rem;
-  line-height: 1.55;
-  color: var(--ink);
-  white-space: pre;
-}
-.data-body .empty { color: #94A5B3; font-style: italic; }
-.data-body .idx { color: #b9c2cd; user-select: none; }
-.data-body .key { color: var(--muted); }
-.data-body .num { color: #b45309; }
-.data-body .str { color: #0d7a5f; }
-/* Table name, for a multi-table dataset (see marks/network). A single-table
-   chart renders no heading at all, so its panel is unchanged. */
-.data-body .tbl { color: var(--muted); font-weight: 600; }
-@media (max-width: 940px) {
-  .body { flex-direction: column; }
-  .code { flex-basis: auto; width: 100%; }
-  /* Stacked: a responsive chart needs a DEFINITE width to measure/scale into,
-     otherwise a reflow chart shrink-wraps its own svg and never grows. */
-  .result.fluid { flex-basis: auto; width: 100%; }
-}
-@media (max-width: 720px) {
-  nav { display: none; }
-}
-
-/* --- API reference block --- */
-section.api { scroll-margin-top: 1rem; }
-.api-entry { margin: 0.9rem 0 1.6rem; }
-.api-entry + .api-entry { padding-top: 1.2rem; border-top: 1px dashed var(--line); }
-.api-heading {
-  font-size: 0.95rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  margin: 0 0 0.35rem;
-  color: var(--ink);
-}
-.api-summary { color: var(--muted); font-size: 0.88rem; max-width: 78ch; margin: 0 0 0.6rem; }
-.code.sig {
-  max-height: none;
-  flex: none;
-  width: 100%;
-  margin: 0 0 0.9rem;
-  white-space: pre-wrap;
-}
-.api-label {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #94A5B3;
-  font-weight: 700;
-  margin: 0.9rem 0 0.35rem;
-}
-.api-table-wrap { overflow-x: auto; }
-table.api-table {
-  border-collapse: collapse;
-  width: 100%;
-  font-size: 0.82rem;
-  margin-bottom: 0.4rem;
-}
-table.api-table th {
-  text-align: left;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #94A5B3;
-  font-weight: 700;
-  padding: 0.3rem 0.7rem 0.3rem 0;
-  border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-table.api-table td {
-  padding: 0.4rem 0.7rem 0.4rem 0;
-  border-bottom: 1px solid #EAF0F4;
-  vertical-align: top;
-  color: var(--muted);
-}
-table.api-table td:first-child, table.api-table th:first-child { padding-left: 0; }
-code.api-name { font-weight: 600; color: var(--ink); white-space: nowrap; }
-code.api-type { color: var(--accent); white-space: nowrap; }
-code.api-def { color: #b45309; white-space: nowrap; }
-
-/* Options / channels tables. Name and type columns size to their content but
-   are CAPPED (the inline-block max-width bounds the cell's preferred width), so
-   a long union type wraps at its `|` seams instead of crushing the description.
-   The default lives under the type — most rows have none, so a whole column of
-   dashes collapses away. */
-table.api-options { line-height: 1.45; }
-table.api-options td { padding: 0.45rem 1rem 0.45rem 0; }
-table.api-options td:last-child, table.api-options th:last-child { padding-right: 0; }
-table.api-options tbody tr:hover td { background: #F6F9FB; }
-table.api-options .api-col-name code.api-name,
-table.api-options .api-col-type code.api-type,
-table.api-options code.api-def {
-  display: inline-block;
-  /* width:max-content + max-width makes the cell's MIN-content width equal its
-     natural width up to the cap — short types never wrap, long ones wrap at
-     the <wbr> seams once they hit the cap. */
-  width: max-content;
-  white-space: normal;
-  overflow-wrap: break-word;
-}
-table.api-options .api-col-name code.api-name { max-width: 11rem; }
-table.api-options .api-col-type { min-width: 6rem; }
-table.api-options .api-col-type code.api-type { max-width: 15rem; }
-table.api-options .api-def-row {
-  display: flex;
-  align-items: baseline;
-  gap: 0.35rem;
-  margin-top: 0.15rem;
-  max-width: 15rem;
-}
-table.api-options .api-def-label {
-  font-size: 0.66rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: #a3acb7;
-  font-weight: 600;
-  flex: none;
-}
-table.api-options .api-col-desc { color: #4a5561; }
-table.api-options .api-col-desc p { margin: 0; }
-
-/* Folding. Folded rows keep their content in the DOM (hidden="until-found");
-   here the row itself collapses to nothing so it takes no height. */
-table.api-options.is-folded tr.api-row-extra td { padding: 0; border: 0; }
-table.api-options.is-folded tbody tr:nth-child(10) td { border-bottom-color: transparent; }
-.api-label-count {
-  margin-left: 0.4rem;
-  font-weight: 600;
-  color: #b4bcc6;
-  font-variant-numeric: tabular-nums;
-}
-.api-fold-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  width: 100%;
-  margin: 0 0 0.4rem;
-  padding: 0.4rem 0.6rem;
-  font: inherit;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--accent);
-  background: linear-gradient(to bottom, #F6F9FB, #EEF3F7);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  cursor: pointer;
-}
-.api-fold-toggle:hover { background: #E8F1F6; border-color: #B5CFE0; }
-.api-fold-toggle:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-.api-fold-chevron { font-size: 0.7rem; }
-@media print {
-  .api-fold-toggle { display: none; }
-}
-
-/* Narrow screens: stack each row — name · type on one line, prose beneath. */
-@media (max-width: 720px) {
-  table.api-options thead { display: none; }
-  table.api-options, table.api-options tbody { display: block; }
-  table.api-options tr {
+  /* ── Example cards ─────────────────────────────────────────────────────
+     `minmax(0, 1fr)`, not `1fr`: a 1fr track's automatic minimum is
+     min-content, so the card would refuse to shrink below the longest code
+     line plus the chart's fixed pixel width and scroll the page sideways. */
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+  .card {
+    background: var(--card);
+    color: var(--card-foreground);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) * 1.4);
+    padding: 1rem 1.15rem 1.15rem;
+    min-width: 0;
+    box-shadow: 0 1px 2px var(--shadow-color);
+  }
+  .card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 0.2rem;
+  }
+  .card > p {
+    color: var(--muted-foreground);
+    font-size: 0.86rem;
+    margin: 0 0 0.7rem;
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+  }
+  .card-head h3 {
+    margin: 0 0 0.2rem;
+  }
+  .card-head p {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.86rem;
+    max-width: 70ch;
+  }
+  .card-actions {
     display: flex;
     flex-wrap: wrap;
-    column-gap: 0.75rem;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #EAF0F4;
+    gap: 0.4rem;
+    justify-content: flex-end;
+    flex: none;
   }
-  table.api-options td { display: block; padding: 0; border: 0; }
-  table.api-options .api-col-desc { flex-basis: 100%; margin-top: 0.2rem; }
+
+  .body {
+    display: flex;
+    gap: 1.1rem;
+    align-items: flex-start;
+    min-width: 0;
+  }
+
+  /* Dark code panel: prose fences and the API signature block. */
+  .code {
+    flex: 1 1 52%;
+    min-width: 0;
+    background: var(--code);
+    color: var(--code-foreground);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.55;
+    padding: 0.8rem 0.95rem;
+    border-radius: var(--radius);
+    margin: 0;
+    /* Long lines wrap rather than scroll sideways; tall blocks scroll down. */
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 460px;
+  }
+  /* Prose fences sit as direct children of <Section>; example panels live
+     inside `.body`, so this margin leaves the live-example layout alone. */
+  section > pre.code,
+  .docs-content > pre.code {
+    margin: 0.6rem 0 0.9rem;
+  }
+  .code code {
+    font-family: inherit;
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+  }
+  /* One block per source line, so a wrapped line hangs under its own indent. */
+  .code .ln {
+    display: block;
+    padding-left: 2.2ch;
+    text-indent: -2.2ch;
+  }
+  .code .ln:empty::before {
+    content: "\200b";
+  }
+  .code .c { color: var(--code-muted); font-style: italic; }
+  .code .s { color: #86efac; }
+  .code .n { color: #fca5a5; }
+  .code .k { color: #c4b5fd; }
+  .code .f { color: #7dd3fc; }
+
+  /* Live editor + read-only highlighter (react-live / prism). */
+  .code-wrap {
+    flex: 1 1 52%;
+    min-width: 0;
+    background: var(--code);
+    border-radius: var(--radius);
+    overflow: hidden;
+    max-height: 460px;
+    overflow-y: auto;
+  }
+  .code-wrap.tall {
+    max-height: min(70vh, 720px);
+    flex-basis: 55%;
+  }
+  .live-editor,
+  .code-wrap pre,
+  .code-wrap textarea {
+    margin: 0 !important;
+    font-family: var(--font-mono) !important;
+    font-size: 0.78rem !important;
+    line-height: 1.55 !important;
+    background: var(--code) !important;
+    color: var(--code-foreground) !important;
+    min-height: 200px;
+    outline: none;
+  }
+  .live-editor textarea {
+    outline: none !important;
+  }
+  .code-wrap:focus-within {
+    box-shadow: 0 0 0 2px var(--ring);
+  }
+  .readonly-code {
+    margin: 0 !important;
+    padding: 0.8rem 0.95rem;
+    font-family: var(--font-mono) !important;
+    font-size: 0.78rem !important;
+    line-height: 1.55 !important;
+    overflow-x: auto;
+    white-space: pre;
+  }
+
+  /* The chart column. A fixed chart's width is pinned to its own pixels by
+     the harness, so the data readout below can't widen the card. A
+     RESPONSIVE chart (`.fluid`) shares the row with the code as a bounded,
+     flexible column the chart scales into. */
+  .result {
+    flex: 0 0 auto;
+    min-width: 0;
+    max-width: 100%;
+  }
+  .result.fluid {
+    flex: 1 1 46%;
+  }
+  .chart {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    /* Charts follow the docs' colour mode (lib/chartTheme.ts) and paint a
+       transparent backdrop, so they sit directly on the card. They keep the
+       font the library measures text with, not the site's typeface. */
+    color: var(--card-foreground);
+    font-family: system-ui, sans-serif;
+    line-height: 1.5;
+  }
+  .result.fluid .chart {
+    width: 100%;
+  }
+  .chart svg {
+    display: inline;
+    vertical-align: baseline;
+  }
+
+  /* Native controls that examples build (`document.createElement("button")`).
+     Preflight strips their UA look, so give them the design system's
+     outline-control look. Inline styles from an example still win. */
+  .chart :is(button, select, input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]), textarea) {
+    font: inherit;
+    font-size: 0.8rem;
+    color: var(--foreground);
+    background: var(--card);
+    border: 1px solid var(--input);
+    border-radius: calc(var(--radius) * 0.6);
+    padding: 0.22rem 0.6rem;
+    line-height: 1.4;
+  }
+  .chart button {
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.15s, border-color 0.15s;
+  }
+  .chart button:hover:not(:disabled) {
+    background: var(--accent);
+    border-color: var(--brand);
+  }
+  .chart button:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+  .chart :is(button, select, input, textarea):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+  .chart :is(input[type="range"], input[type="checkbox"], input[type="radio"]) {
+    accent-color: var(--primary);
+  }
+  /* The in-chart text editor sits on the plot, not in a toolbar. */
+  .chart foreignObject :is(input, textarea) {
+    padding: 0 0.2rem;
+    border-color: var(--brand);
+  }
+
+  .try {
+    display: block;
+    margin-top: 0.55rem;
+    font-size: 0.8rem;
+    color: var(--success);
+  }
+  .try b {
+    font-weight: 600;
+  }
+
+  .live-error {
+    margin: 0.5rem 0 0;
+    color: var(--destructive);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    white-space: pre-wrap;
+    background: var(--destructive-soft);
+    border: 1px solid var(--destructive-border);
+    border-radius: var(--radius);
+    padding: 0.55rem 0.7rem;
+    max-height: 8rem;
+    overflow: auto;
+  }
+
+  .card-tall .body {
+    min-height: 60vh;
+  }
+
+  /* ── Live data readout: what getData() returns ────────────────────────── */
+  .data {
+    margin-top: 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--card);
+  }
+  .data-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.35rem 0.6rem;
+    background: var(--surface-subtle);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--faint-foreground);
+    font-weight: 600;
+  }
+  .data-count {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    color: var(--muted-foreground);
+    font-variant-numeric: tabular-nums;
+  }
+  /* A FIXED height, not max-height: rows appended by a create edit scroll
+     inside the panel instead of growing the card and shifting the page. */
+  .data-body {
+    margin: 0;
+    padding: 0.45rem 0.6rem;
+    height: 7.4em;
+    overflow: auto;
+    background: var(--card);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    line-height: 1.6;
+    color: var(--foreground);
+    white-space: pre;
+  }
+  .data-body .empty { color: var(--faint-foreground); font-style: italic; }
+  .data-body .idx { color: var(--faint-foreground); opacity: 0.7; user-select: none; }
+  .data-body .key { color: var(--muted-foreground); }
+  .data-body .num { color: var(--syntax-number); }
+  .data-body .str { color: var(--syntax-string); }
+  /* Table name, for a multi-table dataset (see marks/network). */
+  .data-body .tbl { color: var(--muted-foreground); font-weight: 600; }
+
+  /* Intro gallery: chart (2/3) | data (1/3); code stacks below when shown. */
+  .card-visual .body-visual {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.9rem;
+  }
+  .card-visual .visual-row {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+  }
+  .card-visual .visual-row .result {
+    flex: 2 1 0;
+    min-width: 0;
+    width: auto;
+    max-width: none;
+  }
+  .card-visual .visual-row .result.fluid {
+    flex: 2 1 0;
+    width: auto;
+  }
+  /* Reflow charts need a definite parent width to measure into. */
+  .card-visual .chart {
+    width: 100%;
+  }
+  .card-visual .visual-data {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-visual .visual-data .data {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-top: 0;
+    min-height: 0;
+  }
+  .card-visual .visual-data .data-body {
+    flex: 1;
+    height: auto;
+    min-height: 12em;
+  }
+  .card-visual .code-wrap.code-below {
+    flex: 1 1 auto;
+    width: 100%;
+    max-height: 360px;
+  }
+
+  @media (max-width: 940px) {
+    .body {
+      flex-direction: column;
+    }
+    .code,
+    .code-wrap {
+      flex-basis: auto;
+      width: 100%;
+    }
+    /* Stacked: a responsive chart needs a DEFINITE width to measure/scale
+       into, otherwise a reflow chart shrink-wraps its own svg. */
+    .result.fluid {
+      flex-basis: auto;
+      width: 100%;
+    }
+  }
+  @media (max-width: 720px) {
+    .card {
+      padding: 0.85rem 0.85rem 0.95rem;
+    }
+    .card-head {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .card-actions {
+      justify-content: flex-start;
+    }
+    .card-visual .visual-row {
+      flex-direction: column;
+    }
+    .card-visual .visual-row .result,
+    .card-visual .visual-row .result.fluid,
+    .card-visual .visual-data {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+    /* A fixed-pixel chart keeps its inline width but may not push the page
+       sideways; `.chart` scrolls it inside the card instead. */
+    .card-visual .visual-row .result {
+      max-width: 100%;
+    }
+    .card-visual .visual-data .data-body {
+      height: 7.4em;
+      min-height: 0;
+      flex: none;
+    }
+  }
+
+  /* ── API reference block ───────────────────────────────────────────────── */
+  section.api {
+    scroll-margin-top: 1.25rem;
+  }
+  .api-entry {
+    margin: 1rem 0 1.75rem;
+  }
+  .api-entry + .api-entry {
+    padding-top: 1.3rem;
+    border-top: 1px dashed var(--border);
+  }
+  .api-heading {
+    font-size: 0.98rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    margin: 0 0 0.35rem;
+    color: var(--foreground);
+  }
+  .api-summary {
+    color: var(--muted-foreground);
+    font-size: 0.9rem;
+    max-width: 78ch;
+    margin: 0 0 0.6rem;
+  }
+  .code.sig {
+    max-height: none;
+    flex: none;
+    width: 100%;
+    margin: 0 0 0.9rem;
+    white-space: pre-wrap;
+  }
+  .api-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--faint-foreground);
+    font-weight: 600;
+    margin: 0.9rem 0 0.35rem;
+  }
+  .api-table-wrap {
+    overflow-x: auto;
+  }
+  table.api-table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.84rem;
+    margin-bottom: 0.4rem;
+  }
+  table.api-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--faint-foreground);
+    font-weight: 600;
+    padding: 0.35rem 0.7rem 0.35rem 0;
+    border-bottom: 1px solid var(--border-strong);
+    white-space: nowrap;
+  }
+  table.api-table td {
+    padding: 0.45rem 0.7rem 0.45rem 0;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    color: var(--muted-foreground);
+  }
+  table.api-table td:first-child,
+  table.api-table th:first-child {
+    padding-left: 0;
+  }
+  table.api-table code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+  }
+  table.api-table td code.inline {
+    padding: 0.02rem 0.28rem;
+  }
+  code.api-name { font-weight: 600; color: var(--foreground); white-space: nowrap; }
+  code.api-type { color: var(--link); white-space: nowrap; }
+  code.api-def { color: var(--syntax-number); white-space: nowrap; }
+
+  /* Options / channels tables. Name and type columns size to their content
+     but are CAPPED, so a long union type wraps at its `|` seams instead of
+     crushing the description. The default lives under the type. */
+  table.api-options { line-height: 1.5; }
+  table.api-options td { padding: 0.5rem 1rem 0.5rem 0; }
+  table.api-options td:last-child,
+  table.api-options th:last-child { padding-right: 0; }
+  table.api-options tbody tr { transition: background-color 0.12s; }
+  table.api-options tbody tr:hover td { background: var(--surface-subtle); }
+  table.api-options .api-col-name code.api-name,
   table.api-options .api-col-type code.api-type,
-  table.api-options .api-def-row { max-width: none; }
-  table.api-options .api-def-row { display: inline-flex; margin: 0 0 0 0.5rem; }
-  table.api-options.is-folded tr.api-row-extra { padding: 0; border: 0; }
-  table.api-options.is-folded tr.api-row-extra .api-col-desc { margin: 0; }
-}
-table.api-table code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
-table.api-table td code.inline { background: #EAF0F4; padding: 0.02rem 0.28rem; border-radius: 4px; }
-.api-returns { color: var(--muted); font-size: 0.88rem; max-width: 78ch; margin: 0.2rem 0 0; }
+  table.api-options code.api-def {
+    display: inline-block;
+    /* width:max-content + max-width: short types never wrap, long ones wrap
+       at the <wbr> seams once they hit the cap. */
+    width: max-content;
+    white-space: normal;
+    overflow-wrap: break-word;
+  }
+  table.api-options .api-col-name code.api-name { max-width: 11rem; }
+  table.api-options .api-col-type { min-width: 6rem; }
+  table.api-options .api-col-type code.api-type { max-width: 15rem; }
+  table.api-options .api-def-row {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin-top: 0.15rem;
+    max-width: 15rem;
+  }
+  table.api-options .api-def-label {
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--faint-foreground);
+    font-weight: 600;
+    flex: none;
+  }
+  table.api-options .api-col-desc { color: var(--muted-foreground); }
+  table.api-options .api-col-desc p { margin: 0; }
 
-/* --- syntax highlight --- */
-.code .c { color: #6F8294; font-style: italic; }
-.code .s { color: #86efac; }
-.code .n { color: #fca5a5; }
-.code .k { color: #c4b5fd; }
-.code .f { color: #7dd3fc; }
+  /* Folding. Folded rows keep their content in the DOM (hidden="until-found");
+     here the row itself collapses to nothing so it takes no height. */
+  table.api-options.is-folded tr.api-row-extra td { padding: 0; border: 0; }
+  table.api-options.is-folded tbody tr:nth-child(10) td { border-bottom-color: transparent; }
+  .api-label-count {
+    margin-left: 0.4rem;
+    font-weight: 600;
+    color: var(--faint-foreground);
+    opacity: 0.8;
+    font-variant-numeric: tabular-nums;
+  }
+  .api-fold-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+    margin: 0 0 0.4rem;
+    padding: 0.45rem 0.6rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--link);
+    background: var(--surface-subtle);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+  }
+  .api-fold-toggle:hover {
+    background: var(--accent);
+    border-color: var(--brand);
+  }
+  .api-fold-toggle:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+  .api-fold-chevron { font-size: 0.7rem; }
+  @media print {
+    .api-fold-toggle { display: none; }
+  }
+  /* Narrow screens: stack each row — name · type on one line, prose beneath. */
+  @media (max-width: 720px) {
+    table.api-options thead { display: none; }
+    table.api-options,
+    table.api-options tbody { display: block; }
+    table.api-options tr {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 0.75rem;
+      padding: 0.55rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    table.api-options td { display: block; padding: 0; border: 0; }
+    table.api-options .api-col-desc { flex-basis: 100%; margin-top: 0.2rem; }
+    table.api-options .api-col-type code.api-type,
+    table.api-options .api-def-row { max-width: none; }
+    table.api-options .api-def-row { display: inline-flex; margin: 0 0 0 0.5rem; }
+    table.api-options.is-folded tr.api-row-extra { padding: 0; border: 0; }
+    table.api-options.is-folded tr.api-row-extra .api-col-desc { margin: 0; }
+  }
+  .api-returns {
+    color: var(--muted-foreground);
+    font-size: 0.9rem;
+    max-width: 78ch;
+    margin: 0.2rem 0 0;
+  }
 
-/* ── API index (/api) ─────────────────────────────────────────────────────── */
-/* The index is a dense lookup surface, not a reading surface: it optimises for
-   scanning 152 names, so entries are tight and the option chips carry most of the
-   information. Search highlights matching OPTION chips, because "which mark takes
-   handleSize" is the question that brings people here. */
-.api-controls { margin: 1rem 0 0.4rem; }
-.api-search {
-  width: 100%;
-  max-width: 34rem;
-  padding: 0.55rem 0.75rem;
-  font: inherit;
-  font-size: 0.9rem;
-  color: var(--ink);
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-}
-.api-search:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
-.api-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
-.api-chip {
-  font: inherit;
-  font-size: 0.78rem;
-  padding: 0.25rem 0.6rem;
-  color: var(--muted);
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  cursor: pointer;
-}
-.api-chip:hover { border-color: var(--accent); color: var(--accent); }
-.api-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
-.api-chip-n { opacity: 0.6; font-variant-numeric: tabular-nums; }
-.api-count { color: var(--muted); font-size: 0.82rem; margin: 0.6rem 0 0; }
+  /* ── API index (/api) ──────────────────────────────────────────────────
+     A dense lookup surface: tight entries, option chips carry the detail.
+     Search highlights matching OPTION chips. */
+  .api-index-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+    gap: 0.65rem;
+    margin-top: 0.8rem;
+  }
+  .api-index-item {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.65rem 0.75rem;
+    background: var(--card);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .api-index-item:hover {
+    border-color: var(--border-strong);
+    box-shadow: 0 1px 3px var(--shadow-color);
+  }
+  .api-index-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+  .api-index-name {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--foreground);
+    text-decoration: none;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  a.api-index-name:hover { color: var(--link); text-decoration: underline; }
+  .api-index-docs {
+    font-size: 0.72rem;
+    color: var(--faint-foreground);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  a.api-index-docs:hover { color: var(--link); }
+  .api-index-nodocs {
+    font-size: 0.72rem;
+    color: var(--faint-foreground);
+    opacity: 0.8;
+    font-style: italic;
+  }
+  .api-index-opts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-top: 0.5rem;
+  }
+  .api-opt {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.08rem 0.38rem;
+    border-radius: calc(var(--radius) * 0.5);
+    background: var(--surface-muted);
+    color: var(--muted-foreground);
+  }
+  .api-opt.hit {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
 
-.api-index-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
-  gap: 0.6rem;
-  margin-top: 0.7rem;
-}
-.api-index-item {
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.6rem 0.7rem;
-  background: #fff;
-}
-.api-index-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.5rem; }
-.api-index-name {
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.85rem;
-  color: var(--ink);
-  text-decoration: none;
-  font-weight: 600;
-}
-a.api-index-name:hover { color: var(--accent); text-decoration: underline; }
-.api-index-docs {
-  font-size: 0.72rem;
-  color: var(--muted);
-  text-decoration: none;
-  white-space: nowrap;
-  opacity: 0.75;
-}
-a.api-index-docs:hover { color: var(--accent); opacity: 1; }
-.api-index-nodocs { font-size: 0.72rem; color: var(--muted); opacity: 0.6; font-style: italic; }
-.api-index-opts { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.45rem; }
-.api-opt {
-  font-size: 0.72rem;
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  background: #EEF3F7;
-  color: var(--muted);
-}
-.api-opt.hit { background: var(--accent); color: #fff; }
+  /* ── Home hero ───────────────────────────────────────────────────────── */
+  /* Short: it hands off to the "What you can elicit" gallery below it. */
+  .hero {
+    position: relative;
+    margin: 0 0 2rem;
+    padding: 2rem 0 1.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero h1 {
+    margin: 0 0 0.6rem;
+    font-size: clamp(2.2rem, 1.6rem + 2.4vw, 3.2rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    background: linear-gradient(100deg, var(--blue-600) 20%, var(--teal-500) 85%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    width: fit-content;
+  }
+  .dark .hero h1 {
+    background-image: linear-gradient(100deg, var(--blue-300) 10%, var(--teal-400) 80%);
+  }
+  .hero-tag {
+    color: var(--muted-foreground);
+    font-size: 1.08rem;
+    max-width: 60ch;
+    margin: 0 0 1.25rem;
+    line-height: 1.6;
+  }
+  .hero-tag b { color: var(--foreground); font-weight: 600; }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  /* Mirrors shadcn's Button (outline / default) for links authored in MDX. */
+  .hero-btn {
+    display: inline-flex;
+    align-items: center;
+    height: 2.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0 0.9rem;
+    border-radius: var(--radius);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    color: var(--foreground);
+    background: var(--background);
+    transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  }
+  :where(.docs-content) a.hero-btn { text-decoration: none; color: var(--foreground); }
+  .hero-btn:hover,
+  :where(.docs-content) a.hero-btn:hover {
+    background: var(--muted);
+    border-color: var(--border-strong);
+    color: var(--foreground);
+  }
+  .hero-btn.primary,
+  :where(.docs-content) a.hero-btn.primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+  .hero-btn.primary:hover,
+  :where(.docs-content) a.hero-btn.primary:hover {
+    background: color-mix(in oklab, var(--primary) 88%, var(--foreground));
+    color: var(--primary-foreground);
+  }
+  .hero-install {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 2.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    padding: 0 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--foreground);
+    background: var(--surface-subtle);
+  }
+  .hero-install .sigil { color: var(--brand); user-select: none; }
+  .hero-alpha {
+    margin: 1rem 0 0;
+    font-size: 0.82rem;
+    color: var(--muted-foreground);
+  }
 
-/* ── Home hero ────────────────────────────────────────────────────────────── */
-/* Sits above the "What you can elicit" gallery. The gallery is the strongest
-   thing on the site, so the hero stays short and hands off to it rather than
-   competing with feature cards. */
-.hero { margin: 0 0 1.8rem; padding-bottom: 1.4rem; border-bottom: 1px solid var(--line); }
-.hero h1 { margin: 0 0 0.3rem; font-size: 2.1rem; letter-spacing: -0.02em; }
-.hero-tag { color: var(--muted); font-size: 1.02rem; max-width: 60ch; margin: 0 0 1rem; line-height: 1.55; }
-.hero-tag b { color: var(--ink); }
-.hero-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-.hero-btn {
-  display: inline-block;
-  font-size: 0.87rem;
-  padding: 0.45rem 0.95rem;
-  border-radius: 7px;
-  text-decoration: none;
-  border: 1px solid var(--line);
-  color: var(--ink);
-  background: #fff;
+  /* ── Getting started (/start) ────────────────────────────────────────── */
+  .steps { counter-reset: step; }
+  .step { counter-increment: step; margin: 1.4rem 0; }
+  .step > h2.section::before {
+    content: counter(step);
+    display: inline-grid;
+    place-items: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-right: 0.55rem;
+    font-family: var(--font-sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: 999px;
+    background: var(--primary);
+    color: var(--primary-foreground);
+    vertical-align: 0.1em;
+  }
+  .next-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: 0.65rem;
+    margin-top: 0.9rem;
+  }
+  .next-card,
+  :where(.docs-content) a.next-card {
+    display: block;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 0.8rem 0.9rem;
+    text-decoration: none;
+    color: var(--foreground);
+    background: var(--card);
+    transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+  }
+  .next-card:hover,
+  :where(.docs-content) a.next-card:hover {
+    border-color: var(--brand);
+    color: var(--foreground);
+    box-shadow: 0 4px 14px var(--shadow-color);
+    transform: translateY(-1px);
+  }
+  .next-card b { display: block; font-size: 0.92rem; font-weight: 600; margin-bottom: 0.15rem; }
+  .next-card span { display: block; font-size: 0.82rem; color: var(--muted-foreground); }
 }
-.hero-btn:hover { border-color: var(--accent); color: var(--accent); }
-.hero-btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-.hero-btn.primary:hover { filter: brightness(1.08); color: #fff; }
-.hero-install {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: 0.83rem;
-  padding: 0.4rem 0.75rem;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  color: var(--ink);
-  background: #F6F9FB;
-}
-.hero-install .sigil { color: var(--muted); user-select: none; }
-.hero-alpha { margin: 0.9rem 0 0; font-size: 0.8rem; color: var(--muted); }
 
-/* ── Getting started (/start) ─────────────────────────────────────────────── */
-.step { counter-increment: step; margin: 1.4rem 0; }
-.steps { counter-reset: step; }
-.step > h2.section::before {
-  content: counter(step);
-  display: inline-grid;
-  place-items: center;
-  width: 1.5rem; height: 1.5rem;
-  margin-right: 0.5rem;
-  font-size: 0.8rem;
-  border-radius: 999px;
-  background: var(--accent);
-  color: #fff;
-  vertical-align: 0.05em;
+/* Below lg the sticky top bar (3.5rem) sits over the page; anchor jumps
+   must land under it. */
+@layer components {
+  @media (max-width: 1023.98px) {
+    section,
+    section.api {
+      scroll-margin-top: 4.75rem;
+    }
+  }
 }
-.next-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-  gap: 0.6rem;
-  margin-top: 0.8rem;
-}
-.next-card {
-  display: block;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 0.7rem 0.8rem;
-  text-decoration: none;
-  color: var(--ink);
-  background: #fff;
-}
-.next-card:hover { border-color: var(--accent); }
-.next-card b { display: block; font-size: 0.9rem; margin-bottom: 0.15rem; }
-.next-card span { display: block; font-size: 0.8rem; color: var(--muted); }

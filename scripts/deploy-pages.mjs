@@ -191,7 +191,7 @@ fs.writeFileSync(
 fs.writeFileSync(
   path.join(pagesRoot, "README.md"),
   `# elicitjs.github.io\n\n` +
-    `The ElicitJS documentation site, live at <${SITE_URL}>.\n\n` +
+    `The Elicit.js documentation site, live at <${SITE_URL}>.\n\n` +
     `**This repository is generated. Do not edit it by hand** — the next deploy\n` +
     `overwrites everything here.\n\n` +
     `The source lives in [elicitjs/elicitjs-docs](https://github.com/elicitjs/elicitjs-docs).\n` +

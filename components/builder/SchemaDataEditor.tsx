@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, type Dispatch } from 'react';
+import { Button } from '@/components/ui/button';
 import type { BuilderAction, BuilderState, MeasureType } from '../../lib/builder/types';
 
 type Props = {
@@ -191,9 +192,9 @@ export function SchemaDataEditor({ state, dispatch }: Props) {
                 <button type="button" className="primary-btn" onClick={handleImportCsv}>
                   Import as JSON
                 </button>
-                <button type="button" className="reset-btn" onClick={() => setShowCsvModal(false)}>
+                <Button type="button" variant="outline" size="sm" onClick={() => setShowCsvModal(false)}>
                   Cancel
-                </button>
+                </Button>
               </div>
             </div>
           )}

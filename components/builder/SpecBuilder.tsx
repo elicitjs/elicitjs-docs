@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useReducer, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { MarkLayers } from './MarkLayers';
 import { MarkInspector } from './MarkInspector';
 import { CanvasPreview } from './CanvasPreview';
@@ -78,14 +79,15 @@ export function SpecBuilder() {
           >
             🚀 Export Spec...
           </button>
-          <button
+          <Button
             type="button"
-            className="reset-btn"
+            variant="outline"
+            size="sm"
             onClick={() => dispatch({ type: 'RESET' })}
             title="Reset to default starter"
           >
             Reset
-          </button>
+          </Button>
         </div>
       </div>
 

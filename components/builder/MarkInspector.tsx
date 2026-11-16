@@ -221,7 +221,7 @@ export function MarkInspector({ state, dispatch, mark }: Props) {
                   {isField && (
                     <div className="channel-edit-section">
                       <div className="opt-field">
-                        <span className="opt-name" style={{ fontSize: '0.72rem', color: 'var(--accent)' }}>
+                        <span className="opt-name" style={{ fontSize: '0.72rem', color: 'var(--link)' }}>
                           Gesture:
                         </span>
                         <select

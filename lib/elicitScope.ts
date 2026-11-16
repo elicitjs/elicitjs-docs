@@ -32,9 +32,11 @@ const {
 } = elicit.edit;
 
 export function createElicitScope() {
-  // The docs site draws every chart in the Data & Dialogue Lab theme. It is the
-  // app-wide base, so an example's own `theme` still layers on top of it. Set on every
-  // eval so an example that calls `setTheme()` never leaks into the next one.
+  // The docs site draws every chart in the Data & Dialogue Lab theme: `dd` in
+  // light mode, its dark variant in dark mode (lib/chartTheme.ts). It is the
+  // app-wide base, so an example's own `theme` still layers on top of it.
+  // ExampleLive re-sets it before every eval, so an example that calls
+  // `setTheme()` never leaks into the next one.
   elicit.setTheme('dd');
   return {
     // Marks — view DATA.

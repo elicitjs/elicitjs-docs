@@ -1,0 +1,261 @@
+/* ==========================================================================
+   Elicit.js docs — design system entry point
+   --------------------------------------------------------------------------
+   Three tiers, each built only from the one above it:
+
+     1. styles/brand.css   palette seeds + generated scales   (edit colours here)
+     2. this file          semantic tokens (shadcn roles + docs roles),
+                           light & dark, exposed to Tailwind via @theme
+     3. components         shadcn/ui in components/ui, and the docs' own
+                           component classes in styles/docs.css and
+                           styles/playground.css
+
+   Components never name a hex value or a scale step; they name a role
+   (bg-card, text-muted-foreground, var(--code)). See DESIGN.md.
+   ========================================================================== */
+
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "../styles/brand.css";
+@import "../styles/docs.css";
+@import "../styles/playground.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── Semantic tokens: light ─────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
+  --radius: 0.625rem;
+
+  /* shadcn roles */
+  --background: var(--neutral-0);
+  --foreground: var(--neutral-900);
+  --card: var(--neutral-0);
+  --card-foreground: var(--neutral-900);
+  --popover: var(--neutral-0);
+  --popover-foreground: var(--neutral-900);
+  --primary: var(--blue-600);
+  --primary-foreground: var(--neutral-0);
+  --secondary: var(--teal-100);
+  --secondary-foreground: var(--teal-900);
+  --muted: var(--neutral-50);
+  --muted-foreground: var(--neutral-600);
+  --accent: var(--teal-50);
+  --accent-foreground: var(--blue-700);
+  --destructive: var(--red-600);
+  --border: var(--neutral-200);
+  --input: var(--neutral-300);
+  --ring: var(--teal-500);
+
+  --chart-1: var(--teal-500);
+  --chart-2: var(--blue-600);
+  --chart-3: var(--teal-300);
+  --chart-4: var(--blue-400);
+  --chart-5: var(--blue-800);
+
+  --sidebar: var(--neutral-50);
+  --sidebar-foreground: var(--neutral-700);
+  --sidebar-primary: var(--blue-600);
+  --sidebar-primary-foreground: var(--neutral-0);
+  --sidebar-accent: var(--teal-50);
+  --sidebar-accent-foreground: var(--blue-700);
+  --sidebar-border: var(--neutral-200);
+  --sidebar-ring: var(--teal-500);
+
+  /* docs roles */
+  --brand: var(--teal-500); /* decorative highlight: rules, markers, active bars */
+  --link: var(--blue-600);
+  --link-hover: var(--teal-700);
+  --surface-subtle: var(--neutral-50); /* panel heads, hover rows */
+  --surface-muted: var(--neutral-100); /* chips, inline code */
+  --border-strong: var(--neutral-300);
+  --faint-foreground: var(--neutral-500); /* eyebrow labels, counts */
+  --success: var(--teal-700); /* "Try:" hints */
+  --code: var(--neutral-900); /* code panels stay dark in both modes */
+  --code-foreground: var(--neutral-100);
+  --code-muted: var(--neutral-400);
+  --syntax-number: var(--amber-600);
+  --syntax-string: var(--teal-700);
+  --destructive-soft: color-mix(in oklab, var(--destructive) 7%, var(--background));
+  --destructive-border: color-mix(in oklab, var(--destructive) 28%, var(--background));
+  --overlay: color-mix(in oklab, var(--neutral-950) 60%, transparent);
+  --shadow-color: color-mix(in oklab, var(--neutral-900) 8%, transparent);
+}
+
+/* ── Semantic tokens: dark ──────────────────────────────────────────────── */
+.dark {
+  color-scheme: dark;
+
+  --background: var(--neutral-950);
+  --foreground: var(--neutral-100);
+  --card: color-mix(in oklab, var(--neutral-900) 55%, var(--neutral-950));
+  --card-foreground: var(--neutral-100);
+  --popover: var(--neutral-900);
+  --popover-foreground: var(--neutral-100);
+  --primary: var(--teal-400);
+  --primary-foreground: var(--neutral-950);
+  --secondary: color-mix(in oklab, var(--brand-teal) 18%, var(--neutral-950));
+  --secondary-foreground: var(--teal-100);
+  --muted: var(--neutral-900);
+  --muted-foreground: var(--neutral-400);
+  --accent: color-mix(in oklab, var(--brand-teal) 16%, var(--neutral-950));
+  --accent-foreground: var(--teal-200);
+  --destructive: var(--red-400);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 16%);
+  --ring: var(--teal-400);
+
+  --chart-1: var(--teal-400);
+  --chart-2: var(--blue-400);
+  --chart-3: var(--teal-200);
+  --chart-4: var(--blue-300);
+  --chart-5: var(--teal-600);
+
+  --sidebar: color-mix(in oklab, var(--neutral-900) 35%, var(--neutral-950));
+  --sidebar-foreground: var(--neutral-300);
+  --sidebar-primary: var(--teal-400);
+  --sidebar-primary-foreground: var(--neutral-950);
+  --sidebar-accent: color-mix(in oklab, var(--brand-teal) 14%, var(--neutral-950));
+  --sidebar-accent-foreground: var(--teal-200);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: var(--teal-400);
+
+  --brand: var(--teal-400);
+  --link: var(--teal-300);
+  --link-hover: var(--teal-200);
+  --surface-subtle: color-mix(in oklab, var(--neutral-900) 70%, var(--neutral-950));
+  --surface-muted: var(--neutral-900);
+  --border-strong: oklch(1 0 0 / 18%);
+  --faint-foreground: var(--neutral-400);
+  --success: var(--teal-300);
+  --code: color-mix(in oklab, var(--neutral-950) 70%, black);
+  --code-foreground: var(--neutral-100);
+  --code-muted: var(--neutral-500);
+  --syntax-number: var(--amber-400);
+  --syntax-string: var(--teal-300);
+  --overlay: color-mix(in oklab, black 70%, transparent);
+  --shadow-color: color-mix(in oklab, black 40%, transparent);
+}
+
+/* ── Tokens → Tailwind utilities ────────────────────────────────────────── */
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-raleway), var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-brand: var(--brand);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-surface-muted: var(--surface-muted);
+  --color-border-strong: var(--border-strong);
+  --color-faint-foreground: var(--faint-foreground);
+  --color-success: var(--success);
+  --color-code: var(--code);
+  --color-code-foreground: var(--code-foreground);
+
+  /* The brand scales replace Tailwind's default teal/blue/neutral, so
+     `bg-teal-100` is always the lab's teal. Prefer roles over steps. */
+  --color-teal-50: var(--teal-50);
+  --color-teal-100: var(--teal-100);
+  --color-teal-200: var(--teal-200);
+  --color-teal-300: var(--teal-300);
+  --color-teal-400: var(--teal-400);
+  --color-teal-500: var(--teal-500);
+  --color-teal-600: var(--teal-600);
+  --color-teal-700: var(--teal-700);
+  --color-teal-800: var(--teal-800);
+  --color-teal-900: var(--teal-900);
+  --color-teal-950: var(--teal-950);
+  --color-blue-50: var(--blue-50);
+  --color-blue-100: var(--blue-100);
+  --color-blue-200: var(--blue-200);
+  --color-blue-300: var(--blue-300);
+  --color-blue-400: var(--blue-400);
+  --color-blue-500: var(--blue-500);
+  --color-blue-600: var(--blue-600);
+  --color-blue-700: var(--blue-700);
+  --color-blue-800: var(--blue-800);
+  --color-blue-900: var(--blue-900);
+  --color-blue-950: var(--blue-950);
+  --color-neutral-50: var(--neutral-50);
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+  --color-neutral-950: var(--neutral-950);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans antialiased;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    line-height: 1.6;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading;
+    font-variant-numeric: lining-nums;
+    text-wrap: balance;
+  }
+  a {
+    color: var(--link);
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--brand) 30%, transparent);
+  }
+}
