@@ -2573,11 +2573,10 @@ mount(Elicit({
   axes: { x: { title: 'weight →', tickFormat: (d) => (d % 20 === 0 ? d : '') }, y: { grid: true } },
   marks: [
     barY({
-      stack: true,
       tip: { text: (d) => ['weight: ' + d.bin + '–' + (d.bin + 5), 'sex: ' + d.sex, 'frequency: ' + d.count] },
       channels: {
         x: { field: 'bin', scale: { padding: 0.05 } }, y: { field: 'count' },
-        series: { field: 'sex' },
+        stack: { field: 'sex' },
         fill: { field: 'sex', scale: { scheme: 'tableau10' } },
       },
     }),

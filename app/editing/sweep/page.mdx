@@ -96,7 +96,7 @@ Place the sweep on the channel it paints. A mark-level `edits: [edit.line.sweep(
 
 On a partition (a pie `arc`, a `donut` or a stacked `barY`), `edit.stack.edge()` and `edit.stack.cut()` change the proportions and keep the total constant.
 
-`edit.stack.edge()` lets you drag the seams between segments. With `edit.stack.cut()`, click inside a segment to split it there; the new piece takes the next unused category from the schema's domain.
+`edit.stack.edge()` lets you drag the seams between segments. With `edit.stack.cut()`, click inside a segment to split it there. The new piece takes an unused category from the domain of the mark's `stack` field.
 
 <Example
   code={cutAStack}

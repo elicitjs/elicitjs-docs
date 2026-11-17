@@ -78,7 +78,8 @@ for (const id of ids) {
     } catch { /* report whatever finished */ }
     await page.waitForTimeout(300);
     const blocks = await page.evaluate(() => window.GALLERY_STATE.blocks.map((b, i) => {
-        const host = b.chart ? b.chart.closest('.chart-host') : null;
+        const dom = b.chart && b.chart.dom ? b.chart.dom() : null;
+        const host = dom ? dom.closest('.chart-host') : null;
         return {
             i, id: b.id, kind: b.kind, state: b.state, title: b.title,
             error: b.error ? String(b.error).split('\n')[0] : undefined,
@@ -106,14 +107,15 @@ for (const id of ids) {
         if (!smoke || b.state !== 'ok') continue;
         const probe = await page.evaluate((bi) => {
             const blk = window.GALLERY_STATE.blocks[bi];
-            const chart = blk.chart; if (!chart || !chart.getData) return null;
+            const chart = blk.chart; if (!chart || !chart.getData || !chart.dom) return null;
+            const dom = chart.dom();
             // Pointer events only land on what is inside the viewport.
-            chart.scrollIntoView({ block: 'center' });
-            const svg = chart.querySelector('svg') || chart.querySelector('canvas');
+            dom.scrollIntoView({ block: 'center' });
+            const svg = dom.querySelector('svg') || dom.querySelector('canvas');
             if (!svg) return null;
             const before = JSON.stringify(chart.getData());
             const r = svg.getBoundingClientRect();
-            const cands = [...chart.querySelectorAll('svg circle, svg rect, svg path, svg ellipse, svg line, svg polygon')]
+            const cands = [...dom.querySelectorAll('svg circle, svg rect, svg path, svg ellipse, svg line, svg polygon')]
                 .filter((el) => getComputedStyle(el).pointerEvents !== 'none')
                 .map((el) => el.getBoundingClientRect())
                 .filter((bb) => bb.width * bb.height > 4 && bb.width < r.width * 0.9 && bb.height < r.height * 0.9);

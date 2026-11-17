@@ -103,6 +103,11 @@ export const api: ApiEntry[] = [
         desc: "Slice size in data units; layout normalizes by the sum of rows. The polar positional channel (Vega-Lite's name for it) — not `angle`, which is a mark's rotation in place, and not `value`, which already means a visual-space constant on any channel. Read raw here: an arc normalizes its own magnitudes, so it neither implies a radial axis nor draws a fan key.",
       },
       {
+        name: "stack",
+        type: "categorical | ordinal field",
+        desc: "Optional. Names each slice and orders the slices by the field's schema domain (else first appearance); without it, slices follow data order. `edit.stack.cut()` writes a new slice's category into it, so a cut needs it.",
+      },
+      {
         name: "fill",
         type: "ordinal | const",
         desc: "Slice colour.",

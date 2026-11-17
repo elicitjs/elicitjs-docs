@@ -2606,8 +2606,8 @@ mount(Elicit({
       title: 'Split each origin',
       question: 'Of 100 new cars from each origin, how many have four, six and eight cylinders?',
       try: 'Drag the boundary between two segments of a column.',
-      why: '`barY({ stack: true })` stacks each origin\'s rows on one band, and `edit.stack.edge()` drags the boundary between two neighbours: one gains what the other loses, so every column keeps its total of 100.',
-      uses: ['barY({ stack: true })', 'edit.stack.edge()'],
+      why: '`barY` with a `stack` channel stacks each origin\'s rows on one band, and `edit.stack.edge()` drags the boundary between two neighbours: one gains what the other loses, so every column keeps its total of 100.',
+      uses: ['barY stack channel', 'edit.stack.edge()'],
       code: `const origins = ['Europe', 'Japan', 'USA'];
 mount(Elicit({
   width: 360, height: 280,
@@ -2624,8 +2624,8 @@ mount(Elicit({
   axes: { x: { title: '' }, y: { title: 'cars', ticks: 5 } },
   marks: [
     barY({
-      stack: true,                                          //! one column per origin
       channels: {
+        stack: { field: 'cyl' },  //! one column per origin
         x: { field: 'origin' },
         y: { field: 'share' },
         fill: { field: 'cyl', scale: { range: ['#c6dbef', '#6baed6', '#08519c'] } },

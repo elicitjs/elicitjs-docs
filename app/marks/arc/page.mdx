@@ -85,7 +85,7 @@ A pie divides one total among its rows, as a stacked `bar` does along an axis. T
 - `edit.stack.edge()` — **drag** a boundary to move value across it.
 - `edit.stack.merge()` — **double-click** a boundary to fuse those two slices back into one.
 
-Each preserves the pie's total. A cut takes its category from the schema's domain, so it needs no typing. A closed domain hands out the values this pie doesn't yet use, and refuses the cut once they run out. `open: true` lets each cut append a new one. See [Slicing a stack](/marks/bar#slice) for the bar form.
+Each preserves the pie's total. A cut needs a `stack` channel: it writes the new slice's category into that field, taking a value from its schema domain, so it needs no typing. A pie always stacks, so on `arc` the `stack` channel only names the slices and orders them by its domain. Without it, slices follow data order. A closed domain hands out the values this pie doesn't yet use, and refuses the cut once they run out. `open: true` lets each cut append a new one. See [Slicing a stack](/marks/bar#slice) for the bar form.
 
 <Example
   code={cutASlice}

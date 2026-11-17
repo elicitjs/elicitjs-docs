@@ -175,7 +175,13 @@
       return origWarn.apply(this, args);
     };
     let chart = null;
-    const mount = (el) => { if (el instanceof Node) { host.append(el); chart = chart || el; } return el; };
+    // A chart (what `Elicit(...)` returns) mounts its `dom()` and becomes the block's
+    // chart; a plain node (controls, a button) is just appended.
+    const mount = (el) => {
+      if (el && typeof el.dom === 'function') { host.append(el.dom()); chart = chart || el; }
+      else if (el instanceof Node) host.append(el);
+      return el;
+    };
     const scope = makeScope(mount);
     try {
       const fn = new AsyncFunction(...Object.keys(scope), code);

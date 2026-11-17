@@ -17,11 +17,11 @@ const chart = Elicit({
   legends: true,
   marks: [
     bar({
-      stack: true,
       channels: {
-        x:    { field: "year" },
-        y:    { field: "pct" },
-        fill: { field: "asset" },
+        x:     { field: "year" },
+        y:     { field: "pct" },
+        stack: { field: "asset" },
+        fill:  { field: "asset" },
       },
     }),
   ],

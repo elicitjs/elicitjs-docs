@@ -461,7 +461,7 @@ mount(Elicit({
       question: 'If 100 new respondents answered Q1 and Q4 again, how would their answers split across the five responses?',
       try: 'Drag the dots on the boundaries between segments. Each bar always holds 100 people.',
       why: 'A stacked bar partitions a total, so `edit.stack.edge()` moves value across one boundary: what one response gains, its neighbour loses, and the 100 is preserved by arithmetic rather than by a constraint.',
-      uses: ['edit.stack.edge()', 'bar({ stack: true })'],
+      uses: ['edit.stack.edge()', 'bar stack channel'],
       code: `const order = ["Strongly Disagree", "Disagree", "Neutral", "Agree", "Strongly Agree"];
 const data = ["Q1", "Q4"].flatMap((Question) =>
   order.map((Response) => ({ Question, Response, n: 20 })));
@@ -478,8 +478,8 @@ mount(Elicit({
   axes: { x: {}, y: { tickSize: 0 } },
   marks: [
     barX({
-      stack: true,                                         //! one bar = 100 people
       channels: {
+        stack: { field: "Response" },  //! one bar = 100 people
         y: { field: "Question" },
         x: { field: "n" },
         fill: { field: "Response", scale: { scheme: "RdBu" }, legend: { anchor: "right", title: false } },
@@ -496,7 +496,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-stacked-bars',
   status: 'full',
-  verdict: 'Penguin counts per island and species, stacked with `bar({ stack: true })` and coloured by species.',
+  verdict: 'Penguin counts per island and species, stacked with a `bar` `stack` channel and coloured by species.',
   needs: [],
   prep: ['prep-aggregate'],
   gaps: [
@@ -522,7 +522,8 @@ mount(Elicit({
   },
   axes: { x: { title: "island" }, y: { grid: false, title: "Frequency →" } },
   marks: [
-    bar({ stack: true, channels: {
+    bar({ channels: {
+      stack: { field: "species" },
       x: { field: "island" },
       y: { field: "count" },
       fill: { field: "species", scale: { scheme: "observable10" },
@@ -561,8 +562,8 @@ mount(Elicit({
   axes: { x: {}, y: { title: "penguins →" } },
   marks: [
     bar({
-      stack: true,
       channels: {
+        stack: { field: "species" },
         x: { field: "island" },
         y: { field: "count" },
         fill,
@@ -583,7 +584,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'plot-crimean-war-bary',
   status: 'full',
-  verdict: 'Monthly deaths by cause, reshaped long, stacked with `bar({ stack: true })` on a month band with one-letter month ticks.',
+  verdict: 'Monthly deaths by cause, reshaped long, stacked with a `bar` `stack` channel on a month band with one-letter month ticks.',
   needs: [],
   prep: ['prep-reshape', 'prep-calculate'],
   gaps: [
@@ -611,7 +612,8 @@ mount(Elicit({
     y: { grid: true, title: "deaths →" },
   },
   marks: [
-    bar({ stack: true, channels: {
+    bar({ channels: {
+      stack: { field: "cause" },
       x: { field: "month" },
       y: { field: "deaths" },
       fill: { field: "cause", scale: { scheme: "observable10" } },
@@ -914,7 +916,8 @@ mount(Elicit({
   scales: { y: { reverse: true } },
   axes: { x: { tickFormat: (d) => Math.round(d * 100), title: "Frequency (%) →" }, y: {} },
   marks: [
-    barX({ stack: true, channels: {
+    barX({ channels: {
+      stack: { field: "party" },
       y: { field: "gender" },
       x: { field: "share" },
       fill: { field: "party", scale: { scheme: "dark2" },
@@ -1603,20 +1606,21 @@ GALLERY.add({
   needs: [],
   prep: ['prep-calculate'],
   gaps: [
-    'Plot’s `x: 1` constant becomes a `one` column, and its `sort: "body_mass_g"` is a JS sort of the rows (the stack follows row order).',
+    'Plot’s `x: 1` constant becomes a `one` column, and its `sort: "body_mass_g"` is a JS sort of the rows. Each penguin gets an `id`, and `stack: { field: "id" }` stacks them in that order.',
     'The two penguins with no recorded mass are dropped; Plot keeps them as unfilled units.',
   ],
   recreation: {
     code: `const penguins = (await plotData("penguins"))
   .filter((d) => Number.isFinite(d.body_mass_g))
   .sort((a, b) => a.body_mass_g - b.body_mass_g)
-  .map((d) => ({ species: d.species, body_mass_g: d.body_mass_g, one: 1 }));
+  .map((d, i) => ({ id: i, species: d.species, body_mass_g: d.body_mass_g, one: 1 }));
 
 mount(Elicit({
   width: 460, height: 220,
   margins: { top: 50, right: 16, bottom: 30, left: 66 },
   data: penguins,
   schema: {
+    id:          { type: "categorical" },
     species:     { type: "categorical", domain: ["Adelie", "Chinstrap", "Gentoo"] },
     body_mass_g: { type: "quantitative", domain: [2700, 6300] },
     one:         { type: "quantitative", domain: [0, 152] },
@@ -1624,7 +1628,8 @@ mount(Elicit({
   scales: { y: { reverse: true } },
   axes: { x: { title: "Frequency →" }, y: {} },
   marks: [
-    barX({ stack: true, stroke: "#fff", strokeWidth: 0.5, channels: {
+    barX({ stroke: "#fff", strokeWidth: 0.5, channels: {
+      stack: { field: "id" },
       y: { field: "species" },
       x: { field: "one" },
       fill: { field: "body_mass_g", scale: { scheme: "turbo" }, legend: { anchor: "top" } },
@@ -1746,7 +1751,7 @@ GALLERY.add({
   needs: [],
   prep: ['prep-stack'],
   gaps: [
-    'Plot’s `stackX` transform computes the spans and the label positions; here both are computed in JS (`bar({ stack: true })` needs a band axis, which this chart does not have).',
+    'Plot’s `stackX` transform computes the spans and the label positions; here both are computed in JS (a stacked `bar` needs a band axis, which this chart does not have).',
   ],
   recreation: {
     code: `const alphabet = await plotData("alphabet");
@@ -1781,7 +1786,7 @@ mount(Elicit({
       question: 'What share of the letters in English text are E, T, A, O and I — and what share are all the other 21 letters?',
       try: 'Drag the dots between segments. The bar always adds up to 100%.',
       why: 'A single stacked bar is a whole divided among rows. `edit.stack.edge()` moves one boundary at a time, so what one letter gains its neighbour loses and the total stays at 100% by construction, with no `maintainSum` needed.',
-      uses: ['edit.stack.edge()', 'bar({ stack: true })'],
+      uses: ['edit.stack.edge()', 'bar stack channel'],
       code: `const parts = ["E", "T", "A", "O", "I", "the other 21"];
 mount(Elicit({
   width: 460, height: 150,
@@ -1796,8 +1801,8 @@ mount(Elicit({
   axes: { x: { tickFormat: ".0%" }, y: false },
   marks: [
     barX({
-      stack: true,                                            //! one bar, one whole
       channels: {
+        stack: { field: "letter" },  //! one bar, one whole
         y: { field: "bar" },
         x: { field: "share" },
         fill: { field: "letter", legend: { anchor: "right", title: false } },
@@ -1871,8 +1876,8 @@ mount(Elicit({
   axes: { x: { tickFormat: ".0%" }, y: false },
   marks: [
     barX({
-      stack: true,
       channels: {
+        stack: { field: "sport" },
         y: { field: "games" },
         x: { field: "share" },
         fill: { field: "sport", scale: { scheme: "tableau10" } },

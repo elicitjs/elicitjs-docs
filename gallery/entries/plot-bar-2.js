@@ -80,8 +80,8 @@ mount(Elicit({
   },
   marks: [
     bar({
-      stack: true, //! the encoding is the stack — one segment per sex
       channels: {
+        stack: { field: "sex" },  //! the encoding is the stack — one segment per sex
         x: { field: "cls" },
         y: { field: "n" },
         fill: { field: "sex", legend: { anchor: "top" } },
@@ -1878,8 +1878,9 @@ mount(Elicit({
   },
   marks: [
     bar({
-      stack: true, fillOpacity: 0.7,
+      fillOpacity: 0.7,
       channels: {
+        stack: { field: "segment" },
         x: { field: "market" },
         y: { field: "share" },
         fill: { field: "segment", legend: { anchor: "right", title: false } },

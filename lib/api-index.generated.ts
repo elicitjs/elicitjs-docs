@@ -16,7 +16,7 @@ export type ApiIndexEntry = {
 export type ApiNamespace = { namespace: string; blurb: string; count: number };
 
 export const API_LIBRARY_VERSION = "0.1.0-alpha.3";
-export const API_GENERATED_AT = "2026-11-15T21:08:58.689Z";
+export const API_GENERATED_AT = "2026-11-17T02:13:23.564Z";
 export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "plot",
@@ -196,7 +196,6 @@ export const API_INDEX: ApiIndexEntry[] = [
     "call": "plot.bar(options)",
     "own": [
       "orientation",
-      "stack",
       "handles",
       "handleSize",
       "handleColor",
@@ -2859,8 +2858,7 @@ export const API_INDEX: ApiIndexEntry[] = [
     "qualified": "edit.stack.cut",
     "call": "edit.stack.cut(options)",
     "own": [
-      "label",
-      "categoryField"
+      "label"
     ],
     "universal": [
       "type",

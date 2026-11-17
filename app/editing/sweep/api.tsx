@@ -143,15 +143,9 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.stack.cut(options)",
-    summary: "Click inside a stacked segment to divide it into two, taking the next category from the schema's domain.",
-    signature: "edit.stack.cut({ label, categoryField, defaults, when }) → Edit",
+    summary: "Click inside a stacked segment to divide it into two. The new segment's category goes in the mark's `stack` field, taken from its schema domain; a mark with no `stack` channel refuses the cut and logs a warning.",
+    signature: "edit.stack.cut({ label, defaults, when }) → Edit",
     options: [
-      {
-        name: "categoryField",
-        type: "string",
-        default: "the stack's category column",
-        desc: "Which column carries the segment's identity, when the stack groups by more than one.",
-      },
       {
         name: "label",
         type: "string",

@@ -54,8 +54,8 @@ GALLERY.beyond({
   },
   marks: [
     bar({
-      stack: true,
       channels: {
+        stack: { field: "mode" },
         x: { field: "year" },
         y: { field: "pct" },
         fill: { field: "mode" },

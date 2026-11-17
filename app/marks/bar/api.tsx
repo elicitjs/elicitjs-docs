@@ -36,18 +36,6 @@ export const api: ApiEntry[] = [
         desc: <>Override the inferred direction (bar only; barY/barX pin it).</>,
       },
       {
-        name: 'stack',
-        type: 'boolean',
-        default: 'false',
-        desc: (
-          <>
-            Stack bars that share a category. The segments are the{' '}
-            <code className="inline">series</code> channel&rsquo;s groups (else the
-            fill or stroke field). Declare a schema domain covering the stacked total.
-          </>
-        ),
-      },
-      {
         name: 'handles / handleSize / handleColor',
         type: "boolean | 'hit' / number / string",
         default: 'true / 5 / theme',
@@ -134,6 +122,18 @@ export const api: ApiEntry[] = [
             A second category nested inside each <code className="inline">x</code> (or{' '}
             <code className="inline">y</code>) category: one sub-band per value, for
             grouped bars.
+          </>
+        ),
+      },
+      {
+        name: 'stack',
+        type: 'categorical | ordinal field',
+        desc: (
+          <>
+            Stack the bars that share a band. The field names each segment and sets
+            their order (its schema domain, else first appearance).{' '}
+            <code className="inline">edit.stack.cut()</code> writes a new segment&rsquo;s
+            category into it. Declare a schema domain covering the stacked total.
           </>
         ),
       },

@@ -69,14 +69,16 @@ Put the band on `y` and the value on `x`, and the bars run horizontally. `barX` 
 
 <Section id="stack" title="Stacked bars">
 
-`stack: true` stacks the bars that share a band. Each segment sits on the cumulative total of the ones before it. Rows with the same `x` (or `y`, for `barX`) stack together. Declare a schema domain that covers the stacked **total**.
+The `stack` channel stacks the bars that share a band. Each segment sits on the cumulative total of the ones before it. Rows with the same `x` (or `y`, for `barX`) stack together. Declare a schema domain that covers the stacked **total**.
 
-Segments are ordered by the mark's series field, so the same category sits at the same height in every band. The `series` channel sets which rows form a series; without it, the field on `fill` (then `stroke`) does. Span mode takes precedence over `stack`: give the value axis `x1`/`x2` or `y1`/`y2` and the bars draw as spans.
+The `stack` field names each segment, and must be categorical or ordinal. Segments follow the order of its schema domain, so the same category sits at the same height in every band. With no domain declared, they follow the order the values first appear in the data. Colour is separate: bind `fill` to the same field to colour each segment by its category.
+
+`stack` is the counterpart of `xOffset`: `xOffset` places the rows of a band side by side, and `stack` places them end to end. Without either, rows that share a band draw over each other. Elicit.js logs a warning, unless the bars are translucent (a constant `opacity` or `fillOpacity` below 1), which layers them on purpose. A span (`x1`/`x2` or `y1`/`y2`) places each bar itself, so `stack` has no effect on it.
 
 <Example
   code={aStackedBarChart}
   title="A stacked bar chart"
-  blurb={'stack: true with fill: { field: "asset" }. The pct domain covers the total, [0, 100].'}
+  blurb={'stack and fill both on { field: "asset" }. The pct domain covers the total, [0, 100].'}
 />
 
 </Section>
@@ -94,7 +96,7 @@ Sub-bands touch by default, and the gap between categories is the `x` band's pad
   try={<><b>Drag</b> any bar up or down.</>}
 />
 
-A bar draws only for a row that names both a category and a group. Combine `xOffset` with `stack: true` and each sub-band stacks on its own. `create()` and `toggle()` read the group from where you click, and `move({ channels: ["x", "xOffset"] })` drags a bar into another category and group.
+A bar draws only for a row that names both a category and a group. Combine `xOffset` with `stack` and each sub-band stacks on its own. `create()` and `toggle()` read the group from where you click, and `move({ channels: ["x", "xOffset"] })` drags a bar into another category and group.
 
 <Example
   code={fillInOneGroup}
@@ -115,7 +117,7 @@ A stacked bar divides one total among its rows. Three gestures reshape it, the s
 
 All three preserve the band's total. Cutting divides a magnitude, dragging moves value from one row to its neighbour, and merging adds two into one. Boundary handles appear once one of these edits is set, and take the shared `handles` / `handleSize` / `handleColor` options.
 
-A cut mints a row and takes its category from the schema's domain, so building a stack takes no typing. A **closed** domain (the default) hands out the values that band doesn't yet use, and refuses the cut once they run out. Each band draws from its own copy of the domain, so `bonds` in 2023 and `bonds` in 2024 are both available.
+A cut mints a row and writes its category into the `stack` field, taking a value from that field's schema domain, so building a stack takes no typing. The new segment takes a category that sorts next to the one you cut, so the other segments keep their places. A **closed** domain (the default) hands out the values that band doesn't yet use, and refuses the cut once they run out. Each band draws from its own copy of the domain, so `bonds` in 2023 and `bonds` in 2024 are both available.
 
 <Example
   code={cutAStackIntoParts}

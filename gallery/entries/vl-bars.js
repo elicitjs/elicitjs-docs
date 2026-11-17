@@ -546,8 +546,8 @@ mount(Elicit({
   legends: { fill: { title: "Weather type", labelWidth: 60 } },
   marks: [
     bar({
-      stack: true,
       channels: {
+        stack: { field: "weather" },
         x: { field: "month" },
         y: { field: "days" },
         fill: { field: "weather",
@@ -584,9 +584,9 @@ mount(Elicit({
   legends: { fill: { title: "Weather type", labelWidth: 60 } },
   marks: [
     bar({
-      stack: true,
       handleSize: 4,
       channels: {
+        stack: { field: "weather" },
         x: { field: "month" },
         y: { field: "days" },
         fill: { field: "weather",
@@ -630,10 +630,10 @@ mount(Elicit({
   legends: { fill: { labelWidth: 60 } },
   marks: [
     barY({
-      stack: true, rx: 3, strokeWidth: 0,              //! a stacked bar takes a corner radius
+      rx: 3, strokeWidth: 0,  //! a stacked bar takes a corner radius
       channels: {
         x: { field: "month" }, y: { field: "n" },
-        series: { field: "weather" }, fill: { field: "weather" },
+        stack: { field: "weather" }, fill: { field: "weather" },
       },
     }),
   ],
@@ -662,8 +662,7 @@ mount(Elicit({
   legends: true,
   marks: [
     bar({
-      stack: true,
-      channels: { x: { field: "month" }, y: { field: "days" }, fill: { field: "weather" } },
+      channels: { stack: { field: "weather" }, x: { field: "month" }, y: { field: "days" }, fill: { field: "weather" } },
       edits: [
         edit.stack.cut(), //! click: split a segment in two
         edit.stack.edge(), //! drag a seam
@@ -703,8 +702,7 @@ mount(Elicit({
   legends: { fill: { labelWidth: 100 } },
   marks: [
     barX({
-      stack: true,
-      channels: { y: { field: "variety" }, x: { field: "yld" }, fill: { field: "site" } },
+      channels: { stack: { field: "site" }, y: { field: "variety" }, x: { field: "yld" }, fill: { field: "site" } },
     }),
   ],
 }))` },
@@ -735,8 +733,7 @@ mount(Elicit({
   legends: true,
   marks: [
     barX({
-      stack: true,
-      channels: { y: { field: "variety" }, x: { field: "yld" }, fill: { field: "site" } },
+      channels: { stack: { field: "site" }, y: { field: "variety" }, x: { field: "yld" }, fill: { field: "site" } },
       edits: [ edit.stack.cut({ label: "Site" }), edit.stack.edge(), edit.stack.merge() ], //! cut / shift / merge
     }),
   ],
@@ -749,7 +746,7 @@ mount(Elicit({
 GALLERY.add({
   id: 'vl-stacked_bar_normalize',
   status: 'full',
-  verdict: 'Each age\'s female and male shares are normalized in JS and stacked with `bar({ stack: true })` on a 0–100% axis.',
+  verdict: 'Each age\'s female and male shares are normalized in JS and stacked with a `bar` `stack` channel on a 0–100% axis.',
   needs: [],
   prep: ['prep-calculate', 'prep-aggregate', 'prep-stack'],
   gaps: ['`stack: "normalize"` is a JS division by each age\'s total; the y axis is in percent rather than 0–1.'],
@@ -776,8 +773,8 @@ mount(Elicit({
   legends: true,
   marks: [
     bar({
-      stack: true,
       channels: {
+        stack: { field: "gender" },
         x: { field: "age" }, y: { field: "share" },
         fill: { field: "gender", scale: { range: ["#675193", "#ca8861"] } },
       },
@@ -851,8 +848,8 @@ mount(Elicit({
   legends: true,
   marks: [
     barX({
-      stack: true,
       channels: {
+        stack: { field: "gender" },
         y: { field: "age" }, x: { field: "share" },
         fill: { field: "gender", scale: { range: ["#675193", "#ca8861"] } },
       },

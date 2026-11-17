@@ -16,6 +16,7 @@ const chart = Elicit({
       outerRadius: 100,
       channels: {
         theta: { field: "share" },
+        stack: { field: "category" },
         fill: { field: "category" },
       },
       edits: [

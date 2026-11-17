@@ -87,7 +87,7 @@ runs as the body of an async function, so `await` works. In scope:
   scoped edits under `edit.*` (`edit.line.sweep()`, `edit.stack.cut()`, …);
 - `Elicit`, `edit`, `when`, `guides`, `widgets`, `elements`, `format`, `themes`,
   `authoring`, `d3`, and `topojson` (topojson-client: `topojson.feature(topo, topo.objects.states)` turns TopoJSON into GeoJSON);
-- `mount(el)` — call it with what `Elicit(...)` returns. Mount exactly one chart.
+- `mount(chart)` — call it with what `Elicit(...)` returns; it mounts `chart.dom()`. Mount exactly one chart. A plain DOM node (a control, a button) is appended as is.
 - data loaders (all cached, return fresh copies):
   - `await vegaData('cars.json')` — a Vega dataset, by the file name the spec uses.
   - `await plotData('penguins')` — an Observable sample dataset (`aapl`,

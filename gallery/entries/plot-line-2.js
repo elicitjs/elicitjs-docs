@@ -828,8 +828,9 @@ mount(Elicit({
   guides: [ ribbons ],                                             //! ribbons follow the live rows
   marks: [
     barY({
-      stack: true, stroke: "white",
+      stroke: "white",
       channels: {
+        stack: { field: "age" },
         x: { field: "type" }, y: { field: "value" },
         fill: { field: "age", legend: { anchor: "right", title: false }, scale: { range: colours } },
       },

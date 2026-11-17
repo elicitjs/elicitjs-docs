@@ -26,11 +26,11 @@ const split = ds.chart({
   elements: [legendColor({ anchor: "top" })],
   marks: [
     barX({
-      stack: true,
       channels: {
-        y:    { field: "cohort" },
-        x:    { field: "count" },
-        fill: { field: "outcome" },
+        y:     { field: "cohort" },
+        x:     { field: "count" },
+        stack: { field: "outcome" },
+        fill:  { field: "outcome" },
       },
       edits: [edit.stack.edge()],
     }),
