@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "point(options)",
+    json: ['plot.point'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. A circle or square per datum; every channel — positional or not — resolves through the global scales.

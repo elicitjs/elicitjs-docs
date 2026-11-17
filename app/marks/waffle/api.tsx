@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "waffle(options) · waffleY(options) · waffleX(options)",
+    json: ['plot.waffle', 'plot.waffleY', 'plot.waffleX'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. <code className="inline">waffleY</code> grows blocks upward (category on x), <code className="inline">waffleX</code> rightward (category on y). Bare <code className="inline">waffle</code> reads the direction from the channel map: the category's axis is the band, and <code className="inline">count</code> runs along the other one.

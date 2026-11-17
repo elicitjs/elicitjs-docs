@@ -1,0 +1,28 @@
+// Code a spec cannot hold is named in it, and supplied where it is compiled.
+const snapToTens = (ctx) => ({
+  ...ctx.datum,
+  y: Math.round(ctx.scales.y.invertValue(ctx.pointer.y) / 10) * 10,
+});
+
+const json = {
+  "width": 380, "height": 260,
+  "margins": { "top": 14, "right": 14, "bottom": 26, "left": 34 },
+  "data": [{ "x": 30, "y": 30 }, { "x": 70, "y": 70 }],
+  "schema": {
+    "x": { "type": "quantitative", "domain": [0, 100] },
+    "y": { "type": "quantitative", "domain": [0, 100] }
+  },
+  "marks": [
+    {
+      "type": "point",
+      "fill": "#50AEB7",
+      "size": 8,
+      "channels": { "x": { "field": "x" }, "y": { "field": "y" } },
+      // `edit.custom(fn)`: the function is the descriptor's "fn".
+      "edits": [{ "type": "custom", "fn": "snapToTens" }]
+    }
+  ]
+};
+
+const chart = Elicit(compile(json, { functions: { snapToTens } }));
+mount(chart.dom());

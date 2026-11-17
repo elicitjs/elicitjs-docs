@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "ellipse(options)",
+    json: ['plot.ellipse'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. A dot with <b>two independent radii</b>. <code className="inline">point</code> has one <code className="inline">size</code> channel because a circle has one radius; splitting it into <code className="inline">rx</code> and <code className="inline">ry</code> means each can carry its own field and its own edit — two elicited numbers in one shape.

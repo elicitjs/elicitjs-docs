@@ -1,0 +1,35 @@
+// Predicates, formats and the renderer are written by name.
+const json = {
+  "width": 440, "height": 260,
+  "margins": { "top": 16, "right": 16, "bottom": 34, "left": 44 },
+  "renderer": "canvas",
+  "data": [
+    { "month": "2024-01-01", "price": 420 },
+    { "month": "2024-04-01", "price": 465 },
+    { "month": "2024-07-01", "price": 450 },
+    { "month": "2024-10-01", "price": 510 }
+  ],
+  "schema": {
+    // A temporal column is written as ISO strings.
+    "month": { "type": "temporal", "domain": ["2024-01-01", "2024-10-01"] },
+    "price": { "type": "quantitative", "domain": [300, 600] }
+  },
+  "marks": [
+    {
+      "type": "lineY",
+      "channels": {
+        "x": { "field": "month" },
+        "y": { "field": "price", "edit": { "type": "move", "when": "noShift" } }
+      },
+      // Shift-click removes a point; a plain drag moves it.
+      "edits": [{ "type": "remove", "when": "shift" }]
+    }
+  ],
+  "axes": {
+    "x": { "tickFormat": { "type": "time", "specifier": "%b" } },
+    "y": { "tickFormat": { "type": "prefix", "prefix": "$", "inner": ",.0f" } }
+  }
+};
+
+const chart = Elicit(compile(json));
+mount(chart.dom());

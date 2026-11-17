@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "Mark SDK — elicit.plot",
+    json: false,
     summary: (
       <>
         Shared foundation every mark factory uses. Import as <code className="inline">authoring.encodeChannel</code> (or the bare name in these docs). A mark never owns <code className="inline">data</code> or a domain — <code className="inline">Elicit</code> owns both.
@@ -72,6 +73,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "Edit SDK — elicit.edit",
+    json: false,
     summary: (
       <>
         Build descriptors and reuse the same invert/pick helpers the stock edits use. Prefer the ladder: stock edit → <code className="inline">custom</code> → <code className="inline">makeEdit</code> → <code className="inline">registerDriver</code>.
@@ -179,6 +181,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "Drivers — authoring.registerDriver",
+    json: false,
     summary: (
       <>
         A driver owns a multi-event plane lifecycle (<code className="inline">hover</code> / <code className="inline">drag</code> / <code className="inline">click</code>, …). Built-ins cover <code className="inline">nearest</code>, <code className="inline">sweep</code>, <code className="inline">draw</code>, <code className="inline">brush</code>, <code className="inline">probe</code>, <code className="inline">plane</code>, …. Register a new one when stock <code className="inline">pick</code> values aren’t enough.

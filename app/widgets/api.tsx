@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "widgets.likert · multipleChoice · slider · matrix · lineCone · ranking · allocation · …",
+    json: ['widgets.allocation', 'widgets.histogram', 'widgets.interval', 'widgets.labeledValue', 'widgets.likert', 'widgets.lineCone', 'widgets.matrix', 'widgets.multipleChoice', 'widgets.probabilityTokens', 'widgets.ranking', 'widgets.region', 'widgets.slider', 'widgets.thermometer'],
     summary: (
       <>
         Import from <code className="inline">elicit.widgets</code>. Each returns an <code className="inline">ElicitSpec</code>; pass it straight to <code className="inline">Elicit</code>. The chart draws one dataset, so <code className="inline">getData()</code> reads the answer.

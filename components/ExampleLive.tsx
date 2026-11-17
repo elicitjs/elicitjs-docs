@@ -9,12 +9,18 @@ import {
   useState,
   type CSSProperties,
 } from 'react';
-import { Highlight, themes } from 'prism-react-renderer';
+import { themes } from 'prism-react-renderer';
 import { Editor } from 'react-live';
 import { Button } from '@/components/ui/button';
 import type { CodeMode, ExampleMeta, Prose } from '../lib/types';
+import * as elicit from '@elicit';
 import { createElicitScope } from '../lib/elicitScope';
 import { chartThemeFor, currentChartMode, useChartMode } from '../lib/chartTheme';
+import { useSpecMode } from '../lib/specMode';
+import { SpecTabs } from './SpecTabs';
+import { FoldedCode } from './FoldedCode';
+import { findFolds } from '../lib/folds';
+import { formatJson, functionsSource, type JsonBlock, type JsonView } from '../lib/jsonSpec';
 
 const EVAL_DEBOUNCE_MS = 280;
 
@@ -174,9 +180,34 @@ function normalizeExampleCode(code: unknown): string {
   return raw;
 }
 
+/** The editor's <pre>, as react-live draws it, so the folded view lines up with it. */
+const EDITOR_PRE_STYLE: CSSProperties = { margin: 0, outline: 'none', padding: 10, fontFamily: 'inherit' };
+
+/** Put the caret `offset` characters into an editable element. */
+function placeCaret(root: HTMLElement, offset: number) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let left = offset;
+  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+    const length = node.textContent?.length ?? 0;
+    if (left <= length) {
+      const range = document.createRange();
+      range.setStart(node, left);
+      range.collapse(true);
+      const selection = window.getSelection();
+      selection?.removeAllRanges();
+      selection?.addRange(range);
+      return;
+    }
+    left -= length;
+  }
+}
+
 /**
  * Isolated from chart/error state so parent re-renders (after debounce eval)
  * do not remount the editor and jump the caret.
+ *
+ * Code with `data` rows shows them folded until the reader clicks into it; the
+ * editor then opens at that spot, and folds again when it loses focus.
  */
 const CodePane = memo(function CodePane({
   source,
@@ -188,6 +219,10 @@ const CodePane = memo(function CodePane({
   onDraftChange: (value: string) => void;
 }) {
   const [value, setValue] = useState(source);
+  const [editing, setEditing] = useState(false);
+  const [open, setOpen] = useState<Set<number>>(() => new Set());
+  const caret = useRef(0);
+  const wrap = useRef<HTMLDivElement>(null);
   const style = useMemo(
     () => ({
       ...EDITOR_STYLE_BASE,
@@ -195,42 +230,93 @@ const CodePane = memo(function CodePane({
     }),
     [tall]
   );
+  const folds = useMemo(() => findFolds(value).length > 0, [value]);
 
   // Remount when `source` identity changes (Reset / new preset) via key on parent.
   useEffect(() => {
     setValue(source);
   }, [source]);
 
+  useEffect(() => {
+    const pre = editing ? wrap.current?.querySelector('pre') : null;
+    if (!pre) return;
+    // After the click that opened it has finished with the view it replaced.
+    const id = window.setTimeout(() => {
+      pre.focus();
+      placeCaret(pre, caret.current);
+    });
+    return () => window.clearTimeout(id);
+  }, [editing]);
+
+  if (folds && !editing) {
+    return (
+      <div className="live-editor" style={style}>
+        <FoldedCode
+          code={value}
+          language="jsx"
+          style={EDITOR_PRE_STYLE}
+          open={open}
+          onOpenChange={setOpen}
+          onPick={(offset) => {
+            caret.current = offset;
+            setEditing(true);
+          }}
+        />
+      </div>
+    );
+  }
   return (
-    <Editor
-      className="live-editor"
-      code={value}
-      language="jsx"
-      theme={themes.nightOwl}
-      onChange={(next) => {
-        setValue(next);
-        onDraftChange(next);
+    <div
+      ref={wrap}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setEditing(false);
       }}
-      style={style}
-    />
+    >
+      <Editor
+        className="live-editor"
+        code={value}
+        language="jsx"
+        theme={themes.nightOwl}
+        onChange={(next) => {
+          setValue(next);
+          onDraftChange(next);
+        }}
+        style={style}
+      />
+    </div>
   );
 });
 
-const ReadOnlyCode = memo(function ReadOnlyCode({ code }: { code: string }) {
+const ReadOnlyCode = memo(function ReadOnlyCode({
+  code,
+  language = 'jsx',
+}: {
+  code: string;
+  language?: 'jsx' | 'json';
+}) {
+  return <FoldedCode code={code.trimEnd()} language={language} className="readonly-code" />;
+});
+
+/** A spec that cannot be written as JSON, as the recorder reports it. */
+const NO_JSON_FORM = '[elicit] recorder: ';
+
+/** An example's JSON spec: each spec it passed to the library, then its functions. */
+const JsonPane = memo(function JsonPane({ view }: { view: JsonView }) {
   return (
-    <Highlight theme={themes.nightOwl} code={code.trimEnd()} language="jsx">
-      {({ className, style, tokens, getLineProps, getTokenProps }) => (
-        <pre className={`readonly-code ${className}`} style={style}>
-          {tokens.map((line, i) => (
-            <div key={i} {...getLineProps({ line })}>
-              {line.map((token, key) => (
-                <span key={key} {...getTokenProps({ token })} />
-              ))}
-            </div>
-          ))}
-        </pre>
-      )}
-    </Highlight>
+    <div className="json-pane">
+      {view.blocks.map((block, i) => (
+        <div key={i} className="json-block">
+          <div className="json-call">{block.call}</div>
+          <ReadOnlyCode code={block.text} language="json" />
+        </div>
+      ))}
+      {view.functions ? (
+        <div className="json-block">
+          <div className="json-call">The functions it names</div>
+          <ReadOnlyCode code={view.functions} />
+        </div>
+      ) : null}
+    </div>
   );
 });
 
@@ -270,6 +356,9 @@ export function ExampleLive({
   const scope = useMemo(() => createElicitScope(), []);
   // Charts follow the docs' light/dark mode: a mode switch re-runs the example.
   const chartMode = useChartMode();
+  // In JSON mode the chart is built from the example's JSON spec, not its JavaScript.
+  const specMode = useSpecMode();
+  const [jsonView, setJsonView] = useState<JsonView | null>(null);
 
   const isEditable = codeMode === 'editable';
   const isVisual = codeMode === 'collapsed' || codeMode === 'readonly';
@@ -325,58 +414,125 @@ export function ExampleLive({
     setFluid(false);
     setResultWidth(undefined);
 
-    // Every chart the example builds is recorded here, through `Elicit` and
-    // `ds.chart`, so a re-run destroys it. Its node carries it as `__chart`, so
-    // browser checks can reach the chart.
-    const created: ElicitChart[] = [];
-    const patched = new WeakSet<object>();
-    type Ds = { chart: (spec: unknown) => ElicitChart };
-    const track = (c: ElicitChart) => {
-      (c.dom() as HTMLElement & { __chart?: ElicitChart }).__chart = c;
-      created.push(c);
-      patch((c as unknown as { dataset?: Ds }).dataset);
-      return c;
-    };
-    const patch = (ds: Ds | undefined) => {
-      if (!ds || patched.has(ds)) return;
-      patched.add(ds);
-      const make = ds.chart;
-      ds.chart = (spec) => track(make(spec));
-    };
-    const RealElicit = scope.Elicit as unknown as ((spec: unknown) => ElicitChart) & {
-      dataset: (spec: unknown) => Ds;
-    };
-    const Elicit = Object.assign((spec: unknown) => track(RealElicit(spec)), RealElicit, {
-      dataset: (spec: unknown) => {
-        const ds = RealElicit.dataset(spec);
-        patch(ds);
-        return ds;
-      },
-    });
+    /**
+     * Run the example. With `asJson`, its namespaces record each factory call,
+     * and every spec it hands to the library is written as JSON and compiled
+     * back, so the chart on screen is the one the JSON describes.
+     */
+    const run = (asJson: boolean) => {
+      // Every chart the example builds is recorded here, through `Elicit` and
+      // `ds.chart`, so a re-run destroys it. Its node carries it as `__chart`, so
+      // browser checks can reach the chart.
+      const created: ElicitChart[] = [];
+      const mounted: ElicitChart[] = [];
+      const blocks: JsonBlock[] = [];
+      const functions: Record<string, Function> = {};
+      const rec = asJson ? elicit.recorder() : null;
+      const names = rec ? createElicitScope(rec) : scope;
 
-    // `mount` appends a node, like `parent.append`. A chart is mounted as
-    // `chart.dom()`; the first one mounted feeds the data panel.
-    const mounted: ElicitChart[] = [];
-    const mount = <T,>(node: T): T => {
-      if (isChart(node)) {
-        throw new Error('mount() takes a DOM node. Pass chart.dom().');
+      // An example may compile a JSON spec itself; that JSON is then the one shown.
+      const compiledHere = new WeakMap<object, { json: unknown; functions: Record<string, Function> }>();
+      const compile: typeof elicit.compile = (json, options) => {
+        const spec = elicit.compile(json, options);
+        compiledHere.set(spec, { json, functions: options?.functions ?? {} });
+        return spec;
+      };
+
+      /** The spec the library is given: as written, or compiled from its JSON. */
+      const specOf = (spec: unknown, call: string): unknown => {
+        if (!rec) return spec;
+        const own = compiledHere.get(spec as object);
+        if (own) {
+          blocks.push({ call, text: formatJson(own.json) });
+          Object.assign(functions, own.functions);
+          return spec;
+        }
+        const recorded = rec.toJSON(spec as object);
+        // Through text and back, so nothing but JSON reaches `compile`.
+        const json = JSON.parse(JSON.stringify(recorded.json));
+        blocks.push({ call, text: formatJson(json) });
+        Object.assign(functions, recorded.functions);
+        return elicit.compile(json, { functions: recorded.functions });
+      };
+      // A function the spec keeps may call a factory while the chart is built.
+      const building = <T,>(fn: () => T): T => (rec ? rec.live(fn) : fn());
+
+      const patched = new WeakSet<object>();
+      type Ds = { chart: (spec: unknown) => ElicitChart };
+      const track = (c: ElicitChart) => {
+        (c.dom() as HTMLElement & { __chart?: ElicitChart }).__chart = c;
+        created.push(c);
+        patch((c as unknown as { dataset?: Ds }).dataset);
+        return c;
+      };
+      const patch = (ds: Ds | undefined) => {
+        if (!ds || patched.has(ds)) return;
+        patched.add(ds);
+        const make = ds.chart;
+        ds.chart = (spec) => track(building(() => make(specOf(spec, 'dataset.chart(compile(json))'))));
+      };
+      const RealElicit = scope.Elicit as unknown as ((spec: unknown) => ElicitChart) & {
+        dataset: (spec: unknown) => Ds;
+      };
+      const Elicit = Object.assign(
+        (spec: unknown) => track(building(() => RealElicit(specOf(spec, 'Elicit(compile(json))')))),
+        RealElicit,
+        {
+          dataset: (spec: unknown) => {
+            const ds = building(() => RealElicit.dataset(specOf(spec, 'Elicit.dataset(compile(json))')));
+            patch(ds);
+            return ds;
+          },
+        },
+      );
+
+      // `mount` appends a node, like `parent.append`. A chart is mounted as
+      // `chart.dom()`; the first one mounted feeds the data panel.
+      const mount = <T,>(node: T): T => {
+        if (isChart(node)) {
+          throw new Error('mount() takes a DOM node. Pass chart.dom().');
+        }
+        chart.appendChild(node as unknown as Node);
+        const owner = created.find((c) => c.dom() === (node as unknown));
+        if (owner) mounted.push(owner);
+        return node;
+      };
+
+      try {
+        // The app-wide chart theme for the docs' current mode. Read from the DOM,
+        // not `chartMode`, so the first render after hydration is already right.
+        // Set on every eval, so an example that calls `setTheme()` never leaks.
+        scope.setTheme(chartThemeFor(currentChartMode()) as Parameters<typeof scope.setTheme>[0]);
+        const keys = Object.keys(names);
+        const vals = keys.map((n) =>
+          n === 'Elicit' ? Elicit : n === 'compile' ? compile : names[n as keyof typeof names],
+        );
+        // eslint-disable-next-line no-new-func
+        const body = new Function(...keys, 'mount', evalCode);
+        body(...vals, mount);
+      } catch (err) {
+        destroyAll(created);
+        chart.replaceChildren();
+        throw err;
       }
-      chart.appendChild(node as unknown as Node);
-      const owner = created.find((c) => c.dom() === (node as unknown));
-      if (owner) mounted.push(owner);
-      return node;
+      // What the example does from here on (a click handler, a timer) is not the spec.
+      if (rec) rec.stop();
+      return { created, mounted, blocks, functions };
     };
 
     try {
-      // The app-wide chart theme for the docs' current mode. Read from the DOM,
-      // not `chartMode`, so the first render after hydration is already right.
-      // Set on every eval, so an example that calls `setTheme()` never leaks.
-      scope.setTheme(chartThemeFor(currentChartMode()) as Parameters<typeof scope.setTheme>[0]);
-      const names = Object.keys(scope);
-      const vals = names.map((n) => (n === 'Elicit' ? Elicit : scope[n as keyof typeof scope]));
-      // eslint-disable-next-line no-new-func
-      const run = new Function(...names, 'mount', evalCode);
-      run(...vals, mount);
+      let ran;
+      let unavailable: string | null = null;
+      try {
+        ran = run(specMode === 'json');
+      } catch (err) {
+        const message = err instanceof Error ? err.message : '';
+        if (specMode !== 'json' || !message.startsWith(NO_JSON_FORM)) throw err;
+        // No JSON form: say why, and draw the example from its JavaScript.
+        unavailable = message.slice(NO_JSON_FORM.length);
+        ran = run(false);
+      }
+      const { created, mounted } = ran;
       if (cancelled) {
         destroyAll(created);
         chart.replaceChildren();
@@ -386,6 +542,11 @@ export function ExampleLive({
       const first = mounted[0] ?? null;
       setError(null);
       setElicited(first);
+      setJsonView(
+        specMode === 'json'
+          ? { blocks: ran.blocks, functions: functionsSource(ran.functions), unavailable }
+          : null,
+      );
       if (first) {
         const width = first.dom().style.width;
         if (width && width.endsWith('px')) {
@@ -396,10 +557,10 @@ export function ExampleLive({
       }
     } catch (err) {
       if (cancelled) return;
-      destroyAll(created);
       chart.replaceChildren();
       activeRef.current = [];
       setElicited(null);
+      setJsonView(null);
       setError(formatEvalError(err));
     }
 
@@ -408,7 +569,11 @@ export function ExampleLive({
       destroyAll(activeRef.current);
       activeRef.current = [];
     };
-  }, [evalCode, scope, chartMode]);
+  }, [evalCode, scope, chartMode, specMode]);
+
+  // The JSON for this example, when the site shows JSON and the example has one.
+  const json = specMode === 'json' && jsonView && !jsonView.unavailable && jsonView.blocks.length ? jsonView : null;
+  const noJson = specMode === 'json' && jsonView ? jsonView.unavailable : null;
 
   const cardClass = [
     'card',
@@ -419,7 +584,7 @@ export function ExampleLive({
     .join(' ');
 
   return (
-    <div className={cardClass}>
+    <div className={cardClass} data-spec={specMode} data-json={json ? 'compiled' : noJson ? 'none' : undefined}>
       {/* No icons in the card's buttons: the library's browser gate selects a
           section's FIRST <svg> (`#edit svg`), which must be the chart's. */}
       <div className="card-head">
@@ -428,6 +593,7 @@ export function ExampleLive({
           {meta.blurb ? <p>{meta.blurb}</p> : null}
         </div>
         <div className="card-actions">
+          {showCode ? <SpecTabs mode={specMode} /> : null}
           {codeMode === 'collapsed' ? (
             <Button
               type="button"
@@ -453,12 +619,17 @@ export function ExampleLive({
       <div className={`body${isVisual ? ' body-visual' : ''}`}>
         {showCode && isEditable ? (
           <div className={`code-wrap${tall ? ' tall' : ''}`}>
-            <CodePane
-              key={editorKey}
-              source={source}
-              tall={tall}
-              onDraftChange={onDraftChange}
-            />
+            {noJson ? <p className="json-note">No JSON form. {noJson}</p> : null}
+            {json ? (
+              <JsonPane view={json} />
+            ) : (
+              <CodePane
+                key={editorKey}
+                source={source}
+                tall={tall}
+                onDraftChange={onDraftChange}
+              />
+            )}
           </div>
         ) : null}
         {isVisual ? (
@@ -488,7 +659,8 @@ export function ExampleLive({
         )}
         {showCode && !isEditable ? (
           <div className={`code-wrap code-below${tall ? ' tall' : ''}`}>
-            <ReadOnlyCode code={source} />
+            {noJson ? <p className="json-note">No JSON form. {noJson}</p> : null}
+            {json ? <JsonPane view={json} /> : <ReadOnlyCode code={source} />}
           </div>
         ) : null}
       </div>

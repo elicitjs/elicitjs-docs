@@ -121,6 +121,10 @@ execFileSync("node", [path.join(docsRoot, "scripts/gen-api-index.mjs")], {
   cwd: docsRoot,
   stdio: "inherit",
 });
+execFileSync("node", [path.join(docsRoot, "scripts/gen-json-api.mjs")], {
+  cwd: docsRoot,
+  stdio: "inherit",
+});
 
 step("Building the static export (DOCS_EXPORT=1 next build)");
 fs.rmSync(outDir, { recursive: true, force: true });

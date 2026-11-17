@@ -6,32 +6,34 @@
  * The shape mirrors the library's own split. MARKS and ELEMENTS are spread bare,
  * because an example reads better as `barY({…})` than `plot.barY({…})`. Universal
  * EDITS are bare for the same reason (`move()`), while the scoped edit families
- * stay under `edit.*` — which is also how they are spelled in a spec, and how they
- * will be spelled in a JSON spec (`{ "type": "line.draw" }`).
+ * stay under `edit.*` — which is also how they are spelled in a spec, and in a
+ * JSON spec (`{ "type": "line.draw" }`).
  */
 import * as elicit from '@elicit';
 import * as d3 from 'd3';
 import vancouver from '../data/vancouver.js';
 
-// The scoped edit namespaces are held back rather than spread: several share a
-// name with a MARK (`line`, `trend`, `waffle`) or an ELEMENT (`axis`, `legend`),
-// and the drawing vocabulary should win the bare name. They stay reachable as
-// `edit.line.draw()`, `edit.legend.category()`, and so on.
-const {
-  line: _editLine,
-  axis: _editAxis,
-  legend: _editLegend,
-  stack: _editStack,
-  geo: _editGeo,
-  waffle: _editWaffle,
-  trend: _editTrend,
-  network: _editNetwork,
-  hierarchy: _editHierarchy,
-  when: _editWhen,
-  ...universalEdits
-} = elicit.edit;
+type EditMembers = typeof elicit.edit;
+/** The edits that are functions on `edit` itself, not a scoped family or `when`. */
+type UniversalEdit = { [K in keyof EditMembers]: EditMembers[K] extends (...args: never[]) => unknown ? K : never }[keyof EditMembers];
 
-export function createElicitScope() {
+/** The grammar namespaces an example names: the library's own, or a recorder's. */
+export type Grammar = Pick<typeof elicit, 'plot' | 'elements' | 'constraints' | 'edit' | 'guides' | 'widgets' | 'format'>;
+
+/**
+ * @param grammar the namespaces the scope spreads. A recorder's look like the
+ *   library's and return each call's JSON descriptor, which is how an example is
+ *   shown as a JSON spec (see ExampleLive).
+ */
+export function createElicitScope(grammar: Grammar = elicit) {
+  // The scoped edit namespaces are held back rather than spread: several share a
+  // name with a MARK (`line`, `trend`, `waffle`) or an ELEMENT (`axis`, `legend`),
+  // and the drawing vocabulary should win the bare name. They stay reachable as
+  // `edit.line.draw()`, `edit.legend.category()`, and so on.
+  const universalEdits = Object.fromEntries(
+    Object.entries(grammar.edit).filter(([, member]) => typeof member === 'function'),
+  ) as Pick<typeof elicit.edit, UniversalEdit>;
+
   // The docs site draws every chart in the Data & Dialogue Lab theme: `dd` in
   // light mode, its dark variant in dark mode (lib/chartTheme.ts). It is the
   // app-wide base, so an example's own `theme` still layers on top of it.
@@ -40,28 +42,32 @@ export function createElicitScope() {
   elicit.setTheme('dd');
   return {
     // Marks — view DATA.
-    ...elicit.plot,
+    ...grammar.plot,
     // Chart elements — view a SCALE. Spread bare so `axisX(…)` / `legendColor(…)`
     // read the same as a mark; `elements.axisX` also works and is the spelling to
     // prefer in a spec, since it says which of the three kinds it is.
-    ...elicit.elements,
+    ...grammar.elements,
     // Constraints — pure data invariants.
-    ...elicit.constraints,
+    ...grammar.constraints,
     // The namespace too: `custom` is both an edit and a constraint, and the bare
     // spread below takes the edit, so a custom constraint is `constraints.custom`.
-    constraints: elicit.constraints,
+    constraints: grammar.constraints,
     // Universal edits (the scoped families stay under `edit.*`).
     ...universalEdits,
     Elicit: elicit.Elicit,
+    // The JSON spec layer: `Elicit(compile(json))`, and the way back.
+    compile: elicit.compile,
+    registerFunction: elicit.registerFunction,
+    recorder: elicit.recorder,
     // Arbitration predicates. Part of the edit vocabulary — a `when` only ever
     // appears inside an edit's options.
-    when: elicit.edit.when,
-    edit: elicit.edit,
-    elements: elicit.elements,
+    when: grammar.edit.when,
+    edit: grammar.edit,
+    elements: grammar.elements,
     // Guides — view chart STATE, and write nothing.
-    guides: elicit.guides,
-    widgets: elicit.widgets,
-    format: elicit.format,
+    guides: grammar.guides,
+    widgets: grammar.widgets,
+    format: grammar.format,
     // The authoring kit, for the /authoring examples that write a custom mark.
     authoring: elicit.authoring,
     D3Renderer: elicit.D3Renderer,

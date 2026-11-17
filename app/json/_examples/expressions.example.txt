@@ -1,0 +1,35 @@
+// An "expr" is a function written as text. Its variables depend on the option.
+const json = {
+  "width": 420, "height": 260,
+  "margins": { "top": 16, "right": 16, "bottom": 32, "left": 48 },
+  "data": [
+    { "year": 2021, "rate": 3.4, "kind": "actual" },
+    { "year": 2022, "rate": 6.8, "kind": "actual" },
+    { "year": 2023, "rate": 3.9, "kind": "forecast" },
+    { "year": 2024, "rate": 2.6, "kind": "forecast" }
+  ],
+  "schema": {
+    "year": { "type": "ordinal" },
+    "rate": { "type": "quantitative", "domain": [0, 10] },
+    "kind": { "type": "categorical" }
+  },
+  // The rows that are given stay fixed.
+  "lock": { "expr": "datum.kind == 'actual'" },
+  "marks": [
+    {
+      "type": "barY",
+      "channels": {
+        "x": { "field": "year" },
+        "y": { "field": "rate", "edit": { "type": "move" } },
+        // A derived channel: recomputed from the row after every edit.
+        "fill": { "expr": "datum.kind == 'actual' ? '#94A5B3' : datum.rate > 5 ? '#EE7B5E' : '#50AEB7'" }
+      }
+    }
+  ],
+  // A guide option reads the chart: here, the mean of a column.
+  "guides": [{ "type": "rule", "y": { "expr": "mean(data, 'rate')" }, "label": "mean" }],
+  "axes": { "y": { "tickFormat": { "expr": "value + ' %'" } } }
+};
+
+const chart = Elicit(compile(json));
+mount(chart.dom());

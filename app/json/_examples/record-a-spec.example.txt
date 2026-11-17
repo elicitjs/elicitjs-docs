@@ -1,0 +1,33 @@
+// Build the spec from the recorder's namespaces, then ask for its JSON.
+const rec = recorder();
+
+const spec = {
+  width: 380, height: 220,
+  margins: { top: 14, right: 14, bottom: 30, left: 36 },
+  data: [{ option: "A", votes: 12 }, { option: "B", votes: 30 }],
+  schema: {
+    option: { type: "categorical" },
+    votes: { type: "quantitative", domain: [0, 50] },
+  },
+  constraints: [rec.constraints.clamp({ min: 0, max: 50 })],
+  marks: [
+    rec.plot.barY({
+      channels: {
+        x: { field: "option" },
+        y: { field: "votes", edit: rec.edit.move() },
+        // An arrow that is one expression is written as an "expr".
+        fill: { fn: (d) => d.votes > 25 ? "#EE7B5E" : "#50AEB7" },
+      },
+    }),
+  ],
+};
+
+const { json, functions } = rec.toJSON(spec);
+
+const chart = Elicit(compile(json, { functions }));
+mount(chart.dom());
+
+const shown = document.createElement("pre");
+shown.textContent = JSON.stringify(json.marks, null, 2);
+shown.style.cssText = "font-size: 11px; margin: 8px 0 0;";
+mount(shown);

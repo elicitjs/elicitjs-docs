@@ -36,6 +36,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: 'moveSpan(options)',
+    json: ['edit.moveSpan'],
     summary: 'Translate a two-endpoint span — both endpoints move together, so its width is preserved.',
     signature: 'moveSpan({ channels, when, stage }) → Edit',
     options: [
@@ -49,6 +50,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: 'brushSpan(options)',
+    json: ['edit.brushSpan'],
     summary: (
       <>
         The Gantt-bar interaction. Grabbing near one endpoint resizes that edge alone; grabbing the body translates both. The zone is resolved once, at the start of the drag.
@@ -83,6 +85,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: 'brushRect(options)',
+    json: ['edit.brushRect'],
     summary: "The 2-D counterpart: edges, corners and body of a rect, each live or not as you choose.",
     signature: 'brushRect({ resize, move, edgeInset, when }) → Edit',
     options: [
@@ -119,6 +122,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: 'edit.stack.edge(options)',
+    json: ['edit.stack.edge'],
     summary: 'Drag an interior boundary to move value between the two segments it separates. The group total is preserved by construction.',
     signature: 'edit.stack.edge(options?) → Edit',
     options: [

@@ -15,7 +15,7 @@ const chart = Elicit({
   // drag are different marks, but one rule gates both — which is exactly why a
   // constraint is declared here, on the spec, and not inside either mark.
   constraints: [
-    custom(({ active }) => active
+    constraints.custom(({ active }) => active
       ? { hi: Math.max(active.hi, active.mean), lo: Math.min(active.lo, active.mean) }
       : undefined),
   ],

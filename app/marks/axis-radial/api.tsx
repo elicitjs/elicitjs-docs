@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "axisRadial(options)",
+    json: ['elements.axisRadial'],
     summary: (
       <>
         Import from <code className="inline">elicit.elements</code>. A curved axis for a polar scale: an arc spine with ticks and labels, and optional coloured bands behind it.

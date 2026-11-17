@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "edit.select",
+    json: ['edit.select'],
     summary: (
       <>
         Makes a mark selectable. Selection is transient <b>pipeline state</b> — the chart remembers which rows are picked, and nothing is written to the data. That is the point: it replaces a <code className="inline">selected</code> column, so no <code className="inline">change</code> fires, nothing lands in undo, and the elicited dataset stays clean.
@@ -38,6 +39,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "Selection API",
+    json: false,
     summary: (
       <>
         Selection has its own small API beside <code className="inline">getData</code>/<code className="inline">setData</code>, and its own <code className="inline">select</code> event. Every route — a mark click, an external control, the keyboard — goes through the same commit, so the selection is always in one shape. Indices are rows of the primary table.

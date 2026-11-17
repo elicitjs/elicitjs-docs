@@ -1,0 +1,10 @@
+{
+  "/authoring": {
+    "A custom square mark": "a mark written with the authoring kit",
+    "makeEdit + invertChannel": "an edit built with authoring.makeEdit",
+    "clickNearest — hover, then click to bump": "an edit built with authoring.makeEdit and its own driver"
+  },
+  "/marks/needle": {
+    "Compress knob": "a mark written with the authoring kit"
+  }
+}

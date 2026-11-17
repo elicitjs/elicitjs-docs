@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "face(options)",
+    json: ['plot.face'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. A <b>preset, not a mark</b>: it returns a <a href="/marks/composite#box">composite in box mode</a> — a head <code className="inline">point</code>, two <code className="inline">ellipse</code> eyes, two <code className="inline">tickY</code> brows and a <code className="inline">curveY</code> mouth — each placed in the glyph&rsquo;s own local units. So every feature is its own drag target, and every parameter takes the universal edits. Its centre is placed by the x/y channels when present, else parked at the plot centre.

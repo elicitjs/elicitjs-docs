@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "link(options)",
+    json: ['plot.link'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. One line per row of the
@@ -254,6 +255,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "node(options)",
+    json: ['plot.node'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. A dot with a label, as one
@@ -371,6 +373,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.network.connect(options)",
+    json: ['edit.network.connect'],
     summary: (
       <>
         Drag from a dot to another node to create a link. Put it on the node mark&rsquo;s{" "}
@@ -421,6 +424,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.network.rewire(options)",
+    json: ['edit.network.rewire'],
     summary: (
       <>
         Drag a link&rsquo;s end to reconnect it. Put it in a{" "}
@@ -450,6 +454,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.network.reverse(options)",
+    json: ['edit.network.reverse'],
     summary: (
       <>
         Swap a link’s two ends. Put it on the <code className="inline">link</code> mark;

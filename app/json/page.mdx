@@ -1,0 +1,215 @@
+import { DocShell } from '../../components/DocShell';
+import { ApiReference } from '../../components/ApiReference';
+import { Section } from '../../components/Section';
+import { Example } from '../../components/Example';
+import { Lead } from '../../components/Lead';
+import { api } from './api';
+
+import aChartFromJson from './_examples/a-chart-from-json.example.txt';
+import expressions from './_examples/expressions.example.txt';
+import aNamedFunction from './_examples/a-named-function.example.txt';
+import namesForBuiltIns from './_examples/names-for-built-ins.example.txt';
+import aWidget from './_examples/a-widget.example.txt';
+import recordASpec from './_examples/record-a-spec.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# JSON specs
+
+<Lead>A JSON spec describes a chart as data, with the same keywords and options as the JavaScript API. `compile(json)` returns the spec `Elicit()` takes, so a chart can be stored, sent or generated. The examples on this site show both forms: switch between **JavaScript** and **JSON** above the code.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="form" title="A factory call is an object with a type">
+
+Write each factory call as an object whose `type` is the factory's name. `barY({ fill: "teal" })` becomes `{ "type": "barY", "fill": "teal" }`. Options keep their names. A scoped edit takes its dotted path: `edit.line.draw()` is `{ "type": "line.draw" }`.
+
+Where a descriptor sits decides how its `type` is read:
+
+<div className="api-table-wrap">
+  <table className="api-table">
+    <thead>
+      <tr><th>Key</th><th>Holds</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>marks</code>, and a composite's <code>parts</code></td><td>marks and chart elements</td></tr>
+      <tr><td><code>elements</code></td><td>chart elements</td></tr>
+      <tr><td><code>guides</code></td><td>guides</td></tr>
+      <tr><td><code>constraints</code>, and an edit's <code>constrain</code></td><td>constraints</td></tr>
+      <tr><td>a mark's <code>edits</code>, and <code>edit</code> on a channel, an axis or a legend</td><td>edits</td></tr>
+    </tbody>
+  </table>
+</div>
+
+`compile` works on all three spec shapes:
+
+```js
+Elicit(compile(json));
+
+const ds = Elicit.dataset(compile(datasetJson));
+ds.chart(compile(chartJson));
+```
+
+<Example
+  code={aChartFromJson}
+  title="A chart from JSON"
+  blurb="One mark, one edit and one constraint. Each is an object with a type."
+  try={(
+    <>
+      <b>Drag</b> a bar. The clamp stops it at 60.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="expr" title="Expressions">
+
+An option that takes a function in JavaScript takes `{ "expr": "…" }` in JSON. An expression is one JavaScript expression over the option's variables:
+
+<div className="api-table-wrap">
+  <table className="api-table">
+    <thead>
+      <tr><th>Option</th><th>Variables</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>a channel's <code>expr</code>, a mark's style options (<code>fill</code>, <code>opacity</code>, <code>dy</code>, …), <code>width</code>, <code>height</code>, <code>path</code>, <code>wrap</code></td><td><code>datum</code>, <code>index</code>, <code>data</code></td></tr>
+      <tr><td><code>lock</code>, <code>context</code></td><td><code>datum</code>, <code>index</code>, <code>table</code></td></tr>
+      <tr><td><code>format</code>, <code>tickFormat</code></td><td><code>value</code></td></tr>
+      <tr><td>an axis's <code>tickSize</code>, <code>stroke</code>, <code>fill</code>, <code>fontWeight</code>; a grid's <code>stroke</code>, <code>strokeWidth</code>, <code>strokeDash</code></td><td><code>value</code>, <code>index</code></td></tr>
+      <tr><td>a guide's options, an axis's <code>transform</code>, an edit's <code>when</code></td><td>the keys of the context: <code>data</code>, <code>scales</code>, <code>width</code>, <code>height</code>, …</td></tr>
+      <tr><td><code>tip</code>, and a tip's <code>text</code></td><td><code>datum</code>, <code>ctx</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+A channel carries its expression directly: `"fill": { "expr": "…" }` is the JSON form of `fill: { fn: (d) => … }`, and it is read-only in the same way.
+
+An expression reads properties with `.` and `[]`, and takes numbers, strings, `true`, `false`, `null`, arrays and objects. Its operators are `+ - * / %`, `< <= > >=`, `== !=`, `&& || ??`, `!` and `? :`. `==` compares without converting, as `===` does in JavaScript. It calls these functions and no others:
+
+<div className="api-table-wrap">
+  <table className="api-table">
+    <thead>
+      <tr><th>Functions</th><th>Result</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>abs</code>, <code>min</code>, <code>max</code>, <code>round</code>, <code>floor</code>, <code>ceil</code>, <code>sqrt</code>, <code>pow</code>, <code>clamp(v, lo, hi)</code></td><td>a number</td></tr>
+      <tr><td><code>format(v, specifier)</code>, <code>timeFormat(date, specifier)</code></td><td>text, through a d3 specifier</td></tr>
+      <tr><td><code>year(date)</code>, <code>month(date)</code>, <code>day(date)</code></td><td>part of a date; January is month <code>0</code></td></tr>
+      <tr><td><code>length(v)</code>, <code>slice(v, start, end)</code>, <code>includes(v, item)</code>, <code>lower(v)</code>, <code>upper(v)</code>, <code>string(v)</code>, <code>number(v)</code></td><td>text and list helpers</td></tr>
+      <tr><td><code>sum</code>, <code>mean</code>, <code>median</code>, <code>minOf</code>, <code>maxOf</code>, <code>extent</code> — each <code>(rows, field)</code></td><td>a column's summary</td></tr>
+      <tr><td><code>count(rows)</code>, <code>distinct(rows, field)</code></td><td>the number of rows; a column's distinct values</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<Example
+  code={expressions}
+  title="Expressions for a fill, a lock, a guide and a tick label"
+  blurb="The fill re-derives from each row. The lock fixes the rows whose kind is actual."
+  try={(
+    <>
+      <b>Drag</b> a forecast bar above 5. Its fill changes and the mean line follows.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="functions" title="Named functions">
+
+Code that is more than one expression stays in JavaScript. Name it in the spec with `{ "fn": "<name>" }`, and supply it in one of two places:
+
+- `compile(json, { functions: { name: fn } })` supplies it for that spec.
+- `registerFunction(name, fn)` supplies it for every later `compile()`.
+
+A name in `functions` wins over a registered one. The function receives the same arguments as in the JavaScript API.
+
+`custom` takes its function as the descriptor's `fn`: `edit.custom(fn, { gesture: "click" })` is `{ "type": "custom", "fn": "<name>", "gesture": "click" }`. The same holds for `constraints.custom` and `guides.custom`. A channel takes it the same way: `"fill": { "fn": "<name>" }`.
+
+`onChange` takes a named function, and so does a d3 scale passed as a channel's `scale`.
+
+<Example
+  code={aNamedFunction}
+  title="A custom edit by name"
+  blurb="The spec names snapToTens. compile() receives it in functions."
+  try={(
+    <>
+      <b>Drag</b> a point. Its y lands on a multiple of 10.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="names" title="Predicates, formats, renderers and dates">
+
+The values the library provides are written by name:
+
+- **`when`** takes a predicate's name: `"when": "shift"`. The predicates are `shift`, `noShift`, `alt`, `noAlt`, `near` and `far`. Those with an argument are descriptors: `{ "type": "modifier", "key": "metaKey" }`, `{ "type": "noModifier", "key": "metaKey" }` and `{ "type": "nearWithin", "threshold": 12 }`.
+- **`format`** and **`tickFormat`** take a d3-format string, as in JavaScript. A `format.*` helper is a descriptor: `{ "type": "time", "specifier": "%b %Y" }`, `{ "type": "percent", "specifier": ".0%" }`, `{ "type": "prefix", "prefix": "$", "inner": ",.0f" }`.
+- **`renderer`** takes `"svg"` or `"canvas"`.
+- **`theme`**, `projection`, `curve` and a scale's `scheme` take the names they take in JavaScript.
+
+Write a date as an ISO string. `compile` turns the strings in a `temporal` field's rows into dates.
+
+<Example
+  code={namesForBuiltIns}
+  title="Names for predicates, formats and the renderer"
+  blurb="A canvas chart over a temporal column, with a time format and a currency prefix."
+  try={(
+    <>
+      <b>Drag</b> a point to move it. <b>Shift-click</b> one to remove it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="widgets" title="Widgets">
+
+A widget returns a whole spec, so it sits under `widget`. Chart keys beside it override the widget's own: `{ ...widgets.slider(options), caption }` is `{ "widget": { "type": "slider", … }, "caption": … }`.
+
+<Example
+  code={aWidget}
+  title="A slider widget"
+  blurb="The widget's options sit in its descriptor. The caption is a chart key."
+  try={(
+    <>
+      <b>Drag</b> the handle.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="recorder" title="From JavaScript to JSON">
+
+`recorder()` returns the library's namespaces in recording form: each factory returns its descriptor. Build a spec from them and call `toJSON(spec)` for the JSON and the functions it names. An arrow function that is a single expression over its own parameters is written as an `expr`. Any other function is named, after its option or from `recorder({ functions })`.
+
+<Example
+  code={recordASpec}
+  title="Record a spec"
+  blurb="The spec is written with factories. The chart is drawn from the JSON the recorder returns."
+  try={(
+    <>
+      <b>Drag</b> a bar past 25. The fill is the expression the arrow became.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="limits" title="What stays in JavaScript">
+
+- **The authoring kit.** A mark or edit written with `authoring.*` is code, so a spec that uses one is written in JavaScript.
+- **Live objects.** A d3 scale or projection instance is registered and named with `{ "fn": "<name>" }`. A `ScaleSpec` or a projection name is plain JSON.
+- **Callbacks after the chart exists.** `chart.on(…)`, `chart.control(…)` and `ds.set(…)` are calls on the chart.
+
+`compile` takes these keys as written and reads nothing inside them: `data`, `schema`, `theme`, `defaults`, `geojson`, a projection's `domain`, and a channel's `value` and `datum`. A row may hold a column called `type` or `fn`.
+
+A function reference in an option that takes no function is an error, as is an unknown `type`. The message gives the path, such as `marks[0].channels.fill.expr`.
+
+</Section>

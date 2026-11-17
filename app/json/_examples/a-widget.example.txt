@@ -1,0 +1,14 @@
+// A widget is a whole spec, so it sits under "widget". Chart keys go beside it.
+const json = {
+  "widget": {
+    "type": "slider",
+    "question": "How likely is rain tomorrow?",
+    "domain": [0, 100],
+    "value": 40,
+    "width": 420
+  },
+  "caption": "0 means it will stay dry. 100 means it will rain."
+};
+
+const chart = Elicit(compile(json));
+mount(chart.dom());

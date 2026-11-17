@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "edit.line.sweep(options)",
+    json: ['edit.line.sweep'],
     summary: (
       <>
         You-draw-it painting: a drag repaints the value of every point the pointer crosses. A <code className="inline">move</code> under the sweep driver, so it inverts the pointer through the same scale.
@@ -31,6 +32,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.line.draw(options)",
+    json: ['edit.line.draw'],
     summary: "Freehand path sampling, or a you-draw-it upsert on a line mark.",
     signature: "edit.line.draw({ along, value, samples, minDist, series, threshold, into }) → Edit",
     options: [
@@ -68,6 +70,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.line.anchor(options)",
+    json: ['edit.line.anchor'],
     summary: "Click to add anchor points to a line, one at a time.",
     signature: "edit.line.anchor({ into, series, gesture, when }) → Edit",
     options: [
@@ -87,6 +90,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.line.newSeries(options)",
+    json: ['edit.line.newSeries'],
     summary: (
       <>
         Seed a whole line at once — one anchor per sampled domain position, all at the pointer&rsquo;s value. The draw-from-scratch primitive; pair it with <code className="inline">sweep</code> to shape the flat line it leaves.
@@ -116,6 +120,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.line.removeSeries(options)",
+    json: ['edit.line.removeSeries'],
     summary: (
       <>
         Delete a whole line. Clicking any point on it reads that point&rsquo;s series key and drops every row sharing it — the counterpart to <code className="inline">remove</code>, which drops one anchor.
@@ -143,6 +148,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.stack.cut(options)",
+    json: ['edit.stack.cut'],
     summary: "Click inside a stacked segment to divide it into two. The new segment's category goes in the mark's `stack` field, taken from its schema domain; a mark with no `stack` channel refuses the cut and logs a warning.",
     signature: "edit.stack.cut({ label, defaults, when }) → Edit",
     options: [
@@ -166,6 +172,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.stack.edge(options)",
+    json: ['edit.stack.edge'],
     summary: (
       <>
         Drag a boundary to move value between the two segments it separates. Only those two change — one grows by exactly what the other loses — so the group&rsquo;s total is preserved by construction.
@@ -183,6 +190,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.stack.merge(options)",
+    json: ['edit.stack.merge'],
     summary: (
       <>
         Double-click a boundary to fuse the two segments it separates back into one. The inverse of <code className="inline">cut</code>, preserving the same total: the lower row survives and takes the pair&rsquo;s whole magnitude.

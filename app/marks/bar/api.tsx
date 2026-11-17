@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: 'bar(options) · barY(options) · barX(options)',
+    json: ['plot.bar', 'plot.barY', 'plot.barX'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>.{' '}

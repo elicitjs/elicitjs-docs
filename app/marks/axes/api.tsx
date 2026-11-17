@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "axes (on Elicit)",
+    json: ['axis'],
     summary: (
       <>
         The implicit layer. Every key desugars into the <code className="inline">axis</code> and <code className="inline">grid</code> marks below, and an explicit one you compose yourself always wins over the injected one.
@@ -53,6 +54,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "axis · axisX · axisY",
+    json: ['elements.axis', 'elements.axisX', 'elements.axisY'],
     summary: (
       <>
         A spine, ticks, labels and an optional title for one channel’s scale. Import from <code className="inline">elicit.elements</code>, or reach it through the <code className="inline">axes</code> option above.
@@ -225,6 +227,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "grid · gridX · gridY",
+    json: ['elements.grid', 'elements.gridX', 'elements.gridY'],
     summary: "Full-span gridlines across the plot, one per tick.",
     signatures: [
       "gridY({ ticks, tickValues, stroke, strokeWidth }) → Feature",
@@ -285,6 +288,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "rule · ruleX · ruleY",
+    json: ['plot.rule', 'plot.ruleX', 'plot.ruleY'],
     summary: (
       <>
         A straight reference line at a value on one axis — or, with a pair of endpoint channels, a <b>span</b> segment (a lollipop stem / error-bar whisker) at a category. An ordinary editable mark: put an <code className="inline">edit</code> on an endpoint channel and its cap becomes a handle. A rule with no edit is left <code className="inline">pointerEvents:"none"</code> by the engine, so an inert whisker never swallows a sibling handle’s drag.

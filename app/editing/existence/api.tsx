@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "create(options)",
+    json: ['edit.create'],
     summary: "A plane gesture that mints a datum — inverts pointer pixels through positional channels, populating defaults for the rest.",
     signatures: [
       "create({ channels, defaults, gesture }) → Edit",
@@ -30,6 +31,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "remove(options)",
+    json: ['edit.remove'],
     summary: "Deletes the targeted datum from the dataset.",
     signatures: [
       "remove({ pick, threshold, when, gesture }) → Edit",
@@ -51,6 +53,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "lock",
+    json: ['spec'],
     summary: "Marks seed rows or matching rows as read-only, preventing edits and deletion.",
     signatures: [
       "lock: 'seed' | ((datum) => boolean)",
@@ -70,6 +73,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "context",
+    json: ['spec'],
     summary: "Marks seeded rows as reference: drawn and read-only, and left out of getData(), onChange, and the selection and control indices.",
     signatures: [
       "context: true | ((datum, index, table) => boolean)",

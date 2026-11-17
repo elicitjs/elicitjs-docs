@@ -146,6 +146,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "setTheme(partial)",
+    json: false,
     summary: (
       <>
         Set the application-wide default theme. Every chart created afterwards inherits it unless it passes its own <code className="inline">theme</code>, which layers on top. Pass <code className="inline">null</code> to reset.

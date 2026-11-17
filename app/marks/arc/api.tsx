@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "arc(options) · donut(options)",
+    json: ['plot.arc', 'plot.donut'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. <code className="inline">donut</code> is <code className="inline">arc</code> with a default inner radius. A full pie is just <code className="inline">arc()</code>.

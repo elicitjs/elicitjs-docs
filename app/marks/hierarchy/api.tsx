@@ -147,6 +147,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.hierarchy.nest(options)",
+    json: ['edit.hierarchy.nest'],
     summary: (
       <>
         Drop a node into the container under the pointer, or out of one. Put it on the

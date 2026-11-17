@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "guides.rule · guides.region · guides.remaining · guides.proximity",
+    json: ['guides.rule', 'guides.region', 'guides.remaining', 'guides.proximity'],
     summary: (
       <>
         Import from <code className="inline">elicit.guides</code> and pass in the chart’s <code className="inline">guides: [...]</code>. All position in <b>data space</b> through the same <code className="inline">scale.encode()</code> a mark uses, so they compose across scale types. Non-interactive.
@@ -100,6 +101,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "guides.custom(build)",
+    json: ['guides.custom'],
     summary: (
       <>
         Draw your own non-interactive nodes from the live render context. One word for &ldquo;author your own&rdquo; in every namespace — cf. <code className="inline">edit.custom</code> and <code className="inline">constraints.custom</code>.
@@ -131,6 +133,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "guides.tip(options) · tip (on a mark)",
+    json: ['guides.tip'],
     summary: (
       <>
         A tooltip of the row under the pointer. It reads state and writes nothing, so it never blocks a gesture, and it shows on read-only rows too. Every mark takes <code className="inline">tip</code> as a shorthand for a tip bound to that mark.
@@ -189,6 +192,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "guides.crosshair(options)",
+    json: ['guides.crosshair'],
     summary: (
       <>
         Rules through the pointer across the plot, each labelled with the value under the pointer on its axis. Hidden while the pointer is outside the plot.
@@ -230,6 +234,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "Instrument affordances",
+    json: ['guides.prompt', 'guides.optionRings', 'guides.cellGrid', 'guides.sliderTrack', 'guides.quadrants'],
     summary: (
       <>
         The chrome a survey instrument draws itself with. Guides like any other — pass them in <code className="inline">guides: [...]</code>. The built-in <a href="/widgets">widgets</a> are assembled from these, so a hand-built instrument gets the same look.

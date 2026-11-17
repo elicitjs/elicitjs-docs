@@ -9,6 +9,7 @@ export const SITE: NavGroup[] = [
       { href: "/overview", title: "Overview" },
       { href: "/concepts", title: "Core concepts" },
       { href: "/concepts/contracts", title: "Mark & element contracts" },
+      { href: "/json", title: "JSON specs" },
       { href: "/sizing", title: "Responsive sizing" },
       { href: "/renderers", title: "Renderers (SVG · Canvas)" },
       { href: "/authoring", title: "Authoring SDK" },

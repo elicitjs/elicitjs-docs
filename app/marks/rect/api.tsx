@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "rect(options) · rectX(options) · rectY(options)",
+    json: ['plot.rect', 'plot.rectX', 'plot.rectY'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. <code className="inline">rect</code> spans both axes; <code className="inline">rectX</code> forces value on x (y a span/band), <code className="inline">rectY</code> forces value on y. All three share these options.

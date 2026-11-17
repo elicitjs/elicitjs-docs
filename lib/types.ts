@@ -21,6 +21,13 @@ export type ApiEntry = {
   options?: ApiOption[];
   channels?: ApiOption[];
   returns?: Prose;
+  /**
+   * What the entry documents, for the JSON switch: keywords (`'plot.bar'`) and
+   * owners (`'mark'`, `'spec'`, `'channel'`) from lib/json-api.generated.ts.
+   * `false`: no JSON form (a call on the chart or dataset). Left out: the same
+   * in both forms.
+   */
+  json?: string[] | false;
 };
 
 export type ExampleMeta = {

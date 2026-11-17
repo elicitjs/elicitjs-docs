@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "Built-in constraints",
+    json: ['constraints.clamp', 'constraints.maintainSum', 'constraints.count', 'constraints.unique', 'constraints.snap', 'constraints.ordering', 'constraints.monotonic', 'constraints.spacing', 'constraints.follow', 'constraints.symmetric'],
     summary: (
       <>
         Import from <code className="inline">elicit.constraints</code> and pass on the <code className="inline">Elicit</code> spec’s <code className="inline">constraints: [...]</code>. That is the only place they go: a constraint gates every edit from every mark, so writing one inside a mark would say something the engine does not mean. All are pure data invariants — they run on every commit and never see pixels.
@@ -176,6 +177,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "constraints.custom(apply, meta?)",
+    json: ['constraints.custom'],
     summary: (
       <>
         Author your own. One word for “author your own X” in every grammar namespace — cf. <code className="inline">edit.custom</code> and <code className="inline">guides.custom</code>. (<code className="inline">authoring.defineConstraint</code> is the same function, under the name a mark author reaches for.) Every constraint is a descriptor — <code className="inline">{'{ type, field?, options, apply }'}</code> — and <code className="inline">field</code> left out means the column the dispatching edit writes, so a one-column instrument names nothing twice. The rule gets a pure-data context and returns the shape that’s natural.

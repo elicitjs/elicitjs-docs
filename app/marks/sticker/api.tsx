@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "sticker(options)",
+    json: ['plot.sticker'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. A rounded box with text
@@ -124,6 +125,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "editText(options)",
+    json: ['edit.editText'],
     summary: (
       <>
         Write a typed string back into the <code className="inline">text</code> channel’s

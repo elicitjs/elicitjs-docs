@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "composite(options)",
+    json: ['plot.composite'],
     summary: (
       <>
         A glyph: a group of marks over the shared dataset. Import from <code className="inline">elicit.plot</code>. Returns an <b>array of features</b>, which <code className="inline">Elicit</code> flattens into its <code className="inline">marks</code> list. In <b>box mode</b> — switched on by a part stating a <code className="inline">frame:</code> channel — the composite&rsquo;s own <code className="inline">x</code> / <code className="inline">y</code> / <code className="inline">size</code> place and size a per-row box, and the parts are placed inside it.

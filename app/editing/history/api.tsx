@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "chart.undo() · chart.redo()",
+    json: false,
     summary: (
       <>
         On the dataset, and on every chart through it. Snapshots, not inverse operations: an edit’s <code className="inline">apply()</code> is already a pure data → data function, so the state <i>before</i> it is the undo, and no edit ever has to describe how to reverse itself.
@@ -82,6 +83,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "Keyboard editing",
+    json: false,
     summary: (
       <>
         Keyboard nudge is always on — there is no option to disable it. Any node carrying a direct edit is focusable (<code className="inline">tabindex=0</code>, <code className="inline">role="button"</code>), and an arrow key on it dispatches a <b>nudge</b> that goes through the edit’s own <code className="inline">apply()</code> — so the keyboard cannot drift from the pointer, because it isn’t a second path. The only chrome option is the browser focus ring below.

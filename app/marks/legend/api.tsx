@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "ChannelSpec.legend · legendColor · legendSize · legendSymbol",
+    json: ['elements.legendColor', 'elements.legendSize', 'elements.legendSymbol', 'legend'],
     summary: (
       <>
         A key for one <b>encoding</b> — a (channel, field) pair. Ask for it on the channel (<code className="inline">fill: {'{'} field, legend: true {'}'}</code>), chart-wide with <code className="inline">legends: true</code>, or by composing an element. The shape follows the channel: swatches, a colour ramp, graduated circles for <code className="inline">size</code>, a fan for <code className="inline">angle</code>, a weight stack for <code className="inline">strokeWidth</code>. It <b>reserves space</b> on its side, shrinking the plot so it never overlaps the marks. Elements import from <code className="inline">elicit.elements</code>.
@@ -102,6 +103,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.legend.category · edit.legend.value",
+    json: ['edit.legend.category', 'edit.legend.value'],
     summary: (
       <>
         The legend pickers, written back through the normal edit pipeline. <code className="inline">edit.legend.category()</code> is a category picker (a direct-pick click on a swatch, whose value it sets). <code className="inline">edit.legend.value()</code> is a continuous value picker (a direct-pick drag on the ramp handle). Pass one to a legend’s <code className="inline">edit</code> option — the legend injects its channel.

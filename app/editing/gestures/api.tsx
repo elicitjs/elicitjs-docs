@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "move(options)",
+    json: ['edit.move'],
     summary: "Position edit — inverts the pointer on each positional channel. On x+y a 2D move; on y alone a bar drag.",
     signatures: [
       "move({ channel, channels, mode, pick, threshold, when, guide, constrain }) → Edit",
@@ -69,6 +70,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "resize(options)",
+    json: ['edit.resize'],
     summary: "Magnitude edit — the gesture radius from the mark centre inverts back to the channel value.",
     signatures: [
       "resize({ channel }) → Edit",
@@ -93,6 +95,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "slide(options)",
+    json: ['edit.slide'],
     summary: "Magnitude edit — a linear drag along one axis maps onto the channel's domain. The linear alternative to resize (radial).",
     signatures: [
       "slide({ axis, increase, extent, mode, channel }) → Edit",
@@ -135,6 +138,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "rotate(options)",
+    json: ['edit.rotate'],
     summary: "Angle edit — the pointer's angle about a pivot inverts back to the channel value (the scale's range is in degrees).",
     signatures: [
       "rotate({ pivot, fold, pick, relativeTo, channel }) → Edit",
@@ -181,6 +185,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "cycle(options)",
+    json: ['edit.cycle'],
     summary: "Discrete edit — a click advances the channel to the next value in its domain. Needs a stable ordinal domain.",
     signatures: [
       "cycle({ channel }) → Edit",
@@ -205,6 +210,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "toggle(options)",
+    json: ['edit.toggle'],
     summary: (
       <>
         Slot edit — <code className="inline">create</code> and <code className="inline">remove</code> folded into the one gesture a checkbox has. Click an empty slot to mint a datum there; click an occupied one to take it back.
@@ -243,6 +249,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "set(options)",
+    json: ['edit.set'],
     summary: (
       <>
         Value edit — write a value straight into the channel&rsquo;s field, whatever its type. Its input is the value itself, not a pixel, so it is the edit an <a href="/editing/external-controls">external control</a> drives.
@@ -277,6 +284,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "rank(options)",
+    json: ['edit.rank'],
     summary: (
       <>
         Reorder by dragging along a rank axis. The pointer inverts to a rank slot, and the datum <b>swaps</b> with whoever holds it, so ranks stay unique.
@@ -305,6 +313,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "custom(fn, options)",
+    json: ['edit.custom'],
     summary: (
       <>
         An arbitrary edit. <code className="inline">fn</code> becomes the edit&rsquo;s <code className="inline">apply</code>; the descriptor still declares which gesture fires it.

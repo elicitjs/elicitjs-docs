@@ -212,6 +212,64 @@
     flex: none;
   }
 
+  /* JavaScript / JSON switch on an example. A segmented control, text only. */
+  .spec-tabs {
+    display: inline-flex;
+    gap: 0.15rem;
+    padding: 0.15rem;
+    border-radius: var(--radius);
+    background: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .spec-tab {
+    font-size: 0.76rem;
+    font-weight: 500;
+    line-height: 1.2;
+    padding: 0.22rem 0.6rem;
+    border-radius: calc(var(--radius) * 0.75);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--muted-foreground);
+    cursor: pointer;
+    transition: color 0.15s, background-color 0.15s;
+  }
+  .spec-tab:hover {
+    color: var(--foreground);
+  }
+  .spec-tab.active {
+    color: var(--foreground);
+    background: var(--card);
+    border-color: var(--border);
+    box-shadow: 0 1px 2px var(--shadow-color);
+  }
+  .spec-tab:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 1px;
+  }
+  /* An example's JSON spec: one block per spec it passes to the library. */
+  .json-call {
+    padding: 0.5rem 0.95rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--code-muted);
+  }
+  .json-block + .json-block {
+    border-top: 1px solid color-mix(in oklch, var(--code-foreground), transparent 85%);
+  }
+  .json-pane .readonly-code {
+    min-height: 0;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .json-note {
+    margin: 0;
+    padding: 0.6rem 0.95rem;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--code-foreground);
+    border-bottom: 1px solid color-mix(in oklch, var(--code-foreground), transparent 85%);
+  }
+
   .body {
     display: flex;
     gap: 1.1rem;
@@ -290,6 +348,25 @@
   }
   .live-editor textarea {
     outline: none !important;
+  }
+  /* A folded run of data rows: "… 9 more rows", and "Hide 9 rows" once open. */
+  .code-fold {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: left;
+    white-space: pre;
+    color: var(--code-muted);
+    cursor: pointer;
+  }
+  .code-fold:hover {
+    color: var(--code-foreground);
+  }
+  .code-fold:focus-visible {
+    outline: 1px solid var(--ring);
   }
   .code-wrap:focus-within {
     box-shadow: 0 0 0 2px var(--ring);
@@ -736,6 +813,21 @@
     font-size: 0.9rem;
     max-width: 78ch;
     margin: 0.2rem 0 0;
+  }
+  /* The JavaScript / JSON switch sits at the right of the section heading. */
+  .api-head {
+    position: relative;
+    display: flow-root;
+  }
+  .api-head .spec-tabs {
+    position: absolute;
+    right: 0;
+    bottom: 0.35rem;
+  }
+  .api-json-note {
+    color: var(--muted-foreground);
+    font-size: 0.85rem;
+    margin: 0.2rem 0 0.4rem;
   }
 
   /* ── API index (/api) ──────────────────────────────────────────────────

@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "area(options) · areaY(options) · areaX(options)",
+    json: ['plot.area', 'plot.areaY', 'plot.areaX'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. One filled path per series, with an optional draggable handle per datum. <code className="inline">areaY</code> fills to the y baseline, <code className="inline">areaX</code> to the x baseline; bare <code className="inline">area</code> infers the value axis.

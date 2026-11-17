@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "Elicit(spec)",
+    json: ['spec'],
     summary: (
       <>
         The entry point (<code className="inline">elicit.Elicit</code>). Builds a dataset and one chart over it from one spec, and returns the <b>chart</b>. Append <code className="inline">chart.dom()</code> to the page. The spec takes the dataset keys and the chart keys below. For several charts over one dataset, call <code className="inline">Elicit.dataset</code> and <code className="inline">ds.chart</code> instead — see <a href="/dataset">Datasets &amp; linked charts</a>.
@@ -21,6 +22,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "Dataset keys",
+    json: ['spec'],
     summary: (
       <>
         What <code className="inline">Elicit.dataset(spec)</code> reads, and the part of an <code className="inline">Elicit(spec)</code> spec that describes the data. Every chart over the dataset shares these.
@@ -90,6 +92,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "Chart keys",
+    json: ['spec'],
     summary: (
       <>
         What <code className="inline">ds.chart(spec)</code> reads: how one chart draws and edits the dataset. Each chart over a dataset has its own.
@@ -259,6 +262,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "The dataset",
+    json: false,
     summary: (
       <>
         What <code className="inline">Elicit.dataset</code> returns. It reads and writes the data from outside any chart, and every chart over it redraws on a change. A chart carries the same methods, so <code className="inline">chart.getData()</code> is <code className="inline">chart.dataset.getData()</code>.
@@ -382,6 +386,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "The chart",
+    json: false,
     summary: (
       <>
         What <code className="inline">Elicit</code> and <code className="inline">ds.chart</code> return: a plain object, not a DOM node. <code className="inline">dom()</code> is the node to append. It carries every dataset method above, plus its own.

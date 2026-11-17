@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "Elicit.dataset(spec)",
+    json: ['spec'],
     summary: (
       <>
         A dataset that any number of charts read and write. It holds the rows, the schema, the dataset&rsquo;s rules, the undo history and the selection. Make a chart over it with <code className="inline">ds.chart(spec)</code>.
@@ -63,6 +64,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "ds.chart(spec)",
+    json: ['spec'],
     summary: (
       <>
         A chart over the dataset. It takes every spec key the dataset doesn&rsquo;t: <code className="inline">marks</code>, <code className="inline">elements</code>, size, <code className="inline">axes</code>, <code className="inline">theme</code>, <code className="inline">guides</code>, <code className="inline">effects</code>, stages. Append <code className="inline">chart.dom()</code> to the page.
@@ -80,6 +82,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "ds.set(field, value, options?)",
+    json: false,
     summary: (
       <>
         Write one cell from outside any chart. Runs the dataset&rsquo;s constraints, then the lock. One undo step; fires <code className="inline">change</code> and redraws every chart.
@@ -116,6 +119,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "ds.hover(index) / ds.getHover()",
+    json: false,
     summary: (
       <>
         The dataset&rsquo;s hovered row, which every chart with a <a href="#hover">linked hover</a> shows. It is interface state: no <code className="inline">change</code> event and no undo step.

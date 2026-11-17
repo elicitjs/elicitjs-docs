@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "shape(options)",
+    json: ['plot.shape'],
     summary: (
       <>
         One SVG path per row, centred at <code className="inline">x</code>/<code className="inline">y</code>. The shape comes from a <code className="inline">symbol</code> channel or the <code className="inline">path</code> option. It takes every universal edit, is picked inside its body, and declares a node box for a <a href="/marks/network">network</a>.

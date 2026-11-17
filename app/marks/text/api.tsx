@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "text(options) · textX(options) · textY(options)",
+    json: ['plot.text', 'plot.textX', 'plot.textY'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. <code className="inline">text</code> positions from x AND y; <code className="inline">textX</code> / <code className="inline">textY</code> are 1-D labels along one axis (the other parks at centre).

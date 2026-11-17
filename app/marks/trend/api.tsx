@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "trend(options)",
+    json: ['plot.trend'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. A single-datum parametric line; the line itself is non-interactive and each handle is a draggable circle claimed by its own parameter.
@@ -76,6 +77,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "trendBand(options)",
+    json: ['plot.trendBand'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. The uncertainty around a parametric line: every line the belief’s ranges allow, drawn as one envelope, a stack of nested envelopes, or a fan of samples. Declares no edits of its own — put them on the mark the reader grabs.
@@ -176,6 +178,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.trend.*",
+    json: ['edit.trend.intercept', 'edit.trend.slope', 'edit.trend.interceptSpread', 'edit.trend.slopeSpread'],
     summary: (
       <>
         The trend-scoped edits. Each inverts the pointer through <code className="inline">x</code>/<code className="inline">y</code> and solves for the parameter it owns, writing the column that parameter’s channel names. A pinned parameter is never written.

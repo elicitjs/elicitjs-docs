@@ -61,6 +61,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "The channel forms",
+    json: ['channel'],
     summary: (
       <>
         The five shapes a channel can take on any mark’s <code className="inline">channels</code>, plus the co-located <code className="inline">edit</code> that makes it writable. Full scale options live on the <a href="/scales">Scales & channels</a> page.

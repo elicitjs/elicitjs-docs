@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "curve(options) · curveX · curveY",
+    json: ['plot.curve', 'plot.curveX', 'plot.curveY'],
     summary: (
       <>
         Import from <code className="inline">elicit.plot</code>. A segment that <b>bends</b>. A <code className="inline">tick</code> draws a straight line between two points; a curve draws the same span bowed off its chord by an amount that is itself a channel — so &ldquo;how much does this bend, and which way&rdquo; becomes an elicited number. <code className="inline">curveY</code> spans x and sits on y; <code className="inline">curveX</code> spans y and sits on x; bare <code className="inline">curve</code> reads the declared channels.

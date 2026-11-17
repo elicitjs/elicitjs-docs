@@ -1,0 +1,28 @@
+// The whole chart is data. Each factory call is an object with a "type".
+const json = {
+  "width": 420, "height": 250,
+  "margins": { "top": 16, "right": 16, "bottom": 32, "left": 40 },
+  "data": [
+    { "party": "Red", "share": 38 },
+    { "party": "Blue", "share": 34 },
+    { "party": "Green", "share": 28 }
+  ],
+  "schema": {
+    "party": { "type": "categorical" },
+    "share": { "type": "quantitative", "domain": [0, 100] }
+  },
+  "constraints": [{ "type": "clamp", "min": 0, "max": 60 }],
+  "marks": [
+    {
+      "type": "barY",
+      "fill": "#50AEB7",
+      "channels": {
+        "x": { "field": "party" },
+        "y": { "field": "share", "edit": { "type": "move" } }
+      }
+    }
+  ]
+};
+
+const chart = Elicit(compile(json));
+mount(chart.dom());

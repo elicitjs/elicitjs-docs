@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "edit.axis.scale(options)",
+    json: ['edit.axis.scale'],
     summary: "Numeric / temporal axis — drag an end-handle to rescale the range. Runs through the axisDrag driver (the plane owns the gesture); apply writes the new [min,max].",
     signatures: [
       "edit.axis.scale({ field, mode }) → Edit",
@@ -33,6 +34,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.scale.categories(options)",
+    json: ['edit.scale.categories'],
     summary: "Categorical / ordinal SCALE — add, rename and remove categories, from any element that draws it (an axis or a legend). Reuses the inline-typing lifecycle: double-click the \"＋\" to add, double-click a label or swatch to rename, click its \"×\" to remove. Renaming and removing write every column on the scale, in every table it spans.",
     signatures: [
       "edit.scale.categories({ field, mode }) → Edit[]",

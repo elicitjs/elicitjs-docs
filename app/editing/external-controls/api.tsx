@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "set(field, value, options?)",
+    json: false,
     summary: (
       <>
         A dataset method, carried by every chart: write one cell from outside any chart. It runs the dataset&rsquo;s constraints, then the lock, as an edit does; an edit&rsquo;s own <code className="inline">constrain</code> does not run. One undo step; fires <code className="inline">change</code> and redraws every chart on the dataset. See <a href="/dataset#set">Datasets &amp; linked charts</a>.
@@ -21,6 +22,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit({ name }) · chart.control(name, index?)",
+    json: false,
     summary: (
       <>
         Give any edit a <code className="inline">name</code>, then replay its gesture from outside the chart with{' '}
@@ -109,6 +111,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "set(options?)",
+    json: false,
     summary: (
       <>
         The universal value edit: write a value into a channel's field — quantitative, colour,
@@ -125,6 +128,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "select() · chart.select · chart.selectWhere",
+    json: false,
     summary: (
       <>
         Selection is transient <em>pipeline</em> state, not a <code className="inline">selected</code> data
@@ -147,6 +151,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "chart.setDomain(field, domain, options)",
+    json: false,
     summary: (
       <>
         Write a field&rsquo;s <b>domain</b> from outside the chart — a zoom button, a reset control. The same commit a wheel zoom, a pan or an axis drag makes: one undo step, a <code className="inline">change</code> notification, and every scale reflows. Pass <code className="inline">null</code> to restore the declared domain. See <a href="/editing/zoom#set-domain">Zoom &amp; pan</a>.
@@ -160,6 +165,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "chart.emit(event)",
+    json: false,
     summary: (
       <>
         Low-level: inject a renderer-shaped gesture event directly. <code className="inline">x</code>/

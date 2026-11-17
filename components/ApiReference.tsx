@@ -2,6 +2,10 @@
 
 import { Fragment, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import type { ApiEntry, ApiOption } from '../lib/types';
+import { useSpecMode } from '../lib/specMode';
+import { exprVariables, jsonForm, jsonType, signatureFor } from '../lib/jsonApi';
+import type { JsonSignature } from '../lib/json-api.generated';
+import { SpecTabs } from './SpecTabs';
 
 /**
  * Long tables fold after FOLD_AT rows, but only when that hides at least
@@ -35,17 +39,30 @@ function breakable(src: string): ReactNode {
   );
 }
 
+type Row = ApiOption & { expr?: string | null };
+
+/** An option row as JSON: a function type becomes `{ expr } | { fn }`, with the expr's variables. */
+function asJson(r: ApiOption, functions: Record<string, JsonSignature>): Row {
+  const sig = signatureFor(r.name, functions);
+  if (!sig) return r;
+  return { ...r, type: jsonType(r.type, sig, r.name), expr: exprVariables(sig) };
+}
+
 function OptionsTable({
   label,
   nameCol,
-  rows,
+  rows: given,
   withDefault,
+  functions,
 }: {
   label: string;
   nameCol: string;
   rows: ApiOption[];
   withDefault: boolean;
+  /** In JSON mode, the options that take a function: their types become references. */
+  functions: Record<string, JsonSignature> | null;
 }) {
+  const rows = functions ? given.map((r) => asJson(r, functions)) : given;
   const hasType = rows.some((r) => r.type != null);
   const hasDefault =
     withDefault && rows.some((r) => r.default != null && !EMPTY_DEFAULTS.has(r.default.trim()));
@@ -107,7 +124,7 @@ function OptionsTable({
             </tr>
           </thead>
           <tbody>
-            {rows.map((r, i) => {
+            {rows.map((r: Row, i) => {
               const def =
                 withDefault && r.default != null && !EMPTY_DEFAULTS.has(r.default.trim())
                   ? r.default
@@ -131,6 +148,12 @@ function OptionsTable({
                           <span className="api-def-row">
                             <span className="api-def-label">default</span>
                             <code className="api-def">{breakable(def)}</code>
+                          </span>
+                        ) : null}
+                        {r.expr ? (
+                          <span className="api-def-row">
+                            <span className="api-def-label">expr</span>
+                            <code className="api-def">{breakable(r.expr)}</code>
                           </span>
                         ) : null}
                       </div>
@@ -165,17 +188,28 @@ function OptionsTable({
 }
 
 export function ApiReference({ entries }: { entries: ApiEntry[] }) {
+  const mode = useSpecMode();
   if (!entries.length) return null;
+  const hasJson = entries.some((e) => e.json !== undefined);
   return (
     <section id="api" className="api">
-      <h2 className="section">API reference</h2>
+      <div className="api-head">
+        <h2 className="section">API reference</h2>
+        {hasJson ? <SpecTabs mode={mode} /> : null}
+      </div>
       {entries.map((entry, i) => {
-        const sigs = entry.signatures || (entry.signature ? [entry.signature] : []);
+        const js = entry.signatures || (entry.signature ? [entry.signature] : []);
+        const form = mode === 'json' && entry.json ? jsonForm(entry.json, js) : null;
+        const sigs = form ? form.signatures : js;
+        const functions = form ? form.functions : null;
         return (
           <div className="api-entry" key={entry.name ?? i}>
             {entry.name ? <h3 className="api-heading">{entry.name}</h3> : null}
             {entry.summary ? (
               <p className="api-summary">{entry.summary}</p>
+            ) : null}
+            {mode === 'json' && entry.json === false ? (
+              <p className="api-json-note">No JSON form: this is called in JavaScript.</p>
             ) : null}
             {sigs.length ? (
               <pre className="code sig">
@@ -183,7 +217,13 @@ export function ApiReference({ entries }: { entries: ApiEntry[] }) {
               </pre>
             ) : null}
             {entry.options?.length ? (
-              <OptionsTable label="Options" nameCol="Option" rows={entry.options} withDefault />
+              <OptionsTable
+                label="Options"
+                nameCol="Option"
+                rows={entry.options}
+                withDefault
+                functions={functions}
+              />
             ) : null}
             {entry.channels?.length ? (
               <OptionsTable
@@ -191,6 +231,7 @@ export function ApiReference({ entries }: { entries: ApiEntry[] }) {
                 nameCol="Channel"
                 rows={entry.channels}
                 withDefault={false}
+                functions={null}
               />
             ) : null}
             {entry.returns ? (

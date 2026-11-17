@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "edit.axis.zoom(options)",
+    json: ['edit.axis.zoom'],
     summary: (
       <>
         The wheel narrows or widens the axis&rsquo;s domain about the value under the pointer. It writes the schema&rsquo;s domain, never the dataset. Place it on an axis: <code className="inline">{'axes: { x: { edit: edit.axis.zoom() } }'}</code>.
@@ -53,6 +54,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.axis.pan(options)",
+    json: ['edit.axis.pan'],
     summary: (
       <>
         Dragging the plot slides the axis&rsquo;s domain along. It writes the schema&rsquo;s domain, never the dataset, and composes with <code className="inline">edit.axis.zoom()</code> on the same axis: <code className="inline">{'axes: { x: { edits: [edit.axis.zoom(), edit.axis.pan()] } }'}</code>.
@@ -133,6 +135,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "chart.setDomain(field, domain, options)",
+    json: false,
     summary: (
       <>
         Write a field&rsquo;s domain from outside the chart — a zoom button, a reset control. The same commit a wheel tick or a pan makes: undoable, notified through <code className="inline">change</code>, and every scale reflows.

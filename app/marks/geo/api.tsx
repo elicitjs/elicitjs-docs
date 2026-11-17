@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "projection (ElicitSpec)",
+    json: ['spec'],
     summary: (
       <>
         Chart option. Built once per layout into <code className="inline">scales.projection</code> with <code className="inline">apply</code>, <code className="inline">invert</code>, and <code className="inline">path</code>. Fit with <code className="inline">domain: geojson</code>. Auto axes default off when set.
@@ -15,6 +16,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "geoBasemap({ geojson, … })",
+    json: ['plot.geoBasemap'],
     summary: (
       <>
         Inert background map. Pass topology as a mark option — <code className="inline">geojson</code> — not as <code className="inline">Elicit</code> data. Load your own: <code className="inline">const map = await fetch("…").then(r ={'>'} r.json())</code> then <code className="inline">geoBasemap({'{'} geojson: map {'}'})</code>. A FeatureCollection draws <b>one path per feature</b> so boundaries show.
@@ -40,6 +42,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "geoTile({ url, … })",
+    json: ['plot.geoTile'],
     summary: (
       <>
         Raster basemap from a slippy-map tile server (OSM, CARTO, satellite, your own) — the Leaflet model. <b>Requires <code className="inline">projection: "mercator"</code></b>: tiles are images baked in Web Mercator and cannot register under another projection (the mark verifies this by <i>behaviour</i>, not by name, and warns instead of misaligning). Chrome, like geoBasemap — takes no data. Compose the two to draw boundaries over imagery.
@@ -105,6 +108,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "geoPoint / geoPolygon / geoLine / geoText / geoRect",
+    json: ['plot.geoPoint', 'plot.geoPolygon', 'plot.geoLine', 'plot.geoText', 'plot.geoRect'],
     summary: (
       <>
         Editable overlays. Import from <code className="inline">elicit.plot</code>. <code className="inline">geoText</code> is <code className="inline">text</code> with the projection doing the placement — it shares the node shape, so <code className="inline">editText</code> / <code className="inline">cycle</code> / <code className="inline">rotate</code> work on it unchanged.
@@ -233,6 +237,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "edit.geo.*",
+    json: ['edit.geo.move', 'edit.geo.create', 'edit.geo.draw', 'edit.geo.dragVertex', 'edit.geo.removeVertex', 'edit.geo.brush', 'edit.geo.createRect'],
     summary: (
       <>
         Geo-scoped edits (<code className="inline">scope: "geo"</code>). Invert the pointer through the chart projection.

@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: "The Edit descriptor",
+    json: ['edit'],
     summary: (
       <>
         Every edit factory (<code className="inline">elicit.edit.*</code>) returns this shape, built by <code className="inline">makeEdit</code>. The named factories are presets over it: each fixes a <code className="inline">gesture</code> and an <code className="inline">apply</code> — the inversion that turns the gesture back into data. <code className="inline">apply(ctx)</code> is pure: given the context it returns a datum (direct edit), a full array (whole-dataset edit), or <code className="inline">undefined</code> (no-op).

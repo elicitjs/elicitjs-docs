@@ -3,6 +3,7 @@ import type { ApiEntry } from '../../../lib/types';
 export const api: ApiEntry[] = [
   {
     name: 'edit.legend.category()',
+    json: ['edit.legend.category'],
     summary: 'Turn legend swatches into click targets that set a categorical field on target rows.',
     signature: 'edit.legend.category(options?)',
     options: [
@@ -16,6 +17,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: 'edit.legend.value()',
+    json: ['edit.legend.value'],
     summary: 'Add a draggable handle to a continuous gradient colour ramp.',
     signature: 'edit.legend.value(options?)',
     options: [
@@ -29,6 +31,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: 'edit.scale.categories()',
+    json: ['edit.scale.categories'],
     summary: 'Inline add, rename, and remove affordances for the scale domain.',
     signature: 'edit.scale.categories(options?)',
     options: [
