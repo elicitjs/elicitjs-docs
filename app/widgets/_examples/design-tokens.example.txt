@@ -1,0 +1,10 @@
+// Start from a design and change its tokens: the accent, the corner, the row height.
+const chart = Elicit(widgets.ranking({
+  question: "Rank these priorities",
+  items: ["Cost", "Speed", "Quality", "Risk"],
+  theme: {
+    extends: "survey",
+    widget: { accent: "#0f766e", tint: "#dff3f0", corner: 4, rowHeight: 36 },
+  },
+}));
+mount(chart.dom());

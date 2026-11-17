@@ -1,0 +1,10 @@
+// theme: "survey" draws each option as an outlined box holding a checkbox,
+// and stacks them as a list.
+const chart = Elicit(widgets.multipleChoice({
+  question: "Which apply?",
+  options: ["Fast", "Cheap", "Reliable", "Simple"],
+  max: 2,
+  value: ["Fast"],
+  theme: "survey",
+}));
+mount(chart.dom());

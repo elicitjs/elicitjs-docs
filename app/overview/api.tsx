@@ -160,7 +160,7 @@ export const api: ApiEntry[] = [
         default: "{ duration: 220 }",
         desc: (
           <>
-            Eased drawing. A hierarchy&apos;s layout glides to its new place over <code>duration</code> ms. <code>false</code> draws every change at once. Off when the reader&apos;s system asks for reduced motion. See <a href="/marks/hierarchy#gestures">Hierarchy</a>.
+            Eased drawing. A hierarchy&apos;s layout, and every mark with <code>motion: true</code>, glides to its new place over <code>duration</code> ms. <code>false</code> draws every change at once. Off when the reader&apos;s system asks for reduced motion. See <a href="/marks/hierarchy#gestures">Hierarchy</a> and <a href="/widgets#ranking">Ranking</a>.
           </>
         ),
       },

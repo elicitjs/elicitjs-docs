@@ -234,7 +234,7 @@ export const api: ApiEntry[] = [
   },
   {
     name: "Instrument affordances",
-    json: ['guides.prompt', 'guides.optionRings', 'guides.cellGrid', 'guides.sliderTrack', 'guides.quadrants'],
+    json: ['guides.prompt', 'guides.options', 'guides.cellGrid', 'guides.sliderTrack', 'guides.quadrants'],
     summary: (
       <>
         The chrome a survey instrument draws itself with. Guides like any other — pass them in <code className="inline">guides: [...]</code>. The built-in <a href="/widgets">widgets</a> are assembled from these, so a hand-built instrument gets the same look.
@@ -242,7 +242,7 @@ export const api: ApiEntry[] = [
     ),
     signatures: [
       "guides.prompt(text, { y }) → Guide            // the question, in the top margin",
-      "guides.optionRings({ labelOffset, radius }) → Guide   // a Likert scale's rings",
+      "guides.options({ labelOffset, radius, control }) → Guide   // a choice's options",
       "guides.cellGrid({ pad }) → Guide              // a matrix's cells + headers",
       "guides.sliderTrack({ format }) → Guide        // a track with end labels",
       "guides.quadrants({ x, y }) → Guide            // centred axes + four end labels",
@@ -255,10 +255,16 @@ export const api: ApiEntry[] = [
         desc: "Lift the prompt clear of whatever sits below it — column headers, an axis title.",
       },
       {
-        name: "optionRings.radius / labelOffset",
+        name: "options.radius / labelOffset",
         type: "number",
         default: "—",
         desc: "Ring radius, and the label's distance below it.",
+      },
+      {
+        name: "options.control",
+        type: '"radio" | "check"',
+        default: '"radio"',
+        desc: "One answer or several: which control a box design draws in each option.",
       },
       {
         name: "cellGrid.pad",

@@ -196,7 +196,7 @@ The rules hide when the pointer leaves the plot. Gestures pass through them.
 The [widgets](/widgets) draw their chrome with guides you can also use in your own spec:
 
 - `guides.prompt(text, { y })` draws the question in the top margin.
-- `guides.optionRings({ labelOffset, radius })` draws a Likert scale's rings and labels.
+- `guides.options({ labelOffset, radius, control })` draws a choice's options, one per category, in the theme's [design](/widgets#designs): rings and labels by default.
 - `guides.cellGrid({ pad })` draws a matrix's cells and headers.
 - `guides.sliderTrack({ format })` draws a slider's track with end labels.
 - `guides.quadrants({ x, y })` draws centred axes with a label at each end.

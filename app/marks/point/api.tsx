@@ -50,6 +50,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "motion",
+        type: "boolean",
+        default: "false",
+        desc: (
+          <>
+            Eased drawing, as on every mark. When the rows change, the mark&apos;s shapes travel to their new places. A grabbed row is drawn at the pointer along a channel whose scale is a band or a point scale, and eases into its slot on release. The data is never eased. See <a href="/widgets#ranking">Ranking</a>.
+          </>
+        ),
+      },
+      {
         name: "fill, stroke, size, angle, …",
         type: "style",
         default: "fill: 'steelblue'",

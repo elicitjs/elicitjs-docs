@@ -20,18 +20,18 @@ export default function Layout({ children }) {
 
 # Theming & style
 
-<Lead>The **theme** holds every default colour, font and affordance token. Pass a partial `theme` on `Elicit` or on any widget. It deep-merges over the built-in defaults, so you name only what you change. A per-datum paint channel (`fill`, `stroke`) wins over any theme token. A theme can also set [effects](/effects) defaults, and `effects` on the spec overrides them. Eighteen [named themes](/theming/themes) ship with the library: `theme: "nyt"` restyles a whole chart from one word.</Lead>
+<Lead>The **theme** holds every default colour, font and affordance token. Pass a partial `theme` on `Elicit` or on any widget. It deep-merges over the built-in defaults, so you name only what you change. A per-datum paint channel (`fill`, `stroke`) wins over any theme token. A theme can also set [effects](/effects) defaults, and `effects` on the spec overrides them. Twenty [named themes](/theming/themes) ship with the library: `theme: "nyt"` restyles a whole chart from one word.</Lead>
 
 <ApiReference entries={api} />
 
 <Section id="survey" title="A themed instrument">
 
-`themes.survey` is a built-in theme for survey widgets. Pass it to any widget to restyle the answer ink, the chrome, and the rings, track and labels. The behaviour stays the same.
+`themes.survey` is a built-in theme for survey widgets. Pass it to any widget to restyle the answer ink and the chrome. The behaviour stays the same. It also sets the widgets' [design](/widgets#designs): `survey` draws outlined boxes, `surveyBlocks` filled blocks and `surveyLines` hairlines. The widget tokens are `theme.widget`, where `design` names the design and the rest are the colours and sizes it reads.
 
 <Example
   code={surveyTheme}
   title="The survey theme"
-  blurb="One object — themes.survey — restyles ink, chrome, and every affordance."
+  blurb="One object — themes.survey — restyles the ink, the chrome and the design."
   try={"move across the options, click to answer — the look is the only change."}
 />
 

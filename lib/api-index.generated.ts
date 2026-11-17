@@ -16,7 +16,7 @@ export type ApiIndexEntry = {
 export type ApiNamespace = { namespace: string; blurb: string; count: number };
 
 export const API_LIBRARY_VERSION = "0.1.0-alpha.3";
-export const API_GENERATED_AT = "2026-11-17T18:27:24.564Z";
+export const API_GENERATED_AT = "2026-11-17T22:24:48.661Z";
 export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "plot",
@@ -140,7 +140,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/arc"
   },
@@ -165,7 +166,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/area"
   },
@@ -182,7 +184,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/area"
   },
@@ -199,7 +202,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/area"
   },
@@ -223,7 +227,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/bar"
   },
@@ -240,7 +245,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/bar"
   },
@@ -257,7 +263,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/bar"
   },
@@ -277,7 +284,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/composite"
   },
@@ -297,7 +305,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/curve"
   },
@@ -314,7 +323,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/curve"
   },
@@ -331,7 +341,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/curve"
   },
@@ -348,7 +359,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/arc"
   },
@@ -370,7 +382,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/dotstack"
   },
@@ -387,7 +400,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/dotstack"
   },
@@ -404,7 +418,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/dotstack"
   },
@@ -421,7 +436,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/ellipse"
   },
@@ -440,7 +456,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/face"
   },
@@ -462,7 +479,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/geo"
   },
@@ -486,7 +504,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/geo"
   },
@@ -503,7 +522,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/geo"
   },
@@ -520,7 +540,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/geo"
   },
@@ -537,7 +558,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/geo"
   },
@@ -556,7 +578,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/geo"
   },
@@ -583,7 +606,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/geo"
   },
@@ -607,7 +631,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/line"
   },
@@ -624,7 +649,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/line"
   },
@@ -641,7 +667,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/line"
   },
@@ -681,7 +708,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/network"
   },
@@ -705,7 +733,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/needle"
   },
@@ -726,7 +755,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/network"
   },
@@ -743,7 +773,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/line"
   },
@@ -762,7 +793,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/point"
   },
@@ -785,7 +817,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/rect"
   },
@@ -802,7 +835,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/rect"
   },
@@ -819,7 +853,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/rect"
   },
@@ -839,7 +874,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/axes"
   },
@@ -856,7 +892,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/axes"
   },
@@ -873,7 +910,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/axes"
   },
@@ -892,7 +930,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/shape"
   },
@@ -917,7 +956,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/sticker"
   },
@@ -939,7 +979,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/text"
   },
@@ -956,7 +997,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/text"
   },
@@ -973,7 +1015,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/text"
   },
@@ -994,7 +1037,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/tick"
   },
@@ -1011,7 +1055,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/tick"
   },
@@ -1028,7 +1073,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/tick"
   },
@@ -1052,7 +1098,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/trend"
   },
@@ -1082,7 +1129,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/trend"
   },
@@ -1107,7 +1155,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/waffle"
   },
@@ -1124,7 +1173,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/waffle"
   },
@@ -1141,7 +1191,8 @@ export const API_INDEX: ApiIndexEntry[] = [
       "edits",
       "table",
       "tip",
-      "clip"
+      "clip",
+      "motion"
     ],
     "docs": "/marks/waffle"
   },
@@ -3762,12 +3813,13 @@ export const API_INDEX: ApiIndexEntry[] = [
   {
     "namespace": "guides",
     "group": "guides",
-    "name": "optionRings",
-    "qualified": "guides.optionRings",
-    "call": "guides.optionRings(options)",
+    "name": "options",
+    "qualified": "guides.options",
+    "call": "guides.options(options)",
     "own": [
       "labelOffset",
-      "radius"
+      "radius",
+      "control"
     ],
     "universal": [
       "id"

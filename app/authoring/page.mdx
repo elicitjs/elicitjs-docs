@@ -135,6 +135,8 @@ Reuse these for proximity and minting:
 - `authoring.nextSeriesKey(data, seriesField, schema?)`: the next free series id for a new line
 - `nearestMark` / `nearestSeries` / `nearestMarkOnAxis`: shared distance pickers
 
+To restyle the built-in [widgets](/widgets), register a design: [`authoring.registerDesign`](/widgets#new-design).
+
 For a custom edit that creates rows, set `cardinality: "append"` so constraints know which row is new. For an edit that runs the pointer back through a scale, set `inverts: true` so the dead-drag guard can check the channel. To drive an edit from external UI, give it a `name` and call [`chart.control(name)`](/editing/external-controls).
 
 </Section>

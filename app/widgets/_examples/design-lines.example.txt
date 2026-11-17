@@ -1,0 +1,9 @@
+// theme: "surveyLines" draws controls and hairlines, with nothing boxed.
+const chart = Elicit(widgets.matrix({
+  question: "Rate each quality",
+  questions: ["Easy to learn", "Fast", "Reliable"],
+  options: ["Poor", "Fair", "Good", "Great"],
+  value: [{ question: "Fast", option: "Great" }],
+  theme: "surveyLines",
+}));
+mount(chart.dom());

@@ -119,7 +119,7 @@ export const api: ApiEntry[] = [
         name: "widget",
         type: "object",
         default: "survey tokens",
-        desc: <>Survey-instrument affordance tokens (ring, track, cell, label, question, radius), read live by the widget guides.</>,
+        desc: <>The widget tokens: <code className="inline">design</code> names how the <a className="underline" href="/widgets#designs">widgets</a> are drawn, and the rest are the colours and sizes that design reads. See <a className="underline" href="/widgets">Widgets</a> for the full list.</>,
       },
       {
         name: "marks",
@@ -133,7 +133,7 @@ export const api: ApiEntry[] = [
     name: "themes",
     summary: (
       <>
-        The eighteen <a className="underline" href="/theming/themes">named themes</a>: <code className="inline">default</code>, <code className="inline">survey</code>, <code className="inline">dark</code> and <code className="inline">dd</code>, plus fourteen house styles from <a className="underline" href="https://github.com/microsoft/flint-chart">Flint</a>. Each is a partial — pass it (or its name) as <code className="inline">theme</code>, or start from one with <code className="inline">extends</code>.
+        The twenty <a className="underline" href="/theming/themes">named themes</a>: <code className="inline">default</code>, <code className="inline">survey</code>, <code className="inline">surveyBlocks</code>, <code className="inline">surveyLines</code>, <code className="inline">dark</code> and <code className="inline">dd</code>, plus fourteen house styles from <a className="underline" href="https://github.com/microsoft/flint-chart">Flint</a>. Each is a partial — pass it (or its name) as <code className="inline">theme</code>, or start from one with <code className="inline">extends</code>.
       </>
     ),
     signatures: [

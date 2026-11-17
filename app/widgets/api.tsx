@@ -200,8 +200,66 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        An <b>ElicitSpec</b> — an ordinary spec, so you can read it, change one key, and pass it on. The chrome each widget draws itself with is a <a href="/guides">guide</a>: <code className="inline">guides.prompt</code>, <code className="inline">guides.optionRings</code>, <code className="inline">guides.cellGrid</code>, <code className="inline">guides.sliderTrack</code>, <code className="inline">guides.quadrants</code>. The plain-API twins below use those same guides, so each block stands alone.
+        An <b>ElicitSpec</b> — an ordinary spec, so you can read it, change one key, and pass it on. The chrome each widget draws itself with is a <a href="/guides">guide</a>: <code className="inline">guides.prompt</code>, <code className="inline">guides.options</code>, <code className="inline">guides.cellGrid</code>, <code className="inline">guides.sliderTrack</code>, <code className="inline">guides.quadrants</code>. The plain-API twins below use those same guides, so each block stands alone.
       </>
     ),
+  },
+  {
+    name: "theme.widget",
+    json: ['spec'],
+    summary: (
+      <>
+        The widget tokens, set through <code className="inline">theme</code> on a widget, on <code className="inline">Elicit</code> or with <code className="inline">setTheme</code>. <code className="inline">design</code> names the <a href="#designs">design</a>; the others are the colours and sizes it reads. A widget takes its theme when it is built.
+      </>
+    ),
+    signatures: [
+      'theme: "survey" | "surveyBlocks" | "surveyLines"',
+      'theme: { extends: "survey", widget: { design, accent, corner, … } }',
+    ],
+    options: [
+      { name: "design", type: '"ring" | "box" | "block" | "line" | string', default: '"ring"', desc: <>How the widgets are drawn: a built-in design, or one you <a href="#new-design">registered</a>.</> },
+      { name: "accent / onAccent", type: "string", default: '"#2563eb" / "#ffffff"', desc: "A committed answer, and the text and ticks drawn on it." },
+      { name: "tint", type: "string", default: '"#e9f0fe"', desc: "A chosen option's wash in the box design, and a grabbed card's in the block design." },
+      { name: "surface / soft / stroke", type: "string", default: "white / light grey / grey", desc: "An option box or a card, a filled block or a bar's track, and the edge of a box or a card." },
+      { name: "ring / track", type: "string", default: '"#cbd5e1" / "#e2e8f0"', desc: "An empty control, and a track or a hairline." },
+      { name: "cellFill / cellStroke", type: "string", default: '"#f8fafc" / "#e2e8f0"', desc: "A matrix cell in the ring design." },
+      { name: "label / question", type: "string", default: '"#334155" / "#0f172a"', desc: "An option's label, and the prompt." },
+      { name: "grip / shadow", type: "string", default: "grey / translucent black", desc: "A ranking card's drag handle, and the shadow under a lifted card." },
+      { name: "labelSize / itemSize", type: "number", default: "12 / 13", desc: "The text size of an option's label, and of a list row or a card." },
+      { name: "questionSize / questionWeight", type: "number", default: "13 / 400", desc: "The prompt's size and weight." },
+      { name: "radius", type: "number", default: "11", desc: "The radius of a ring or a radio, and half a checkbox's side." },
+      { name: "corner", type: "number", default: "10", desc: "The corner radius of a box, a block or a card." },
+      { name: "gap", type: "number", default: "8", desc: "The space between options and between cards." },
+      { name: "optionHeight / rowHeight", type: "number", default: "74 / 40", desc: "The height of an option in a row of boxes, and of a list row or a card." },
+    ],
+  },
+  {
+    name: "authoring.registerDesign(name, design)",
+    json: false,
+    summary: (
+      <>
+        Adds a design. Every widget then draws with it when <code className="inline">theme.widget.design</code> names it. State the parts you change; the rest come from <code className="inline">extends</code>. See <a href="#new-design">Add a design</a>.
+      </>
+    ),
+    signatures: [
+      "authoring.registerDesign(name, { extends, list, tiles, option, answer, grid, track, thumb, card, slots, bar, theme })",
+      "authoring.designNames() → string[]",
+      "authoring.labelNode(text, x, y, tokens, { width, anchor, fill, fontSize, fontWeight }) → node",
+      "authoring.checkNode(cx, cy, tokens) → node",
+      "authoring.controlNodes(cx, cy, control, selected, tokens) → node[]",
+    ],
+    options: [
+      { name: "extends", type: "string", default: '"ring"', desc: "The design to take the unstated parts from." },
+      { name: "list / tiles", type: "boolean", default: "false", desc: <>
+        <code className="inline">list</code> stacks multiple choice as a list. <code className="inline">tiles</code> sizes the plot to the options from <code className="inline">optionHeight</code>, <code className="inline">rowHeight</code> and <code className="inline">gap</code>.
+      </> },
+      { name: "option", type: "(option, tokens) => node[]", default: "from extends", desc: "Draws one option: its box, its empty control and its label." },
+      { name: "answer", type: "(option, tokens) => { shape, size, corner, left, top }", default: "from extends", desc: <>The answer&apos;s ink: a <code className="inline">dot</code> or a <code className="inline">square</code> on the control, or a <code className="inline">block</code> that fills the option.</> },
+      { name: "grid / slots", type: "(box, tokens) => node[]", default: "from extends", desc: "Chrome around a whole matrix, and the lines between a ranking list's slots." },
+      { name: "track / thumb", type: "(track, tokens) => node[] / (tokens) => { size, fill, stroke, strokeWidth }", default: "from extends", desc: "A slider's track, and its handle." },
+      { name: "card", type: "(card, tokens) => part[]", default: "from extends", desc: <>A ranking card&apos;s parts, back to front: <code className="inline">body</code>, <code className="inline">badge</code>, <code className="inline">rank</code>, <code className="inline">label</code>, <code className="inline">grip</code>. Each takes <code className="inline">left</code> or <code className="inline">right</code> and its paint.</> },
+      { name: "bar", type: "(tokens) => { corner, fillOpacity, track }", default: "from extends", desc: "A bar in the widgets drawn on chart axes." },
+      { name: "theme", type: "ThemeSpec", default: "—", desc: <>Registers a named theme under the design&apos;s name, with <code className="inline">widget.design</code> set to it.</> },
+    ],
   },
 ];

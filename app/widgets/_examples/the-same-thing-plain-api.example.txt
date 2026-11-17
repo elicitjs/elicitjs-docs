@@ -6,7 +6,7 @@ const prompt = (text) => guides.custom(() => [{
   textAnchor: "start", fontSize: 13, fill: "#20555A",
 }]);
 
-const optionRings = () => guides.custom((ctx) => {
+const rings = () => guides.custom((ctx) => {
   const cats = ctx.scales.x.domainConfig || [];
   const cy = ctx.height / 2;
   const cxOf = (c) => ctx.scales.x.encode(c);
@@ -40,7 +40,7 @@ const chart = Elicit({
   schema: { choice: { type: "ordinal", domain: options } },
   scales: { x: { type: "band" } },
   constraints: [ count({ max: 1, strategy: "replace" }) ],
-  guides: [ prompt("This tool is easy to use"), optionRings() ],
+  guides: [ prompt("This tool is easy to use"), rings() ],
   marks: [
     point({
       id: "likert",

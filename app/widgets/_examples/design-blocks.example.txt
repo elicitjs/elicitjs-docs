@@ -1,0 +1,8 @@
+// theme: "surveyBlocks" draws options as soft blocks. The chosen one turns solid.
+const chart = Elicit(widgets.likert({
+  question: "This tool is easy to use",
+  options: ["Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree"],
+  value: "Agree",
+  theme: "surveyBlocks",
+}));
+mount(chart.dom());

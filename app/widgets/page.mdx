@@ -13,6 +13,12 @@ import asAWidget3 from './_examples/as-a-widget-3.example.txt';
 import asAWidget4 from './_examples/as-a-widget-4.example.txt';
 import themedWidget from './_examples/themed-widget.example.txt';
 import ranking from './_examples/ranking.example.txt';
+import rankingPlainApi from './_examples/ranking-plain-api.example.txt';
+import designSurvey from './_examples/design-survey.example.txt';
+import designBlocks from './_examples/design-blocks.example.txt';
+import designLines from './_examples/design-lines.example.txt';
+import designTokens from './_examples/design-tokens.example.txt';
+import registerDesign from './_examples/register-design.example.txt';
 import allocation from './_examples/allocation.example.txt';
 import region from './_examples/region.example.txt';
 import intervalCi from './_examples/interval-ci.example.txt';
@@ -28,7 +34,7 @@ export default function Layout({ children }) {
 
 # Widgets
 
-<Lead>**Widgets** are ready-made elicitation interfaces for survey questions. Each one returns an `ElicitSpec` built from ordinary marks, edits and constraints, with option rings, cell grids and tracks drawn as [guides](/guides). Render one with `Elicit(widgets.likert({…}))`. The Likert scale below appears both as a widget and as the plain-API spec it expands to.</Lead>
+<Lead>**Widgets** are ready-made elicitation interfaces for survey questions. Each one returns an `ElicitSpec` built from ordinary marks, edits and constraints, with its chrome drawn as [guides](/guides). Render one with `Elicit(widgets.likert({…}))`. A [design](#designs) sets how all thirteen are drawn, and you choose one with `theme`. The Likert scale below appears both as a widget and as the plain-API spec it expands to.</Lead>
 
 <ApiReference entries={api} />
 
@@ -106,9 +112,82 @@ It is a preset over [`trendBand`](/marks/trend#band) and [`trend`](/marks/trend)
 
 </Section>
 
+<Section id="ranking" title="Ranking">
+
+Each item is a card. Drag one to reorder the list: `rank()` on the card's body writes the new order as you cross each slot, and the other cards shift by one place. The card follows the pointer, the others ease into their slots, and the card eases into its own when you let go. With reduced motion on, cards step from slot to slot.
+
+<Example
+  code={ranking}
+  title="Ranking"
+  blurb="A card per item. The whole card is the handle."
+  try={(
+    <>
+      <b>Drag</b> a card up or down. The others make room.
+    </>
+  )}
+/>
+
+The card is a [`composite`](/marks/composite): a `rect` body that carries the `rank()` edit, with the rank and the label drawn on it. `motion: true` on the glyph eases its parts when the order changes. Along the `rank` channel, whose scale is a band of slots, it draws the grabbed card at the pointer. `motion: true` works on any mark, and [`spec.motion`](/overview) sets the duration.
+
+<Example
+  code={rankingPlainApi}
+  title="The same thing, plain API"
+  blurb="A composite card, rank() on its body, and motion: true."
+  try={(
+    <>
+      <b>Drag</b> a card by its label. The press reaches the body.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="designs" title="Designs">
+
+A **design** sets how every widget is drawn: its options, the answer inside them, a slider's track, a ranking card, a bar. Four ship with the library. `ring` is the default and draws rings on a track. The other three come with a named theme.
+
+- The default theme draws `ring`: rings on a track, and the answer is a filled dot.
+- `theme: "survey"` draws `box`: each option is an outlined box holding a radio or a checkbox.
+- `theme: "surveyBlocks"` draws `block`: options are soft blocks, and the chosen one turns solid.
+- `theme: "surveyLines"` draws `line`: controls and hairlines, with nothing boxed.
+
+Pass the theme to a widget, or call `setTheme("survey")` once to draw every widget that way. The three form designs stack multiple choice as a list. The gestures, the data and the constraints are the same in every design.
+
+<Example
+  code={designSurvey}
+  title="theme: &quot;survey&quot;"
+  blurb="Outlined boxes, each with a checkbox."
+  try={"click a row to pick it, and again to take it back."}
+/>
+
+<Example
+  code={designBlocks}
+  title="theme: &quot;surveyBlocks&quot;"
+  blurb="Soft blocks. The chosen one turns solid."
+  try={"hover across the blocks, then click."}
+/>
+
+<Example
+  code={designLines}
+  title="theme: &quot;surveyLines&quot;"
+  blurb="Radios and hairlines."
+  try={"answer each row."}
+/>
+
+</Section>
+
 <Section id="styles" title="Customizing styles">
 
-Every widget accepts a `theme`, which restyles the answer ink, chrome and affordances together. See [Theming](/theming). For a one-off change, edit the [plain-API version](#likert): repaint the answer mark or swap a guide. The edits and constraints stay the same.
+Every widget accepts a `theme`, which restyles the answer ink, chrome and affordances together. See [Theming](/theming). The widget tokens live in `theme.widget`: `design` names the design, and the rest are the colours and sizes it reads. Start from a named theme with `extends` and change the tokens you need.
+
+<Example
+  code={designTokens}
+  title="Change a design's tokens"
+  blurb="extends: &quot;survey&quot;, with its own accent, corner and row height."
+  try={"drag a card."}
+/>
+
+The design and the colours are separate tokens, so any theme takes any design: `theme: { extends: "dark", widget: { design: "block" } }` draws blocks in the dark theme's colours.
 
 <Example
   code={themedWidget}
@@ -117,22 +196,39 @@ Every widget accepts a `theme`, which restyles the answer ink, chrome and afford
   try={"drag the knob — only the look changed."}
 />
 
+For a one-off change to a single widget, edit the [plain-API version](#likert): repaint the answer mark or swap a guide. The edits and constraints stay the same.
+
+</Section>
+
+<Section id="new-design" title="Add a design">
+
+`authoring.registerDesign(name, design)` adds a design. A design is an object of drawers, one per part. Each drawer takes the box to draw in and the widget tokens, and returns [scene nodes](/authoring#custom-mark) in plot pixels. State the parts you change and name the design to start from in `extends`. Every widget then draws with it.
+
+<Example
+  code={registerDesign}
+  title="A pill design"
+  blurb="Two drawers and a theme, extending box."
+  try={'click a pill. Then change extends to "line".'}
+/>
+
+A design may state these parts:
+
+- `option(o, t)` draws one option. `o` is its box (`x`, `y`, `width`, `height`, `cx`, `cy`) with `label`, `selected`, `control` (`"radio"` or `"check"`) and `layout` (`"row"`, `"list"` or `"cell"` for a matrix).
+- `answer(o, t)` describes the answer's ink: `{ shape: "dot" | "square" | "block", size, corner, left, top }`. A `block` fills the option. `left` and `top` place a dot or a square on the control.
+- `grid(g, t)` draws chrome around a whole matrix, and `slots(l, t)` the lines between a ranking list's slots.
+- `track(s, t)` draws a slider's track from `x1`, `x2`, `y` and `at` (the value's pixel). `thumb(t)` describes its handle.
+- `card(c, t)` lists a ranking card's parts, back to front: `body`, `badge`, `rank`, `label` and `grip`. Place each with `left` or `right`, measured from the card's edge. The `body` takes the drag, and its `hovered` and `grabbed` styles become the chart's [effects](/effects).
+- `bar(t)` describes a bar in the widgets drawn on chart axes: `{ corner, fillOpacity, track }`.
+- `list` stacks multiple choice as a list. `tiles` sizes the plot to the options from `optionHeight`, `rowHeight` and `gap`.
+- `theme` registers a named theme with the design, so `theme: "pill"` selects both.
+
+Take colours and sizes from the tokens `t`, so a theme can change them. `authoring.labelNode`, `authoring.checkNode` and `authoring.controlNodes` draw the label, the tick and the empty control the built-in designs share. A design holds functions, so register it in JavaScript. A JSON spec then names it like any other: `"theme": "pill"`.
+
 </Section>
 
 <Section id="more" title="More instruments">
 
-Ranking, allocation, tokens, intervals, histograms, regions, thermometers and labelled values. Each accepts `question`, `onChange`, `stage` and `theme`. Starting answers use options specific to each widget, such as `value`, `values`, `bins` or `mean` / `lo` / `hi`.
-
-<Example
-  code={ranking}
-  title="Ranking"
-  blurb="Drag items to reorder. It expands to a rank edit."
-  try={(
-    <>
-      <b>Drag</b> a dot up or down to swap ranks.
-    </>
-  )}
-/>
+Allocation, tokens, intervals, histograms, regions, thermometers and labelled values. Each accepts `question`, `onChange`, `stage` and `theme`. Starting answers use options specific to each widget, such as `value`, `values`, `bins` or `mean` / `lo` / `hi`.
 
 <Example
   code={allocation}

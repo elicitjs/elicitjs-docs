@@ -1,0 +1,52 @@
+// What widgets.ranking expands to: one card per row, a rank edit on its body,
+// and motion: true on the glyph.
+const items = ["Cost", "Speed", "Quality", "Risk"];
+const chart = Elicit({
+  width: 420,
+  height: 238,
+  margins: { top: 34, right: 16, bottom: 4, left: 16 },
+  axes: false,
+  schema: {
+    item: { type: "categorical", domain: items },
+    rank: { type: "ordinal", domain: [1, 2, 3, 4] },
+  },
+  // The band runs down the plot, so rank 1 is at the top.
+  scales: { y: { type: "band", padding: 0.17, range: [0, 200] } },
+  data: items.map((item, i) => ({ item, rank: i + 1 })),
+  effects: {
+    hovered: { outline: false, stroke: "#94a3b8" },
+    grabbed: {
+      stroke: "#2563eb",
+      strokeWidth: 1.5,
+      cursor: "grabbing",
+      filter: "drop-shadow(0 6px 9px rgba(15, 23, 42, 0.18))",
+    },
+  },
+  marks: [
+    composite({
+      id: "card",
+      motion: true,
+      channels: {},
+      parts: [
+        // The body spans the plot and takes the drag.
+        rect({
+          height: 40, rx: 10, fill: "#ffffff", stroke: "#d5dbe5",
+          channels: { y: { field: "rank", edit: rank({ cursor: "grab" }) } },
+        }),
+        // The rank and the label are inert, so a press on them reaches the body.
+        text({
+          fill: "#2563eb", fontWeight: 600,
+          channels: { x: { value: 20 }, y: { field: "rank" }, text: { field: "rank" } },
+        }),
+        text({
+          fill: "#0f172a", fontSize: 13,
+          channels: {
+            x: { value: 40 }, y: { field: "rank" },
+            text: { field: "item" }, textAnchor: { value: "start" },
+          },
+        }),
+      ],
+    }),
+  ],
+});
+mount(chart.dom());

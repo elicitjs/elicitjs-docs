@@ -1,0 +1,29 @@
+// A design states the parts it changes. The rest come from the design it extends.
+authoring.registerDesign("pill", {
+  extends: "box",
+  // One option: a pill with its label inside.
+  option: (o, t) => [
+    { type: "rect", x: o.x, y: o.y, width: o.width, height: o.height,
+      rx: o.height / 2, fill: t.surface,
+      stroke: o.selected ? t.accent : t.stroke, strokeWidth: 1 },
+    authoring.labelNode(o.label, o.cx, o.cy, t, {
+      width: o.width - 12,
+      fill: o.selected ? t.onAccent : t.label,
+    }),
+  ],
+  // The answer's ink: a block that fills the chosen pill, under its label.
+  answer: (o, t) => ({ shape: "block", corner: o.height / 2 }),
+  // Registers theme: "pill" with the design's own tokens.
+  theme: {
+    extends: "survey",
+    widget: { accent: "#0f766e", optionHeight: 40, gap: 6 },
+  },
+});
+
+const chart = Elicit(widgets.likert({
+  question: "How often do you cycle to work?",
+  options: ["Never", "Rarely", "Sometimes", "Often", "Daily"],
+  value: "Often",
+  theme: "pill",
+}));
+mount(chart.dom());

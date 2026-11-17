@@ -287,7 +287,7 @@ export const api: ApiEntry[] = [
     json: ['edit.rank'],
     summary: (
       <>
-        Reorder by dragging along a rank axis. The pointer inverts to a rank slot, and the datum <b>swaps</b> with whoever holds it, so ranks stay unique.
+        Reorder by dragging along a rank axis. The pointer inverts to a rank slot, and the rows between the old slot and the new one <b>shift</b> by one place, so ranks stay unique. On a mark with <code className="inline">motion: true</code> the grabbed row follows the pointer and the others ease into place. See <a href="/widgets#ranking">Ranking</a>.
       </>
     ),
     signatures: [
@@ -307,7 +307,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        An <b>Edit</b> returning the full dataset, with the two swapped rows rewritten.
+        An <b>Edit</b> returning the full dataset, with the shifted rows rewritten.
       </>
     ),
   },

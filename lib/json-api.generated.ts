@@ -79,7 +79,7 @@ export const JSON_KEYWORDS: Record<string, JsonKeyword> = {
   "guides.cellGrid": {"type":"cellGrid","place":"in \"guides\"","positional":[],"owners":[]},
   "guides.crosshair": {"type":"crosshair","place":"in \"guides\"","positional":[],"owners":[]},
   "guides.custom": {"type":"custom","place":"in \"guides\"","positional":["fn"],"owners":["guides.custom"]},
-  "guides.optionRings": {"type":"optionRings","place":"in \"guides\"","positional":[],"owners":[]},
+  "guides.options": {"type":"options","place":"in \"guides\"","positional":[],"owners":[]},
   "guides.prompt": {"type":"prompt","place":"in \"guides\"","positional":["text"],"owners":[]},
   "guides.proximity": {"type":"proximity","place":"in \"guides\"","positional":[],"owners":[]},
   "guides.quadrants": {"type":"quadrants","place":"in \"guides\"","positional":[],"owners":[]},
