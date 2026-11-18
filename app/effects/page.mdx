@@ -64,8 +64,9 @@ Each state paints in one of two ways, and can use both at once.
 
 **Element props** restyle the mark itself: `filter`, `opacity`, `fill`, `stroke`,
 `strokeWidth`, `cursor`. They override the mark's own paint while the state holds,
-and the mark's paint returns when it ends. `filter` and `cursor` apply only under
-the SVG renderer. Every other prop paints in both [renderers](/renderers).
+and the mark's paint returns when it ends. Every prop paints in both
+[renderers](/renderers). On canvas, `filter` needs a browser whose 2D context has
+`filter`; in any other it logs a warning.
 
 **`outline`** draws an overlay on the mark's edge, above every other layer. It takes
 `color`, `darken`, `fallback`, `width`, `pad`, `dash` and `opacity`, and traces

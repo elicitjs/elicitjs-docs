@@ -14,7 +14,7 @@ export default function Layout({ children }) {
 
 <Lead>A mark produces plain-data **scene nodes**: a circle at `cx,cy`, a rect, a path. The engine hands the whole scene to a **renderer**, which draws the nodes and reports gestures back. The renderer is the only link between the engine and the screen, so marks, edits, scales, guides and constraints behave the same under any renderer. Set it with `renderer:` on the spec.</Lead>
 
-The default is `new D3Renderer()`, an SVG backend. `new CanvasRenderer()` implements the same contract (`render(context)` in, `onEvent` out) and draws to a `<canvas>`. The examples below run on canvas, and every edit behaves as it does under SVG, because the interaction model lives in the engine. Two [effect](/effects#mechanisms) props, `filter` and `cursor`, apply only under SVG. The default `grabbed` effect is a `filter`, so canvas shows no grab feedback unless you give `grabbed` an `opacity` or an `outline`.
+The default is `new D3Renderer()`, an SVG backend. `new CanvasRenderer()` implements the same contract (`render(context)` in, `onEvent` out) and draws to a `<canvas>`. The examples below run on canvas, and every pointer edit behaves as it does under SVG, because the interaction model lives in the engine. [What each renderer supports](#supports) lists where the two differ.
 
 <Section id="direct" title="Direct-pick drag, on canvas">
 
@@ -47,5 +47,26 @@ Plane-driven edits (`sweep`, `draw`, `nearest`, `create`) resolve their target f
     </>
   )}
 />
+
+</Section>
+
+<Section id="supports" title="What each renderer supports">
+
+Both renderers draw every mark, element, guide and effect, and report every pointer gesture. A renderer declares what it does beyond that in `supports`. A spec that asks for something its renderer does not declare logs a warning.
+
+| `supports` | Covers | `D3Renderer` | `CanvasRenderer` |
+| --- | --- | --- | --- |
+| `keyboard` | Tab focus on editable marks, arrow-key nudges, `focusOutline` | yes | no |
+| `textEditor` | Typing into a mark with `edit.editText()` | yes | no |
+| `filter` | The `filter` prop of an [effect](/effects#mechanisms) | yes | in browsers whose 2D context has `filter` |
+| `overflow` | `overflow: "visible"` | yes | no |
+
+Canvas differs in three more ways, none of which a spec can ask for:
+
+- It finds the mark under the pointer geometrically, with a 4px tolerance around every shape. SVG tests the drawn shape exactly.
+- It picks a path along its `points`, so a custom mark that emits only `d` draws and takes no press.
+- It draws pixels, so a mark has no element to style with CSS, select in a test, or expose to a screen reader.
+
+A custom renderer sets `supports` to what it implements; unset declares nothing. It can also define `destroy()`, which `chart.destroy()` calls so the renderer can release its listeners and caches.
 
 </Section>
