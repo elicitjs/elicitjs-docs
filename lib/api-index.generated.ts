@@ -15,8 +15,8 @@ export type ApiIndexEntry = {
 
 export type ApiNamespace = { namespace: string; blurb: string; count: number };
 
-export const API_LIBRARY_VERSION = "0.1.0-alpha.3";
-export const API_GENERATED_AT = "2026-11-17T22:24:48.661Z";
+export const API_LIBRARY_VERSION = "0.2.0-alpha.0";
+export const API_GENERATED_AT = "2026-11-18T20:35:15.449Z";
 export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "plot",
@@ -42,6 +42,11 @@ export const API_NAMESPACES: ApiNamespace[] = [
     "namespace": "guides",
     "blurb": "Guides draw reference lines and interaction state. They never write data.",
     "count": 12
+  },
+  {
+    "namespace": "looks",
+    "blurb": "Looks change how the finished chart is drawn: by hand, or through a shader. Experimental.",
+    "count": 5
   },
   {
     "namespace": "widgets",
@@ -3968,6 +3973,84 @@ export const API_INDEX: ApiIndexEntry[] = [
       "id"
     ],
     "docs": "/guides"
+  },
+  {
+    "namespace": "looks",
+    "group": "looks",
+    "name": "cartoon",
+    "qualified": "looks.cartoon",
+    "call": "looks.cartoon(options)",
+    "own": [
+      "levels",
+      "outline",
+      "ink"
+    ],
+    "universal": [
+      "scope"
+    ],
+    "docs": "/looks"
+  },
+  {
+    "namespace": "looks",
+    "group": "looks",
+    "name": "custom",
+    "qualified": "looks.custom",
+    "call": "looks.custom(options)",
+    "own": [
+      "uniforms",
+      "seed"
+    ],
+    "universal": [
+      "scope"
+    ],
+    "docs": "/editing/gestures"
+  },
+  {
+    "namespace": "looks",
+    "group": "looks",
+    "name": "halftone",
+    "qualified": "looks.halftone",
+    "call": "looks.halftone(options)",
+    "own": [
+      "size",
+      "angle"
+    ],
+    "universal": [
+      "scope"
+    ],
+    "docs": "/looks"
+  },
+  {
+    "namespace": "looks",
+    "group": "looks",
+    "name": "rough",
+    "qualified": "looks.rough",
+    "call": "looks.rough(options)",
+    "own": [
+      "roughness",
+      "fill",
+      "seed"
+    ],
+    "universal": [
+      "scope"
+    ],
+    "docs": "/looks"
+  },
+  {
+    "namespace": "looks",
+    "group": "looks",
+    "name": "sketch",
+    "qualified": "looks.sketch",
+    "call": "looks.sketch(options)",
+    "own": [
+      "amount",
+      "grain",
+      "seed"
+    ],
+    "universal": [
+      "scope"
+    ],
+    "docs": "/looks"
   },
   {
     "namespace": "widgets",

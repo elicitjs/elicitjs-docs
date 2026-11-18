@@ -1,0 +1,17 @@
+const points = d3.range(11).map((t) => ({ t, v: 30 + 40 * Math.sin(t / 2) + t * 2 }));
+const chart = Elicit({
+  width: 380, height: 260,
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  // "frame" redraws the axes too. Text stays as it is.
+  looks: [looks.rough({ scope: "frame", fill: "solid", roughness: 1.5 })],
+  data: points,
+  schema: {
+    t: { type: "quantitative", domain: [0, 10] },
+    v: { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    lineY({ strokeWidth: 2, curve: "catmullRom", channels: { x: { field: "t" }, y: { field: "v" } } }),
+    point({ size: 6, channels: { x: { field: "t" }, y: { field: "v", edit: move() } } }),
+  ],
+});
+mount(chart.dom());

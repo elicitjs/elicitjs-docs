@@ -45,6 +45,7 @@ const GRAMMAR = [
   "edit",
   "constraints",
   "guides",
+  "looks",
   "widgets",
   "format",
 ];
@@ -59,6 +60,8 @@ const BLURB = {
     "Constraints are rules over the dataset. Each one rejects or repairs every edit.",
   guides:
     "Guides draw reference lines and interaction state. They never write data.",
+  looks:
+    "Looks change how the finished chart is drawn: by hand, or through a shader. Experimental.",
   widgets: "Widgets are complete survey instruments. Each returns a spec.",
   format: "Formatters turn a value into a string for a label or an axis.",
 };
@@ -144,6 +147,7 @@ const NAMESPACE_FALLBACK = {
   edit: "/editing",
   constraints: "/constraints",
   guides: "/guides",
+  looks: "/looks",
   widgets: "/widgets",
   format: "/scales",
 };
@@ -181,12 +185,14 @@ function optionsFor(ns, bare, dotted) {
       plot: vocab.MARK_UNIVERSAL_OPTIONS,
       elements: vocab.ELEMENT_UNIVERSAL_OPTIONS,
       guides: vocab.GUIDE_UNIVERSAL_OPTIONS,
+      looks: vocab.LOOK_UNIVERSAL_OPTIONS,
       edit: vocab.EDIT_UNIVERSAL_OPTIONS,
     }[ns] || [];
   const own = {
     plot: vocab.MARK_OPTIONS?.[bare],
     elements: vocab.ELEMENT_OPTIONS?.[bare],
     guides: vocab.GUIDE_OPTIONS?.[bare],
+    looks: vocab.LOOK_OPTIONS?.[bare],
     edit: vocab.EDIT_OPTIONS?.[dotted] ?? vocab.EDIT_OPTIONS?.[bare],
     constraints: vocab.CONSTRAINT_OPTIONS?.[bare],
   }[ns];

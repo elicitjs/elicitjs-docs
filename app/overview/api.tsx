@@ -165,6 +165,16 @@ export const api: ApiEntry[] = [
         ),
       },
       {
+        name: "looks",
+        type: "Look[]",
+        default: "none",
+        desc: (
+          <>
+            Experimental. How the finished chart is drawn: by hand, or through a shader. See <a href="/looks">Looks</a>.
+          </>
+        ),
+      },
+      {
         name: "focusOutline",
         type: "boolean",
         default: "false",

@@ -94,6 +94,7 @@ export const SITE: NavGroup[] = [
       { href: "/guides", title: "Guides" },
       { href: "/theming", title: "Theming & style" },
       { href: "/theming/themes", title: "Named themes" },
+      { href: "/looks", title: "Looks (experimental)" },
     ],
   },
   {

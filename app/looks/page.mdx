@@ -1,0 +1,251 @@
+import { DocShell } from '../../components/DocShell';
+import { ApiReference } from '../../components/ApiReference';
+import { Section } from '../../components/Section';
+import { Example } from '../../components/Example';
+import { Lead } from '../../components/Lead';
+import { api } from './api';
+
+import roughBars from './_examples/rough-bars.example.txt';
+import roughFrame from './_examples/rough-frame.example.txt';
+import sketchBars from './_examples/sketch-bars.example.txt';
+import cartoonBars from './_examples/cartoon-bars.example.txt';
+import halftoneBars from './_examples/halftone-bars.example.txt';
+import customShader from './_examples/custom-shader.example.txt';
+import severalLooks from './_examples/several-looks.example.txt';
+import faceRough from './_examples/face-rough.example.txt';
+import faceCartoon from './_examples/face-cartoon.example.txt';
+import emojiCartoon from './_examples/emoji-cartoon.example.txt';
+import emojiSketch from './_examples/emoji-sketch.example.txt';
+import plantRough from './_examples/plant-rough.example.txt';
+import plantHalftone from './_examples/plant-halftone.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Looks
+
+<Lead>A **look** changes how the finished chart is drawn: by hand with `looks.rough()`, or through a shader with `looks.sketch()`, `looks.cartoon()`, `looks.halftone()` and `looks.custom()`. Set them in `looks: [...]` on the `Elicit` spec. A look changes no data, scale or gesture. Looks are experimental, so their names and options may change.</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="rough" title="Drawn by hand">
+
+`looks.rough()` redraws each shape with a pen that wobbles. Lines are drawn twice, corners overshoot, and a mark's fill is hatched. It draws in both [renderers](/renderers).
+
+Each shape keeps its true outline for the pointer, so a drag grabs a bar where it sits. `roughness` sets how far the pen strays, from 0 to 3. `fill: "solid"` fills a mark with colour in place of hatching. `seed` picks another hand, and the same seed draws the same chart every time.
+
+<Example
+  code={roughBars}
+  title="A hand-drawn bar chart"
+  blurb="looks: [looks.rough()]. The bars are hatched and their edges wobble; the drag still reads each bar's true shape."
+  try={(
+    <>
+      <b>Drag</b> a bar up or down.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="scope" title="What a look covers">
+
+`scope` is `"marks"` by default: the look covers the marks that draw data, and axes, labels, legends and guides stay as drawn. `scope: "frame"` covers the whole chart.
+
+`looks.rough()` leaves text as it is in either scope. A shader look with `scope: "frame"` runs over text too, so tick labels wobble or break into dots.
+
+<Example
+  code={roughFrame}
+  title="The whole frame"
+  blurb="scope: &quot;frame&quot; redraws the axis lines and ticks with the marks. fill: &quot;solid&quot; fills the dots."
+  try={(
+    <>
+      <b>Drag</b> a dot. The line follows, redrawn.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="shaders" title="Shader looks">
+
+A shader look runs over the chart's pixels once it is painted. It needs the canvas renderer, so set `renderer: new CanvasRenderer()`. Under SVG the chart draws without the look and logs a warning.
+
+- `looks.sketch()` wobbles and doubles every line and gives fills a pencil grain. `amount` sets the wobble, from 0 to 2, and `grain` the grain, from 0 to 1.
+- `looks.cartoon()` flattens colour into `levels` steps and inks an `outline` where colour changes, in the colour `ink`.
+- `looks.halftone()` redraws the chart as dots `size` px apart, on a screen turned by `angle` degrees.
+
+The built-in shaders move a pixel by less than 4px, so a mark is drawn where the pointer hits it.
+
+<Example
+  code={sketchBars}
+  title="Sketch"
+  blurb="looks.sketch() on canvas: wobbling edges and a pencil grain."
+  try={(
+    <>
+      <b>Drag</b> a bar.
+    </>
+  )}
+/>
+
+<Example
+  code={cartoonBars}
+  title="Cartoon"
+  blurb="looks.cartoon(): flat colour and an ink line."
+  try={(
+    <>
+      <b>Drag</b> a bar.
+    </>
+  )}
+/>
+
+<Example
+  code={halftoneBars}
+  title="Halftone"
+  blurb="looks.halftone(): the marks as a screen of dots. The axes are outside the default scope."
+  try={(
+    <>
+      <b>Drag</b> a bar.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="custom" title="Your own shader">
+
+`looks.custom(fragment, options)` runs your GLSL. `fragment` is GLSL ES 1.00 source that defines `vec4 look(vec2 uv)`, which returns the pixel at `uv`. Colour is premultiplied by alpha, both in the frame you read and in the pixel you return.
+
+A fragment can read and call:
+
+<div className="api-table-wrap">
+  <table className="api-table">
+    <thead>
+      <tr><th>Name</th><th>Type</th><th>What it is</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>u_frame</code></td><td><code>sampler2D</code></td><td>The painted chart.</td></tr>
+      <tr><td><code>u_resolution</code></td><td><code>vec2</code></td><td>The frame's size in device px.</td></tr>
+      <tr><td><code>u_pixelRatio</code></td><td><code>float</code></td><td>Device px per chart px.</td></tr>
+      <tr><td><code>u_seed</code></td><td><code>float</code></td><td>The <code>seed</code> option.</td></tr>
+      <tr><td><code>chartPx(uv)</code></td><td><code>vec2</code></td><td>A <code>uv</code> as chart px, whose origin is the top-left corner.</td></tr>
+      <tr><td><code>toUv(px)</code></td><td><code>vec2</code></td><td>Chart px as a <code>uv</code>.</td></tr>
+      <tr><td><code>hash(p)</code></td><td><code>float</code></td><td>Noise from 0 to 1 at a <code>vec2</code>, a new value at every point.</td></tr>
+      <tr><td><code>noise(p)</code></td><td><code>float</code></td><td>Noise from 0 to 1 at a <code>vec2</code>, smooth between whole numbers.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+`uniforms` passes your own numbers under their own names: a number arrives as a `float`, and two to four numbers as a `vec2`, `vec3` or `vec4`.
+
+A fragment that fails to compile is skipped, and the compiler's error is logged. A shader that moves pixels further than 4px draws a mark away from where the pointer hits it.
+
+<Example
+  code={customShader}
+  title="A custom shader"
+  blurb="looks.custom(fragment, { uniforms }). The fragment shifts each row sideways by its strength uniform and mixes in its tint."
+  try={(
+    <>
+      <b>Edit</b> <code>strength</code> or <code>tint</code> in the code.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="order" title="Several looks">
+
+`looks.rough()` runs first. Shader looks with `scope: "marks"` run next, in list order, and shader looks with `scope: "frame"` run last, in list order.
+
+<Example
+  code={severalLooks}
+  title="Rough, then sketch"
+  blurb="The shapes are redrawn by hand, then the frame takes a light wobble and a pencil grain."
+  try={(
+    <>
+      <b>Drag</b> a bar.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="glyphs" title="Faces, emoji and glyphs">
+
+A look covers a glyph part by part, and each part keeps its own edit. `looks.rough()` redraws shapes, so it reaches a [`face`](/marks/face) and a [`composite`](/marks/composite) glyph, such as the plant from the [glyph case study](/case-studies/glyphs). An emoji from a [`symbol`](/marks/symbol) channel is text, so `looks.rough()` leaves it as drawn and a shader look reaches it.
+
+<Example
+  code={faceRough}
+  title="A face, by hand"
+  blurb="looks.rough({ fill: &quot;solid&quot;, roughness: 1.6 }) over a face. The head, eyes, brows and mouth are each redrawn."
+  try={(
+    <>
+      <b>Drag</b> the mouth, an eye or a brow.
+    </>
+  )}
+/>
+
+<Example
+  code={faceCartoon}
+  title="A face, as a cartoon"
+  blurb="The same face on canvas under looks.cartoon(): flat colour and an ink line round every part."
+  try={(
+    <>
+      <b>Drag</b> the mouth, an eye or a brow.
+    </>
+  )}
+/>
+
+<Example
+  code={emojiCartoon}
+  title="Emoji, inked"
+  blurb="looks.cartoon() over emoji symbols. The axes are outside the default scope and stay as drawn."
+  try={(
+    <>
+      <b>Click</b> an emoji to cycle its mood.
+    </>
+  )}
+/>
+
+<Example
+  code={emojiSketch}
+  title="Emoji, sketched"
+  blurb="looks.sketch({ amount: 2, grain: 0.5 }): the emoji wobble and take a pencil grain."
+  try={(
+    <>
+      <b>Click</b> an emoji to cycle its mood.
+    </>
+  )}
+/>
+
+<Example
+  code={plantRough}
+  title="A plant, hatched"
+  blurb="The plant glyph from the glyph case study under looks.rough(). Hatching is see-through, so the stem shows behind the flower."
+  try={(
+    <>
+      <b>Drag</b> the flower up, down or sideways, or a leaf outwards.
+    </>
+  )}
+/>
+
+<Example
+  code={plantHalftone}
+  title="A plant, in dots"
+  blurb="The same plant on canvas under looks.halftone({ size: 4 })."
+  try={(
+    <>
+      <b>Drag</b> the flower or a leaf.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="limits" title="Limits">
+
+- A shader look reads the chart's pixels. A chart that draws [`geoTile()`](/marks/geo) tiles from a server without CORS headers draws without its shader looks and logs a warning.
+- A browser with no WebGL draws the chart without its shader looks and logs a warning.
+- `looks.rough()` leaves text and images as drawn.
+
+</Section>

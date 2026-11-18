@@ -54,12 +54,20 @@ Plane-driven edits (`sweep`, `draw`, `nearest`, `create`) resolve their target f
 
 Both renderers draw every mark, element, guide and effect, and report every pointer gesture. A renderer declares what it does beyond that in `supports`. A spec that asks for something its renderer does not declare logs a warning.
 
-| `supports` | Covers | `D3Renderer` | `CanvasRenderer` |
-| --- | --- | --- | --- |
-| `keyboard` | Tab focus on editable marks, arrow-key nudges, `focusOutline` | yes | no |
-| `textEditor` | Typing into a mark with `edit.editText()` | yes | no |
-| `filter` | The `filter` prop of an [effect](/effects#mechanisms) | yes | in browsers whose 2D context has `filter` |
-| `overflow` | `overflow: "visible"` | yes | no |
+<div className="api-table-wrap">
+  <table className="api-table">
+    <thead>
+      <tr><th><code>supports</code></th><th>Covers</th><th><code>D3Renderer</code></th><th><code>CanvasRenderer</code></th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>keyboard</code></td><td>Tab focus on editable marks, arrow-key nudges, <code>focusOutline</code></td><td>yes</td><td>no</td></tr>
+      <tr><td><code>textEditor</code></td><td>Typing into a mark with <code>edit.editText()</code></td><td>yes</td><td>no</td></tr>
+      <tr><td><code>filter</code></td><td>The <code>filter</code> prop of an <a href="/effects#mechanisms">effect</a></td><td>yes</td><td>in browsers whose 2D context has <code>filter</code></td></tr>
+      <tr><td><code>overflow</code></td><td><code>overflow: "visible"</code></td><td>yes</td><td>no</td></tr>
+      <tr><td><code>shaders</code></td><td>Shader <a href="/looks">looks</a></td><td>no</td><td>in browsers with WebGL</td></tr>
+    </tbody>
+  </table>
+</div>
 
 Canvas differs in three more ways, none of which a spec can ask for:
 

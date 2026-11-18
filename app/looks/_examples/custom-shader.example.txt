@@ -1,0 +1,32 @@
+// `look` returns the pixel at uv. This one shifts each row sideways and tints it.
+const wave = `
+vec4 look(vec2 uv) {
+  vec2 p = chartPx(uv);
+  p.x += sin(p.y / 9.0) * strength;
+  vec4 c = texture2D(u_frame, toUv(p));
+  return vec4(mix(c.rgb, tint * c.a, 0.3), c.a);
+}`;
+const chart = Elicit({
+  width: 380, height: 260,
+  renderer: new CanvasRenderer(),
+  margins: { top: 14, right: 14, bottom: 26, left: 30 },
+  looks: [looks.custom(wave, { uniforms: { strength: 2.5, tint: [1, 0.3, 0.6] } })],
+  data: [
+    { x: "A", y: 20 }, { x: "B", y: 45 },
+    { x: "C", y: 30 }, { x: "D", y: 60 },
+  ],
+  schema: {
+    x: { type: "categorical", domain: ["A", "B", "C", "D"] },
+    y: { type: "quantitative", domain: [0, 100] },
+  },
+  marks: [
+    barY({
+      channels: {
+        x: { field: "x" },
+        y: { field: "y", edit: move() },
+        fill: { field: "x" },
+      },
+    }),
+  ],
+});
+mount(chart.dom());

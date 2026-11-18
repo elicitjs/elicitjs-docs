@@ -18,7 +18,7 @@ type EditMembers = typeof elicit.edit;
 type UniversalEdit = { [K in keyof EditMembers]: EditMembers[K] extends (...args: never[]) => unknown ? K : never }[keyof EditMembers];
 
 /** The grammar namespaces an example names: the library's own, or a recorder's. */
-export type Grammar = Pick<typeof elicit, 'plot' | 'elements' | 'constraints' | 'edit' | 'guides' | 'widgets' | 'format'>;
+export type Grammar = Pick<typeof elicit, 'plot' | 'elements' | 'constraints' | 'edit' | 'guides' | 'looks' | 'widgets' | 'format'>;
 
 /**
  * @param grammar the namespaces the scope spreads. A recorder's look like the
@@ -66,6 +66,8 @@ export function createElicitScope(grammar: Grammar = elicit) {
     elements: grammar.elements,
     // Guides — view chart STATE, and write nothing.
     guides: grammar.guides,
+    // Looks — how the finished chart is drawn. Experimental.
+    looks: grammar.looks,
     widgets: grammar.widgets,
     format: grammar.format,
     // The authoring kit, for the /authoring examples that write a custom mark.

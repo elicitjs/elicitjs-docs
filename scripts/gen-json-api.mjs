@@ -34,6 +34,7 @@ const PLACE = {
   edit: 'in "edits", or a channel\'s "edit"',
   constraints: 'in "constraints"',
   guides: 'in "guides"',
+  looks: 'in "looks"',
   widgets: 'under "widget"',
   format: 'in "format" or "tickFormat"',
   when: 'in "when"',
