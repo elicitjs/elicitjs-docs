@@ -117,7 +117,7 @@ A constraint is a rule over the dataset. It applies to every edit and every mark
 <Example
   code={withAConstraint}
   title="Four bars that always sum to 100"
-  blurb="`clamp` keeps values non-negative. `maintainSum` redistributes so the total holds."
+  blurb={'`clamp` keeps values non-negative. `maintainSum` with `strategy: "redistribute"` holds the bar you drag and adjusts the others so the total stays 100.'}
   try={<><b>Drag</b> a bar — the others compensate.</>}
 />
 
@@ -134,7 +134,7 @@ import { Elicit, widgets } from "elicitjs";
 
 const chart = Elicit(widgets.likert({
   question: "How confident are you?",
-  scale: ["Not at all", "Slightly", "Moderately", "Very", "Extremely"],
+  options: ["Not at all", "Slightly", "Moderately", "Very", "Extremely"],
 }));
 document.body.append(chart.dom());
 ```

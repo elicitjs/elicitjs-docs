@@ -11,7 +11,7 @@ const chart = Elicit({
   ],
   constraints: [
     clamp({ field: "share", min: 0 }),
-    maintainSum({ field: "share", total: 100 }),
+    maintainSum({ field: "share", total: 100, strategy: "redistribute" }),
   ],
   schema: {
     category: { type: "categorical", domain: ["Product", "Marketing", "Ops", "R&D"] },

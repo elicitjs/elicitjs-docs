@@ -10,7 +10,10 @@ const chart = Elicit({
     n:   { type: "quantitative", domain: [0, 100] },
   },
   // A rule about the DATA, not about any one mark. It holds for every edit.
-  constraints: [clamp({ min: 0 }), maintainSum({ total: 100 })],
+  constraints: [
+    clamp({ min: 0 }),
+    maintainSum({ total: 100, strategy: "redistribute" }),
+  ],
   marks: [
     barY({
       fill: "#50AEB7",
