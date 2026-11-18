@@ -60,10 +60,10 @@ export const api: ApiEntry[] = [
     summary: (
       <>
         A channel on the mark that draws the nodes. It says which rows can hold other
-        nodes.
+        nodes, and how they arrange them.
       </>
     ),
-    signatures: ["contains: true | { value | fn | field, padding }"],
+    signatures: ["contains: true | { value | fn | field, padding, arrange, gap, columns }"],
     options: [
       {
         name: "value | fn | field",
@@ -88,6 +88,37 @@ export const api: ApiEntry[] = [
           </>
         ),
       },
+      {
+        name: "arrange",
+        type: '"dodge" | "free" | "row" | "column" | "grid" | "pack"',
+        default: '"dodge"',
+        desc: (
+          <>
+            How the contents are placed. <code className="inline">dodge</code> and{" "}
+            <code className="inline">free</code> leave them where you drop them.{" "}
+            <code className="inline">pack</code> draws them together where you drop
+            them. The others put them in slots, in order: a drag reorders, and a drop
+            takes the nearest slot.
+          </>
+        ),
+      },
+      {
+        name: "gap",
+        type: "number",
+        default: "8",
+        desc: <>The space in px between slots.</>,
+      },
+      {
+        name: "columns",
+        type: "number",
+        default: "as many as fit",
+        desc: (
+          <>
+            Cells to a row, with <code className="inline">arrange: "grid"</code>. A fitted
+            grid with no <code className="inline">columns</code> makes a square.
+          </>
+        ),
+      },
     ],
   },
   {
@@ -95,10 +126,11 @@ export const api: ApiEntry[] = [
     summary: (
       <>
         A channel on the mark that draws the nodes. Rows that take part are pushed clear
-        of their siblings when a drag ends and when data is set from outside.
+        of their siblings when a drag ends and when data is set from outside. Every
+        node takes part until a mark states <code className="inline">dodge</code>.
       </>
     ),
-    signatures: ["dodge: true | { value | fn | field, gap }"],
+    signatures: ["dodge: false | true | { value | fn | field, gap }"],
     options: [
       {
         name: "value | fn | field",
@@ -106,7 +138,8 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            <code className="inline">true</code> is every row. Use{" "}
+            <code className="inline">true</code> is every row and{" "}
+            <code className="inline">false</code> is none. Use{" "}
             <code className="inline">fn</code> or <code className="inline">field</code> to
             pick the rows that take part.
           </>
@@ -139,7 +172,9 @@ export const api: ApiEntry[] = [
             The channel needs a <code className="inline">field</code>. The fitted value is
             written to it, so <code className="inline">getData()</code> reports the size
             that is drawn. The row&rsquo;s <code className="inline">x</code> and{" "}
-            <code className="inline">y</code> follow the centre of its contents.
+            <code className="inline">y</code> follow the centre of its contents. A
+            container that loses its last child returns to the column&rsquo;s schema{" "}
+            <code className="inline">default</code>.
           </>
         ),
       },

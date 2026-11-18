@@ -1,0 +1,71 @@
+const chart = Elicit({
+  width: 560, height: 340,
+  margins: { top: 24, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["set", "item"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        // An empty set returns to this radius.
+        r: { type: "quantitative", domain: [0, 300], default: 30 },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "likely", label: "Likely", kind: "set", x: 28, y: 50, r: 30 },
+      { id: "unlikely", label: "Unlikely", kind: "set", x: 72, y: 50, r: 30 },
+      { id: "a", label: "Rain", kind: "item", x: 28, y: 50, r: 22 },
+      { id: "b", label: "Wind", kind: "item", x: 28, y: 50, r: 16 },
+      { id: "c", label: "Heat", kind: "item", x: 28, y: 50, r: 18 },
+      { id: "d", label: "Fog", kind: "item", x: 28, y: 50, r: 14 },
+      { id: "e", label: "Snow", kind: "item", x: 72, y: 50, r: 20 },
+      { id: "f", label: "Hail", kind: "item", x: 72, y: 50, r: 15 },
+    ],
+    nesting: [
+      { child: "a", parent: "likely" },
+      { child: "b", parent: "likely" },
+      { child: "c", parent: "likely" },
+      { child: "d", parent: "likely" },
+      { child: "e", parent: "unlikely" },
+      { child: "f", parent: "unlikely" },
+    ],
+  },
+  marks: [
+    point({
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        size: { field: "r", scale: null, fit: true },
+        // Items gather where they are dropped; the set encloses them.
+        contains: { fn: (d) => d.kind === "set", padding: 6, arrange: "pack", gap: 3 },
+        fill: { fn: (d) => (d.kind === "set" ? "#EDF7F8" : "#C3B9DF") },
+      },
+    }),
+    text({
+      fontSize: 10,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        dy: { fn: (d) => (d.kind === "set" ? -d.r - 8 : 0) },
+      },
+    }),
+  ],
+});
+mount(chart.dom());

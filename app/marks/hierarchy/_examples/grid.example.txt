@@ -1,0 +1,72 @@
+const chart = Elicit({
+  width: 560, height: 320,
+  margins: { top: 16, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  // The two boards are the question, so they stay where they are.
+  lock: (d, i, table) => table === "nodes" && d.kind === "board",
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["board", "item"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "keep", label: "Keep", kind: "board", x: 27, y: 50, w: 220, h: 250 },
+      { id: "drop", label: "Drop", kind: "board", x: 73, y: 50, w: 220, h: 250 },
+      ...["🍎", "🍌", "🍇", "🥕", "🥦", "🧀", "🍞", "🍫"].map((label, k) => ({
+        id: "i" + k, label, kind: "item", x: 27, y: 50, w: 52, h: 52,
+      })),
+    ],
+    nesting: ["i0", "i1", "i2", "i3", "i4", "i5", "i6", "i7"].map((child) => ({ child, parent: "keep" })),
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        // No `fit`: a board keeps its size.
+        width: { field: "w", scale: null },
+        height: { field: "h", scale: null },
+        // Items fill three cells to a row, under the board's name.
+        contains: {
+          fn: (d) => d.kind === "board",
+          padding: { top: 30, right: 14, bottom: 14, left: 14 },
+          arrange: "grid",
+          columns: 3,
+          gap: 8,
+        },
+        fill: { fn: (d) => (d.kind === "board" ? "#EDF7F8" : "#FFFFFF") },
+      },
+    }),
+    text({
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        fontSize: { fn: (d) => (d.kind === "board" ? 11 : 24) },
+        dy: { fn: (d) => (d.kind === "board" ? -d.h / 2 + 15 : 0) },
+      },
+    }),
+  ],
+});
+mount(chart.dom());

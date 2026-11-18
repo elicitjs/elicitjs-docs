@@ -1,0 +1,77 @@
+const chart = Elicit({
+  width: 560, height: 300,
+  margins: { top: 16, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        kind: { type: "categorical", domain: ["row", "tile"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        // An empty row returns to this size.
+        w: { type: "quantitative", domain: [0, 600], default: 60 },
+        h: { type: "quantitative", domain: [0, 400], default: 50 },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "outer", kind: "row", x: 10, y: 75, w: 60, h: 50 },
+      { id: "A1", kind: "tile", x: 12, y: 75, w: 40, h: 34 },
+      { id: "B1", kind: "tile", x: 20, y: 75, w: 40, h: 34 },
+      { id: "inner", kind: "row", x: 30, y: 75, w: 60, h: 50 },
+      { id: "A1-1", kind: "tile", x: 32, y: 75, w: 40, h: 34 },
+      { id: "deep", kind: "row", x: 40, y: 75, w: 60, h: 50 },
+      { id: "B1-1", kind: "tile", x: 42, y: 75, w: 40, h: 34 },
+      { id: "B2", kind: "tile", x: 50, y: 75, w: 40, h: 34 },
+      { id: "C2", kind: "tile", x: 58, y: 75, w: 40, h: 34 },
+      { id: "spare", kind: "row", x: 20, y: 25, w: 60, h: 50 },
+      { id: "A2", kind: "tile", x: 50, y: 25, w: 40, h: 34 },
+    ],
+    nesting: [
+      { child: "A1", parent: "outer" },
+      { child: "B1", parent: "outer" },
+      { child: "inner", parent: "outer" },
+      { child: "A1-1", parent: "inner" },
+      { child: "deep", parent: "inner" },
+      { child: "B1-1", parent: "deep" },
+      { child: "B2", parent: "deep" },
+      { child: "C2", parent: "deep" },
+    ],
+  },
+  marks: [
+    rect({
+      rx: 5,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        // Rows hold tiles and other rows, left to right.
+        contains: { fn: (d) => d.kind === "row", padding: 8, arrange: "row", gap: 6 },
+        fill: { fn: (d) => (d.kind === "row" ? "#EDF7F8" : "#FFFFFF") },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { fn: (d) => (d.kind === "tile" ? d.id : "") },
+      },
+    }),
+  ],
+});
+mount(chart.dom());

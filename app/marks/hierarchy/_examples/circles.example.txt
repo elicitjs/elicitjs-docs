@@ -11,7 +11,7 @@ const chart = Elicit({
         kind: { type: "categorical", domain: ["set", "item"] },
         x: { type: "quantitative", domain: [0, 100] },
         y: { type: "quantitative", domain: [0, 100] },
-        r: { type: "quantitative", domain: [0, 300] },
+        r: { type: "quantitative", domain: [0, 300], default: 40 },
       },
       nesting: {
         child: { type: "ref" },

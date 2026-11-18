@@ -10,8 +10,8 @@ const chart = Elicit({
         label: { type: "categorical", open: true },
         x: { type: "quantitative", domain: [0, 100] },
         y: { type: "quantitative", domain: [0, 100] },
-        w: { type: "quantitative", domain: [0, 600] },
-        h: { type: "quantitative", domain: [0, 400] },
+        w: { type: "quantitative", domain: [0, 600], default: 80 },
+        h: { type: "quantitative", domain: [0, 400], default: 28 },
       },
       nesting: {
         child: { type: "ref" },

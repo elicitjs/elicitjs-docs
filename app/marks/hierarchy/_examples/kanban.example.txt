@@ -1,0 +1,79 @@
+const chart = Elicit({
+  width: 560, height: 360,
+  margins: { top: 16, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["lane", "card"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        // An empty lane returns to this size.
+        w: { type: "quantitative", domain: [0, 600], default: 140 },
+        h: { type: "quantitative", domain: [0, 600], default: 70 },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "todo", label: "To do", kind: "lane", x: 18, y: 80, w: 140, h: 70 },
+      { id: "doing", label: "Doing", kind: "lane", x: 50, y: 80, w: 140, h: 70 },
+      { id: "done", label: "Done", kind: "lane", x: 82, y: 80, w: 140, h: 70 },
+      { id: "a", label: "Write survey", kind: "card", x: 18, y: 80, w: 120, h: 28 },
+      { id: "b", label: "Recruit", kind: "card", x: 18, y: 70, w: 120, h: 28 },
+      { id: "c", label: "Pilot study", kind: "card", x: 18, y: 60, w: 120, h: 28 },
+      { id: "d", label: "Ethics form", kind: "card", x: 50, y: 80, w: 120, h: 28 },
+      { id: "e", label: "Literature", kind: "card", x: 82, y: 80, w: 120, h: 28 },
+    ],
+    nesting: [
+      { child: "a", parent: "todo" },
+      { child: "b", parent: "todo" },
+      { child: "c", parent: "todo" },
+      { child: "d", parent: "doing" },
+      { child: "e", parent: "done" },
+    ],
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        // A lane grows down as cards join it.
+        width: { field: "w", scale: null, fit: true },
+        height: { field: "h", scale: null, fit: true },
+        // Cards stack top to bottom, in order, under the lane's name.
+        contains: {
+          fn: (d) => d.kind === "lane",
+          padding: { top: 30, right: 10, bottom: 10, left: 10 },
+          arrange: "column",
+          gap: 6,
+        },
+        fill: { fn: (d) => (d.kind === "lane" ? "#EDF7F8" : "#FFFFFF") },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        dy: { fn: (d) => (d.kind === "lane" ? -d.h / 2 + 15 : 0) },
+      },
+    }),
+  ],
+});
+mount(chart.dom());

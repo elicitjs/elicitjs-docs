@@ -15,6 +15,10 @@ import linked from './_examples/linked.example.txt';
 import rules from './_examples/rules.example.txt';
 import setData from './_examples/set-data.example.txt';
 import namedTables from './_examples/named-tables.example.txt';
+import kanban from './_examples/kanban.example.txt';
+import rows from './_examples/rows.example.txt';
+import grid from './_examples/grid.example.txt';
+import pack from './_examples/pack.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -22,7 +26,7 @@ export default function Layout({ children }) {
 
 # Hierarchy
 
-<Lead>A **hierarchy** is nodes that sit inside each other, declared with `structure: "hierarchy"`: one table of nodes, and a `nesting` table with one row per containment. Any mark that draws a node shape can be a container. A `contains` channel picks the rows that hold others, `fit: true` on a size channel sizes a container to its contents, and `edit.hierarchy.nest` drops a node into a container or out of one.</Lead>
+<Lead>A **hierarchy** is nodes that sit inside each other, declared with `structure: "hierarchy"`: one table of nodes, and a `nesting` table with one row per containment. Any mark that draws a node shape can be a container. A `contains` channel picks the rows that hold others and how they are arranged, `fit: true` on a size channel sizes a container to its contents, and `edit.hierarchy.nest` drops a node into a container or out of one.</Lead>
 
 <ApiReference entries={api} />
 
@@ -149,6 +153,12 @@ rect({
 
 A row with contents gets its fitted columns from them, so a resize edit leaves those columns alone. A row without contents keeps its own size and stays editable.
 
+When a container loses its last child, it returns to each fitted column's `default` in the schema and keeps its top-left corner. Declare one for every fitted column; without it, the container shrinks to its padding and logs a warning.
+
+```js
+w: { type: "quantitative", domain: [0, 600], default: 130 },
+```
+
 The fitted size is in the data, so other channels can read it. The examples here place a group's name from its `h` column.
 
 <Example
@@ -188,7 +198,7 @@ contains: { fn: (d) => d.kind === "group", padding: { top: 30, right: 12, bottom
 
 A fitted container is sized to leave that room. A container with a size of its own moves its contents inside it.
 
-`dodge` keeps nodes from overlapping. It is a channel like `contains`: `true` is every row, and `{ fn }` or `{ field }` picks the rows that take part. `gap` is the space they keep, 8px by default. Round nodes keep it edge to edge. A `composite` dodges as a whole, with every part, its label included.
+Nodes keep 8px from their siblings. The `dodge` channel changes that: `{ value: true, gap }` sets the space, `{ fn }` or `{ field }` picks the rows that take part, and `dodge: false` lets nodes overlap. Round nodes keep the gap edge to edge. A `composite` dodges as a whole, with every part, its label included.
 
 ```js
 dodge: { value: true, gap: 10 }
@@ -196,7 +206,7 @@ dodge: { value: true, gap: 10 }
 
 Nodes dodge their siblings: the contents of one container dodge each other, and so do the top-level nodes. When two overlap, the node you just dropped stays put and the other moves the shortest distance that clears it. When that leaves no room, the contents are packed in reading order from the top-left. A container that grows pushes its neighbours the same way, and they take their contents along. A pushed node stays inside its container's padding, or inside the plot at the top level. Where the space runs out, nodes spread as far apart as it allows.
 
-Nodes are pushed apart on release, and when data arrives through `setData`. While you drag, they are drawn where the release will put them. Seeded data is spaced once, at the start. Without `dodge`, nodes stay where they are put.
+Nodes are pushed apart on release, and when data arrives through `setData`. While you drag, they are drawn where the release will put them. Seeded data is spaced once, at the start.
 
 <Example
   code={spacing}
@@ -212,9 +222,83 @@ Nodes are pushed apart on release, and when data arrives through `setData`. Whil
 
 </Section>
 
+<Section id="arrange" title="Arranging contents">
+
+`arrange` on `contains` sets how a container places its contents.
+
+| `arrange` | Contents |
+| --- | --- |
+| `"dodge"` | Where you drop them, pushed apart when they overlap. The default. |
+| `"free"` | Where you drop them. They may overlap. |
+| `"row"` | Left to right from the top-left. A row with a fixed width wraps at it. |
+| `"column"` | Top to bottom from the top-left. A column with a fixed height wraps at it. |
+| `"grid"` | Equal cells, the size of the largest node, `columns` to a row. |
+| `"pack"` | Circles drawn together where you drop them. |
+
+In a row, column or grid, the order of the contents is the answer. Drag a node within its container to reorder it. Drop one into a container and it takes the nearest slot. While you drag, the other nodes open a space where it will land. On release, every node snaps to its slot.
+
+A pack has no order. A node you drop there lands in the free spot nearest where you let go, touching the others, and the others stay where they are. Nothing in a pack moves until you let go, so the circle you aim at holds still.
+
+`gap` is the space between slots, 8px by default. `columns` sets a grid's cells to a row. Without it, a grid fills a fixed width, or makes a square.
+
+```js
+contains: { fn: (d) => d.kind === "lane", arrange: "column", gap: 6 }
+```
+
+The order is read from the `x` and `y` columns, which hold each node's slot. A fitted container keeps its top-left corner and grows right and down. A pack is fitted round its contents.
+
+<Example
+  code={kanban}
+  title="A board that grows"
+  blurb={'arrange: "column" — each lane stacks its cards and fits round them.'}
+  tall
+  try={(
+    <>
+      <b>Drag</b> Pilot study above Write survey. <b>Drag</b> Ethics form into Done,
+      between the cards there. Doing returns to its default size.
+    </>
+  )}
+/>
+
+<Example
+  code={rows}
+  title="Rows inside rows"
+  blurb={'arrange: "row" — rows hold tiles and other rows, at any depth.'}
+  try={(
+    <>
+      <b>Drag</b> A2 into any row. <b>Drag</b> a whole row into another one.
+    </>
+  )}
+/>
+
+<Example
+  code={grid}
+  title="A grid"
+  blurb={'arrange: "grid", columns: 3 — fixed boards that fill in reading order.'}
+  try={(
+    <>
+      <b>Drag</b> items onto Drop. <b>Drag</b> an item between two others to reorder.
+    </>
+  )}
+/>
+
+<Example
+  code={pack}
+  title="Packed circles"
+  blurb={'arrange: "pack" — an item lands where you drop it, touching the others.'}
+  try={(
+    <>
+      <b>Drag</b> Rain into Unlikely. <b>Drag</b> every item out of a set and it returns
+      to its default radius.
+    </>
+  )}
+/>
+
+</Section>
+
 <Section id="fixed" title="Fixed containers">
 
-Leave `fit` off and a container keeps the size it was given. Use this for regions that are part of the question: buckets, lanes, zones. Lock them with `lock` so only the cards move. Cards stay inside the bucket's padding, and a locked row stays where it is when nodes dodge.
+Leave `fit` off and a container keeps the size it was given. Use this for regions that are part of the question: buckets, lanes, zones. Lock them with `lock` so only the cards move. Cards stay inside the bucket's padding, and a locked row stays where it is when nodes dodge. Add `arrange` to put the cards in slots.
 
 The answer is the nesting table: one row per card, naming its bucket.
 
@@ -254,7 +338,7 @@ The answer is the nesting table: one row per card, naming its bucket.
 
 Put `edit.hierarchy.nest()` on the mark you drag, beside `move({ mode: "relative" })`. The move carries the node. On release, the node joins the innermost container under the pointer. Released over no container, it leaves the one it was in.
 
-While you drag, the chart shows what a release would do. The container the node would join is outlined and grows to hold it. The container it came from keeps its size while the pointer is inside it, and shrinks once the pointer leaves. With `dodge`, other nodes move out of the way, inside a container and at the top level. The data changes on release. Style the outline with the `target` state of `effects`.
+While you drag, the chart shows what a release would do. The container the node would join is outlined and grows to hold it. The container it came from keeps its size while the pointer is inside it, and shrinks once the pointer leaves. Other nodes move out of the way, inside a container and at the top level. The data changes on release. Style the outline with the `target` state of `effects`.
 
 A container stays where it is when you drag a node past it or out of it. Released against a container's edge, the node you dropped moves clear of it.
 
@@ -301,7 +385,7 @@ Add a `links` table and the nodes can be connected as in a [network](/marks/netw
 
 Containment is stored as rows, so your code reads and writes it like any other data. `getData()` returns the nesting rows and each container's fitted size.
 
-`setData` takes the same shape. Change the nesting rows and every container re-fits. A node sent with no `x` and `y` is placed inside the container it joins. With `dodge`, it is also moved clear of the nodes already there.
+`setData` takes the same shape. Change the nesting rows and every container re-fits. A node sent with no `x` and `y` is placed inside the container it joins, clear of the nodes already there. In an arranged container it takes the last slot.
 
 ```js
 const data = chart.getData();
