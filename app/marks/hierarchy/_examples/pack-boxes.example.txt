@@ -1,0 +1,67 @@
+const chart = Elicit({
+  width: 560, height: 340,
+  margins: { top: 16, right: 16, bottom: 16, left: 16 },
+  axes: false,
+  // The board is the question, so it stays where it is.
+  lock: (d, i, table) => table === "nodes" && d.kind === "board",
+  schema: {
+    structure: "hierarchy",
+    tables: {
+      nodes: {
+        id: { type: "categorical", key: true, open: true },
+        label: { type: "categorical", open: true },
+        kind: { type: "categorical", domain: ["board", "goal", "item"] },
+        x: { type: "quantitative", domain: [0, 100] },
+        y: { type: "quantitative", domain: [0, 100] },
+        w: { type: "quantitative", domain: [0, 600] },
+        h: { type: "quantitative", domain: [0, 400] },
+      },
+      nesting: {
+        child: { type: "ref" },
+        parent: { type: "ref" },
+      },
+    },
+  },
+  data: {
+    nodes: [
+      { id: "board", label: "What drives the price?", kind: "board", x: 50, y: 50, w: 520, h: 300 },
+      { id: "price", label: "Price", kind: "goal", x: 50, y: 48, w: 96, h: 40 },
+      { id: "a", label: "Demand", kind: "item", x: 18, y: 78, w: 84, h: 32 },
+      { id: "b", label: "Supply", kind: "item", x: 84, y: 76, w: 84, h: 32 },
+      { id: "c", label: "Fuel", kind: "item", x: 14, y: 22, w: 64, h: 32 },
+      { id: "d", label: "Taxes", kind: "item", x: 86, y: 18, w: 72, h: 32 },
+      { id: "e", label: "Season", kind: "item", x: 52, y: 10, w: 84, h: 32 },
+    ],
+    nesting: ["price", "a", "b", "c", "d", "e"].map((child) => ({ child, parent: "board" })),
+  },
+  marks: [
+    rect({
+      rx: 6,
+      stroke: "#46596B",
+      edits: [
+        move({ channels: ["x", "y"], mode: "relative" }),
+        edit.hierarchy.nest(),
+      ],
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        width: { field: "w", scale: null },
+        height: { field: "h", scale: null },
+        // Each card slides in to touch, keeping its direction from Price.
+        contains: { fn: (d) => d.kind === "board", arrange: "pack", keep: "angle", gap: 6 },
+        fill: { fn: (d) => (d.kind === "board" ? "#EDF7F8" : d.kind === "goal" ? "#C3B9DF" : "#FFFFFF") },
+      },
+    }),
+    text({
+      fontSize: 11,
+      fill: "#20555A",
+      channels: {
+        x: { field: "x" },
+        y: { field: "y" },
+        text: { field: "label" },
+        dy: { fn: (d) => (d.kind === "board" ? -d.h / 2 + 15 : 0) },
+      },
+    }),
+  ],
+});
+mount(chart.dom());

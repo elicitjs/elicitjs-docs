@@ -19,6 +19,7 @@ import kanban from './_examples/kanban.example.txt';
 import rows from './_examples/rows.example.txt';
 import grid from './_examples/grid.example.txt';
 import pack from './_examples/pack.example.txt';
+import packBoxes from './_examples/pack-boxes.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -233,11 +234,20 @@ Nodes are pushed apart on release, and when data arrives through `setData`. Whil
 | `"row"` | Left to right from the top-left. A row with a fixed width wraps at it. |
 | `"column"` | Top to bottom from the top-left. A column with a fixed height wraps at it. |
 | `"grid"` | Equal cells, the size of the largest node, `columns` to a row. |
-| `"pack"` | Circles drawn together where you drop them. |
+| `"pack"` | Drawn together where you drop them, touching. |
 
 In a row, column or grid, the order of the contents is the answer. Drag a node within its container to reorder it. Drop one into a container and it takes the nearest slot. While you drag, the other nodes open a space where it will land. On release, every node snaps to its slot.
 
-A pack has no order. A node you drop there lands in the free spot nearest where you let go, touching the others, and the others stay where they are. Nothing in a pack moves until you let go, so the circle you aim at holds still.
+A pack has no order. A node you drop there moves in to touch the others, and the others stay where they are. Nothing in a pack moves until you let go, so the node you aim at holds still. Round nodes pack as circles. Boxes pack as boxes, so they meet edge to edge.
+
+`keep` sets how a dropped node moves in:
+
+| `keep` | The node moves |
+| --- | --- |
+| `"distance"` | To the free spot nearest where you let go. The default. |
+| `"angle"` | Straight towards the node in the middle of the pack, or away from it, until it touches. Its direction from the middle stays the same. |
+
+Use `"angle"` when where a node sits around the middle is the answer.
 
 `gap` is the space between slots, 8px by default. `columns` sets a grid's cells to a row. Without it, a grid fills a fixed width, or makes a square.
 
@@ -290,6 +300,18 @@ The order is read from the `x` and `y` columns, which hold each node's slot. A f
     <>
       <b>Drag</b> Rain into Unlikely. <b>Drag</b> every item out of a set and it returns
       to its default radius.
+    </>
+  )}
+/>
+
+<Example
+  code={packBoxes}
+  title="Packed boxes"
+  blurb={'arrange: "pack", keep: "angle" — a card keeps its direction from Price.'}
+  try={(
+    <>
+      <b>Drag</b> Fuel to the far right of the board. It slides in beside Price on
+      that side.
     </>
   )}
 />

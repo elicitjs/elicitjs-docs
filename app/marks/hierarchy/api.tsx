@@ -63,7 +63,7 @@ export const api: ApiEntry[] = [
         nodes, and how they arrange them.
       </>
     ),
-    signatures: ["contains: true | { value | fn | field, padding, arrange, gap, columns }"],
+    signatures: ["contains: true | { value | fn | field, padding, arrange, gap, columns, keep }"],
     options: [
       {
         name: "value | fn | field",
@@ -97,7 +97,7 @@ export const api: ApiEntry[] = [
             How the contents are placed. <code className="inline">dodge</code> and{" "}
             <code className="inline">free</code> leave them where you drop them.{" "}
             <code className="inline">pack</code> draws them together where you drop
-            them. The others put them in slots, in order: a drag reorders, and a drop
+            them: boxes as boxes, round nodes as circles. The others put them in slots, in order: a drag reorders, and a drop
             takes the nearest slot.
           </>
         ),
@@ -116,6 +116,20 @@ export const api: ApiEntry[] = [
           <>
             Cells to a row, with <code className="inline">arrange: "grid"</code>. A fitted
             grid with no <code className="inline">columns</code> makes a square.
+          </>
+        ),
+      },
+      {
+        name: "keep",
+        type: '"distance" | "angle"',
+        default: '"distance"',
+        desc: (
+          <>
+            How a dropped node moves in to touch the others, with{" "}
+            <code className="inline">arrange: "pack"</code>.{" "}
+            <code className="inline">distance</code> takes the free spot nearest it.{" "}
+            <code className="inline">angle</code> moves it towards or away from the
+            middle node, keeping its direction from it.
           </>
         ),
       },
