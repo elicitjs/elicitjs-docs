@@ -24,6 +24,16 @@ One band (category) axis — <code className="inline">x</code> or <code classNam
         ),
       },
       {
+        name: "image",
+        type: "string | (d) => string | ChannelSpec",
+        default: "—",
+        desc: (
+          <>
+            The shape's background image: a URL painted inside each shape in place of the fill. Takes <code className="inline">fit</code>, <code className="inline">position</code> and <code className="inline">repeat</code> as channel params, as in CSS. See <a href="/marks/image#settings">Image</a>.
+          </>
+        ),
+      },
+      {
         name: "orientation",
         type: "'vertical' | 'horizontal'",
         default: "from the channel map",

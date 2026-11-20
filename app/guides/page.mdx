@@ -13,6 +13,7 @@ import howMuchIsLeftToAllocate from './_examples/how-much-is-left-to-allocate.ex
 import aTipOnEveryBar from './_examples/a-tip-on-every-bar.example.txt';
 import aTipInYourOwnWords from './_examples/a-tip-in-your-own-words.example.txt';
 import aCrosshairWithReadouts from './_examples/a-crosshair-with-readouts.example.txt';
+import aFloorPlanToPlaceThingsOn from './_examples/a-floor-plan-to-place-things-on.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
@@ -20,7 +21,7 @@ export default function Layout({ children }) {
 
 # Guides
 
-<Lead>A guide draws the **rule** and the **state**: what a gesture is allowed to do, and what is left to do. It views the interface's state rather than rows, so it has no channels, no table and no `edit`, and writes no data. Declare one in `guides: [...]` (`guides.rule`, `guides.region`, `guides.remaining`, `guides.proximity`, `guides.tip`, `guides.crosshair`, `guides.custom`), or let an edit draw its own with `guide:`. Survey widgets use their own [widget guides](#widget-guides). Guides rebuild every render and let every gesture pass through. For hovered, selected and grabbed feedback, see [Effects](/effects).</Lead>
+<Lead>A guide draws the **rule** and the **state**: what a gesture is allowed to do, and what is left to do. It views the interface's state rather than rows, so it has no channels, no table and no `edit`, and writes no data. Declare one in `guides: [...]` (`guides.rule`, `guides.region`, `guides.image`, `guides.remaining`, `guides.proximity`, `guides.tip`, `guides.crosshair`, `guides.custom`), or let an edit draw its own with `guide:`. Survey widgets use their own [widget guides](#widget-guides). Guides rebuild every render and let every gesture pass through. For hovered, selected and grabbed feedback, see [Effects](/effects).</Lead>
 
 <ApiReference entries={api} />
 
@@ -120,6 +121,27 @@ Annotations you declare in `guides: [...]`. `guides.region` shades a band, `guid
     </>
   )}
 />
+
+</Section>
+
+<Section id="image" title="An image behind the marks">
+
+`guides.image({ src })` draws a picture behind the gridlines and marks, as a CSS background image on the plot. With no `x` or `y` it fills the plot, which makes it the chart's background. Give `x: [lo, hi]` and `y: [lo, hi]` in data units to place it, and it moves with the scales. Unset, either axis spans the plot.
+
+`fit` defaults to `'fill'`: the picture stretches to its box, so a position on it reads in the same units as the axes. `fit`, `position` and `repeat` take the same values as on the [`image` channel](/marks/image#settings), so `fit: 'none', repeat: 'repeat'` tiles a texture. `opacity` fades it.
+
+<Example
+  code={aFloorPlanToPlaceThingsOn}
+  title="A floor plan to place things on"
+  blurb="guides.image spans 40 × 30 m, so each point's x and y are metres on the plan."
+  try={(
+    <>
+      <b>Drag</b> the router and the speaker to where you would put them.
+    </>
+  )}
+/>
+
+For a picture per row, or one inside a mark, see [Image](/marks/image).
 
 </Section>
 

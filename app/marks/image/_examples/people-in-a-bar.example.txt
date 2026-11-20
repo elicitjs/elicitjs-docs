@@ -1,0 +1,27 @@
+const chart = Elicit({
+  width: 380, height: 300,
+  margins: { top: 14, right: 14, bottom: 26, left: 34 },
+  data: [
+    { group: "18–34", people: 40 }, { group: "35–54", people: 65 },
+    { group: "55+",   people: 25 },
+  ],
+  schema: {
+    group:  { type: "categorical", domain: ["18–34", "35–54", "55+"] },
+    people: { type: "quantitative", domain: [0, 100] },
+  },
+  scales: { x: { type: "band", padding: 0.55 } },
+  marks: [
+    barY({
+      channels: {
+        x: { field: "group" },
+        y: { field: "people", edit: move() },
+        // As CSS: each picture as wide as the bar, stacked up from its base.
+        image: {
+          value: "/images/person.svg",
+          fit: "contain", position: "bottom", repeat: "repeat-y",
+        },
+      },
+    }),
+  ],
+});
+mount(chart.dom());

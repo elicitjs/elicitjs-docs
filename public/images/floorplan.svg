@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#F7F4EE"/>
+  <g fill="none" stroke="#6B6358" stroke-width="6" stroke-linecap="square">
+    <path d="M3 3h394v294H3z"/>
+    <path d="M160 3v110M160 150v147"/>
+    <path d="M3 170h100M135 170h25"/>
+    <path d="M280 3v60M280 100v97h117"/>
+    <path d="M160 197h80"/>
+  </g>
+  <g font-family="sans-serif" font-size="15" fill="#6B6358" text-anchor="middle">
+    <text x="80" y="90">Bedroom</text>
+    <text x="80" y="240">Office</text>
+    <text x="220" y="110">Living</text>
+    <text x="340" y="110">Kitchen</text>
+    <text x="340" y="255">Bath</text>
+    <text x="280" y="260">Hall</text>
+  </g>
+</svg>

@@ -1,0 +1,85 @@
+import { DocShell } from '../../../components/DocShell';
+import { ApiReference } from '../../../components/ApiReference';
+import { Section } from '../../../components/Section';
+import { Example } from '../../../components/Example';
+import { Lead } from '../../../components/Lead';
+import { api } from './api';
+
+import placeEachForecast from './_examples/place-each-forecast.example.txt';
+import peopleInABar from './_examples/people-in-a-bar.example.txt';
+import aPictogramWaffle from './_examples/a-pictogram-waffle.example.txt';
+
+export default function Layout({ children }) {
+  return <DocShell>{children}</DocShell>;
+}
+
+# Image
+
+<Lead>Pictures work as they do in CSS. `image()` draws one picture per row at `x`, `y`, from its `src` channel, like an `<img>`. On `bar`, `rect`, `area`, `point`, `ellipse`, `shape`, `waffle` and `dotStack`, the `image` channel is the shape's background image: it paints inside the shape in place of the fill. Both channels take their settings as params: `fit`, `position`, and on `image`, `repeat`. For a picture behind the whole chart, use [`guides.image`](/guides#image).</Lead>
+
+<ApiReference entries={api} />
+
+<Section id="per-row" title="One picture per row">
+
+`image()` centres each picture on its row's `x` and `y`, in a square of side `2 * size` (default `size: 16`, a 32px square). Give one URL with the `src` shorthand, or a column of URLs with `channels: { src: { field } }`. A row with no URL draws nothing.
+
+The picture moves, picks and outlines like any other mark, so `move()` places it.
+
+<Example
+  code={placeEachForecast}
+  title="Place each forecast"
+  blurb="Each row names its icon in src; move() writes both coordinates."
+  try={(
+    <>
+      <b>Drag</b> each icon to how likely and how disruptive you think that day's weather is.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="inside" title="Pictures inside marks">
+
+Set the `image` channel on a mark with a shape and the picture replaces its fill. The mark keeps its stroke, its edits and its geometry. `fillOpacity` and `opacity` fade the picture. A hover or selection effect that sets `fill` shows its colour in place of the picture.
+
+`repeat` repeats the picture from where `position` puts it, as `background-repeat` does. With `fit: 'contain'`, `position: 'bottom'` and `repeat: 'repeat-y'`, each picture is as wide as the bar and they stack up from its base, so a taller bar shows more copies.
+
+<Example
+  code={peopleInABar}
+  title="People in a bar"
+  blurb={'image: { value, fit: "contain", position: "bottom", repeat: "repeat-y" }'}
+  try={(
+    <>
+      <b>Drag</b> a bar up or down.
+    </>
+  )}
+/>
+
+On a `waffle`, each filled cell shows the picture and empty cells stay the track. With one cell per person, the chart is a pictogram.
+
+<Example
+  code={aPictogramWaffle}
+  title="A pictogram you fill"
+  blurb="100 cells, one per person; edit.waffle.fill() sets how many are filled."
+  try={(
+    <>
+      <b>Drag</b> up or down the grid to set how many people out of 100.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="settings" title="Fit, position and repeat">
+
+The settings are params of the channel, next to its `field` or `value`: `image: { field: 'photo', fit: 'contain', position: 'top' }`. A mark's box is its shape's bounding box. An `image()`'s box is its square.
+
+- `fit` sizes the picture, as `object-fit`. `'cover'` fills the box and crops what spills over; `'contain'` shows all of it; `'fill'` stretches it to the box; `'none'` keeps the picture's own size; `'scale-down'` is the smaller of `'none'` and `'contain'`. The default is `'cover'` on `image` and `'contain'` on `src`.
+- `position` places the picture in what room is left, as `object-position` and `background-position`. It takes keywords (`'center'`, `'top'`, `'bottom left'`) and percentages (`'25% 75%'`). The default is `'center'`.
+- `repeat` repeats the picture across the box, as `background-repeat`: `'no-repeat'` (the default), `'repeat'`, `'repeat-x'` or `'repeat-y'`. It applies to `image` only, since an `<img>` does not repeat.
+
+`fit: 'none'` and `'scale-down'` read the picture's own width and height. Give an SVG explicit `width` and `height` attributes, or these use its default size.
+
+`arc`, `line`, `text` and the other marks draw no `image` channel and log a warning when given one.
+
+</Section>

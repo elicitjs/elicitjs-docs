@@ -1,0 +1,29 @@
+const chart = Elicit({
+  width: 440, height: 340,
+  margins: { top: 14, right: 14, bottom: 30, left: 34 },
+  data: [
+    { item: "router",  x: 6,  y: 24 },
+    { item: "speaker", x: 30, y: 6 },
+  ],
+  schema: {
+    item: { type: "categorical" },
+    x: { type: "quantitative", domain: [0, 40] },
+    y: { type: "quantitative", domain: [0, 30] },
+  },
+  guides: [
+    // The plan spans 40 × 30 m, so a point on it reads in metres.
+    guides.image({ src: "/images/floorplan.svg", x: [0, 40], y: [0, 30] }),
+  ],
+  marks: [
+    point({
+      fill: "#2B5D87", size: 8,
+      channels: { x: { field: "x" }, y: { field: "y" } },
+      edits: [ move({ channels: ["x", "y"] }) ],
+    }),
+    text({
+      dy: -16,
+      channels: { x: { field: "x" }, y: { field: "y" }, text: { field: "item" } },
+    }),
+  ],
+});
+mount(chart.dom());

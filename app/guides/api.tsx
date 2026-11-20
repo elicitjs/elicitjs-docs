@@ -100,6 +100,56 @@ export const api: ApiEntry[] = [
     ),
   },
   {
+    name: "guides.image(options)",
+    json: ['guides.image'],
+    summary: (
+      <>
+        A picture behind the gridlines and marks, as a CSS background image on the plot. With no <code className="inline">x</code> or <code className="inline">y</code> it fills the plot; with them it is placed in data space and moves with the scales.
+      </>
+    ),
+    signatures: [
+      "guides.image({ src, x?, y?, fit?, position?, repeat?, opacity? }) → Guide",
+    ],
+    options: [
+      {
+        name: "src",
+        type: "string | (ctx) => string",
+        default: "—",
+        desc: "The picture's URL. Required.",
+      },
+      {
+        name: "x / y",
+        type: "[a, b] | (ctx) => [a, b]",
+        default: "the plot",
+        desc: "The picture's extent on that axis, in data units. Unset, it spans the plot on that axis.",
+      },
+      {
+        name: "fit",
+        type: "'fill' | 'cover' | 'contain' | 'none' | 'scale-down'",
+        default: "'fill'",
+        desc: "How the picture is sized in its box, as CSS object-fit. 'fill' stretches it, so data positions line up with it.",
+      },
+      {
+        name: "position",
+        type: "string",
+        default: "'center'",
+        desc: "Where the picture sits in its box, as CSS background-position: keywords and percentages.",
+      },
+      {
+        name: "repeat",
+        type: "'no-repeat' | 'repeat' | 'repeat-x' | 'repeat-y'",
+        default: "'no-repeat'",
+        desc: "Whether the picture repeats, as CSS background-repeat.",
+      },
+      {
+        name: "opacity",
+        type: "number | (ctx) => number",
+        default: "1",
+        desc: "Fades the picture.",
+      },
+    ],
+  },
+  {
     name: "guides.custom(build)",
     json: ['guides.custom'],
     summary: (

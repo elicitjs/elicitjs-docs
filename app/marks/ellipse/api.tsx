@@ -20,6 +20,16 @@ export const api: ApiEntry[] = [
         desc: "x, y, rx, ry, angle plus the standard style channels.",
       },
       {
+        name: "image",
+        type: "string | (d) => string | ChannelSpec",
+        default: "—",
+        desc: (
+          <>
+            The shape's background image: a URL painted inside each shape in place of the fill. Takes <code className="inline">fit</code>, <code className="inline">position</code> and <code className="inline">repeat</code> as channel params, as in CSS. See <a href="/marks/image#settings">Image</a>.
+          </>
+        ),
+      },
+      {
         name: "size",
         type: "number | ChannelSpec",
         default: "5",

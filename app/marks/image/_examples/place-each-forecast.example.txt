@@ -1,0 +1,29 @@
+const chart = Elicit({
+  width: 420, height: 300,
+  margins: { top: 16, right: 20, bottom: 40, left: 48 },
+  axes: { x: { title: "how likely (%)" }, y: { title: "how disruptive" } },
+  data: [
+    { day: "Mon", icon: "/images/sun.svg",   chance: 70, impact: 1 },
+    { day: "Tue", icon: "/images/cloud.svg", chance: 45, impact: 3 },
+    { day: "Wed", icon: "/images/storm.svg", chance: 25, impact: 8 },
+  ],
+  schema: {
+    day:    { type: "categorical" },
+    icon:   { type: "categorical" },
+    chance: { type: "quantitative", domain: [0, 100] },
+    impact: { type: "quantitative", domain: [0, 10] },
+  },
+  marks: [
+    image({
+      size: 18,
+      channels: {
+        x: { field: "chance" },
+        y: { field: "impact" },
+        // One URL per row. `fit` and `position` work as on an <img>.
+        src: { field: "icon", fit: "contain" },
+      },
+      edits: [ move({ channels: ["x", "y"] }) ],
+    }),
+  ],
+});
+mount(chart.dom());

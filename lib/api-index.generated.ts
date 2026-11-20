@@ -16,12 +16,12 @@ export type ApiIndexEntry = {
 export type ApiNamespace = { namespace: string; blurb: string; count: number };
 
 export const API_LIBRARY_VERSION = "0.2.0-alpha.0";
-export const API_GENERATED_AT = "2026-11-18T20:35:15.449Z";
+export const API_GENERATED_AT = "2026-11-19T20:47:52.348Z";
 export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "plot",
     "blurb": "Marks draw the rows of your dataset.",
-    "count": 51
+    "count": 52
   },
   {
     "namespace": "elements",
@@ -41,7 +41,7 @@ export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "guides",
     "blurb": "Guides draw reference lines and interaction state. They never write data.",
-    "count": 12
+    "count": 13
   },
   {
     "namespace": "looks",
@@ -615,6 +615,24 @@ export const API_INDEX: ApiIndexEntry[] = [
       "motion"
     ],
     "docs": "/marks/geo"
+  },
+  {
+    "namespace": "plot",
+    "group": "plot",
+    "name": "image",
+    "qualified": "plot.image",
+    "call": "plot.image(options)",
+    "own": [],
+    "universal": [
+      "channels",
+      "id",
+      "edits",
+      "table",
+      "tip",
+      "clip",
+      "motion"
+    ],
+    "docs": "/marks/image"
   },
   {
     "namespace": "plot",
@@ -3809,6 +3827,26 @@ export const API_INDEX: ApiIndexEntry[] = [
     "call": "guides.custom(options)",
     "own": [
       "tracksPointer"
+    ],
+    "universal": [
+      "id"
+    ],
+    "docs": "/guides"
+  },
+  {
+    "namespace": "guides",
+    "group": "guides",
+    "name": "image",
+    "qualified": "guides.image",
+    "call": "guides.image(options)",
+    "own": [
+      "src",
+      "x",
+      "y",
+      "fit",
+      "position",
+      "repeat",
+      "opacity"
     ],
     "universal": [
       "id"

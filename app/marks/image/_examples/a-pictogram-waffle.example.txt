@@ -1,0 +1,22 @@
+const chart = Elicit({
+  width: 260, height: 300,
+  margins: { top: 16, right: 12, bottom: 24, left: 12 },
+  data: [{ cat: "of 100 people", value: 30 }],
+  schema: {
+    cat:   { type: "categorical", domain: ["of 100 people"] },
+    value: { type: "quantitative", domain: [0, 100] },
+  },
+  scales: { x: { type: "band" } },
+  marks: [
+    waffleY({
+      multiple: 10,
+      channels: {
+        x: { field: "cat" },
+        count: { field: "value", edit: edit.waffle.fill() },
+        // Each filled cell shows the picture; empty cells stay the track.
+        image: { value: "/images/person.svg", fit: "contain" },
+      },
+    }),
+  ],
+});
+mount(chart.dom());
