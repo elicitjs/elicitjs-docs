@@ -1,38 +1,41 @@
-# Build the docs and publish them to elicitjs/elicitjs.github.io.
+# Build the site and publish it with GitHub Pages.
 #
-# This runs the same scripts/deploy-pages.mjs you run locally, so the script
-# stays the one definition of a deploy. It expects three sibling checkouts,
-# the same layout as on a laptop:
+# This repo, elicitjs/elicitjs.github.io, is both the source and the site. Pages
+# is set to deploy from GitHub Actions, so nothing built is ever committed: this
+# job builds out/ and hands it to Pages as an artifact.
+#
+# The build runs the same scripts/build-site.mjs you run locally. It expects the
+# library checked out beside it, the same layout as on a laptop:
 #
 #   $GITHUB_WORKSPACE/
-#     elicitjs-docs/        this repo (the source)
-#     elicitjs/             the library, imported through the @elicit alias
-#     elicitjs.github.io/   the build repo the script syncs into and pushes
+#     elicitjs-docs/   this repo (the folder keeps its old name, which the
+#                      library's verify scripts look for locally)
+#     elicitjs/        the library, imported through the @elicit alias
 #
-# Required secret: PAGES_DEPLOY_TOKEN, a fine-grained PAT with
-# "Contents: read and write" on elicitjs/elicitjs.github.io. The default
-# GITHUB_TOKEN can't push to another repository.
-name: Deploy docs to GitHub Pages
+# A push to the library alone does not rebuild the site. Run this workflow by
+# hand from the Actions tab (workflow_dispatch) to pick up library changes.
+name: Deploy site to GitHub Pages
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
-# Two deploys pushing into the build repo at once would race. Queue them;
-# the later run rebuilds from newer source anyway.
+# Let a newer deploy wait for one in progress rather than cancel it mid-publish.
 concurrency:
-  group: deploy-pages
+  group: pages
   cancel-in-progress: false
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out docs
+      - name: Check out site
         uses: actions/checkout@v4
         with:
           path: elicitjs-docs
@@ -43,14 +46,6 @@ jobs:
           repository: elicitjs/elicitjs
           ref: main
           path: elicitjs
-
-      - name: Check out Pages repo
-        uses: actions/checkout@v4
-        with:
-          repository: elicitjs/elicitjs.github.io
-          ref: main
-          path: elicitjs.github.io
-          token: ${{ secrets.PAGES_DEPLOY_TOKEN }}
 
       - uses: actions/setup-node@v4
         with:
@@ -67,16 +62,26 @@ jobs:
         working-directory: elicitjs
         run: npm ci --ignore-scripts
 
-      - name: Install docs dependencies
+      - name: Install site dependencies
         working-directory: elicitjs-docs
         run: npm ci
 
-      - name: Set commit identity for the Pages repo
-        working-directory: elicitjs.github.io
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: Build and publish
+      - name: Build
         working-directory: elicitjs-docs
-        run: npm run deploy:pages
+        run: npm run build:site
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: elicitjs-docs/out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

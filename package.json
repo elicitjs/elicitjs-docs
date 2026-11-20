@@ -8,17 +8,17 @@
     "build": "next build",
     "export": "DOCS_EXPORT=1 next build",
     "gen:api": "node scripts/gen-api-index.mjs && node scripts/gen-json-api.mjs",
-    "deploy:pages": "node scripts/deploy-pages.mjs",
+    "build:site": "node scripts/build-site.mjs",
     "start": "next start",
     "figures": "node figures/render.mjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/elicitjs/elicitjs-docs.git"
+    "url": "git+https://github.com/elicitjs/elicitjs.github.io.git"
   },
-  "homepage": "https://github.com/elicitjs/elicitjs-docs#readme",
+  "homepage": "https://elicitjs.github.io/",
   "bugs": {
-    "url": "https://github.com/elicitjs/elicitjs-docs/issues"
+    "url": "https://github.com/elicitjs/elicitjs.github.io/issues"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

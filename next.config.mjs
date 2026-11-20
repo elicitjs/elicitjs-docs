@@ -10,7 +10,7 @@ const libRoot = path.join(workspaceRoot, 'elicitjs');
 const elicitEntry = path.join(libRoot, 'src/index.js');
 const rawLoader = path.join(__dirname, 'loaders/raw-string-loader.cjs');
 
-// Static export is OPT-IN, via DOCS_EXPORT=1 (see scripts/deploy-pages.mjs).
+// Static export is OPT-IN, via DOCS_EXPORT=1 (see scripts/build-site.mjs).
 // It must never be the default: `next dev` backs both regression gates in the
 // library repo (verify:browser drives real gestures, check:warnings reads console
 // output), and an exported build has no dev server to drive. Gating it here keeps
