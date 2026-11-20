@@ -5,6 +5,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type CSSProperties,
@@ -265,6 +266,20 @@ const CodePane = memo(function CodePane({
     setValue(source);
   }, [source]);
 
+  // use-editable (inside react-live's Editor) lists `ref.current` among its
+  // effect deps, and reads it during render, when the <pre> does not exist yet.
+  // So the Editor's first re-render looks like a new element: the hook tears
+  // itself down, which drops contentEditable and with it the focus, and sets
+  // up again without refocusing. Left alone, that first re-render is the
+  // reader's first keystroke, which lands nowhere. Re-render once as soon as
+  // the Editor mounts, before anyone types and before it takes focus below.
+  const [settled, settleEditor] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => {
+    settleEditor();
+  }, [editing]);
+
+  // Focus on the settling render, not the one that mounted the Editor: the
+  // Editor's own effects run before this one, so its teardown is already done.
   useEffect(() => {
     const pre = editing ? wrap.current?.querySelector('pre') : null;
     if (!pre) return;
@@ -277,7 +292,9 @@ const CodePane = memo(function CodePane({
       keepUnderPointer(pre, clickY.current);
     });
     return () => window.clearTimeout(id);
-  }, [editing]);
+    // `settled`, not `editing`: see above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settled]);
 
   if (folds && !editing) {
     return (

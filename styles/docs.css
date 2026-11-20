@@ -354,6 +354,13 @@
   .live-editor textarea {
     outline: none !important;
   }
+  /* One block per line in both views (prism's token-line), so a wrapped line
+     hangs under its start instead of running back to the panel's edge. */
+  .code-wrap .token-line {
+    display: block;
+    padding-left: 2ch;
+    text-indent: -2ch;
+  }
   /* A folded run of data rows: "… 9 more rows", and "Hide 9 rows" once open. */
   .code-fold {
     display: block;
