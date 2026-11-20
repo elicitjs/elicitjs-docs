@@ -154,7 +154,7 @@ export const api: ApiEntry[] = [
     json: false,
     summary: (
       <>
-        Write a field&rsquo;s <b>domain</b> from outside the chart — a zoom button, a reset control. The same commit a wheel zoom, a pan or an axis drag makes: one undo step, a <code className="inline">change</code> notification, and every scale reflows. Pass <code className="inline">null</code> to restore the declared domain. See <a href="/editing/zoom#set-domain">Zoom &amp; pan</a>.
+        Write a field&rsquo;s <b>domain</b> from outside the chart — a zoom button, a reset control. The same commit a wheel zoom, a pan or an axis drag makes: one undo step, a <code className="inline">change</code> notification, and every scale reflows. Pass <code className="inline">null</code> to restore the declared domain. See <a href="/editing/axis#set-domain">Zoom &amp; pan</a>.
       </>
     ),
     signatures: [

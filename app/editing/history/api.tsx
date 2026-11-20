@@ -64,7 +64,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            A reseed is a new starting point, not an edit — there is nothing sensible to undo back to, and undoing past it would resurrect rows the caller replaced, under a <a href="/editing/lock">lock</a> that no longer covers them.
+            A reseed is a new starting point, not an edit — there is nothing sensible to undo back to, and undoing past it would resurrect rows the caller replaced, under a <a href="/editing/existence#seed">lock</a> that no longer covers them.
           </>
         ),
       },
@@ -122,7 +122,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Same edit, same dataset invariants: a nudge is clamped, snapped and repaired exactly as the drag is, and a <a href="/editing/lock">locked</a> row is not focusable at all.
+            Same edit, same dataset invariants: a nudge is clamped, snapped and repaired exactly as the drag is, and a <a href="/editing/existence#seed">locked</a> row is not focusable at all.
           </>
         ),
       },

@@ -45,7 +45,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Read-only rows and reference rows, in every chart. See <a href="/editing/lock">Locked rows</a> and <a href="/editing/existence#context">Context rows</a>.
+            Read-only rows and reference rows, in every chart. See <a href="/editing/existence#seed">Locked rows</a> and <a href="/editing/existence#context">Context rows</a>.
           </>
         ),
       },
@@ -58,7 +58,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        A <b>Dataset</b>: <code className="inline">chart</code>, <code className="inline">getData</code>, <code className="inline">getSchema</code>, <code className="inline">setData</code>, <code className="inline">setDomain</code>, <code className="inline">set</code>, <code className="inline">undo</code> / <code className="inline">redo</code> / <code className="inline">canUndo</code> / <code className="inline">canRedo</code>, <code className="inline">on(&quot;change&quot; | &quot;select&quot;)</code> and the <a href="/editing/selection">selection</a> methods. See <a href="/overview">Overview</a> for each.
+        A <b>Dataset</b>: <code className="inline">chart</code>, <code className="inline">getData</code>, <code className="inline">getSchema</code>, <code className="inline">setData</code>, <code className="inline">setDomain</code>, <code className="inline">set</code>, <code className="inline">undo</code> / <code className="inline">redo</code> / <code className="inline">canUndo</code> / <code className="inline">canRedo</code>, <code className="inline">on(&quot;change&quot; | &quot;select&quot;)</code> and the <a href="/editing/selection">selection</a> methods. See <a href="/start#api">Getting started</a> for each.
       </>
     ),
   },
@@ -76,7 +76,7 @@ export const api: ApiEntry[] = [
     ],
     returns: (
       <>
-        A <b>Chart</b>: <code className="inline">dom()</code>, <code className="inline">dataset</code>, <code className="inline">control</code>, <code className="inline">emit</code>, <code className="inline">on(&quot;stage&quot;)</code>, the <a href="/editing/stages">stage</a> methods and <code className="inline">destroy()</code>, plus the dataset&rsquo;s methods.
+        A <b>Chart</b>: <code className="inline">dom()</code>, <code className="inline">dataset</code>, <code className="inline">control</code>, <code className="inline">emit</code>, <code className="inline">on(&quot;stage&quot;)</code>, the <a href="/editing/probe#basics">stage</a> methods and <code className="inline">destroy()</code>, plus the dataset&rsquo;s methods.
       </>
     ),
   },

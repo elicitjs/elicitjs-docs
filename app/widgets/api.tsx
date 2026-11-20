@@ -43,7 +43,7 @@ export const api: ApiEntry[] = [
         default: "per widget",
         desc: (
           <>
-            The ordinary spec options, passed through. Every widget takes them, so a survey can size and theme its instruments in one place. See <a href="/theming">Theming</a> and <a href="/editing/stages">Stages</a>.
+            The ordinary spec options, passed through. Every widget takes them, so a survey can size and theme its instruments in one place. See <a href="/theming">Theming</a> and <a href="/editing/probe#basics">Stages</a>.
           </>
         ),
       },

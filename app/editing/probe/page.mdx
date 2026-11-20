@@ -7,14 +7,15 @@ import { api } from './api';
 
 import probeASingleValue from './_examples/probe-a-single-value.example.txt';
 import aimThenOpen from './_examples/aim-then-open.example.txt';
+import twoStagePoint from './_examples/two-stage-point.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Probe
+# Probe & stages
 
-<Lead>`pick: "probe"` previews an edit before it commits. Moving the pointer draws an uncommitted ghost, and `getData()` reports only the last settled answer. A staged probe edit advances to the next [stage](/editing/stages) when it commits.</Lead>
+<Lead>`pick: "probe"` previews an edit before it commits. Moving the pointer draws an uncommitted ghost, and `getData()` reports only the last settled answer. Stages split a question into steps: first do X, then do Y. Give an edit a numeric `stage` and it is active only in that stage; an edit with no `stage` is always active. Move between stages with `nextStage()`, `setStage(n)` and `getStage()`, and listen with `on("stage", cb)`. A staged probe edit advances to the next stage when it commits.</Lead>
 
 <ApiReference entries={api} />
 
@@ -41,9 +42,24 @@ A probe edit commits on either gesture:
 
 </Section>
 
+<Section id="basics" title="Stages: place, then size">
+
+Stage 0 drags the point along `x` (where). Stage 1 resizes it (how confident). Only one edit is live at a time.
+
+A staged probe edit advances the stage when it commits. Set `advance: false` on it to advance by hand instead.
+
+<Example
+  code={twoStagePoint}
+  title="Two-stage point"
+  blurb="Same mark, two staged edits, a Next button."
+  try={"drag horizontally; press Next; drag outward to resize."}
+/>
+
+</Section>
+
 <Section id="stages" title="Probe across stages">
 
-A probe edit with a `stage` advances to the next stage when it commits, unless it sets `advance: false`. See [Stages](/editing/stages) for the stage API.
+A probe edit with a `stage` advances to the next stage when it commits, unless it sets `advance: false`.
 
 <Example
   code={aimThenOpen}

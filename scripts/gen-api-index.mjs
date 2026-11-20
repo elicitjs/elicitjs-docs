@@ -138,6 +138,9 @@ const { call: callLinks, bare: bareLinks, weak: weakLinks } = harvestDocLinks();
 const OVERRIDES = {
   "elements.axis": "/marks/axes",
   "elements.legend": "/marks/legend",
+  // `/sizing` shows `Elicit({ responsive, … })` and sorts before `/start`, which
+  // documents the entry point itself.
+  Elicit: "/start",
 };
 
 // A namespace's own landing page, used when a member has no entry of its own.
@@ -249,7 +252,7 @@ for (const ns of GRAMMAR) {
 // A function's own function-valued properties are listed after it, dotted
 // (`Elicit.dataset`), since they are called the same way.
 const topLink = (k) =>
-  callLinks.get(k) || bareLinks.get(k) || weakLinks.get(k) || null;
+  OVERRIDES[k] || callLinks.get(k) || bareLinks.get(k) || weakLinks.get(k) || null;
 const topLevel = Object.keys(lib)
   .filter((k) => !GRAMMAR.includes(k) && k !== "authoring")
   .sort()

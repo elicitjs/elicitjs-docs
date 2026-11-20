@@ -127,7 +127,7 @@ Each item is a card. Drag one to reorder the list: `rank()` on the card's body w
   )}
 />
 
-The card is a [`composite`](/marks/composite): a `rect` body that carries the `rank()` edit, with the rank and the label drawn on it. `motion: true` on the glyph eases its parts when the order changes. Along the `rank` channel, whose scale is a band of slots, it draws the grabbed card at the pointer. `motion: true` works on any mark, and [`spec.motion`](/overview) sets the duration.
+The card is a [`composite`](/marks/composite): a `rect` body that carries the `rank()` edit, with the rank and the label drawn on it. `motion: true` on the glyph eases its parts when the order changes. Along the `rank` channel, whose scale is a band of slots, it draws the grabbed card at the pointer. `motion: true` works on any mark, and [`spec.motion`](/start#api) sets the duration.
 
 <Example
   code={rankingPlainApi}

@@ -45,7 +45,8 @@ export type ExampleModule = {
   code: string;
 };
 
-export type NavPage = { href: string; title: string };
+/** `heading` starts a labelled sub-list within the group, from this page on. */
+export type NavPage = { href: string; title: string; heading?: string };
 export type NavGroup = { group: string; pages: NavPage[] };
 
 export type PlaygroundPreset = {

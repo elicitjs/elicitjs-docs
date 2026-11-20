@@ -337,6 +337,11 @@
   .live-editor,
   .code-wrap pre,
   .code-wrap textarea {
+    /* Every view of the code wraps exactly as the editor does (use-editable sets
+       pre-wrap on it), so a click that swaps one for the other reflows nothing,
+       and no line is cut off at the panel's edge. */
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere;
     margin: 0 !important;
     font-family: var(--font-mono) !important;
     font-size: 0.78rem !important;
@@ -358,7 +363,7 @@
     background: none;
     font: inherit;
     text-align: left;
-    white-space: pre;
+    white-space: pre-wrap;
     color: var(--code-muted);
     cursor: pointer;
   }
@@ -377,8 +382,8 @@
     font-family: var(--font-mono) !important;
     font-size: 0.78rem !important;
     line-height: 1.55 !important;
-    overflow-x: auto;
-    white-space: pre;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
   }
 
   /* The chart column. A fixed chart's width is pinned to its own pixels by

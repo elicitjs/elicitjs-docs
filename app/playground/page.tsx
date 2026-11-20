@@ -1,5 +1,5 @@
 import { Playground } from '../../components/Playground';
-import barCode from '../overview/_examples/a-bar-mark.example.txt';
+import barCode from './_examples/a-bar-mark.example.txt';
 import sumCode from '../constraints/_examples/bars-that-compensate.example.txt';
 import sweepCode from '../editing/sweep/_examples/draw-a-curve.example.txt';
 import geoCode from '../marks/geo/_examples/belief-pins-on-vancouver.example.txt';

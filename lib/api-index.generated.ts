@@ -16,7 +16,7 @@ export type ApiIndexEntry = {
 export type ApiNamespace = { namespace: string; blurb: string; count: number };
 
 export const API_LIBRARY_VERSION = "0.2.0-alpha.0";
-export const API_GENERATED_AT = "2026-11-20T20:17:35.942Z";
+export const API_GENERATED_AT = "2026-11-20T20:54:15.659Z";
 export const API_NAMESPACES: ApiNamespace[] = [
   {
     "namespace": "plot",
@@ -78,7 +78,7 @@ export const API_TOP_LEVEL = [
   {
     "name": "Elicit",
     "kind": "function",
-    "docs": "/overview"
+    "docs": "/start"
   },
   {
     "name": "Elicit.dataset",
@@ -1513,7 +1513,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "cursor",
       "grabs"
     ],
-    "docs": "/editing/zoom"
+    "docs": "/editing/axis"
   },
   {
     "namespace": "edit",
@@ -1597,7 +1597,7 @@ export const API_INDEX: ApiIndexEntry[] = [
       "cursor",
       "grabs"
     ],
-    "docs": "/editing/zoom"
+    "docs": "/editing/axis"
   },
   {
     "namespace": "edit",

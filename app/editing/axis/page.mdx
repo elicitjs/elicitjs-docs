@@ -9,14 +9,18 @@ import rescaleInPlace from './_examples/rescale-in-place.example.txt';
 import growTheChartInstead from './_examples/grow-the-chart-instead.example.txt';
 import editTheCategoryList from './_examples/edit-the-category-list.example.txt';
 import growALikertScale from './_examples/grow-a-likert-scale.example.txt';
+import wheelBothAxes from './_examples/wheel-both-axes.example.txt';
+import panAndZoom from './_examples/pan-and-zoom.example.txt';
+import clipPadAndLabels from './_examples/clip-pad-and-labels.example.txt';
+import oneAxisWithAModifier from './_examples/one-axis-with-a-modifier.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Editable axes (domain)
+# Axes: rescale, zoom & pan
 
-<Lead>An axis with an `edit` rewrites the field's **domain** on the schema, where a mark edit rewrites a **datum**. Drag a numeric axis to change its range. A categorical axis gains controls to **add, rename and remove** categories. The grid, guides and marks follow the new domain. Read it with `chart.getSchema()`. The dataset is unchanged, except that removing a category deletes its rows.</Lead>
+<Lead>An axis with an `edit` rewrites the field's **domain** on the schema, where a mark edit rewrites a **datum**. Drag a numeric axis to change its range, or let the wheel zoom it and a drag pan it. A categorical axis gains controls to **add, rename and remove** categories. The grid, guides and marks follow the new domain, and `chart.setDomain(field, domain)` does the same from a button. Read it with `chart.getSchema()`. The dataset is unchanged, except that removing a category deletes its rows.</Lead>
 
 <ApiReference entries={api} />
 
@@ -75,5 +79,112 @@ The domain belongs to the **scale**, so the same edit works on any element that 
     </>
   )}
 />
+
+</Section>
+
+<Section id="wheel" title="Zoom with the wheel">
+
+Put `edit.axis.zoom()` on an axis in `axes`, one per axis you want to zoom. Scroll up to zoom in and down to zoom out. The value under the pointer stays where it is.
+
+The declared domain is the zoom-out ceiling, so you can always scroll back to the full view and no further. Set `limit` to an explicit `[lo, hi]` for a different ceiling, or `false` for none.
+
+A burst of wheel ticks is one step in [history](/editing/history), so one undo restores the domain from before you scrolled. Each tick notifies `change`, and `chart.getSchema()` reads the current domain. The domain is the dataset's, so [charts that share a dataset](/dataset) zoom together.
+
+Zoom works on numeric and temporal axes. Mark edits keep working at every zoom level: drag a point and it inverts through the zoomed scale. The buttons call `chart.setDomain` for each axis (see [below](#set-domain)).
+
+<Example
+  code={wheelBothAxes}
+  title="Zoom both axes"
+  blurb="edit.axis.zoom() on x and y, plus buttons that zoom about the centre."
+  try={(
+    <>
+      <b>Scroll</b> over the plot or <b>click</b> Zoom in · <b>drag</b> a point at any zoom level.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="pan" title="Pan by dragging">
+
+Add `edit.axis.pan()` to the same axis. Drag the plot and the domain follows the pointer. A pan on `x` follows horizontal travel and a pan on `y` follows vertical travel, so a pan on both moves the view diagonally.
+
+A press on a mark with an edit of its own still edits that mark. A press anywhere else on the plot pans.
+
+Pan stops at the declared domain, keeping the span. Set `limit` as on zoom. One drag is one undo step.
+
+Zoom and pan write the same domain, so they combine. Each starts from where the other left it, and you can scroll to zoom in the middle of a drag.
+
+<Example
+  code={panAndZoom}
+  title="Zoom and pan a year of data"
+  blurb="edit.axis.zoom() and edit.axis.pan() on x. The buttons zoom about the centre of the view."
+  try={(
+    <>
+      <b>Scroll</b> or <b>click</b> Zoom in · <b>drag</b> the plot to pan · <b>drag</b> a point to edit it.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="clip" title="Clip to the plot">
+
+A zoomed or panned chart clips its marks to the plot area, axis to axis. A mark past an axis is hidden, and only the part inside the plot takes a press or shows a tip. Axes, legends and guides keep drawing in the margins.
+
+Clipping is on by default whenever an axis carries `edit.axis.zoom()` or `edit.axis.pan()`. Set `clip: false` on the spec to turn it off, or `clip: true` to clip a chart with neither.
+
+`clip: { pad: 6 }` clips to the plot area grown by 6 pixels, so a point on the edge of the domain draws whole. Pass one number for every side, or `{ top, right, bottom, left }` for each side. A `pad` turns clipping on.
+
+Set `clip: false` on a mark to draw it past the clip, such as a label in the margin. Its marks take a press and show a tip out there too. On a `composite`, it applies to every part.
+
+<Example
+  code={clipPadAndLabels}
+  title="Pad the clip, label in the margin"
+  blurb="clip: { pad: 6 } on the spec and clip: false on the text mark."
+  try={(
+    <>
+      <b>Scroll</b> to zoom · <b>drag</b> the plot to pan · <b>drag</b> the last point and its label follows.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="modifier" title="One axis at a time">
+
+A plain wheel zooms every axis carrying `edit.axis.zoom()`. Give each a `when` to split them by modifier key: `when.noAlt` on one axis and `when.alt` on the other.
+
+`minSpan` sets the narrowest the domain may zoom in to, in data units. Here time stops at three months and value at ten units.
+
+<Example
+  code={oneAxisWithAModifier}
+  title="Time with the wheel, value with Alt"
+  blurb="when.noAlt on x and when.alt on y; minSpan caps how far each zooms in."
+  try={(
+    <>
+      <b>Scroll</b> to zoom time · <b>Alt + scroll</b> to zoom value · <b>drag</b> a point on the line.
+    </>
+  )}
+/>
+
+</Section>
+
+<Section id="set-domain" title="Set a domain from outside">
+
+`chart.setDomain(field, domain)` writes a field's domain. It takes the same path as a wheel tick or a pan: one undo step, a `change` notification, and every scale reflows. Pass `null` to restore the domain declared in the schema.
+
+`setDomain` returns `false` and logs a warning when the table declares no such field. Pass `{ table }` to name a field of a table other than the primary one.
+
+It writes the domain as given. Clamp to the declared domain yourself when zooming out, as the buttons above do:
+
+```js
+const zoomBy = (k) => {
+  const [lo, hi] = chart.getSchema().week.domain;
+  const half = Math.min((hi - lo) * k, 52) / 2;
+  const mid = Math.min(Math.max((lo + hi) / 2, half), 52 - half);
+  chart.setDomain("week", [mid - half, mid + half]);
+};
+```
 
 </Section>

@@ -68,7 +68,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Read-only rows. See <a href="/editing/lock">Locked rows</a>.
+            Read-only rows. See <a href="/editing/existence#seed">Locked rows</a>.
           </>
         ),
       },
@@ -252,7 +252,7 @@ export const api: ApiEntry[] = [
         default: "0 / []",
         desc: (
           <>
-            The stage a multi-step elicitation starts on, and the caption for each. See <a href="/editing/stages">Stages</a>.
+            The stage a multi-step elicitation starts on, and the caption for each. See <a href="/editing/probe#basics">Stages</a>.
           </>
         ),
       },
@@ -337,7 +337,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Set a field&rsquo;s domain, for a zoom button or a reset. One undo step; <code className="inline">null</code> restores the declared domain. Every chart shares the domain. See <a href="/editing/zoom#set-domain">Zoom &amp; pan</a>.
+            Set a field&rsquo;s domain, for a zoom button or a reset. One undo step; <code className="inline">null</code> restores the declared domain. Every chart shares the domain. See <a href="/editing/axis#set-domain">Zoom &amp; pan</a>.
           </>
         ),
       },
@@ -434,7 +434,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Fires when this chart&rsquo;s <a href="/editing/stages">stage</a> changes. <code className="inline">change</code> and <code className="inline">select</code> are the dataset&rsquo;s.
+            Fires when this chart&rsquo;s <a href="/editing/probe#basics">stage</a> changes. <code className="inline">change</code> and <code className="inline">select</code> are the dataset&rsquo;s.
           </>
         ),
       },
@@ -444,7 +444,7 @@ export const api: ApiEntry[] = [
         default: "—",
         desc: (
           <>
-            Read and drive a multi-step elicitation from outside. Stages are per chart. See <a href="/editing/stages">Stages</a>.
+            Read and drive a multi-step elicitation from outside. Stages are per chart. See <a href="/editing/probe#basics">Stages</a>.
           </>
         ),
       },

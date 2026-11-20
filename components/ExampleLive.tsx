@@ -203,6 +203,33 @@ function placeCaret(root: HTMLElement, offset: number) {
 }
 
 /**
+ * Opening the editor unfolds the data rows, so the line that was clicked can
+ * move. Scroll it back under the pointer: first within the code panel, if it
+ * scrolls, then the page for whatever is left.
+ */
+function keepUnderPointer(pre: HTMLElement, clientY: number | null) {
+  const selection = window.getSelection();
+  if (clientY == null || !selection || selection.rangeCount === 0) return;
+  let rect = selection.getRangeAt(0).getBoundingClientRect();
+  // A caret on an empty line has no box; measure its line instead.
+  if (rect.height === 0) {
+    const node = selection.anchorNode;
+    const el = node instanceof Element ? node : node?.parentElement;
+    if (!el) return;
+    rect = el.getBoundingClientRect();
+  }
+  let delta = rect.top + rect.height / 2 - clientY;
+  if (Math.abs(delta) < 2) return;
+  const panel = pre.closest<HTMLElement>('.code-wrap');
+  if (panel && panel.scrollHeight > panel.clientHeight) {
+    const before = panel.scrollTop;
+    panel.scrollTop = before + delta;
+    delta -= panel.scrollTop - before;
+  }
+  if (Math.abs(delta) >= 2) window.scrollBy(0, delta);
+}
+
+/**
  * Isolated from chart/error state so parent re-renders (after debounce eval)
  * do not remount the editor and jump the caret.
  *
@@ -222,6 +249,7 @@ const CodePane = memo(function CodePane({
   const [editing, setEditing] = useState(false);
   const [open, setOpen] = useState<Set<number>>(() => new Set());
   const caret = useRef(0);
+  const clickY = useRef<number | null>(null);
   const wrap = useRef<HTMLDivElement>(null);
   const style = useMemo(
     () => ({
@@ -242,15 +270,24 @@ const CodePane = memo(function CodePane({
     if (!pre) return;
     // After the click that opened it has finished with the view it replaced.
     const id = window.setTimeout(() => {
-      pre.focus();
+      // focus() would scroll the editor into view on its own; the code below
+      // decides the scroll instead.
+      pre.focus({ preventScroll: true });
       placeCaret(pre, caret.current);
+      keepUnderPointer(pre, clickY.current);
     });
     return () => window.clearTimeout(id);
   }, [editing]);
 
   if (folds && !editing) {
     return (
-      <div className="live-editor" style={style}>
+      <div
+        className="live-editor"
+        style={style}
+        onPointerDown={(e) => {
+          clickY.current = e.clientY;
+        }}
+      >
         <FoldedCode
           code={value}
           language="jsx"

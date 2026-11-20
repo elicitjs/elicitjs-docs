@@ -2,6 +2,8 @@ import { DocShell } from "../../components/DocShell";
 import { Section } from "../../components/Section";
 import { Example } from "../../components/Example";
 import { Lead } from "../../components/Lead";
+import { ApiReference } from "../../components/ApiReference";
+import { api } from "./api";
 
 import aStaticChart from "./_examples/a-static-chart.example.txt";
 import nowEditable from "./_examples/now-editable.example.txt";
@@ -17,7 +19,7 @@ export default function Layout({ children }) {
 <Lead>
   Install Elicit.js, build an elicitation interface with `Elicit(spec)`, make it
   editable by putting an `edit` on a channel, and read the answer back through
-  `onChange`.
+  `onChange`. Every example on these pages runs the code beside it.
 </Lead>
 
 <Section id="install" title="Install">
@@ -142,6 +144,8 @@ document.body.append(chart.dom());
 `likert`, `multipleChoice`, `slider`, `matrix`, `lineCone`, `ranking`, `allocation`, `probabilityTokens`, `interval`, `histogram`, `region`, `thermometer` and `labeledValue` are documented on [Widgets](/widgets).
 
 </Section>
+
+<ApiReference entries={api} />
 
 <Section id="next" title="Where to go next">
 

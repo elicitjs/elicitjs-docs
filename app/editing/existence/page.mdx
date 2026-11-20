@@ -9,14 +9,17 @@ import clickToAddAPoint from './_examples/click-to-add-a-point.example.txt';
 import existenceMoveOnOneMark from './_examples/existence-move-on-one-mark.example.txt';
 import arbitrationClickRecoloursAltClickDeletes from './_examples/arbitration-click-recolours-alt-click-deletes.example.txt';
 import contextRows from './_examples/context-rows.example.txt';
+import scatterObservedPointsYours from './_examples/scatter-observed-points-yours.example.txt';
+import actualsForecast from './_examples/actuals-forecast.example.txt';
+import drawTheLineForTheMissingYears from './_examples/draw-the-line-for-the-missing-years.example.txt';
 
 export default function Layout({ children }) {
   return <DocShell>{children}</DocShell>;
 }
 
-# Row lifecycle & lock
+# Adding, removing & locking rows
 
-<Lead>These edits add and remove rows. `create()` inverts a click into a new row, and `remove()` deletes the clicked row. `lock` makes given rows read-only, and `context` marks given rows as reference, left out of your answer.</Lead>
+<Lead>These edits add and remove rows. `create()` inverts a click into a new row, and `remove()` deletes the clicked row. `lock` on the spec makes **given** rows read-only: the record so far, points already measured, last quarter’s actuals. No gesture can change or delete a locked row, and rows an edit _adds_ stay editable. Locked rows are still part of `getData()`; to leave given rows out of the answer, mark them as [`context`](#context).</Lead>
 
 <ApiReference entries={api} />
 
@@ -92,15 +95,37 @@ Declare a creator on one mark only. Each mark on the table that carries one appe
 
 </Section>
 
-<Section id="lock-seed" title="Locked seed data, free additions">
+<Section id="seed" title="Locked seed, free additions">
 
-`lock: "seed"` makes the rows you passed as `data` read-only. Rows that `create()` adds stay editable. See [Locked rows](/editing/lock#seed).
+`lock: "seed"` locks exactly the rows you passed as `data`. Rows a `create` mints afterwards are ordinary, editable data. One dataset can hold the observed points and your answer.
+
+<Example
+  code={scatterObservedPointsYours}
+  title="Scatter: observed points + yours"
+  blurb="The five grey points are the seed — try to drag one and nothing happens. Click to add your own, and those you can move and delete."
+  try={(
+    <>
+      <b>Click</b> empty space to add a point · <b>drag</b> one of yours · <b>Alt-click</b> one of yours to remove it. The grey points never move.
+    </>
+  )}
+/>
 
 </Section>
 
-<Section id="lock-predicate" title="Locking rows by predicate">
+<Section id="predicate" title="Locking rows by what they are">
 
-A predicate locks rows by their fields, such as actuals beside a forecast. See [Locked rows](/editing/lock#predicate).
+Pass a predicate to lock rows by their fields. Here the quarters that already happened are actuals, and the rest are your forecast. Both live in one dataset and one bar mark.
+
+<Example
+  code={actualsForecast}
+  title="Actuals + forecast"
+  blurb={"lock: (d) => d.kind === \"actual\". The two grey bars are reported; only the forecast bars take a drag."}
+  try={(
+    <>
+      <b>Drag</b> Q3 / Q4 (blue). Q1 and Q2 are reported — they don’t budge.
+    </>
+  )}
+/>
 
 </Section>
 
@@ -127,8 +152,21 @@ When the reference rows carry other columns (an observed `price` beside your `lo
 
 </Section>
 
-<Section id="you-draw-it" title="You draw it (locked record + multi-stage reveal)">
+<Section id="you-draw-it" title="You draw it">
 
-A locked record, a staged `edit.line.draw()` and `chart.nextStage()` combine into the New York Times' "You Draw It". See [Locked rows](/editing/lock#you-draw-it).
+This recreates the New York Times’ “You Draw It” (2017): the record runs to 1990 and you draw the rest. Both halves use the same dataset, line mark and `y` field; only the lock differs. Proximity picks skip locked rows, so a drag beside the record starts drawing instead of grabbing it.
+
+`edit.line.draw({ stage: 0 })` draws the missing years in stage 0. `chart.nextStage()` moves to stage 1, which retires the edit and shows the answer key.
+
+<Example
+  code={drawTheLineForTheMissingYears}
+  title="Draw the line for the missing years"
+  blurb={"edit.line.draw({ samples: years }) paints one point per year as the pointer crosses its column. Drag back over the record and it will not budge — the lock repairs those rows and keeps the rest of the stroke."}
+  try={(
+    <>
+      <b>Drag</b> left-to-right across the empty half to draw 1991–2016, then <b>drag again</b> to refine it. Then press <b>Show me how I did</b>.
+    </>
+  )}
+/>
 
 </Section>

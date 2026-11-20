@@ -114,7 +114,7 @@ export const api: ApiEntry[] = [
         default: "null",
         desc: (
           <>
-            Only active when the chart is on this stage. See <a href="/editing/stages">Stages</a>.
+            Only active when the chart is on this stage. See <a href="/editing/probe#basics">Stages</a>.
           </>
         ),
       },
